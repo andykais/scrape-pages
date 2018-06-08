@@ -14,6 +14,7 @@ export default {
       },
       for_each: {
         criteria: {
+          singular: true,
           selector: '.dev-view-deviation',
           attribute: 'src'
         }
