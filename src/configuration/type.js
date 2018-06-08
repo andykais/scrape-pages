@@ -1,44 +1,53 @@
+type RegexRemove = string
 type RegexReplace = {
   select: string,
-  replace: string
+  replace?: string, // defaults to ''
+  flags?: string // defaults to 'g'
 }
+type Regex = RegexRemove | RegexReplace
 
 type ExpectedResults = 'html' | 'json' | 'scalar'
 
+// User input
+type InputSimple = string
+type InputCleaned = {
+  name: string,
+  regex_cleanup: Regex
+}
+type Input = InputSimple | InputCleaned
+
+// html or json parser
 type Scrape = {
   selector: string, // html selector (e.g. '.someclass > span')
-  attribute?: string, // html element attribute (e.g. src)
-  regex_cleanup?: RegexReplace,
+  attribute?: string, // html element attribute (e.g. src), if not specified w/ html, textContent is selected
+  regex_cleanup?: Regex,
   expect?: ExpectedResults
 }
 
-type UrlCriteria = Scrape
-
+// recursing parser
 type ScrapeCriteria = {
   criteria: Scrape,
   for_each?: ScrapeCriteria
 }
 
-type IncrementNextUrl = {
-  type: 'increment',
-  build_url: string,
-  increment_by?: number, // defaults to 1
-  inital_value?: number, // defaults to 0
-  regex_cleanup?: RegexReplace,
-  expect?: ExpectedResults // defaults to "html
-}
-
-type PaginationNextUrl = {
-  type: 'pagination',
-  url_criteria: UrlCriteria, // should return single value
-  regex_cleanup?: RegexReplace,
+type NextUrlBase = {
+  url_template: string,
+  regex_cleanup?: Regex,
   expect?: ExpectedResults
 }
+type NextUrlIncrement = {
+  ...NextUrlBase,
+  increment: boolean, // defaults to false
+  initial_index?: number, // defaults to 0
+  increment_by?: number // defaults to 1
+}
 
-type NextUrl = IncrementNextUrl | PaginationNextUrl
+type NextUrl = NextUrlBase | NextUrlIncrement
 
 export type Config = {
-  input: string | [string],
-  next_url: NextUrl,
-  scrape_criteria: ScrapeCriteria
+  input: Input | [Input],
+  scrape: {
+    build_url: NextUrl,
+    for_each: ScrapeCriteria
+  }
 }
