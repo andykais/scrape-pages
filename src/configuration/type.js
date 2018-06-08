@@ -54,7 +54,7 @@ type NextUrlIncrement = {|
 type NextUrl = NextUrlBase | NextUrlIncrement
 
 export type Config = {|
-  input: Input | Array<Input>,
+  input?: Input | Array<Input>,
   scrape: {|
     build_url: NextUrl,
     expect?: ExpectedResults,
