@@ -1,19 +1,19 @@
-import expect from "expect";
-import type { Config } from "../src/configuration/type";
+import expect from 'expect'
+import type { Config } from '../src/configuration/type'
 
 expect.extend({
   toBeConfigType: receivedConfig => {
     try {
-      const testConfig: Config = receivedConfig;
+      const testConfig: Config = receivedConfig
       return {
-        message: () => "passed",
+        message: () => 'passed',
         pass: true
-      };
+      }
     } catch (e) {
       return {
         message: () => e.toString(),
         pass: false
-      };
+      }
     }
   }
-});
+})

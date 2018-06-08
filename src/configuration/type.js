@@ -6,6 +6,7 @@ type RegexReplace = {|
 |}
 type Regex = RegexRemove | RegexReplace
 
+// 'html' and 'json' are got from a url that is scraped, a scalar is a final value
 type ExpectedResults = 'html' | 'json' | 'scalar'
 
 // User input
@@ -20,20 +21,28 @@ type Input = InputSimple | InputCleaned
 type Scrape = {|
   selector: string, // html selector (e.g. '.someclass > span')
   attribute?: string, // html element attribute (e.g. src), if not specified w/ html, textContent is selected
+  singular?: boolean, // defaults to false
   regex_cleanup?: Regex,
-  expect?: ExpectedResults
+  expect_url_for_download?: boolean // defaults to true
 |}
 
 // recursing parser
-type ScrapeCriteria = {|
+type ScrapeCriteriaUnNamed = {|
   criteria: Scrape,
+  expect?: ExpectedResults,
   for_each?: ScrapeCriteria
 |}
+type ScrapeCriteriaNamed = {|
+  ...ScrapeCriteriaUnNamed,
+  name: string
+|}
+// the reason for different types is so when an array of values is scraped, we have a key to distinguish them
+type ScrapeCriteria = ScrapeCriteriaUnNamed | Array<ScrapeCriteriaNamed>
 
+// toplevel url builder
 type NextUrlBase = {|
   url_template: string,
-  regex_cleanup?: Regex,
-  expect?: ExpectedResults
+  regex_cleanup?: Regex
 |}
 type NextUrlIncrement = {|
   ...NextUrlBase,
@@ -45,9 +54,10 @@ type NextUrlIncrement = {|
 type NextUrl = NextUrlBase | NextUrlIncrement
 
 export type Config = {|
-  input: Input | [Input],
+  input: Input | Array<Input>,
   scrape: {|
     build_url: NextUrl,
+    expect?: ExpectedResults,
     for_each: ScrapeCriteria
   |}
 |}
