@@ -1,0 +1,10 @@
+{
+  "presets": ["env", "stage-2", "react"],
+  "plugins": [
+    "transform-decorators-legacy",
+    ["flow-runtime", {
+      "assert": true,
+      "annotate": true
+    }]
+  ]
+}
