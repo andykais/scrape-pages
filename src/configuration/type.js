@@ -7,7 +7,11 @@ type RegexReplace = {|
 type Regex = RegexRemove | RegexReplace
 
 // 'html' and 'json' are got from a url that is scraped, a scalar is a final value
-type ExpectedResults = 'html' | 'json' | 'scalar'
+type ExpectedResults =
+  | 'html' // html is the default, use it when there is an html parse step afterwords
+  | 'json' // use this when there is a json parse step afterwords
+  | 'binary' // use this when the result is definitely binary. No parse step may come after this
+  | 'final' // mainly internal use, this lets the parsers know if there are no more child parsers
 
 // User input
 type InputSimple = string
@@ -18,46 +22,50 @@ type InputCleaned = {|
 type Input = InputSimple | InputCleaned
 
 // html or json parser
-type Scrape = {|
+type Parse = {|
   selector: string, // html selector (e.g. '.someclass > span')
   attribute?: string, // html element attribute (e.g. src), if not specified w/ html, textContent is selected
   singular?: boolean, // defaults to false
-  regex_cleanup?: Regex,
-  expect_url_for_download?: boolean // defaults to true
+  regex_cleanup?: Regex
 |}
+
+// toplevel url builder
+type UrlBuilderBase = {|
+  template?: string, // template for url, will be filled using variables available
+  expect?: ExpectedResults, // defaults to 'html'
+  regex_cleanup?: Regex,
+  increment?: false
+|}
+type UrlBuilderIncrement = {|
+  ...UrlBuilderBase,
+  increment: true,
+  initial_index?: number, // defaults to 0
+  increment_by?: number // defaults to 1
+|}
+// defaults to { template: '{parse}', expect: 'html' }
+type UrlBuilder = false | UrlBuilderBase | UrlBuilderIncrement
 
 // recursing parser
 type ScrapeCriteriaUnNamed = {|
-  criteria: Scrape,
-  expect?: ExpectedResults,
-  for_each?: ScrapeCriteria
+  parse: Parse,
+  build_url?: UrlBuilder,
+  scrape_each?: ScrapeCriteria
 |}
 type ScrapeCriteriaNamed = {|
   ...ScrapeCriteriaUnNamed,
   name: string
 |}
 // the reason for different types is so when an array of values is scraped, we have a key to distinguish them
-type ScrapeCriteria = ScrapeCriteriaUnNamed | Array<ScrapeCriteriaNamed>
-
-// toplevel url builder
-type NextUrlBase = {|
-  url_template: string,
-  regex_cleanup?: Regex
-|}
-type NextUrlIncrement = {|
-  ...NextUrlBase,
-  increment: boolean, // defaults to false
-  initial_index?: number, // defaults to 0
-  increment_by?: number // defaults to 1
-|}
-
-type NextUrl = NextUrlBase | NextUrlIncrement
+type ScrapeCriteria =
+  | ScrapeCriteriaUnNamed
+  | ScrapeCriteriaNamed
+  | Array<ScrapeCriteriaNamed>
 
 export type Config = {|
   input?: Input | Array<Input>,
   scrape: {|
-    build_url: NextUrl,
-    expect?: ExpectedResults,
-    for_each: ScrapeCriteria
+    parse?: Parse,
+    build_url: UrlBuilder,
+    scrape_each: ScrapeCriteria
   |}
 |}
