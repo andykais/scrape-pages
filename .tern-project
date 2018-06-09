@@ -1,0 +1,13 @@
+{
+  "libs": [
+    "ecmascript"
+  ],
+  "ecmaVersion": 6,
+  "plugins": {
+    "node": {},
+    "es_modules": {},
+    "doc_comment": {
+      "strong": true
+    }
+  }
+}

@@ -4,21 +4,20 @@ export default {
     build_url: {
       increment: true,
       increment_by: 50,
-      url_template:
+      template:
         'https://{username}.tumblr.com/api/read/json?start={_index}&num=50',
-      regex_cleanup: 'var tumblr_api_read = '
+      regex_cleanup: 'var tumblr_api_read = ',
+      expect: 'json'
     },
-    expect: 'json',
-    for_each: {
-      criteria: {
-        selector: 'posts[type:photo]',
-        expect_url_for_download: false
+    scrape_each: {
+      parse: {
+        selector: 'posts[type:photo]'
       },
-      expect: 'json',
-      for_each: [
+      build_url: false,
+      scrape_each: [
         {
           name: 'image',
-          criteria: {
+          parse: {
             selector: 'photo-url-1280',
             regex_cleanup: {
               select: 'https://d+?.',
@@ -27,8 +26,8 @@ export default {
           }
         },
         {
-          name: 'tag',
-          criteria: {
+          name: 'tags',
+          parse: {
             selector: 'tags'
           }
         }

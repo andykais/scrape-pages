@@ -4,16 +4,16 @@ export default {
     build_url: {
       increment: true,
       increment_by: 24,
-      url_template:
+      template:
         'https://{artist}.deviantart.com/gallery/?catpath=/&offset={_index}'
     },
-    for_each: {
-      criteria: {
+    scrape_each: {
+      parse: {
         selector: '.torpedo-thumb-link',
         attribute: 'href'
       },
-      for_each: {
-        criteria: {
+      scrape_each: {
+        parse: {
           singular: true,
           selector: '.dev-view-deviation',
           attribute: 'src'
