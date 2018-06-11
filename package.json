@@ -5,7 +5,8 @@
   "main": "src/index.js",
   "scripts": {
     "lint": "git ls-files '*.js' '*.json' | xargs prettier -l",
-    "test": "jest --detectOpenHandles"
+    "test": "jest",
+    "test:integrations": "jest integration"
   },
   "repository": {
     "type": "git",
