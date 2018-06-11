@@ -1,38 +1,47 @@
-const parseDefaults = {
+const defaultsParse = {
+  expect: 'html',
   attribute: undefined,
   singular: false,
   regex_cleanup: undefined
 }
 
-const buildUrlDefaults = {
-  increment: false,
-  expect: 'html',
+const defaultsBuildUrl = {
+  // increment: false, // TODO reenabled after fix with flow-runtime
+  template: '{parentValue}',
   regex_cleanup: undefined
 }
-const buildUrlIncrementDefaults = {
-  ...buildUrlDefaults,
+const defaultsBuildUrlIncrement = {
+  ...defaultsBuildUrl,
   increment: true,
   initial_index: 0,
   increment_by: 1
 }
 
-const fillInDefaultsRecurse = parseConfig => {
+const fillInDefaultsRecurse = (parseConfig, { level = 0, index = 0 } = {}) => {
   if (!parseConfig) return undefined
+  const { name, parse, build_url, scrape_each } = parseConfig
 
   return {
-    parse: parseConfig.parse
+    name: name || `level_${level}_index_${index}`,
+    parse: parse
       ? {
-          ...parseDefaults,
-          ...parseConfig.parse
+          ...defaultsParse,
+          ...parse
         }
       : undefined,
     build_url: {
-      ...(parseConfig.build_url && parseConfig.build_url.increment
-        ? buildUrlIncrementDefaults
-        : buildUrlDefaults),
-      ...parseConfig.build_url
+      ...(build_url && build_url.increment
+        ? defaultsBuildUrlIncrement
+        : defaultsBuildUrl),
+      ...build_url
     },
-    scrape_each: fillInDefaultsRecurse(parseConfig.scrape_each)
+    scrape_each: scrape_each
+      ? Array.isArray(scrape_each)
+        ? scrape_each.map((scrape, index) =>
+            fillInDefaultsRecurse(scrape, { level: level + 1, index })
+          )
+        : [fillInDefaultsRecurse(scrape_each, { level: level + 1 })]
+      : undefined
   }
 }
 
@@ -42,7 +51,6 @@ const fillInDefaults = config => {
     input: undefined,
     ...config,
     scrape: fullConfig
-    // ...fullConfig
   }
 }
 export default fillInDefaults

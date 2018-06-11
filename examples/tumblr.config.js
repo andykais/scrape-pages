@@ -6,11 +6,11 @@ export default {
       increment_by: 50,
       template:
         'https://{username}.tumblr.com/api/read/json?start={_index}&num=50',
-      regex_cleanup: 'var tumblr_api_read = ',
-      expect: 'json'
+      regex_cleanup: 'var tumblr_api_read = '
     },
     scrape_each: {
       parse: {
+        expect: 'json',
         selector: 'posts[type:photo]'
       },
       build_url: false,

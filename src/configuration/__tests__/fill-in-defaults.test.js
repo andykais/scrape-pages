@@ -13,27 +13,29 @@ describe('fill in defaults', () => {
     expect(fullConfig).toStrictEqual({
       input: undefined,
       scrape: {
+        name: 'level_0_index_0',
         parse: undefined,
         build_url: {
           template: simpleConfig.scrape.build_url.template,
-          increment: false,
-          expect: 'html',
           regex_cleanup: undefined
         },
-        scrape_each: {
-          parse: {
-            selector: 'img',
-            attribute: 'src',
-            regex_cleanup: undefined,
-            singular: false
-          },
-          build_url: {
-            increment: false,
-            expect: 'html',
-            regex_cleanup: undefined
-          },
-          scrape_each: undefined
-        }
+        scrape_each: [
+          {
+            name: 'level_1_index_0',
+            parse: {
+              expect: 'html',
+              selector: 'img',
+              attribute: 'src',
+              regex_cleanup: undefined,
+              singular: false
+            },
+            build_url: {
+              template: '{parentValue}',
+              regex_cleanup: undefined
+            },
+            scrape_each: undefined
+          }
+        ]
       }
     })
   })
