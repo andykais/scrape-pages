@@ -6,9 +6,9 @@ import mime from 'mime-types'
 import { createWriteStream } from 'fs'
 
 class BaseSaver extends BaseStep {
-  populateTemplate = runObject => {
+  populateTemplate = ({ input }) => {
     // TODO add vars like _index, parentValue
-    const templateVars = runObject.input
+    const templateVars = input
     const templatedUrl = new URL(this.build_url.template)
 
     // sanitize the parameter templates, then the whole string, then feed back into URL
@@ -23,29 +23,57 @@ class BaseSaver extends BaseStep {
     return populatedUrl
   }
 
-  saveUrl = async url =>
+  saveUrl = (url, { options }) =>
     new Promise((resolve, reject) => {
-      console.log(url.toString())
+      // console.log(url.toString())
       const req = http
-        .get(url.toString(), res => {
-          console.log(res.headers)
-          const extension = mime.extension(res.headers['content-type'])
-          console.log(extension)
-          res.pipe(this.writer({ extension }))
+        .get(url.toString(), async response => {
+          // const timeout = n => new Promise(resolve => setTimeout(resolve, n))
+          const [text] = await Promise.all([
+            this.reader(response, options),
+            this.writer(response, options)
+          ])
+          resolve(text)
         })
-        .on('error', error => console.error(error))
+        .on('error', reject)
       req.end()
       // http.request
     })
-  writer = ({ extension }) => createWriteStream(`filename.${extension}`)
+  writer = (response, options) => {
+    // TODO add expectedOutput extension?
+    const extension = mime.extension(response.headers['content-type'])
+    return new Promise((resolve, reject) => {
+      if (options.cache) {
+        response
+          .pipe(createWriteStream(`filename.${extension}`))
+          .on('error', reject)
+          .on('close', resolve)
+      } else {
+        resolve()
+      }
+    })
+  }
+  reader = response =>
+    new Promise((resolve, reject) => {
+      let data = ''
+      response.on('data', incoming => {
+        // console.log('incoming')
+        data += incoming.toString()
+      })
+      response.on('error', reject)
+      response.on('end', () => {
+        resolve(data)
+      })
+      // response.on('close', resolve(data))
+    })
 }
 class UrlSaver extends BaseSaver {
-  _run = runObject => {
+  _run = async runObject => {
     // console.log('saving url', runObject.parentValue)
     const url = this.populateTemplate(runObject)
     // console.log('get url', url)
-    const result = this.saveUrl(url)
-    return []
+    const result = await this.saveUrl(url, runObject)
+    return [result]
   }
 }
 class UrlSaverIncrement extends BaseSaver {

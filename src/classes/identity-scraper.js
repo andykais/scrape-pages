@@ -1,11 +1,12 @@
 import BaseScraper from './base-scraper'
 
 class IdentityScraper extends BaseScraper {
-  flatten = (acc, val) => [...acc, val]
+  flatten = runParams => runParams
 
-  _run = ({ parentValue }) => {
+  _run = runParams => {
+    return [runParams]
     // TODO investigate IdentityParser that isnt toplevel
-    return parentValue || []
+    // return parentValue || []
   }
 }
 
