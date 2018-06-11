@@ -1,5 +1,5 @@
 export default {
-  input: ['artist'],
+  input: 'artist',
   scrape: {
     build_url: {
       increment: true,

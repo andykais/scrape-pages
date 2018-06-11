@@ -14,6 +14,7 @@ type ExpectedResults =
   | 'final' // mainly internal use, this lets the parsers know if there are no more child parsers
 
 // User input
+// special keyword _parse will be passed to parser initially
 type InputSimple = string
 type InputCleaned = {|
   name: string,
@@ -26,15 +27,15 @@ type Parse = {|
   selector: string, // html selector (e.g. '.someclass > span')
   attribute?: string, // html element attribute (e.g. src), if not specified w/ html, textContent is selected
   singular?: boolean, // defaults to false
-  regex_cleanup?: Regex
+  regex_cleanup?: Regex,
+  expect?: ExpectedResults
 |}
 
 // toplevel url builder
 type UrlBuilderBase = {|
   template?: string, // template for url, will be filled using variables available
-  expect?: ExpectedResults, // defaults to 'html'
-  regex_cleanup?: Regex,
-  increment?: false
+  regex_cleanup?: Regex
+  // increment: false // TODO reenable after fix with flow-runtime
 |}
 type UrlBuilderIncrement = {|
   ...UrlBuilderBase,
@@ -64,6 +65,7 @@ type ScrapeCriteria =
 export type Config = {|
   input?: Input | Array<Input>,
   scrape: {|
+    name?: string,
     parse?: Parse,
     build_url: UrlBuilder,
     scrape_each: ScrapeCriteria

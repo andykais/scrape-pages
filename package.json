@@ -5,7 +5,7 @@
   "main": "src/index.js",
   "scripts": {
     "lint": "git ls-files '*.js' '*.json' | xargs prettier -l",
-    "test": "jest"
+    "test": "jest --detectOpenHandles"
   },
   "repository": {
     "type": "git",
@@ -24,7 +24,11 @@
     "prettier": "^1.13.5"
   },
   "dependencies": {
-    "flow-runtime": "^0.17.0"
+    "cheerio": "^1.0.0-rc.2",
+    "flow-runtime": "^0.17.0",
+    "mime-types": "^2.1.18",
+    "rxjs": "^6.2.0",
+    "string-template": "^1.0.0"
   },
   "jest": {
     "setupFiles": [
