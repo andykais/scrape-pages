@@ -1,52 +1,66 @@
-const defaultsParse = {
-  expect: 'html',
-  attribute: undefined,
-  singular: false,
-  regex_cleanup: undefined
+const assignDownloadDefaults = download => {
+  if (download === undefined) return undefined
+
+  const defaults = {
+    regexCleanup: undefined,
+    increment: 0,
+    initialIndex: 0
+  }
+  return typeof download === 'string'
+    ? {
+        ...defaults,
+        template: download
+      }
+    : {
+        ...defaults,
+        ...download
+      }
 }
 
-const defaultsBuildUrl = {
-  // increment: false, // TODO reenabled after fix with flow-runtime
-  template: '{parentValue}',
-  regex_cleanup: undefined
-}
-const defaultsBuildUrlIncrement = {
-  ...defaultsBuildUrl,
-  increment: true,
-  initial_index: 0,
-  increment_by: 1
+const assignParseDefaults = parse => {
+  if (parse === undefined) return undefined
+
+  const defaults = {
+    expect: 'html',
+    attribute: undefined,
+    regexCleanup: undefined
+  }
+
+  return typeof parse === 'string'
+    ? {
+        ...defaults,
+        selector: parse
+      }
+    : {
+        ...defaults,
+        ...parse
+      }
 }
 
-const fillInDefaultsRecurse = (parseConfig, { level = 0, index = 0 } = {}) => {
-  if (!parseConfig) return undefined
-  const { name, parse, build_url, scrape_each } = parseConfig
+const fillInDefaultsRecurse = (level = 0, parentName = '') => (
+  scrapeConfig,
+  index = 0
+) => {
+  if (!scrapeConfig) return undefined
+
+  const { name, download, parse, scrapeEach = [] } = scrapeConfig
+
+  const internalName = `${parentName}${
+    parentName ? '-' : ''
+  }level_${level}_index_${index}`
 
   return {
-    name: name || `level_${level}_index_${index}`,
-    parse: parse
-      ? {
-          ...defaultsParse,
-          ...parse
-        }
-      : undefined,
-    build_url: {
-      ...(build_url && build_url.increment
-        ? defaultsBuildUrlIncrement
-        : defaultsBuildUrl),
-      ...build_url
-    },
-    scrape_each: scrape_each
-      ? Array.isArray(scrape_each)
-        ? scrape_each.map((scrape, index) =>
-            fillInDefaultsRecurse(scrape, { level: level + 1, index })
-          )
-        : [fillInDefaultsRecurse(scrape_each, { level: level + 1 })]
-      : undefined
+    name: name || internalName,
+    download: assignDownloadDefaults(download),
+    parse: assignParseDefaults(parse),
+    scrapeEach: Array.isArray(scrapeEach)
+      ? scrapeEach.map(fillInDefaultsRecurse(level + 1, parentName))
+      : [fillInDefaultsRecurse(level + 1)(scrapeEach)]
   }
 }
 
 const fillInDefaults = config => {
-  const fullConfig = fillInDefaultsRecurse(config.scrape)
+  const fullConfig = fillInDefaultsRecurse()(config.scrape)
   return {
     input: undefined,
     ...config,

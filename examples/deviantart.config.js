@@ -1,23 +1,23 @@
 export default {
   input: 'artist',
   scrape: {
-    build_url: {
-      increment: true,
-      increment_by: 24,
+    download: {
+      increment: 24,
       template:
         'https://{artist}.deviantart.com/gallery/?catpath=/&offset={_index}'
     },
-    scrape_each: {
+    parse: {
+      selector: '.torpedo-thumb-link',
+      attribute: 'href'
+    },
+    scrapeEach: {
+      download: '{value}',
       parse: {
-        selector: '.torpedo-thumb-link',
-        attribute: 'href'
+        selector: '.dev-view-deviation',
+        attribute: 'src'
       },
-      scrape_each: {
-        parse: {
-          singular: true,
-          selector: '.dev-view-deviation',
-          attribute: 'src'
-        }
+      scrapeEach: {
+        download: '{value}'
       }
     }
   }

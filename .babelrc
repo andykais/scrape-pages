@@ -1,10 +1,14 @@
 {
-  "presets": ["env", "stage-2", "react"],
-  "plugins": [
-    "transform-decorators-legacy",
-    ["flow-runtime", {
-      "assert": true,
-      "annotate": true
-    }]
+  // TODO fix issue with 'env': necessary for jest, breaks code built w webpack
+  presets: ['stage-2', 'react'],
+  plugins: [
+    'transform-decorators-legacy',
+    [
+      'flow-runtime',
+      {
+        assert: true,
+        annotate: true
+      }
+    ]
   ]
 }

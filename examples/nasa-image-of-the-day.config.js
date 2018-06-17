@@ -1,13 +1,15 @@
+// TODO edit to work using json api
 export default {
   scrape: {
-    build_url: {
+    download: {
       template: 'https://www.nasa.gov/multimedia/imagegallery/iotd.html'
     },
-    scrape_each: {
-      parse: {
-        selector: '.gallery-card img',
-        attribute: 'src'
-      }
+    parse: {
+      selector: '.gallery-card img',
+      attribute: 'src'
+    },
+    scrapeEach: {
+      download: '{value}'
     }
   }
 }

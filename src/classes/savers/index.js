@@ -1,100 +1,80 @@
 import format from 'string-template'
+import request from 'request'
 import BaseStep from '../base-scraper'
 import IdentityStep from '../identity-scraper'
 import http from 'https'
-import mime from 'mime-types'
 import { createWriteStream } from 'fs'
+import { resolve, basename } from 'path'
+import { mkdirP } from '../../util'
+import * as Rx from 'rxjs'
+import * as ops from 'rxjs/operators'
+import { takeWhileHardStop } from '../../rxjs-operators'
 
-class BaseSaver extends BaseStep {
-  populateTemplate = ({ input }) => {
-    // TODO add vars like _index, parentValue
-    const templateVars = input
-    const templatedUrl = new URL(this.build_url.template)
-
-    // sanitize the parameter templates, then the whole string, then feed back into URL
-    templatedUrl.searchParams.forEach((val, key, map) => {
-      const sanitizedParam = format(val, templateVars).replace(/\s/g, '+')
-      map.set(key, sanitizedParam)
-    })
-    const populatedUrl = new URL(format(this.build_url.template))
-    populatedUrl.searchParams.forEach((v, key, map) =>
-      map.set(key, templatedUrl.searchParams.get(key))
-    )
-    return populatedUrl
+class UrlSaver extends BaseStep {
+  constructor(...args) {
+    super(...args)
+    // url index source will either increment or be single value based on config
+    this.startSource = this.download.increment ? Rx.interval() : Rx.of(0)
   }
 
-  saveUrl = (url, { options }) =>
-    new Promise((resolve, reject) => {
-      // console.log(url.toString())
-      const req = http
-        .get(url.toString(), async response => {
-          // const timeout = n => new Promise(resolve => setTimeout(resolve, n))
-          const [text] = await Promise.all([
-            this.reader(response, options),
-            this.writer(response, options)
-          ])
-          resolve(text)
-        })
-        .on('error', reject)
-      req.end()
-      // http.request
-    })
-  writer = (response, options) => {
-    // TODO add expectedOutput extension?
-    const extension = mime.extension(response.headers['content-type'])
+  populateTemplate = ({ input }, value, index) => {
+    // TODO add nice error messages for bad urls
+    const incrementIndex =
+      this.download.initialIndex + index * this.download.increment
+
+    const templateVars = { ...input, value, index: incrementIndex }
+
+    const populatedUriString = format(this.download.template, templateVars)
+    try {
+      const populatedUrl = new URL(populatedUriString)
+      return populatedUrl
+    } catch (e) {
+      throw new Error(`cannot create url from "${populatedUriString}"`)
+    }
+  }
+
+  saveUrl = async (url, filepath, runParams) => {
+    const uri = url.toString()
+    // TODO keep or remove url.search?
+    const filename = basename(url.pathname) + url.search
+    const file = resolve(filepath, filename)
+    await mkdirP(filepath)
+
+    // TODO use asyncIterator stream?
+    const buffers = []
+    // this.logger.debug(`getting ${uri}`)
+    // this.logger.debug(`saving to ${file}`)
     return new Promise((resolve, reject) => {
-      if (options.cache) {
-        response
-          .pipe(createWriteStream(`filename.${extension}`))
-          .on('error', reject)
-          .on('close', resolve)
-      } else {
-        resolve()
-      }
+      // TODO only save if options.save is on
+      request(uri)
+        .on('data', data => buffers.push(data))
+        .pipe(createWriteStream(file))
+        .on('error', reject)
+        .on('close', () => {
+          this.logger.debug(`${this.name} saved ${uri}`)
+          resolve(Buffer.concat(buffers).toString())
+        })
     })
   }
-  reader = response =>
-    new Promise((resolve, reject) => {
-      let data = ''
-      response.on('data', incoming => {
-        // console.log('incoming')
-        data += incoming.toString()
-      })
-      response.on('error', reject)
-      response.on('end', () => {
-        resolve(data)
-      })
-      // response.on('close', resolve(data))
-    })
-}
-class UrlSaver extends BaseSaver {
-  _run = async runObject => {
-    // console.log('saving url', runObject.parentValue)
-    const url = this.populateTemplate(runObject)
-    // console.log('get url', url)
-    const result = await this.saveUrl(url, runObject)
-    return [result]
-  }
-}
-class UrlSaverIncrement extends BaseSaver {
-  _run = async runObject => {
-    const { increment_by, initial_index } = this.build_url
 
-    // TODO look into observable 'map request result until no more'
-    let index = initial_index
-    let result
-    const results = []
-    do {
-      index += increment_by
-      result = undefined
-      result && results.push(result)
-    } while (result)
-    return results
-  }
-}
-class IdentitySaver extends BaseSaver {}
+  downloadSourceFunc = (runParams, parentIndexes) => value =>
+    this.startSource.pipe(
+      ops.mergeMap(incrementIndex => {
+        const url = this.populateTemplate(runParams, value, incrementIndex)
+        const filepath = resolve(
+          runParams.options.folder,
+          this.name,
+          [...parentIndexes, incrementIndex].join('-')
+        )
+        return this.saveUrl(url, filepath, runParams)
+      }, 1),
+      ops.take(this.download.increment ? Infinity : 1)
+    )
 
-export default setupParams => {
-  if (setupParams.build_url === false) return new IdentityStep(setupParams)
-  else return new UrlSaver(setupParams)
+  _run = this.downloadSourceFunc
+}
+
+export default (setupParams, io) => {
+  if (setupParams.download) return new UrlSaver(setupParams, io)
+  else return new IdentityStep(setupParams)
 }
