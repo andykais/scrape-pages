@@ -1,24 +1,27 @@
 import cheerio from 'cheerio'
+import artoo from 'artoo-js'
 import BaseStep from '../base-scraper'
 import IdentityStep from '../identity-scraper'
 
-class BaseParser {}
+artoo.bootstrap(cheerio)
 
-class HtmlParser extends BaseParser {
-  _run = ({ parentValue }) => {
-    console.log('parse html')
-    const $ = cheerio.load(parentValue)
-    return parentValue
+class HtmlParser extends BaseStep {
+  _run = () => value => {
+    if (!value) return []
+    const $ = cheerio.load(value)
+    const element = $(this.parse.selector)
+    const parsedVal = $(this.parse.selector).scrape(this.parse.attribute)
+    return parsedVal || []
   }
 }
 
-class JsonParser extends BaseParser {}
+class JsonParser extends BaseStep {}
 
 export default setupParams => {
   const parsers = {
     html: HtmlParser,
     json: JsonParser
   }
-  const chosenParser = parsers[setupParams.expectedInput] || IdentityStep
+  const chosenParser = parsers[setupParams.expect] || IdentityStep
   return new chosenParser(setupParams)
 }

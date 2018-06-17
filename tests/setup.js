@@ -21,14 +21,13 @@ expect.extend({
 // setup reusable variables
 global.__SIMPLE_CONFIG__ = {
   scrape: {
-    build_url: {
-      template: 'example-site.com/images'
+    download: 'example-site.com/images',
+    parse: {
+      selector: 'img',
+      attribute: 'src'
     },
-    scrape_each: {
-      parse: {
-        selector: 'img',
-        attribute: 'src'
-      }
+    scrapeEach: {
+      download: '{value}'
     }
   }
 }

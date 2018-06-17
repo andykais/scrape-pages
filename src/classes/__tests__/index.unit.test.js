@@ -5,6 +5,6 @@ describe('scrape-pages class', () => {
 
   test('class loads', () => {
     const siteScraper = new ScrapePages(simpleConfig)
-    siteScraper.run()
+    // siteScraper.run()
   })
 })

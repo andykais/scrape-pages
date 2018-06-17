@@ -1,4 +1,10 @@
 # editor files
 .tern-port
 
+# build files
+dist
+
+# scratchwork folder
+scratchwork
+
 node_modules

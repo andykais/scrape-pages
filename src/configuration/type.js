@@ -18,56 +18,48 @@ type ExpectedResults =
 type InputSimple = string
 type InputCleaned = {|
   name: string,
-  regex_cleanup: Regex
+  regexCleanup: Regex
 |}
 type Input = InputSimple | InputCleaned
 
 // html or json parser
-type Parse = {|
+type ParseDetailed = {|
   selector: string, // html selector (e.g. '.someclass > span')
   attribute?: string, // html element attribute (e.g. src), if not specified w/ html, textContent is selected
-  singular?: boolean, // defaults to false
-  regex_cleanup?: Regex,
+  regexCleanup?: Regex,
   expect?: ExpectedResults
 |}
+type ParseSelectorOnly = string
+type Parse = ParseSelectorOnly | ParseDetailed
 
 // toplevel url builder
 type UrlBuilderBase = {|
   template?: string, // template for url, will be filled using variables available
-  regex_cleanup?: Regex
+  regexCleanup?: Regex
+  // increment?: 0
   // increment: false // TODO reenable after fix with flow-runtime
 |}
 type UrlBuilderIncrement = {|
   ...UrlBuilderBase,
-  increment: true,
-  initial_index?: number, // defaults to 0
-  increment_by?: number // defaults to 1
+  increment: number,
+  initialIndex?: number
 |}
+type UrlBuilderTemplateOnly = string
 // defaults to { template: '{parse}', expect: 'html' }
-type UrlBuilder = false | UrlBuilderBase | UrlBuilderIncrement
+// when undefined, identity is used
+type UrlBuilder = UrlBuilderTemplateOnly | UrlBuilderBase | UrlBuilderIncrement
 
 // recursing parser
-type ScrapeCriteriaUnNamed = {|
-  parse: Parse,
-  build_url?: UrlBuilder,
-  scrape_each?: ScrapeCriteria
+// TODO handle the cases where there is no parser,
+type ScrapeCriteriaBase = {|
+  name?: string,
+  download?: UrlBuilder,
+  parse?: Parse,
+  scrapeEach?: ScrapeCriteria
 |}
-type ScrapeCriteriaNamed = {|
-  ...ScrapeCriteriaUnNamed,
-  name: string
-|}
-// the reason for different types is so when an array of values is scraped, we have a key to distinguish them
-type ScrapeCriteria =
-  | ScrapeCriteriaUnNamed
-  | ScrapeCriteriaNamed
-  | Array<ScrapeCriteriaNamed>
+type ScrapeCriteria = ScrapeCriteriaBase | Array<ScrapeCriteriaBase>
 
 export type Config = {|
   input?: Input | Array<Input>,
-  scrape: {|
-    name?: string,
-    parse?: Parse,
-    build_url: UrlBuilder,
-    scrape_each: ScrapeCriteria
-  |}
+  scrape: ScrapeCriteria
 |}

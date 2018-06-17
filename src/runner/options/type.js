@@ -9,7 +9,7 @@ type Limiters = {
 }
 
 type Options = {
-  downloadDir: string, // folder that all downloads will go to
+  folder: string, // folder that all downloads will go to
   cache?: boolean, // defaults to true
   request?: RequestOptions, // params passed down to the request module downloading the data
   limit?: number | Array<Limiters>

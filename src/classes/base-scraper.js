@@ -2,20 +2,13 @@ import { mergeMap } from 'rxjs/operators'
 
 
 class BaseScraper {
-  constructor(params) {
+  constructor(params, io) {
     Object.assign(this, params)
   }
 
-  run = async runParams => {
-    // console.log(runParams)
-    return this._run(runParams)
-    // this._run(runParams).pipe(
-      // mergeMap(this.flatten)
-    // )
-    // return {
-      // ...runParams,
-      // parentValue: value
-    // }
+  // run = this._run
+  run = (runParams, parentIndexes) => (value, index) => {
+    return this._run(runParams, parentIndexes)(value, index)
   }
 
   flatten = (acc, val) => {
