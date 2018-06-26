@@ -1,6 +1,6 @@
 import * as Rx from 'rxjs'
 
-export default predicate => source =>
+export const takeWhileHardStop = predicate => source =>
   new Rx.Observable(destination => {
     let index = 0
     const subscription = source.subscribe({
@@ -12,6 +12,9 @@ export default predicate => source =>
           subscription.unsubscribe()
         }
         index++
+      },
+      error(error) {
+        destination.error(error)
       },
       complete() {
         destination.complete()

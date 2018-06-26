@@ -10,6 +10,7 @@ describe('filled in defaults', () => {
       download: {
         increment: 0,
         initialIndex: 0,
+        incrementUntil: undefined,
         template: simpleConfig.scrape.download,
         regexCleanup: undefined
       },
@@ -24,6 +25,7 @@ describe('filled in defaults', () => {
           download: {
             increment: 0,
             initialIndex: 0,
+            incrementUntil: undefined,
             template: simpleConfig.scrape.scrapeEach.download,
             regexCleanup: undefined
           },
@@ -49,5 +51,4 @@ describe('filled in defaults', () => {
     const fullConfig = fillInDefaults(simpleConfig)
     expect(fullConfig).toBeConfigType()
   })
-
 })

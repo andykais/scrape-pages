@@ -7,11 +7,18 @@ artoo.bootstrap(cheerio)
 
 class HtmlParser extends BaseStep {
   _run = () => value => {
-    if (!value) return []
+    if (value === undefined || value === null) return []
+    // console.log(this.name, 'parsing', this.parse.selector)
     const $ = cheerio.load(value)
-    const element = $(this.parse.selector)
-    const parsedVal = $(this.parse.selector).scrape(this.parse.attribute)
-    return parsedVal || []
+    const element = $(this.config.parse.selector)
+    const parsedVals = $(this.config.parse.selector).scrape(
+      this.config.parse.attribute
+    )
+    const cleanedVals = parsedVals.filter(val => val !== undefined)
+    // if (this.config.name === 'level_0_index_0') {
+    // console.log(cleanedVals)
+    // }
+    return cleanedVals || []
   }
 }
 

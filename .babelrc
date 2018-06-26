@@ -1,13 +1,18 @@
 {
-  // TODO fix issue with 'env': necessary for jest, breaks code built w webpack
-  presets: ['stage-2', 'react'],
+  presets: [
+    'env', // TODO fix issue with 'env': necessary for jest, breaks code built w webpack
+    'stage-2',
+    'react'
+  ],
   plugins: [
     'transform-decorators-legacy',
     [
       'flow-runtime',
       {
-        assert: true,
-        annotate: true
+        assert: false,
+        annotate: false,
+        warn: false,
+        // optInOnly: true
       }
     ]
   ]

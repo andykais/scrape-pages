@@ -1,30 +1,34 @@
+import { resolve, normalize, basename } from 'path'
 import format from 'string-template'
-import request from 'request'
-import BaseStep from '../base-scraper'
-import IdentityStep from '../identity-scraper'
-import http from 'https'
-import { createWriteStream } from 'fs'
-import { resolve, basename } from 'path'
-import { mkdirP } from '../../util'
 import * as Rx from 'rxjs'
 import * as ops from 'rxjs/operators'
+import BaseStep from '../base-scraper'
+import IdentityStep from '../identity-scraper'
 import { takeWhileHardStop } from '../../rxjs-operators'
+import {
+  downloadToFileAndMemory,
+  downloadToFileOnly,
+  downloadToMemoryOnly
+} from './fetchers'
 
 class UrlSaver extends BaseStep {
   constructor(...args) {
     super(...args)
     // url index source will either increment or be single value based on config
-    this.startSource = this.download.increment ? Rx.interval() : Rx.of(0)
+    this.startSource = this.config.download.increment ? Rx.interval() : Rx.of(0)
   }
 
   populateTemplate = ({ input }, value, index) => {
     // TODO add nice error messages for bad urls
     const incrementIndex =
-      this.download.initialIndex + index * this.download.increment
+      this.config.download.initialIndex + index * this.config.download.increment
 
     const templateVars = { ...input, value, index: incrementIndex }
 
-    const populatedUriString = format(this.download.template, templateVars)
+    const populatedUriString = format(
+      this.config.download.template,
+      templateVars
+    )
     try {
       const populatedUrl = new URL(populatedUriString)
       return populatedUrl
@@ -33,48 +37,33 @@ class UrlSaver extends BaseStep {
     }
   }
 
-  saveUrl = async (url, filepath, runParams) => {
-    const uri = url.toString()
-    // TODO keep or remove url.search?
-    const filename = basename(url.pathname) + url.search
-    const file = resolve(filepath, filename)
-    await mkdirP(filepath)
-
-    // TODO use asyncIterator stream?
-    const buffers = []
-    // this.logger.debug(`getting ${uri}`)
-    // this.logger.debug(`saving to ${file}`)
-    return new Promise((resolve, reject) => {
-      // TODO only save if options.save is on
-      request(uri)
-        .on('data', data => buffers.push(data))
-        .pipe(createWriteStream(file))
-        .on('error', reject)
-        .on('close', () => {
-          this.logger.debug(`${this.name} saved ${uri}`)
-          resolve(Buffer.concat(buffers).toString())
-        })
-    })
+  saveUrl = (url, runParams) => {
+    const folder = resolve(runParams.options.folder, this.config.name)
+    if (this.config.scrapeEach.length) {
+      return downloadToFileAndMemory(url, folder, this.logger)
+    } else {
+      return downloadToFileOnly(url, folder, this.logger)
+    }
   }
 
   downloadSourceFunc = (runParams, parentIndexes) => value =>
     this.startSource.pipe(
       ops.mergeMap(incrementIndex => {
         const url = this.populateTemplate(runParams, value, incrementIndex)
-        const filepath = resolve(
-          runParams.options.folder,
-          this.name,
-          [...parentIndexes, incrementIndex].join('-')
-        )
-        return this.saveUrl(url, filepath, runParams)
-      }, 1),
-      ops.take(this.download.increment ? Infinity : 1)
+        // const filepath = resolve(
+        // runParams.options.folder,
+        // this.config.name,
+        // [...parentIndexes, incrementIndex].join('-')
+        // )
+        return this.saveUrl(url, runParams)
+      }, 1)
+      // ops.take(this.download.increment ? Infinity : 1)
     )
 
   _run = this.downloadSourceFunc
 }
 
 export default (setupParams, io) => {
-  if (setupParams.download) return new UrlSaver(setupParams, io)
+  if (setupParams.config.download) return new UrlSaver(setupParams, io)
   else return new IdentityStep(setupParams)
 }
