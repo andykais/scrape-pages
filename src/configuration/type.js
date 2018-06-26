@@ -42,7 +42,8 @@ type UrlBuilderBase = {|
 type UrlBuilderIncrement = {|
   ...UrlBuilderBase,
   increment: number,
-  initialIndex?: number
+  initialIndex?: number,
+  incrementUntil?: number
 |}
 type UrlBuilderTemplateOnly = string
 // defaults to { template: '{parse}', expect: 'html' }

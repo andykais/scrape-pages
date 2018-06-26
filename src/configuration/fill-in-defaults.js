@@ -4,7 +4,8 @@ const assignDownloadDefaults = download => {
   const defaults = {
     regexCleanup: undefined,
     increment: 0,
-    initialIndex: 0
+    initialIndex: 0,
+    incrementUntil: undefined
   }
   return typeof download === 'string'
     ? {

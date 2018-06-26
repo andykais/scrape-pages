@@ -1,30 +1,31 @@
-import http from 'http'
 import EventEmitter from 'events'
 import Logger from '../logger'
 import fillInDefaults from '../configuration/fill-in-defaults'
 import chooseParser from './parsers'
 import chooseSaver from './savers'
-import { mkdirP } from '../util'
+import { mkdirp } from '../util/fs-promise'
 import * as Rx from 'rxjs'
 import * as ops from 'rxjs/operators'
 import { takeWhileHardStop } from '../rxjs-operators'
-import type { Config } from '../configuration/type'
+import { assertConfigType } from '../configuration/assert-type'
 
 export class Scraper {
-  constructor({ name, parse, download, scrapeEach }, io) {
+  // constructor({ name, parse, download, scrapeEach }, io) {
+  constructor(config, io) {
+    const { name, parse, download, scrapeEach } = config
     const childless = !Boolean(scrapeEach.length)
     const { expect } = parse || {}
 
     this.name = name
-    this.save = chooseSaver({ name, download, expect, ...io })
-    this.parse = chooseParser({ name, parse, expect, ...io })
+    this.save = chooseSaver({ config, expect, ...io })
+    this.parse = chooseParser({ config, expect, ...io })
     this.emitter = io.emitter
     this.logger = io.logger
     this.children = scrapeEach.map(scrape => new Scraper(scrape, io))
   }
 
   runSetup = async options => {
-    await mkdirP(`${options.folder}/${this.name}`)
+    await mkdirp(`${options.folder}/${this.name}`)
     await Promise.all(this.children.map(child => child.runSetup(options)))
   }
 
@@ -32,10 +33,8 @@ export class Scraper {
   // then make flat observable
   //
   // TODO allow for increments like range(0, 100) where some may respond with nothing
-  run = params => (parentValue, parentIndexes = []) => {
-    // console.log('scrape-run', this.name, parentIndexes)
-
-    const obs = this.save
+  run = params => (parentValue, parentIndexes = []) =>
+    this.save
       .run(params, parentIndexes)(parentValue)
       .pipe(
         ops.map(this.parse.run(params)),
@@ -55,12 +54,11 @@ export class Scraper {
         ),
         ops.mergeAll()
       )
-    return obs
-  }
 }
 
 class ScrapePages {
-  constructor(config: Config) {
+  constructor(config) {
+    assertConfigType(config)
     this.config = fillInDefaults(config)
     this.emitter = new EventEmitter() // dependency inject?
     this.logger = new Logger({ log_level: 3 })
@@ -72,19 +70,27 @@ class ScrapePages {
 
   // TODO add parsable input for this first parse step
   run = async (input = {}, options = {}) => {
+    this.logger.info('Begin downloading with inputs', input)
     try {
       if (!options.folder) throw new Error('need a download dir! (for now)')
       if (!this.isValidInput(input)) throw new Error('invalid input')
-      await mkdirP(options.folder)
+      await mkdirp(options.folder)
       await this.scrapingScheme.runSetup(options)
 
       this.scrapingScheme
         .run({ input, options })()
-        .toPromise()
-        .then(output => {
-          this.logger.info('Done!')
-          this.emitter.emit('done', output)
-        })
+        .subscribe(
+          () => {},
+          error => {
+            this.logger.error(error.toString())
+            this.emitter.emit('error', error)
+          },
+          () => {
+            // TODO add timer to show how long it took
+            this.logger.info('Done!')
+            this.emitter.emit('done')
+          }
+        )
       return this.emitter
     } catch (e) {
       this.logger.error(e)

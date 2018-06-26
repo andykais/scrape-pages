@@ -32,9 +32,9 @@ class Logger {
     this.pe = new PrettyError()
   }
 
-  _log = prefix => message => {
+  _log = prefix => (...messages) => {
     if (this.allowed[prefix] === undefined || this.allowed[prefix]) {
-      console.log(prefix, message)
+      console.log(prefix, ...messages)
     }
   }
 
