@@ -1,6 +1,6 @@
 {
   presets: [
-    'env', // TODO fix issue with 'env': necessary for jest, breaks code built w webpack
+    // 'env', // TODO fix issue with 'env': necessary for jest, breaks code built w webpack
     'stage-2',
     'react'
   ],
@@ -11,9 +11,14 @@
       {
         assert: false,
         annotate: false,
-        warn: false,
+        warn: false
         // optInOnly: true
       }
     ]
-  ]
+  ],
+  env: {
+    test: {
+      presets: ['env']
+    }
+  }
 }
