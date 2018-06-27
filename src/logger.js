@@ -1,5 +1,4 @@
 import chalk from 'chalk'
-import PrettyError from 'pretty-error'
 import { tap } from 'rxjs/operators'
 
 class Logger {
@@ -29,7 +28,6 @@ class Logger {
       this.allowed[key] = this.level[key] <= log_level
     }
     this.log_level = log_level
-    this.pe = new PrettyError()
   }
 
   _log = prefix => (...messages) => {

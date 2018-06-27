@@ -8,6 +8,7 @@ import * as Rx from 'rxjs'
 import * as ops from 'rxjs/operators'
 import { takeWhileHardStop } from '../rxjs-operators'
 import { assertConfigType } from '../configuration/assert-type'
+import Store from '../store'
 
 export class Scraper {
   // constructor({ name, parse, download, scrapeEach }, io) {

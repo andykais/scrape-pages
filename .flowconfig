@@ -1,0 +1,18 @@
+[include]
+
+[ignore]
+scratchwork
+
+[libs]
+
+[lints]
+
+[options]
+module.name_mapper='^raw-loader!\(.*\.sql?\)' -> '\1'
+module.file_ext=.sql
+module.file_ext=.js
+module.file_ext=.json
+
+
+[version]
+0.75.0

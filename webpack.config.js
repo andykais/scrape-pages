@@ -12,6 +12,10 @@ module.exports = {
         test: /\.js$/,
         exclude: /node_modules/,
         use: ['babel-loader']
+      },
+      {
+        test: /\.sql$/,
+        use: 'raw-loader'
       }
     ]
   },
@@ -20,7 +24,7 @@ module.exports = {
     path: `${__dirname}/dist`,
     filename: 'main.js',
     library: 'scrape-pages',
-    libraryTarget: 'umd',
+    libraryTarget: 'umd'
   },
   externals: [nodeExternals()]
 }
