@@ -50,15 +50,25 @@ type UrlBuilderTemplateOnly = string
 // when undefined, identity is used
 type UrlBuilder = UrlBuilderTemplateOnly | UrlBuilderBase | UrlBuilderIncrement
 
+type ParserName = string
 // recursing parser
 // TODO handle the cases where there is no parser,
 type ScrapeCriteriaBase = {|
-  name?: string,
+  name?: ParserName,
   download?: UrlBuilder,
   parse?: Parse,
-  scrapeEach?: ScrapeCriteria
 |}
-type ScrapeCriteria = ScrapeCriteriaBase | Array<ScrapeCriteriaBase>
+type ScrapeCriteriaLooper = {|
+  ...ScrapeCriteriaBase,
+  loopBackTo?: ParserName // this specifies which parser to return to with the current value, it cannot have children
+|}
+type ScrapeCriteriaWithChildren = {|
+  ...ScrapeCriteriaBase,
+  scrapeEach: ScrapeCriteria
+|}
+type ScrapeCriteriaOptions = ScrapeCriteriaBase | ScrapeCriteriaLooper | ScrapeCriteriaWithChildren
+
+type ScrapeCriteria = ScrapeCriteriaOptions | Array<ScrapeCriteriaOptions>
 
 export type Config = {|
   input?: Input | Array<Input>,
