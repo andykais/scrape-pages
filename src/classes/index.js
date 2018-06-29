@@ -1,13 +1,12 @@
 import EventEmitter from 'events'
 import Logger from '../logger'
-import fillInDefaults from '../configuration/fill-in-defaults'
 import chooseParser from './parsers'
 import chooseSaver from './savers'
 import { mkdirp } from '../util/fs-promise'
 import * as Rx from 'rxjs'
 import * as ops from 'rxjs/operators'
 import { takeWhileHardStop } from '../rxjs-operators'
-import { assertConfigType } from '../configuration/assert-type'
+import { assertConfigType, fillInDefaults } from '../configuration'
 import Store from '../store'
 
 export class Scraper {
