@@ -65,7 +65,8 @@
       "<rootDir>/src"
     ],
     "transform": {
-      "\\.sql$": "jest-raw-loader"
+      "\\.sql$": "jest-raw-loader",
+      "\\.js$": "babel-jest"
     },
     "globals": {
       "NODE_ENV": "test"
