@@ -1,7 +1,7 @@
 // @flow
 import DB from './database'
 import type { Config } from '../configuration/type'
-import { RECURSIVE_ORDER_FROM_CHILD_TO_PARENT_SQL } from './sql'
+import { RECURSIVE_ORDER_FROM_CHILD_TO_PARENT_SQL } from './sql-templates'
 
 const reverseConfig = (config, parentName = null) => {
   const levelConfig = { ...config, parentName }

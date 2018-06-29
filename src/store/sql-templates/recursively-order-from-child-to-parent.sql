@@ -7,7 +7,7 @@ WITH cte AS (
     parseIndex,
     incrementIndex,
   FROM tree
-  WHERE level = :startLevel
+  WHERE level in {levels}
   UNION ALL
   SELECT
     pTree.id,
@@ -22,4 +22,4 @@ WITH cte AS (
   WHERE cte.level != :parentLevel
   ORDER BY parseIndex, incrementIndex
 )
-SELECT * FROM cte WHERE level = ${endLevel}
+SELECT * FROM cte WHERE parentId IS NULL
