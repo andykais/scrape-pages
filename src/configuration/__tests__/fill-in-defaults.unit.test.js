@@ -5,7 +5,7 @@ describe('filled in defaults', () => {
     const simpleConfig = global.__SIMPLE_CONFIG__
     const fullConfig = fillInDefaults(simpleConfig)
     const fullConfigGuess = {
-      input: undefined,
+      input: [],
       scrape: {
         name: 'level_0_index_0',
         download: {

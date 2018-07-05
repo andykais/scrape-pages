@@ -20,8 +20,8 @@ export const downloadToFileAndMemory = async (url, folder, logger) => {
     if (e.code !== 'ENOENT') throw e
 
     const buffers = []
-    const dest = createWriteStream(file)
     const response = await fetch(url)
+    const dest = createWriteStream(file)
     const body = await new Promise((resolve, reject) => {
       response.body.pipe(dest)
       response.body.on('error', error => reject(error))

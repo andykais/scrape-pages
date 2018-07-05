@@ -30,15 +30,14 @@ class UrlSaver extends BaseStep {
       templateVars
     )
     try {
-      const populatedUrl = new URL(populatedUriString)
-      return populatedUrl
+      return new URL(populatedUriString)
     } catch (e) {
       throw new Error(`cannot create url from "${populatedUriString}"`)
     }
   }
 
   saveUrl = (url, runParams) => {
-    const folder = resolve(runParams.options.folder, this.config.name)
+    const { folder } = this.options
     if (this.config.scrapeEach.length) {
       return downloadToFileAndMemory(url, folder, this.logger)
     } else {
@@ -56,15 +55,18 @@ class UrlSaver extends BaseStep {
           incrementIndex,
           url
         )
-        // const filepath = resolve(
-        // runParams.options.folder,
-        // this.config.name,
-        // [...parentIndexes, incrementIndex].join('-')
-        // )
         const fileContent = await this.saveUrl(url, runParams)
-        return fileContent
-      }, 1)
-      // ops.take(this.download.increment ? Infinity : 1)
+        return { value: fileContent, downloadId }
+      }, 1),
+      ops.catchError(error => {
+        // missing pages are not fatal errors
+        if (error.code === 'ENOTFOUND') {
+          this.logger.warn(error.message)
+          return Rx.of('') // TODO find better solution involving takeWhileHardStop
+        } else {
+          throw error
+        }
+      })
     )
 
   _run = this.downloadSourceFunc

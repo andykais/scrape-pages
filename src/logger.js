@@ -44,7 +44,7 @@ class Logger {
   }
 
   debug = this._log('DEBUG')
-  warning = this._log('WRN')
+  warn = this._log('WRN')
   cli = console.log
   error = this._log('ERR')
   tap = (name = 'TAP') => tap(this._log(name))

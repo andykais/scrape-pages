@@ -6,7 +6,7 @@ import IdentityStep from '../identity-scraper'
 artoo.bootstrap(cheerio)
 
 class HtmlParser extends BaseStep {
-  _run = () => value => {
+  _run = () => async ({ value }) => {
     if (value === undefined || value === null) return []
     // console.log(this.name, 'parsing', this.parse.selector)
     const $ = cheerio.load(value)

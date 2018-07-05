@@ -15,10 +15,8 @@ class Store {
     this.flatConfig = makeFlatConfig(config)
   }
 
-  init = async options => {
-    this.options = options
-    console.log(options)
-    this.db = new DB(options)
+  init = async folder => {
+    this.db = new DB(folder)
     await this.db.exec(CREATE_TABLES)
     // TODO optimize queries by creating dynamic sql ahead of time
     // find which are returned from options, create one for each individually and one for all combined
@@ -41,13 +39,15 @@ class Store {
 
   insertCompletedDownload = (id, filename) => {}
 
-  insertParsedValue = (
-    scraper,
-    downloadId,
-    parentId,
-    parseIndex,
-    value
-  ): number => -1
+  insertParsedValue = ({ name, parentId, parseIndex, downloadId, value }) =>
+    Promise.resolve(-1)
+  // insertParsedValue = (
+  // scraper,
+  // downloadId,
+  // parentId,
+  // parseIndex,
+  // value
+  // ): number => -1
 
   getOrderedScrapers = scrapers => {
     const orderLevelColumnSql = makeDynamicOrderLevelColumn(

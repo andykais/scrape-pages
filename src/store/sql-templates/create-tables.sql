@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS downloads (
   url TEXT,
   filename TEXT,
   downloaded BIT,
+  failed BIT,
   allChildrenDownloaded BIT,
   identity BIT
 );
@@ -20,6 +21,7 @@ CREATE TABLE IF NOT EXISTS parsedTree (
   parseIndex INT NOT NULL, -- index the item appeared on the page (priority medium)
   parsedValue TEXT,
   identity BIT,
+  FOREIGN KEY (parentId) REFERENCES parsedTree(id)
   FOREIGN KEY(downloadId) REFERENCES download(id)
 );
 
