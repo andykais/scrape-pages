@@ -2,7 +2,7 @@ import { findMin, findMax } from '../../util/array'
 import { k_combinations } from './util/k_combinations'
 import { findLowestCommonParent } from './util/find-lowest-common-parent'
 
-const makeDynamicOrderLevelColumns = (flatConfig, levels) => {
+const makeDynamicOrderLevelColumn = (flatConfig, levels) => {
   const recurse = levelsRecursed => {
     if (levelsRecursed.length < 2) return ''
     const combinations = k_combinations(levelsRecursed, 2)
@@ -40,4 +40,4 @@ const makeDynamicOrderLevelColumns = (flatConfig, levels) => {
   else return '0'
 }
 
-export { makeDynamicOrderLevelColumns }
+export { makeDynamicOrderLevelColumn }

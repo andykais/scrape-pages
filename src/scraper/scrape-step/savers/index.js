@@ -4,7 +4,7 @@ import * as Rx from 'rxjs'
 import * as ops from 'rxjs/operators'
 import BaseStep from '../base-scraper'
 import IdentityStep from '../identity-scraper'
-import { takeWhileHardStop } from '../../rxjs-operators'
+import { takeWhileHardStop } from '../../../util/rxjs-operators'
 import {
   downloadToFileAndMemory,
   downloadToFileOnly,
@@ -48,14 +48,16 @@ class UrlSaver extends BaseStep {
 
   downloadSourceFunc = (runParams, parentIndexes) => value =>
     this.startSource.pipe(
-      ops.mergeMap(incrementIndex => {
+      ops.mergeMap(async incrementIndex => {
         const url = this.populateTemplate(runParams, value, incrementIndex)
+        const downloadId = await this.store.insertFileToBeDownloaded(this.name, 0, incrementIndex, url)
         // const filepath = resolve(
         // runParams.options.folder,
         // this.config.name,
         // [...parentIndexes, incrementIndex].join('-')
         // )
-        return this.saveUrl(url, runParams)
+        const fileContent = await this.saveUrl(url, runParams)
+        return fileContent
       }, 1)
       // ops.take(this.download.increment ? Infinity : 1)
     )

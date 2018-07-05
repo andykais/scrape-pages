@@ -5,9 +5,9 @@ import sqlite3 from 'sqlite3'
 class DB {
   database: any
 
-  constructor(downloadFolder: string) {
+  constructor({ folder }) {
     const verbose = sqlite3.verbose()
-    this.database = new verbose.Database(resolve(downloadFolder, 'store.sql'))
+    this.database = new verbose.Database(resolve(folder, 'store.sqlite'))
     // this.database = sqlite3
     // .verbose()
 
@@ -29,6 +29,14 @@ class DB {
         else resolve()
       })
     )
+
+  exec = sql =>
+    new Promise((resolve, reject) => {
+      this.database.exec(sql, error => {
+        if (error) reject(error)
+        else resolve()
+      })
+    })
 
   run = this._run('run')
 
