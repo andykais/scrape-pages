@@ -50,7 +50,12 @@ class UrlSaver extends BaseStep {
     this.startSource.pipe(
       ops.mergeMap(async incrementIndex => {
         const url = this.populateTemplate(runParams, value, incrementIndex)
-        const downloadId = await this.store.insertFileToBeDownloaded(this.name, 0, incrementIndex, url)
+        const downloadId = await this.store.insertFileToBeDownloaded(
+          this.name,
+          0,
+          incrementIndex,
+          url
+        )
         // const filepath = resolve(
         // runParams.options.folder,
         // this.config.name,

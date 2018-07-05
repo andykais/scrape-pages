@@ -32,11 +32,22 @@ class Store {
 
   areChildrenCompleted = url => false
 
-  insertFileToBeDownloaded = (scraper, loopIndex, incrementIndex, url): number => -1
+  insertFileToBeDownloaded = (
+    scraper,
+    loopIndex,
+    incrementIndex,
+    url
+  ): number => -1
 
   insertCompletedDownload = (id, filename) => {}
 
-  insertParsedValue = (scraper, downloadId, parentId, parseIndex, value): number => -1
+  insertParsedValue = (
+    scraper,
+    downloadId,
+    parentId,
+    parseIndex,
+    value
+  ): number => -1
 
   getOrderedScrapers = scrapers => {
     const orderLevelColumnSql = makeDynamicOrderLevelColumn(

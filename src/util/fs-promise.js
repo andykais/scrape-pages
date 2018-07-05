@@ -12,4 +12,3 @@ export const mkdirp = async folder =>
       else resolve()
     })
   )
-

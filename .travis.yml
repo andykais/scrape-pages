@@ -1,8 +1,24 @@
 language: node_js
 node_js:
   - "10"
+  - "9"
+  - "8"
+
+stages:
+  - test
+  - lint
+
+cache:
+  directories:
+    - $HOME/.npm
 
 install:
-  - npm install
-script:
-  - npm run test:unit
+  - npm ci
+script: echo "Running tests against $(node -v)"
+jobs:
+  include:
+    - stage: test
+      script: npm run test:unit
+    - stage: lint
+      node_js: "10"
+      script: npm run lint
