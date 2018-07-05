@@ -2,7 +2,7 @@ import fetch from 'node-fetch'
 import { createWriteStream } from 'fs'
 import { resolve, basename, relative, dirname } from 'path'
 import sanitize from 'sanitize-filename'
-import { read, exists, mkdirp } from '../../util/fs-promise'
+import { read, exists, mkdirp } from '../../../util/fs-promise'
 
 const relativeToBaseDir = folder => relative(dirname(dirname(folder)), folder)
 

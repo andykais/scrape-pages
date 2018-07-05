@@ -1,3 +1,5 @@
+import { assertConfigType } from './assert-config-type'
+
 const assignDownloadDefaults = download => {
   if (download === undefined) return undefined
 
@@ -61,10 +63,17 @@ const fillInDefaultsRecurse = (level = 0, parentName = '') => (
 }
 
 const fillInDefaults = config => {
+  assertConfigType(config)
+
+  const input =
+    typeof config.input === 'string'
+      ? { [config.input]: config.input }
+      : config.input
+
   const fullConfig = fillInDefaultsRecurse()(config.scrape)
+
   return {
-    input: undefined,
-    ...config,
+    input,
     scrape: fullConfig
   }
 }

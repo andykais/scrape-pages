@@ -21,5 +21,5 @@ export const findLowestCommonParent = (flatConfig, level1, level2) => {
     if (commonParent2) return commonParent2
   }
   // make sure the level lower on the tree is second
-  return recurse(...[level1, level2].sort(l => l.depth))
+  return recurse(...[level1, level2].sort((a, b) => b.depth - a.depth))
 }

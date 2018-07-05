@@ -1,53 +1,70 @@
 // @flow
+import format from 'string-template'
 import DB from './database'
 import type { Config } from '../configuration/type'
-import { RECURSIVE_ORDER_FROM_CHILD_TO_PARENT_SQL } from './sql-templates'
-
-const reverseConfig = (config, parentName = null) => {
-  const levelConfig = { ...config, parentName }
-  levelConfig.scrapeEach = config.scrapeEach.map(childConfig =>
-    reverseConfig(childConfig, config.name)
-  )
-  return levelConfig
-}
+import { makeFlatConfig } from '../configuration'
+import {
+  makeDynamicOrderLevelColumn,
+  makeWaitingConditionalJoins
+} from './sql-generators'
+import { CREATE_TABLES, SELECT_ORDERED_AS_TREE } from './sql-templates'
 
 class Store {
-  config: Config
-  db: DB
-
-  constructor(config: Config, downloadFolder: string) {
+  constructor(config) {
     this.config = config
-    this.db = new DB(downloadFolder)
+    this.flatConfig = makeFlatConfig(config)
   }
 
-  insertCompletedFile = (configLevel: string, value: string, url: string) => {}
+  init = async options => {
+    this.options = options
+    console.log(options)
+    this.db = new DB(options)
+    await this.db.exec(CREATE_TABLES)
+    // TODO optimize queries by creating dynamic sql ahead of time
+    // find which are returned from options, create one for each individually and one for all combined
+  }
+
+  insertCompletedFile = (scraper, value, url) => {}
 
   countCompletedFiles = () => {}
 
-  isFileDownloaded = (url: string): boolean => false
+  isFileDownloaded = url => false
 
-  getOrderedFromTo = (
-    startLevel: string,
-    parentLevel: string
-  ): Promise<Array<{}>> =>
+  areChildrenCompleted = url => false
+
+  insertFileToBeDownloaded = (scraper, loopIndex, incrementIndex, url): number => -1
+
+  insertCompletedDownload = (id, filename) => {}
+
+  insertParsedValue = (scraper, downloadId, parentId, parseIndex, value): number => -1
+
+  getOrderedScrapers = scrapers => {
+    const orderLevelColumnSql = makeDynamicOrderLevelColumn(
+      this.flatConfig,
+      scrapers
+    )
+    const waitingJoinsSql = makeWaitingConditionalJoins(
+      this.flatConfig,
+      scrapers
+    )
+
+    const selectedScrapers = scrapers.map(s => `'${s}'`).join(',')
+
+    console.log({ orderLevelColumnSql, waitingJoinsSql, selectedScrapers })
+    const selectOrderedSql = format(SELECT_ORDERED_AS_TREE, {
+      orderLevelColumnSql,
+      waitingJoinsSql,
+      selectedScrapers
+    })
+
+    return this.db.all(selectOrderedSql)
+  }
+
+  getOrderedFromTo = (startLevel, parentLevel): Promise<Array<{}>> =>
     this.db.all(RECURSIVE_ORDER_FROM_CHILD_TO_PARENT_SQL, [
       startLevel,
       parentLevel
     ])
-
-  recurseCombineCommonParents = (
-    levels: Array<string>
-  ): Promise<Array<any>> => {
-    const parentPointingConfig = reverseConfig(this.config.scrape)
-    console.log(parentPointingConfig)
-    return Promise.reject([])
-  }
-
-  getLevelsNested = (levels: Array<string>): Promise<Array<any>> => {
-    if (levels.length === 1)
-      return this.getOrderedFromTo(levels[0], this.config.parse.name)
-    else return this.recurseCombineCommonParents(levels)
-  }
 }
 
 export default Store

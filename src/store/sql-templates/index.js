@@ -1,3 +1,5 @@
 // @flow
 
-export { default as RECURSIVE_ORDER_FROM_CHILD_TO_PARENT_SQL } from './recursively-order-from-child-to-parent.sql'
+export { default as CREATE_TABLES } from './create-tables.sql'
+
+export { default as SELECT_ORDERED_AS_TREE } from './select-ordered-as-tree.sql'

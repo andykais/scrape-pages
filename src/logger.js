@@ -4,23 +4,30 @@ import { tap } from 'rxjs/operators'
 class Logger {
   level = {
     DEBUG: 3,
-    WARN: 2,
-    INFO: 1,
-    ERRO: 0
+    WRN: 2,
+    CLI: 1,
+    ERR: 0
   }
 
   allowed = {
     DEBUG: false,
-    WARN: false,
-    INFO: false,
-    ERROR: false
+    WRN: false,
+    CLI: false,
+    ERR: false
   }
 
   colors = {
     DEBUG: chalk,
-    WARN: chalk.yellow,
-    INFO: chalk,
-    ERRO: chalk.red
+    WRN: chalk.yellow,
+    CLI: chalk,
+    ERR: chalk.red
+  }
+
+  out = {
+    DEBUG: console.log,
+    WRN: console.log,
+    CLI: console.log,
+    ERR: console.error
   }
 
   constructor({ log_level }) {
@@ -31,15 +38,15 @@ class Logger {
   }
 
   _log = prefix => (...messages) => {
-    if (this.allowed[prefix] === undefined || this.allowed[prefix]) {
-      console.log(prefix, ...messages)
+    if (this.allowed[prefix]) {
+      this.out[prefix](this.colors[prefix](prefix, ...messages))
     }
   }
 
   debug = this._log('DEBUG')
-  warning = this._log('WARN')
-  info = console.log
-  error = this._log('ERRO')
+  warning = this._log('WRN')
+  cli = console.log
+  error = this._log('ERR')
   tap = (name = 'TAP') => tap(this._log(name))
 }
 
