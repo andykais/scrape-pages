@@ -12,6 +12,7 @@ cache:
   directories:
     - $HOME/.npm
 
+script: skip
 jobs:
   include:
     - stage: test
