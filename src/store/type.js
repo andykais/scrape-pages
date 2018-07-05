@@ -13,6 +13,4 @@ type UrlScraper = {
   downloaded: Array<Filepath>
 }
 
-export type Store = {
-  
-}
+export type Store = {}

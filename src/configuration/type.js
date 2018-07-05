@@ -56,7 +56,7 @@ type ParserName = string
 type ScrapeCriteriaBase = {|
   name?: ParserName,
   download?: UrlBuilder,
-  parse?: Parse,
+  parse?: Parse
 |}
 type ScrapeCriteriaLooper = {|
   ...ScrapeCriteriaBase,
@@ -66,7 +66,10 @@ type ScrapeCriteriaWithChildren = {|
   ...ScrapeCriteriaBase,
   scrapeEach: ScrapeCriteria
 |}
-type ScrapeCriteriaOptions = ScrapeCriteriaBase | ScrapeCriteriaLooper | ScrapeCriteriaWithChildren
+type ScrapeCriteriaOptions =
+  | ScrapeCriteriaBase
+  | ScrapeCriteriaLooper
+  | ScrapeCriteriaWithChildren
 
 type ScrapeCriteria = ScrapeCriteriaOptions | Array<ScrapeCriteriaOptions>
 
