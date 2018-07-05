@@ -62,13 +62,17 @@ const fillInDefaultsRecurse = (level = 0, parentName = '') => (
   }
 }
 
+const standardizeInput = input => {
+  if (!input) return []
+  const type = typeof input
+  if (type === 'string') return { [input]: input }
+  else return input
+}
+
 const fillInDefaults = config => {
   assertConfigType(config)
 
-  const input =
-    typeof config.input === 'string'
-      ? { [config.input]: config.input }
-      : config.input
+  const input = standardizeInput(config.input)
 
   const fullConfig = fillInDefaultsRecurse()(config.scrape)
 

@@ -20,40 +20,48 @@ class ScrapePages {
   }
 
   // TODO add parsable input for this first parse step
-  run = async (input = {}, options) => {
-    this.options = fillInDefaultOptions(this.config, options)
-    // create database file during run, not setup
+  runSetup = async (input = {}, optionsAll, optionsNamed) => {
+    this.options = fillInDefaultOptions(this.config, optionsAll, optionsNamed)
     try {
       if (!this.isValidInput(input)) throw new Error('invalid input')
 
-      this.logger.cli('Setting up SQLite database.')
-      await this.store.init(this.options)
-      await this.store.getOrderedScrapers(['media'])
-
-      this.logger.cli('Begin downloading with inputs', input)
-      await mkdirp(this.options.folder)
+      this.logger.cli('Making folders.')
+      await mkdirp(optionsAll.folder)
       await this.scrapingScheme.runSetup(this.options)
 
-      this.scrapingScheme
-        .run({ input, options: this.options })()
-        .subscribe(
-          () => {},
-          error => {
-            this.logger.error(error.toString())
-            this.emitter.emit('error', error)
-            process.exit(1)
-          },
-          () => {
-            // TODO add timer to show how long it took
-            this.logger.cli('Done!')
-            this.emitter.emit('done')
-          }
-        )
-      return this.emitter
+      this.logger.cli('Setting up SQLite database.')
+      await this.store.init(optionsAll.folder)
+      const scraperValues = await this.store.getOrderedScrapers(['media'])
+      console.log({ scraperValues })
+
+      this.logger.cli('Begin downloading with inputs', input)
+      return this.scrapingScheme.run({ input })()
     } catch (e) {
       this.logger.error(e.code, e.message)
+      console.log(e.stack)
       process.exit(1)
     }
+  }
+
+  run = async (...args) => {
+    const scrapingObservable = await this.runSetup(...args)
+    scrapingObservable.subscribe(
+      undefined,
+      error => {
+        this.emitter.emit('error', error)
+        scrapingObservable.unsubscribe()
+      },
+      () => {
+        // TODO add timer to show how long it took
+        this.logger.cli('Done!')
+        this.emitter.emit('done')
+      }
+    )
+    return this.emitter
+  }
+  runAsPromise = async (...args) => {
+    const scrapingObservable = await this.runSetup(...args)
+    return scrapingObservable.toPromise()
   }
 
   isValidInput = input =>

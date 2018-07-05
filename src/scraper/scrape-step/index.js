@@ -16,11 +16,15 @@ class Scraper {
     this.parse = chooseParser({ config, expect, ...io })
     this.emitter = io.emitter
     this.logger = io.logger
+    this.store = io.store
     this.children = scrapeEach.map(scrape => new Scraper(scrape, io))
   }
 
   runSetup = async options => {
-    await mkdirp(`${options.folder}/${this.name}`)
+    this.options = options[this.name]
+    await mkdirp(this.options.folder)
+    this.save.runSetup(this.options)
+    this.parse.runSetup(this.options)
     await Promise.all(this.children.map(child => child.runSetup(options)))
   }
 
@@ -28,23 +32,26 @@ class Scraper {
   // then make flat observable
   //
   // TODO allow for increments like range(0, 100) where some may respond with nothing
-  run = params => (parentValue, parentIndexes = []) =>
+  run = params => (parentValue, parentId) =>
     this.save
-      .run(params, parentIndexes)(parentValue)
+      .run(params, parentId)(parentValue)
       .pipe(
         ops.map(this.parse.run(params)),
         takeWhileHardStop(parsed => parsed.length),
         ops.mergeMap((parsed, incrementIndex) =>
           Rx.from(parsed).pipe(
-            ops.mergeMap((value, parsedIndex) =>
-              this.children.map(child =>
-                child.run(params)(value, [
-                  ...parentIndexes,
-                  incrementIndex,
-                  parsedIndex
-                ])
+            ops.mergeMap(async ({ value, downloadId }, parsedIndex) => {
+              const nextParentId = this.store.insertParsedValue({
+                name: this.name,
+                parseIndex,
+                value,
+                downloadId,
+                parentIndex
+              })
+              return this.children.map(child =>
+                child.run(params)(value, nextParentId)
               )
-            )
+            })
           )
         ),
         ops.mergeAll()
