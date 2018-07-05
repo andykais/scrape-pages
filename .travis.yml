@@ -12,9 +12,6 @@ cache:
   directories:
     - $HOME/.npm
 
-install:
-  - npm ci
-script: echo "Running tests against $(node -v)"
 jobs:
   include:
     - stage: test
