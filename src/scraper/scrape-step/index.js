@@ -21,7 +21,7 @@ class Scraper {
   }
 
   runSetup = async options => {
-    this.options = options[this.name]
+    this.options = options[this.name] // TODO decide if making each run stateful is a good idea or not
     await mkdirp(this.options.folder)
     this.save.runSetup(this.options)
     this.parse.runSetup(this.options)
@@ -32,29 +32,40 @@ class Scraper {
   // then make flat observable
   //
   // TODO allow for increments like range(0, 100) where some may respond with nothing
-  run = params => (parentValue, parentId) =>
-    this.save
+  run = params => (parentValue, parentId) => {
+    // console.log(this.name, parentValue)
+
+    return this.save
       .run(params, parentId)(parentValue)
       .pipe(
-        ops.map(this.parse.run(params)),
-        takeWhileHardStop(parsed => parsed.length),
-        ops.mergeMap((parsed, incrementIndex) =>
-          Rx.from(parsed).pipe(
-            ops.mergeMap(async ({ value, downloadId }, parsedIndex) => {
+        ops.mergeMap(this.parse.run(params), 1),
+        ops.tap(p => console.log(p.value.length)),
+        takeWhileHardStop(parsed => parsed.value.length),
+        ops.mergeMap(({ value, downloadId }) =>
+          Rx.from(value).pipe(
+            ops.mergeMap(async (value, parseIndex) => {
               const nextParentId = this.store.insertParsedValue({
                 name: this.name,
                 parseIndex,
                 value,
                 downloadId,
-                parentIndex
+                parentId
               })
-              return this.children.map(child =>
+              // console.log(value)
+              const c = this.children.map(child =>
                 child.run(params)(value, nextParentId)
               )
-            })
+              // console.log(c)
+              return c
+            }),
+            ops.mergeAll()
           )
         ),
+        // this.logger.tap(),
         ops.mergeAll()
+        // ops.mergeAll()
+        // this.logger.tap()
       )
+  }
 }
 export default Scraper

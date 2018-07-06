@@ -37,6 +37,8 @@ class UrlSaver extends BaseStep {
   }
 
   saveUrl = (url, runParams) => {
+    if (this.config.name === 'level_0_index_0') this.logger.warn(url)
+    this.logger.debug(this.config.name, url)
     const { folder } = this.options
     if (this.config.scrapeEach.length) {
       return downloadToFileAndMemory(url, folder, this.logger)
@@ -45,9 +47,10 @@ class UrlSaver extends BaseStep {
     }
   }
 
-  downloadSourceFunc = (runParams, parentIndexes) => value =>
-    this.startSource.pipe(
+  downloadSourceFunc = (runParams, parentIndexes) => value => {
+    return this.startSource.pipe(
       ops.mergeMap(async incrementIndex => {
+        // console.log('url time!')
         const url = this.populateTemplate(runParams, value, incrementIndex)
         const downloadId = await this.store.insertFileToBeDownloaded(
           this.name,
@@ -55,8 +58,8 @@ class UrlSaver extends BaseStep {
           incrementIndex,
           url
         )
-        const fileContent = await this.saveUrl(url, runParams)
-        return { value: fileContent, downloadId }
+        const urlContent = await this.saveUrl(url, runParams)
+        return { value: urlContent, downloadId }
       }, 1),
       ops.catchError(error => {
         // missing pages are not fatal errors
@@ -68,7 +71,7 @@ class UrlSaver extends BaseStep {
         }
       })
     )
-
+  }
   _run = this.downloadSourceFunc
 }
 
