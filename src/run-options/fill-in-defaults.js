@@ -14,7 +14,7 @@ const fillInDefaults = (config, optionsAll, optionsNamed) => {
   const defaults = {
     cache: true,
     request: {},
-    limit: undefined,
+    useLimiter: true,
     return: true,
     ...optionsAll // user preferences for all things override
   }

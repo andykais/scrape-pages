@@ -1,9 +1,10 @@
 import EventEmitter from 'events'
+import * as Rx from 'rxjs'
 
 class ScrapeEmitter {
   constructor() {
     this.limiters = []
-    this.emitter = new EventEmitter()
+    this._emitter = new EventEmitter()
     this.emitter.on('limit', this.setLimitersTo)
   }
 
@@ -28,7 +29,20 @@ class ScrapeEmitter {
     this.emitter.emit('progress', id, progress)
   }
 
+  emitDone() {
+    this.emitter.emit('done')
+  }
+
+  emitError(error) {
+    this.emitter.emit('error', error)
+  }
+
   get emitter() {
-    return this.emitter
+    return this._emitter
+  }
+
+  get toggler() {
+    return Rx.fromEvent(this.emitter, 'turnOffRateLimiter')
   }
 }
+export default ScrapeEmitter

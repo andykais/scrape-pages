@@ -5,7 +5,7 @@ import {
   downloadToMemoryOnly
 } from '../fetchers'
 
-const populateTemplate = ({ config }, { input }, { value, incrementIndex }) => {
+const populateTemplate = (config, { input }, { value, incrementIndex }) => {
   const { initialIndex, increment } = config.download
   const index = initialIndex + incrementIndex * increment
   const templateVals = { ...input, value, index }
@@ -17,30 +17,29 @@ const populateTemplate = ({ config }, { input }, { value, incrementIndex }) => {
   }
 }
 
-const saveUrl = ({ config, logger }, { options }, url) => {
-  // if (config.name === 'level_0_index_0') logger.warn(url)
-  // logger.debug(config.name, url)
+const chooseFetcher = (config, options) => {
+  if (config.scrapeEach.length || config.parse) return downloadToFileAndMemory
+  else return downloadToFileOnly
+}
+const saveUrl = (config, { options, logger, queue }, url) => {
   const { folder } = options
-  if (config.scrapeEach.length || config.parse) {
-    return downloadToFileAndMemory(url, folder, logger)
-  } else {
-    return downloadToFileOnly(url, folder, logger)
-  }
+  const fetcher = chooseFetcher(config, options)
+
+  return queue.add(() => fetcher(url, folder, logger))
 }
 
-export default setupParams => {
-  const { config, store } = setupParams
-
+export default config => {
   return runParams => async downloadParams => {
+    const { store } = runParams
     const { incrementIndex, loopIndex, value } = downloadParams
-    const url = populateTemplate(setupParams, runParams, downloadParams)
+    const url = populateTemplate(config, runParams, downloadParams)
     const downloadId = await store.insertQueuedDownload(
       config.name,
       0,
       incrementIndex,
       url
     )
-    const downloadValue = await saveUrl(setupParams, runParams, url)
+    const downloadValue = await saveUrl(config, runParams, url)
     await store.markDownloadComplete(downloadId)
     return { downloadValue, downloadId }
   }

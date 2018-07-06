@@ -1,7 +1,7 @@
 import urlDownloader from './variations/url-downloader'
 import identityDownloader from './variations/identity-downloader'
 
-export const incrementShouldKeepGoing = ({ config }) => (
+export const incrementShouldKeepGoing = config => (
   { parsedValues },
   incrementIndex
 ) => {
@@ -15,7 +15,7 @@ export const incrementShouldKeepGoing = ({ config }) => (
   }
 }
 
-export default setupParams => {
-  if (setupParams.config.download) return urlDownloader(setupParams)
-  else return identityDownloader(setupParams)
+export default config => {
+  if (config.download) return urlDownloader(config)
+  else return identityDownloader(config)
 }

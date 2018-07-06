@@ -1,4 +1,4 @@
-export default setupParams => runParams => async ({ value }) => {
-  const downloadId = await setupParams.store.insertQueuedDownload()
+export default config => ({ store }) => async ({ value }) => {
+  const downloadId = await store.insertQueuedDownload()
   return { downloadId, value }
 }

@@ -6,25 +6,25 @@ import * as ops from 'rxjs/operators'
 import { takeWhileHardStop } from '../../util/rxjs-operators'
 
 // init setup
-const scraper = setupParams => {
-  const downloaderSetup = chooseDownloader(setupParams)
-  const parserSetup = chooseParser(setupParams)
-  const childrenSetup = setupParams.config.scrapeEach.map(scrapeConfig =>
-    scraper({
-      ...setupParams,
-      config: scrapeConfig
-    })
+const scraper = config => {
+  const downloaderSetup = chooseDownloader(config)
+  const parserSetup = chooseParser(config)
+  const childrenSetup = config.scrapeEach.map(scrapeConfig =>
+    scraper(scrapeConfig)
   )
 
   // run setup
-  return async (input, optionsNamed) => {
-    const runParams = { input, options: optionsNamed[setupParams.config.name] }
+  return async scraperRunParams => {
+    const runParams = {
+      ...scraperRunParams,
+      options: scraperRunParams.flatOptions[config.name]
+    }
     const downloader = downloaderSetup(runParams)
     const parser = parserSetup(runParams)
 
     await mkdirp(runParams.options.folder)
     const children = await Promise.all(
-      childrenSetup.map(child => child(input, optionsNamed))
+      childrenSetup.map(child => child(scraperRunParams))
     )
 
     // called per each value
@@ -32,7 +32,6 @@ const scraper = setupParams => {
       return Rx.from(parentValues).pipe(
         ops.flatMap(value =>
           Rx.interval().pipe(
-            ops.take(6),
             ops.flatMap(async incrementIndex => {
               // db write start, download, db write complete
               const loopIndex = 0
@@ -47,9 +46,10 @@ const scraper = setupParams => {
                 downloadId,
                 value: downloadValue
               })
+              if (config.name === 'post') console.log(parsedValues)
               return { parsedValues, nextParentId }
             }, 1),
-            takeWhileHardStop(incrementShouldKeepGoing(setupParams)),
+            takeWhileHardStop(incrementShouldKeepGoing(config)),
             ops.flatMap(({ parsedValues, nextParentId }) =>
               children.map(child => child(parsedValues, nextParentId))
             ),
