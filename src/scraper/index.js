@@ -20,7 +20,7 @@ class ScrapePages {
   }
 
   // TODO add parsable input for this first parse step
-  runSetup = async (input = {}, optionsAll, optionsNamed) => {
+  runSetup = async (input = {}, optionsAll, optionsNamed = {}) => {
     this.options = fillInDefaultOptions(this.config, optionsAll, optionsNamed)
     try {
       if (!this.isValidInput(input)) throw new Error('invalid input')

@@ -38,6 +38,7 @@ class Logger {
   }
 
   _log = prefix => (...messages) => {
+    if (this.allowed[prefix] === undefined) console.log(prefix, ...messages)
     if (this.allowed[prefix]) {
       this.out[prefix](this.colors[prefix](prefix, ...messages))
     }

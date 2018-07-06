@@ -1,12 +1,12 @@
 import cheerio from 'cheerio'
 import artoo from 'artoo-js'
 import BaseStep from '../base-scraper'
-import IdentityStep from '../identity-scraper'
+// import IdentityStep from '../identity-scraper'
 
 artoo.bootstrap(cheerio)
 
 class HtmlParser extends BaseStep {
-  _run = () => async ({ value }) => {
+  _run = () => async ({ value, downloadId }) => {
     if (value === undefined || value === null) return []
     // console.log(this.name, 'parsing', this.parse.selector)
     const $ = cheerio.load(value)
@@ -18,11 +18,21 @@ class HtmlParser extends BaseStep {
     // if (this.config.name === 'level_0_index_0') {
     // console.log(cleanedVals)
     // }
-    return cleanedVals || []
+    const values = cleanedVals || []
+    if (this.config.name === 'level_0_index_0') this.logger.warn(values.length)
+
+    return { value: cleanedVals || [], downloadId }
   }
 }
 
 class JsonParser extends BaseStep {}
+
+class IdentityStep extends BaseStep {
+  _run = () => async ({ value, downloadId }) => ({
+    value: value ? [value] : [],
+    downloadId
+  })
+}
 
 export default setupParams => {
   const parsers = {
