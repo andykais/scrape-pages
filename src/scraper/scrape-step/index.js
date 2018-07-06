@@ -1,71 +1,64 @@
-import chooseParser from './parsers'
-import chooseSaver from './savers'
+import chooseParser from './parser'
+import chooseDownloader, { incrementShouldKeepGoing } from './downloader'
 import { mkdirp } from '../../util/fs-promise'
 import * as Rx from 'rxjs'
 import * as ops from 'rxjs/operators'
 import { takeWhileHardStop } from '../../util/rxjs-operators'
 
-class Scraper {
-  constructor(config, io) {
-    const { name, parse, download, scrapeEach } = config
-    const childless = !Boolean(scrapeEach.length)
-    const { expect } = parse || {}
+// init setup
+const scraper = setupParams => {
+  const downloaderSetup = chooseDownloader(setupParams)
+  const parserSetup = chooseParser(setupParams)
+  const childrenSetup = setupParams.config.scrapeEach.map(scrapeConfig =>
+    scraper({
+      ...setupParams,
+      config: scrapeConfig
+    })
+  )
 
-    this.name = name
-    this.save = chooseSaver({ config, expect, ...io })
-    this.parse = chooseParser({ config, expect, ...io })
-    this.emitter = io.emitter
-    this.logger = io.logger
-    this.store = io.store
-    this.children = scrapeEach.map(scrape => new Scraper(scrape, io))
-  }
+  // run setup
+  return async (input, optionsNamed) => {
+    const runParams = { input, options: optionsNamed[setupParams.config.name] }
+    const downloader = downloaderSetup(runParams)
+    const parser = parserSetup(runParams)
 
-  runSetup = async options => {
-    this.options = options[this.name] // TODO decide if making each run stateful is a good idea or not
-    await mkdirp(this.options.folder)
-    this.save.runSetup(this.options)
-    this.parse.runSetup(this.options)
-    await Promise.all(this.children.map(child => child.runSetup(options)))
-  }
+    await mkdirp(runParams.options.folder)
+    const children = await Promise.all(
+      childrenSetup.map(child => child(input, optionsNamed))
+    )
 
-  // TODO recursively get operators instead of recusive run
-  // then make flat observable
-  //
-  // TODO allow for increments like range(0, 100) where some may respond with nothing
-  run = params => (parentValue, parentId) => {
-    // console.log(this.name, parentValue)
-
-    return this.save
-      .run(params, parentId)(parentValue)
-      .pipe(
-        ops.mergeMap(this.parse.run(params), 1),
-        ops.tap(p => console.log(p.value.length)),
-        takeWhileHardStop(parsed => parsed.value.length),
-        ops.mergeMap(({ value, downloadId }) =>
-          Rx.from(value).pipe(
-            ops.mergeMap(async (value, parseIndex) => {
-              const nextParentId = this.store.insertParsedValue({
-                name: this.name,
-                parseIndex,
-                value,
-                downloadId,
-                parentId
+    // called per each value
+    return (parentValues, parentId) => {
+      return Rx.from(parentValues).pipe(
+        ops.flatMap(value =>
+          Rx.interval().pipe(
+            ops.take(6),
+            ops.flatMap(async incrementIndex => {
+              // db write start, download, db write complete
+              const loopIndex = 0
+              const { downloadValue, downloadId } = await downloader({
+                incrementIndex,
+                loopIndex,
+                value
               })
-              // console.log(value)
-              const c = this.children.map(child =>
-                child.run(params)(value, nextParentId)
-              )
-              // console.log(c)
-              return c
-            }),
+
+              const { parsedValues, nextParentId } = await parser({
+                parentId,
+                downloadId,
+                value: downloadValue
+              })
+              return { parsedValues, nextParentId }
+            }, 1),
+            takeWhileHardStop(incrementShouldKeepGoing(setupParams)),
+            ops.flatMap(({ parsedValues, nextParentId }) =>
+              children.map(child => child(parsedValues, nextParentId))
+            ),
             ops.mergeAll()
+            // ops.mergeAll() // not sure if necessary??
           )
-        ),
-        // this.logger.tap(),
-        ops.mergeAll()
-        // ops.mergeAll()
-        // this.logger.tap()
+        )
       )
+    }
   }
 }
-export default Scraper
+export default scraper
