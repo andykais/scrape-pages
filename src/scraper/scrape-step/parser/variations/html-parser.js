@@ -3,7 +3,7 @@ import artoo from 'artoo-js'
 
 artoo.bootstrap(cheerio)
 
-export default ({ config, store }) => runParams => async ({ value }) => {
+export default config => ({ store }) => async ({ value }) => {
   // parse from config
   const $ = cheerio.load(value)
   const parsedValues = $(config.parse.selector)

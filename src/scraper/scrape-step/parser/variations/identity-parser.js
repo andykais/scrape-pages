@@ -1,4 +1,4 @@
-export default ({ config, store }) => runParams => async ({
+export default config => ({ store }) => async ({
   downloadId,
   parentId,
   value

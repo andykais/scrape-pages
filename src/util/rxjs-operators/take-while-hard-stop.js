@@ -1,6 +1,6 @@
 import * as Rx from 'rxjs'
 
-export const takeWhileHardStop = predicate => source =>
+const takeWhileHardStop = predicate => source =>
   new Rx.Observable(destination => {
     let index = 0
     const subscription = source.subscribe({
@@ -21,3 +21,4 @@ export const takeWhileHardStop = predicate => source =>
       }
     })
   })
+export { takeWhileHardStop }

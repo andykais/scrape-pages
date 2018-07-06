@@ -11,7 +11,7 @@ type Limiters = {
 type OptionsAny = {|
   cache?: boolean, // defaults to true
   request?: RequestOptions, // params passed down to the request module downloading the data
-  limit?: number,
+  useLimiter?: boolean, // defaults to true
   return?: boolean, // defaults to true
   returnParsed?: boolean, // defaults to true if leaf node and no download step
   returnDownloaded?: boolean, // defaults to true if leaf node
@@ -21,7 +21,13 @@ type OptionsAny = {|
 // defaults only occur in optionsAll, and optionsAll options will be overridden by optionsNamed
 export type OptionsAll = {|
   ...OptionsAny,
-  folder: string
+  folder: string,
+  maxConcurrent?: number, // total concurrent requests, defaults to 1
+  limiter?: {|
+    // defaults to none
+    rate: number, // time interval for the given limit of requests (in millis)
+    limit: number // total requests allowed within the time interval
+  |}
 |}
 export type OptionsNamed = OptionsAny
 

@@ -1,58 +1,60 @@
 import EventEmitter from 'events'
-import { fromEvent } from 'rxjs'
-import { tap, takeUntil, mergeMap } from 'rxjs/operators'
+import * as Rx from 'rxjs'
+import * as ops from 'rxjs/operators'
+import { rateLimitToggle } from './util/rxjs-operators'
 
 class Queuer {
-  constructor({ maxConcurrent = 1, debug = false } = {}) {
+  constructor({ maxConcurrent = 1, limiter, debug = false }, toggler) {
     // node event emitter
     const queueEmitter = new EventEmitter()
     // event emitter to keep track of each task finishing
-    const taskEmitter = new EventEmitter()
 
     const debugMsg = message => val =>
       debug && console.log(message, val, `${this.pending} pending`)
 
+    // based on the run options it may use the conditional rate limiter or a simple concurrent limiter
+    const concurrentController = limiter
+      ? rateLimitToggle(
+          this._executeTask,
+          limiter.limit,
+          limiter.rate,
+          maxConcurrent,
+          toggler
+        )
+      : mergeMap(this._executeTask, maxConcurrent)
+
     // listen to `queueEmitter` for a stream of inputs
-    const source = fromEvent(queueEmitter, 'promise').pipe(
-      tap(debugMsg('ADD TASK')),
+    const source = Rx.fromEvent(queueEmitter, 'task').pipe(
+      ops.tap(debugMsg('ADD TASK')),
       // stop accepting new values after 'close' event is emitted
-      takeUntil(fromEvent(queueEmitter, 'close')),
-      // concurrently run 'maxConcurrent' promises together
-      mergeMap(vals => this._executeTask(vals), maxConcurrent),
-      tap(debugMsg('TASK COMPLETED'))
+      ops.takeUntil(Rx.fromEvent(queueEmitter, 'close')),
+      concurrentController,
+      ops.tap(debugMsg('TASK COMPLETED'))
     )
 
     this.pending = 0
+    this.inProgress = 0
     this.queueEmitter = queueEmitter
-    this.taskEmitter = taskEmitter
     this.source = source
     this.queuePromise = source.toPromise()
   }
 
-  // does not affect the stream but notifies taskEmitter that this particular promise has completed
-  _executeTask([task, unique]) {
+  _executeTask = ([task, callback]) => {
+    this.inProgress++
     return task()
-      .then(
-        value => (this.taskEmitter.emit('complete', { unique, value }), value)
-      )
-      .catch(
-        error => (this.taskEmitter.emit('complete', { error, unique }), error)
-      )
+      .then(value => callback(null, value))
+      .catch(error => callback(error))
   }
 
   // returns a promise that resolves or rejects according to the promise passed in
   // <T>(task: () => Promise<T>): Promise<T>
   add(task) {
     return new Promise((resolve, reject) => {
-      const uniqueId = Symbol()
       this.pending++
-      this.queueEmitter.emit('promise', task, uniqueId)
-      this.taskEmitter.on('complete', ({ error, unique, value }) => {
-        if (uniqueId === unique) {
-          this.pending--
-          if (error) reject(error)
-          else resolve(value)
-        }
+      this.queueEmitter.emit('task', task, (error, value) => {
+        this.inProgress--
+        if (error) reject(error)
+        else resolve(value)
       })
     })
   }
