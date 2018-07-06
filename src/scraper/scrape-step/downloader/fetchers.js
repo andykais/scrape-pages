@@ -14,7 +14,7 @@ export const downloadToFileAndMemory = async (url, folder, logger) => {
   try {
     // TODO replace with database knowledge of files downloaded
     const body = await read(file)
-    logger.debug('read', relativeToBaseDir(file))
+    logger.debug('read', url)
     return body.toString()
   } catch (e) {
     if (e.code !== 'ENOENT') throw e
@@ -29,7 +29,7 @@ export const downloadToFileAndMemory = async (url, folder, logger) => {
       dest.on('error', error => reject(error))
       dest.on('close', () => resolve(Buffer.concat(buffers).toString()))
     })
-    logger.debug('downloaded', relativeToBaseDir(file))
+    logger.debug('downloaded', url)
     return body
   }
 }
@@ -40,7 +40,7 @@ export const downloadToFileOnly = async (url, folder, logger) => {
 
   const fileIsAlreadySaved = await exists(file)
   if (fileIsAlreadySaved) {
-    logger.debug('skipped', relativeToBaseDir(file))
+    logger.debug('skipped', url)
   } else {
     const response = await fetch(url)
     return new Promise((resolve, reject) => {
