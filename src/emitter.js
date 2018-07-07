@@ -42,7 +42,7 @@ class ScrapeEmitter {
   }
 
   get toggler() {
-    return Rx.fromEvent(this.emitter, 'turnOffRateLimiter')
+    return Rx.fromEvent(this.emitter, 'useRateLimiter')
   }
 }
 export default ScrapeEmitter

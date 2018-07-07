@@ -5,7 +5,7 @@ import sqlite3 from 'sqlite3'
 class DB {
   database: any
 
-  constructor(folder) {
+  constructor(folder: string) {
     const verbose = sqlite3.verbose()
     this.database = new verbose.Database(resolve(folder, 'store.sqlite'))
     // this.database = sqlite3
@@ -16,9 +16,9 @@ class DB {
 
   _run = (method: string) => (sql: string, values: Array<any> = []) =>
     new Promise((resolve, reject) => {
-      this.database[method](sql, values, (error, result) => {
+      this.database[method](sql, values, function(error, result) {
         if (error) reject(error)
-        else resolve(result)
+        else resolve({ result, id: this.lastID })
       })
     })
 
@@ -30,7 +30,7 @@ class DB {
       })
     )
 
-  exec = sql =>
+  exec = (sql: string) =>
     new Promise((resolve, reject) => {
       this.database.exec(sql, error => {
         if (error) reject(error)
@@ -38,10 +38,12 @@ class DB {
       })
     })
 
-  run = this._run('run')
+  run = (sql, values) => this._run('run')(sql, values).then(({ id }) => id)
 
-  get = this._run('get')
+  get = (sql, values) =>
+    this._run('get')(sql, values).then(({ result }) => result)
 
-  all = this._run('all')
+  all = (sql, values) =>
+    this._run('all')(sql, values).then(({ result }) => result)
 }
 export default DB

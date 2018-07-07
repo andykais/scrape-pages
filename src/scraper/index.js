@@ -14,6 +14,14 @@ class ScrapePages {
     this.scrapingSetup = scraper(this.config.scrape)
   }
 
+  initDependencies = (input, optionsAll) => {
+    this.store = new Store(this.config)
+    this.emitter = new Emitter()
+    this.logger = new Logger({ log_level: 3 })
+    this.queue = new Queue(optionsAll, this.emitter.toggler)
+    console.log('initted dependencies')
+  }
+
   // TODO add parsable input for this first parse step
   runSetup = async (input = {}, optionsAll, optionsNamed = {}) => {
     const flatOptions = fillInDefaultOptions(
@@ -22,11 +30,6 @@ class ScrapePages {
       optionsNamed
     )
     if (!this.isValidInput(input)) throw new Error('invalid input')
-
-    this.store = new Store(this.config)
-    this.emitter = new Emitter()
-    this.logger = new Logger({ log_level: 3 })
-    this.queue = new Queue(optionsAll, this.emitter.toggler)
 
     this.logger.cli('Making folders.')
     await mkdirp(optionsAll.folder)
@@ -48,23 +51,35 @@ class ScrapePages {
     return this.scrapingScheme([undefined])
   }
 
-  run = async (...args) => {
-    const scrapingObservable = await this.runSetup(...args)
-    scrapingObservable.subscribe(
-      undefined,
-      error => {
-        this.emitter.emitError(error)
-        scrapingObservable.unsubscribe()
-      },
-      () => {
-        // TODO add timer to show how long it took
-        this.logger.cli('Done!')
-        this.emitter.emitDone()
-      }
-    )
-    return this.emitter
+  run = (...args) => {
+    console.log('FUCUCUCU')
+    this.initDependencies(...args)
+    this.runSetup(...args).then(scrapingObservable => {
+      scrapingObservable.subscribe(
+        undefined,
+        error => {
+          this.emitter.emitError(error)
+          scrapingObservable.unsubscribe()
+          // TODO unsubscribe from queue
+        },
+        () => {
+          // TODO add timer to show how long it took
+          this.logger.cli('Done!')
+          this.queue.closeQueue()
+          this.emitter.emitDone()
+          this.store.db
+            .all('SELECT id, complete, url FROM downloads WHERE complete = 1')
+            .then(v => console.log(v.length))
+          this.store
+            .getOrderedScrapers(['post'])
+            .then(output => console.log({ output }))
+        }
+      )
+    })
+    return this.emitter.emitter
   }
   runAsPromise = async (...args) => {
+    this.initDependencies(...args)
     const scrapingObservable = await this.runSetup(...args)
     return scrapingObservable.toPromise()
   }
