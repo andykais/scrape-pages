@@ -1,3 +1,5 @@
+// @flow
+
 type RegexRemove = string
 type RegexReplace = {|
   select: string,
@@ -33,9 +35,12 @@ type ParseSelectorOnly = string
 type Parse = ParseSelectorOnly | ParseDetailed
 
 // toplevel url builder
+// TODO put cookies and headers in here as templates
 type UrlBuilderBase = {|
   template?: string, // template for url, will be filled using variables available
-  regexCleanup?: Regex
+  regexCleanup?: Regex,
+  cookieTemplates?: {[string]: string},
+  headerTemplates?: {[string]: string}
   // increment?: 0
   // increment: false // TODO reenable after fix with flow-runtime
 |}

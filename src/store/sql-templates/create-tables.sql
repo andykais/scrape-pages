@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS downloads (
   incrementIndex INT NOT NULL, -- index of a url incrementer (priority low)
   url TEXT,
   filename TEXT,
-  downloaded BIT,
+  complete BIT,
   failed BIT,
   allChildrenDownloaded BIT,
   identity BIT
@@ -26,4 +26,6 @@ CREATE TABLE IF NOT EXISTS parsedTree (
 );
 
 --  horizontalIndex INT, -- index used for consitent order when two parsers are next to each other (priority low and only under certain circumstances)
+CREATE UNIQUE INDEX IF NOT EXISTS urlIndex ON downloads(url);
+CREATE UNIQUE INDEX IF NOT EXISTS downloadId ON downloads(id);
 COMMIT;

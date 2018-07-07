@@ -46,7 +46,10 @@ const scraper = config => {
                 downloadId,
                 value: downloadValue
               })
-              if (config.name === 'post') console.log(parsedValues)
+              console.log(parsedValues, {
+                progressing: runParams.queue.inProgress,
+                queued: runParams.queue.pending
+              })
               return { parsedValues, nextParentId }
             }, 1),
             takeWhileHardStop(incrementShouldKeepGoing(config)),

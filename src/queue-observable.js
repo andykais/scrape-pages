@@ -4,32 +4,24 @@ import * as ops from 'rxjs/operators'
 import { rateLimitToggle } from './util/rxjs-operators'
 
 class Queuer {
-  constructor({ maxConcurrent = 1, limiter, debug = false }, toggler) {
+  constructor({ maxConcurrent = 1, rateLimit, }, toggler) {
     // node event emitter
     const queueEmitter = new EventEmitter()
     // event emitter to keep track of each task finishing
 
-    const debugMsg = message => val =>
-      debug && console.log(message, val, `${this.pending} pending`)
-
     // based on the run options it may use the conditional rate limiter or a simple concurrent limiter
-    const concurrentController = limiter
-      ? rateLimitToggle(
-          this._executeTask,
-          limiter.limit,
-          limiter.rate,
-          maxConcurrent,
-          toggler
-        )
-      : mergeMap(this._executeTask, maxConcurrent)
+    const concurrentController = rateLimit
+      ? rateLimitToggle(this._executeTask, toggler, {
+          ...rateLimit,
+          maxConcurrent
+        })
+      : ops.mergeMap(this._executeTask, maxConcurrent)
 
     // listen to `queueEmitter` for a stream of inputs
     const source = Rx.fromEvent(queueEmitter, 'task').pipe(
-      ops.tap(debugMsg('ADD TASK')),
       // stop accepting new values after 'close' event is emitted
       ops.takeUntil(Rx.fromEvent(queueEmitter, 'close')),
       concurrentController,
-      ops.tap(debugMsg('TASK COMPLETED'))
     )
 
     this.pending = 0
@@ -53,6 +45,7 @@ class Queuer {
       this.pending++
       this.queueEmitter.emit('task', task, (error, value) => {
         this.inProgress--
+        this.pending--
         if (error) reject(error)
         else resolve(value)
       })

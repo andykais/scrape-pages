@@ -1,11 +1,11 @@
 import * as Rx from 'rxjs'
 import * as ops from 'rxjs/operators'
 
-const rateLimitToggle = (func, limit, rate, maxConcurrent, toggler) => {
+const rateLimitToggle = (func, toggler, {  limit, rate, maxConcurrent, useLimiterFirst = true}) => {
   const rateTimer = Rx.timer(0, rate).pipe(ops.mapTo(true))
   return source =>
     new Rx.Observable(subscriber => {
-      const concurrentLimiter = new Rx.Subject()
+      const concurrentLimiter = new Rx.BehaviorSubject(false)
       // stateful vars
       const queue = []
       let inProgress = 0
@@ -16,21 +16,23 @@ const rateLimitToggle = (func, limit, rate, maxConcurrent, toggler) => {
         concurrentLimiter.next()
       }
       const dequeue = useRateLimit => {
-        const availableSlots = useRateLimit ? limit : maxConcurrent - inProgress
+        const availableSlots = useRateLimit
+          ? limit
+          : Math.min(maxConcurrent, maxConcurrent - inProgress)
         const numberToDequeue = Math.min(availableSlots, queue.length)
         const nextVals = queue.splice(0, numberToDequeue)
-        inProgress += availableSlots
+        inProgress += numberToDequeue
         return nextVals
       }
 
-      Rx.merge(Rx.of(true), toggler)
+      Rx.merge(Rx.of(useLimiterFirst), toggler)
         .pipe(
-          ops.switchMap(
+          ops.mergeMap(
             useRateLimiter => (useRateLimiter ? rateTimer : concurrentLimiter)
           ),
           ops.takeWhile(() => !closed || queue.length),
           ops.mergeMap(dequeue),
-          ops.mergeMap(val => func(val), maxConcurrent)
+          ops.mergeMap(val => func(val), maxConcurrent) // must manage the max concurrent number manually
         )
         .subscribe(val => {
           inProgress--

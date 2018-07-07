@@ -1,14 +1,14 @@
 import fs from 'fs'
 import { promisify } from 'util'
 
-export const exists = promisify(fs.exists)
+const { readFile, exists, mkdir } = fs.promises
 
-export const read = promisify(fs.readFile)
+export { exists, readFile }
 
-export const mkdirp = async folder =>
-  new Promise((resolve, reject) =>
-    fs.mkdir(folder, err => {
-      if (err && err.code !== 'EEXIST') reject(err)
-      else resolve()
-    })
-  )
+export const mkdirp = async folder => {
+  try {
+    await mkdir(folder)
+  } catch (e) {
+    if (e.code !== 'EEXIST') throw e
+  }
+}

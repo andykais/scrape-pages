@@ -1,4 +1,3 @@
-// @flow
 import format from 'string-template'
 import DB from './database'
 import type { Config } from '../configuration/type'
@@ -7,7 +6,13 @@ import {
   makeDynamicOrderLevelColumn,
   makeWaitingConditionalJoins
 } from './sql-generators'
-import { CREATE_TABLES, SELECT_ORDERED_AS_TREE } from './sql-templates'
+import {
+  CREATE_TABLES,
+  SELECT_ORDERED_AS_TREE,
+  INSERT_QUEUED_DOWNLOAD,
+  SELECT_DOWNLOAD_WHERE_URL_IS,
+  MARK_DOWNLOAD_COMPLETE
+} from './sql-templates'
 
 class Store {
   constructor(config) {
@@ -17,6 +22,7 @@ class Store {
 
   init = async folder => {
     this.db = new DB(folder)
+    await this.db.run('PRAGMA journal_mode = WAL')
     await this.db.exec(CREATE_TABLES)
     // TODO optimize queries by creating dynamic sql ahead of time
     // find which are returned from options, create one for each individually and one for all combined
@@ -30,10 +36,28 @@ class Store {
 
   areChildrenCompleted = url => false
 
-  insertQueuedDownload = (scraper, loopIndex, incrementIndex, url): number =>
-    Promise.resolve(-1)
+  getCachedDownload = url => this.db.get(SELECT_DOWNLOAD_WHERE_URL_IS, [url])
+  // TODO batch this call? (less readable but doable)
+  insertQueuedDownload = ({
+    scraper,
+    loopIndex,
+    incrementIndex,
+    url
+  }): number => {
+    return this.db.run(INSERT_QUEUED_DOWNLOAD, {
+      $scraper: scraper,
+      $loopIndex: loopIndex,
+      $incrementIndex: incrementIndex,
+      $url: url
+    })
+  }
 
-  markDownloadComplete = (id, filename) => {}
+  markDownloadComplete = ({ downloadId, filename }) => {
+    return this.db.run(MARK_DOWNLOAD_COMPLETE, {
+      $filename: filename,
+      $downloadId: downloadId
+    })
+  }
 
   insertBatchParsedValues = ({
     name,
@@ -69,6 +93,7 @@ class Store {
       selectedScrapers
     })
 
+    return this.db.all('SELECT * FROM parsedTree')
     return this.db.all(selectOrderedSql)
   }
 

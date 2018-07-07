@@ -23,7 +23,7 @@ export type OptionsAll = {|
   ...OptionsAny,
   folder: string,
   maxConcurrent?: number, // total concurrent requests, defaults to 1
-  limiter?: {|
+  rateLimit?: {|
     // defaults to none
     rate: number, // time interval for the given limit of requests (in millis)
     limit: number // total requests allowed within the time interval
