@@ -2,12 +2,14 @@ import { findMin, findMax } from '../../util/array'
 import { k_combinations } from './util/k_combinations'
 import { findLowestCommonParent } from './util/find-lowest-common-parent'
 
-const makeDynamicOrderLevelColumn = (flatConfig, levels) => {
+const makeDynamicOrderLevelColumn = (flatConfig, scraperNames) => {
   const recurse = levelsRecursed => {
     if (levelsRecursed.length < 2) return ''
     const combinations = k_combinations(levelsRecursed, 2)
     const parentObj = combinations.reduce((acc, pair) => {
+      console.log(pair)
       const parent = findLowestCommonParent(flatConfig, ...pair)
+      console.log({ parent })
       acc[parent.name] = (acc[parent.name] || []).concat(pair)
       return acc
     }, {})
@@ -25,9 +27,9 @@ const makeDynamicOrderLevelColumn = (flatConfig, levels) => {
     const selectedString = selectedLevels.map(l => `'${l.name}'`).join(',')
 
     const caseSql = children.length
-      ? `WHEN pTree.level = '${
+      ? `WHEN pTree.scraper = '${
           parent.name
-        }' AND cte.startLevel IN (${selectedString}) THEN horizontalIndex `
+        }' AND cte.currentScraper IN (${selectedString}) THEN cte.scraper `
       : ''
 
     const remainingLevels = Array.from(
@@ -35,6 +37,8 @@ const makeDynamicOrderLevelColumn = (flatConfig, levels) => {
     )
     return caseSql + recurse(remainingLevels)
   }
+  const levels = scraperNames.map(name => flatConfig[name])
+  console.log({ levels })
   const cases = recurse(levels)
   if (cases) return `CASE ${cases}ELSE 0 END`
   else return '0'

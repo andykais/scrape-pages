@@ -9,7 +9,7 @@ describe('make waiting conditional joins', () => {
   const flatConfig = makeFlatConfig(fullConfig)
 
   it('should wait for the lowest level respective to its own depth', () => {
-    const scrapersToGetOut = [flatConfig['tag'], flatConfig['img']]
+    const scrapersToGetOut = ['tag', 'img']
     const joinSql = makeWaitingConditionalJoins(flatConfig, scrapersToGetOut)
     expect(joinSql).toBe(
       `CASE WHEN cte.startLevel = 'tag' AND cte.recurseDepth IN ('0') THEN cte.id ELSE cte.parentId END`
@@ -17,11 +17,7 @@ describe('make waiting conditional joins', () => {
   })
 
   it('should have separate WHENs for each level above the lowest', () => {
-    const scrapersToGetOut = [
-      flatConfig['tag'],
-      flatConfig['img'],
-      flatConfig['img-parse']
-    ]
+    const scrapersToGetOut = ['tag', 'img', 'img-parse']
     const joinSql = makeWaitingConditionalJoins(flatConfig, scrapersToGetOut)
     expect(joinSql).toBe(
       `CASE WHEN cte.startLevel = 'tag' AND cte.recurseDepth IN ('0') THEN cte.id WHEN cte.startLevel = 'img-parse' AND cte.recurseDepth IN ('0') THEN cte.id ELSE cte.parentId END`

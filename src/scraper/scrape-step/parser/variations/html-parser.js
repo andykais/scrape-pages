@@ -3,13 +3,26 @@ import artoo from 'artoo-js'
 
 artoo.bootstrap(cheerio)
 
-export default config => ({ store }) => async ({ value }) => {
+export default config => ({ store }) => async ({
+  value,
+  parentId,
+  downloadId
+}) => {
   // parse from config
   const $ = cheerio.load(value)
   const parsedValues = $(config.parse.selector)
     .scrape(config.parse.attribute)
     .filter(val => val !== undefined)
   // write values to db
-  const nextParentId = await store.insertBatchParsedValues(parsedValues)
-  return { parsedValues, nextParentId }
+  await store.insertBatchParsedValues({
+    name: config.name,
+    parentId,
+    downloadId,
+    values: parsedValues
+  })
+  const parsedValuesWithId = await store.getParsedValuesFromParentId(parentId)
+  console.log('withid', parsedValuesWithId.length)
+  return parsedValuesWithId
+  // return { parsedValues }
+  // return { parsedValues, nextParentId }
 }

@@ -23,4 +23,13 @@ describe('find lowest common parent', () => {
     )
     expect(parent).toStrictEqual(flatConfig['img-parse'])
   })
+
+  it('should select one of the two if one is a child of the other (toplevel)', () => {
+    const parent = findLowestCommonParent(
+      flatConfig,
+      flatConfig['gallery'],
+      flatConfig['post']
+    )
+    expect(parent).toStrictEqual(flatConfig['gallery'])
+  })
 })
