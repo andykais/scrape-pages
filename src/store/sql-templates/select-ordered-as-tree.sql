@@ -2,6 +2,7 @@ WITH cte AS (
   SELECT
     parsedTree.id,
     url,
+    parsedValue,
     parentId,
     parseIndex,
     incrementIndex,
@@ -15,6 +16,7 @@ WITH cte AS (
   SELECT
     pTree.id,
     cte.url,
+    cte.parsedValue,
     pTree.parentId,
     pTree.parseIndex,
     pDownloads.incrementIndex,
@@ -29,9 +31,16 @@ WITH cte AS (
   pTree.downloadId = pDownloads.id
   ORDER BY
   recurseDepth,
-  parseIndex, incrementIndex,
+  parseIndex,
+  incrementIndex,
   levelOrder
 )
-SELECT id, url, parentId, parseIndex, incrementIndex, recurseDepth, currentScraper, scraper, levelOrder
+SELECT id, url, parsedValue, parentId, parseIndex, incrementIndex, recurseDepth, currentScraper, scraper, levelOrder
 FROM cte
-WHERE parentId IS NULL;
+WHERE recurseDepth = {lowestDepth}
+ORDER BY
+  recurseDepth,
+  incrementIndex,
+  parseIndex,
+  levelOrder
+;

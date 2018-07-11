@@ -11,7 +11,10 @@ import {
   SELECT_ORDERED_AS_TREE,
   INSERT_QUEUED_DOWNLOAD,
   SELECT_DOWNLOAD_WHERE_URL_IS,
-  MARK_DOWNLOAD_COMPLETE
+  MARK_DOWNLOAD_COMPLETE,
+  INSERT_PARSED_VALUES,
+  SELECT_PARSED_VALUES_WHERE_PARENT_ID_IS,
+  SELECT_PARSED_VALUES_WHERE_PARENT_ID_IS_NULL
 } from './sql-templates'
 
 class Store {
@@ -59,13 +62,27 @@ class Store {
     })
   }
 
-  insertBatchParsedValues = ({
-    name,
-    parentId,
-    parseIndex,
-    downloadId,
-    value
-  }) => Promise.resolve(-1)
+  insertBatchParsedValues = ({ name, parentId, downloadId, values }) => {
+    const valuesString = Array(values.length)
+      .fill('(?, ?, ?, ?, ?)')
+      .join(',')
+    const insertBatchParsedValuesSql = format(INSERT_PARSED_VALUES, {
+      values: valuesString
+    })
+    const insertRows = values.reduce(
+      (acc, parsedValue, parseIndex) =>
+        acc.concat([name, parentId, downloadId, parseIndex, parsedValue]),
+      []
+    )
+    console.log(parentId)
+    return this.db.run(insertBatchParsedValuesSql, insertRows)
+  }
+  getParsedValuesFromParentId = (
+    parentId = -1 // undefined is treated as -1 for selecting
+  ): Array<{ id: number, parsedValue: string }> => {
+    console.log({ parentId })
+    return this.db.all(SELECT_PARSED_VALUES_WHERE_PARENT_ID_IS, [parentId])
+  }
   // insertParsedValue = (
   // scraper,
   // downloadId,
@@ -75,6 +92,8 @@ class Store {
   // ): number => -1
 
   getOrderedScrapers = scrapers => {
+    const scraperConfigs = scrapers.map(s => this.flatConfig[s])
+    const lowestDepth = Math.max(...scraperConfigs.map(s => s.depth))
     const orderLevelColumnSql = makeDynamicOrderLevelColumn(
       this.flatConfig,
       scrapers
@@ -90,10 +109,11 @@ class Store {
     const selectOrderedSql = format(SELECT_ORDERED_AS_TREE, {
       orderLevelColumnSql,
       waitingJoinsSql,
-      selectedScrapers
+      selectedScrapers,
+      lowestDepth
     })
+    console.log(selectOrderedSql)
 
-    return this.db.all('SELECT * FROM parsedTree')
     return this.db.all(selectOrderedSql)
   }
 

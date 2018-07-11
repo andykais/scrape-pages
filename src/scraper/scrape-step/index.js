@@ -28,9 +28,9 @@ const scraper = config => {
     )
 
     // called per each value
-    return (parentValues, parentId) => {
+    return parentValues => {
       return Rx.from(parentValues).pipe(
-        ops.flatMap(value =>
+        ops.flatMap(({ parsedValue: value, id: parentId }) =>
           Rx.interval().pipe(
             ops.flatMap(async incrementIndex => {
               // db write start, download, db write complete
@@ -41,7 +41,7 @@ const scraper = config => {
                 value
               })
 
-              const { parsedValues, nextParentId } = await parser({
+              const parsedValues = await parser({
                 parentId,
                 downloadId,
                 value: downloadValue
@@ -50,11 +50,11 @@ const scraper = config => {
                 progressing: runParams.queue.inProgress,
                 queued: runParams.queue.pending
               })
-              return { parsedValues, nextParentId }
+              return parsedValues
             }, 1),
             takeWhileHardStop(incrementShouldKeepGoing(config)),
-            ops.flatMap(({ parsedValues, nextParentId }) =>
-              children.map(child => child(parsedValues, nextParentId))
+            ops.flatMap(parsedValues =>
+              children.map(child => child(parsedValues))
             ),
             ops.mergeAll()
             // ops.mergeAll() // not sure if necessary??

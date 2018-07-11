@@ -8,6 +8,8 @@
  * findLowestCommonParent(T, I) => P
  */
 export const findLowestCommonParent = (flatConfig, level1, level2) => {
+  if (level1.parentName === null) return level1
+  if (level2.parentName === null) return level2
   const recurse = (level1, level2) => {
     const level1Parent = flatConfig[level1.parentName]
     const level2Parent = flatConfig[level2.parentName]

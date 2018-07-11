@@ -44,15 +44,23 @@ class ScrapePages {
 
     this.logger.cli('Setting up SQLite database.')
     await this.store.init(optionsAll.folder)
-    const scraperValues = await this.store.getOrderedScrapers(['media'])
-    console.log({ scraperValues })
+    console.log(await this.store.db.all(`SELECT parsedValue FROM parsedTree WHERE scraper in ('post')`))
+    const scraperValues = await this.store.getOrderedScrapers([
+      'post',
+      'post-list'
+    ])
+    console.log(
+      scraperValues
+      .map(({ id, url, parseIndex, parsedValue, recurseDepth}) => [url])
+      // .map(({ url, parsedValue }) => ({ url, value: parsedValue }))
+    )
+    process.exit(0)
 
     this.logger.cli('Begin downloading with inputs', input)
-    return this.scrapingScheme([undefined])
+    return this.scrapingScheme([{}])
   }
 
   run = (...args) => {
-    console.log('FUCUCUCU')
     this.initDependencies(...args)
     this.runSetup(...args).then(scrapingObservable => {
       scrapingObservable.subscribe(
@@ -69,10 +77,20 @@ class ScrapePages {
           this.emitter.emitDone()
           this.store.db
             .all('SELECT id, complete, url FROM downloads WHERE complete = 1')
-            .then(v => console.log(v.length))
+            .then(v => console.log('downloaded', v.length))
           this.store
-            .getOrderedScrapers(['post'])
-            .then(output => console.log({ output }))
+            .getOrderedScrapers([
+              'post'
+              // ,'post-list'
+            ])
+            .then(output =>
+              console.log(
+                'parsed',
+                output.map(
+                  o => o.parsedValue
+                )
+              )
+            )
         }
       )
     })
