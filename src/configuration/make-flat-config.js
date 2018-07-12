@@ -1,23 +1,29 @@
 const makeFlatConfig = fullConfig => {
-  const recurse = (config, depth, parentName) => {
+  const recurse = (
+    config,
+    parentName = null,
+    depth = 0,
+    horizontalIndex = 0
+  ) => {
     const { name } = config
     // console.log(config)
     const childConfigs = config.scrapeEach.reduce(
-      (acc, scraper) => ({
+      (acc, scraper, horizontalIndex) => ({
         ...acc,
-        ...recurse(scraper, depth + 1, name)
+        ...recurse(scraper, name, depth + 1, horizontalIndex)
       }),
       {}
     )
     return {
       [name]: {
         name,
+        parentName,
         depth,
-        parentName
+        horizontalIndex
       },
       ...childConfigs
     }
   }
-  return recurse(fullConfig.scrape, 0, null)
+  return recurse(fullConfig.scrape)
 }
 export { makeFlatConfig }
