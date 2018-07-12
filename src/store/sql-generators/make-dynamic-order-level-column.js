@@ -7,9 +7,7 @@ const makeDynamicOrderLevelColumn = (flatConfig, scraperNames) => {
     if (levelsRecursed.length < 2) return ''
     const combinations = k_combinations(levelsRecursed, 2)
     const parentObj = combinations.reduce((acc, pair) => {
-      console.log(pair)
       const parent = findLowestCommonParent(flatConfig, ...pair)
-      console.log({ parent })
       acc[parent.name] = (acc[parent.name] || []).concat(pair)
       return acc
     }, {})
@@ -17,6 +15,7 @@ const makeDynamicOrderLevelColumn = (flatConfig, scraperNames) => {
     const parentName = findMin(Object.keys(parentObj), (min, val) => {
       return flatConfig[min].depth < flatConfig[val].depth
     })
+    console.log({parentName})
     const parent = flatConfig[parentName]
     const children = Array.from(new Set(parentObj[parentName]))
 
@@ -26,11 +25,20 @@ const makeDynamicOrderLevelColumn = (flatConfig, scraperNames) => {
       : [findMin(children, (min, val) => min.depth < val.depth)]
     const selectedString = selectedLevels.map(l => `'${l.name}'`).join(',')
 
-    const caseSql = children.length
-      ? `WHEN pTree.scraper = '${
-          parent.name
-        }' AND cte.currentScraper IN (${selectedString}) THEN cte.scraper `
-      : ''
+    // const caseSql = children.length
+      // ? `WHEN pTree.scraper = '${
+          // parent.name
+        // }' AND cte.currentScraper IN (${selectedString}) THEN cte.scraper `
+      // : ''
+
+    console.log(levelsRecursed)
+    console.log(selectedLevels, parent)
+    const caseSql = selectedLevels.map(
+      level =>
+        `WHEN pTree.currentScraper = '${parent.name}' AND cte.scraper = '${
+          level.name
+        }' THEN ${Math.pow(10, level.depth) + level.horizontalIndex} `
+    ).join('')
 
     const remainingLevels = Array.from(
       new Set(levelsRecursed.filter(l => !selectedLevels.includes(l)))
@@ -38,7 +46,6 @@ const makeDynamicOrderLevelColumn = (flatConfig, scraperNames) => {
     return caseSql + recurse(remainingLevels)
   }
   const levels = scraperNames.map(name => flatConfig[name])
-  console.log({ levels })
   const cases = recurse(levels)
   if (cases) return `CASE ${cases}ELSE 0 END`
   else return '0'
