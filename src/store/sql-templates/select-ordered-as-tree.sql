@@ -9,7 +9,7 @@ WITH cte AS (
     0 as recurseDepth,
     parsedTree.scraper,
     parsedTree.scraper AS currentScraper,
-    0 as levelOrder
+    {orderLevelColumnSql} as levelOrder
   FROM parsedTree INNER JOIN downloads ON parsedTree.downloadId = downloads.id
   WHERE parsedTree.scraper in ({selectedScrapers})
   UNION ALL
@@ -23,7 +23,7 @@ WITH cte AS (
     cte.recurseDepth + 1,
     cte.scraper,
     pTree.scraper AS currentScraper,
-    {orderLevelColumnSql} AS levelOrder
+    cte.levelOrder
   FROM cte
   INNER JOIN parsedTree as pTree ON
   {waitingJoinsSql} = pTree.id
