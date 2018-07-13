@@ -1,6 +1,5 @@
 export { fillInDefaults } from './fill-in-defaults'
 
 export {
-  assertOptionsNamedType,
-  assertOptionsAllType
+  assertOptionsType
 } from './assert-options-type'

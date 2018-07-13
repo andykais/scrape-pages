@@ -15,18 +15,15 @@ const scraper = config => {
   )
 
   // run setup
-  return async scraperRunParams => {
-    const runParams = {
-      ...scraperRunParams,
-      options: scraperRunParams.flatOptions[config.name]
-    }
-    const downloader = downloaderSetup(runParams)
-    const parser = parserSetup(runParams)
+  return async (flatRunParams, dependencies) => {
+    const runParams = flatRunParams[config.name]
+    const downloader = downloaderSetup(runParams, dependencies)
+    const parser = parserSetup(runParams, dependencies)
 
-    const { queue, store, options } = runParams
-    await mkdirp(options.folder)
+    const { queue, store } = dependencies
+    await mkdirp(runParams.folder)
     const children = await Promise.all(
-      childrenSetup.map(child => child(scraperRunParams))
+      childrenSetup.map(child => child(flatRunParams, dependencies))
     )
 
     // called per each value
@@ -40,6 +37,12 @@ const scraper = config => {
                 incrementIndex
               })
 
+              if (config.name === 'post-list') console.log('post-list')
+              if (config.name === 'downloadOnly') console.log('downloadOnly')
+              if (config.name === 'score') {
+                console.log(config.name, url)
+              }
+
               const {
                 id: downloadId,
                 complete
@@ -49,6 +52,8 @@ const scraper = config => {
                 const parsedValues = await store.getParsedValuesFromDownloadId(
                   downloadId
                 )
+                if (config.name === 'downloadOnly')
+                  console.log('downloadOnly', parsedValues.length)
                 return parsedValues
               } else {
                 const downloadId = await store.insertQueuedDownload({
@@ -72,6 +77,9 @@ const scraper = config => {
                 const parsedValuesWithId = await store.getParsedValuesFromDownloadId(
                   downloadId
                 )
+                if (config.name === 'downloadOnly') {
+                  console.log(config.name, parsedValuesWithId.length)
+                }
                 return parsedValuesWithId
               }
             }, 1),
