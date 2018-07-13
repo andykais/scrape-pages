@@ -5,13 +5,11 @@ export const incrementShouldKeepGoing = config => (
   parsedValues,
   incrementIndex
 ) => {
-  const { increment, initialIndex, incrementUntil } = config.download
-  if (increment && incrementUntil) {
+  if (config.download && config.download.incrementUntil) {
+    const { increment, initialIndex, incrementUntil } = config.download
     return incrementUntil > incrementIndex * increment + initialIndex
-  } else if (increment) {
-    return parsedValues.length
   } else {
-    return false
+    return parsedValues.length
   }
 }
 

@@ -1,38 +1,31 @@
 import { resolve } from 'path'
 import { makeFlatConfig } from '../configuration/make-flat-config'
-import {
-  assertOptionsAllType,
-  assertOptionsNamedType
-} from './assert-options-type'
+import { assertOptionsType } from './assert-options-type'
 
-const fillInDefaults = (config, optionsAll, optionsNamed) => {
-  assertOptionsAllType(optionsAll)
-  assertOptionsNamedType(optionsNamed)
-
+const fillInDefaults = (config, runParams) => {
+  assertOptionsType(runParams)
   const flatConfig = makeFlatConfig(config)
+  const { optionsEach = {}, ...globalOptions } = runParams
 
   const defaults = {
     cache: true,
     request: {},
     useLimiter: true,
     return: true,
-    ...optionsAll // user preferences for all things override
+    ...globalOptions // user preferences for all things override
   }
 
-  const options = {}
-  for (const name of Object.keys(flatConfig)) {
-    const scrapeStepOptions = optionsNamed[name] || {}
-    const folder = scrapeStepOptions.folder
-      ? scrapeStepOptions.folder
-      : resolve(defaults.folder, name)
-
-    options[name] = {
+  const options = Object.values(flatConfig).reduce((acc, scraperConfig) => {
+    const { name } = scraperConfig
+    const scraperOptions = optionsEach[name]
+    acc[name] = {
       ...defaults,
-      ...optionsNamed[name],
-      folder
+      folder: resolve(defaults.folder, name),
+      ...scraperOptions
     }
-  }
+    return acc
+  }, {})
+  
   return options
 }
-
 export { fillInDefaults }

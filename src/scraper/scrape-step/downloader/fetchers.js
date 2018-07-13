@@ -7,8 +7,8 @@ import { readFile, exists, mkdirp } from '../../../util/fs-promise'
 
 const sanitizeUrl = url => sanitize(url.toString(), { replacement: '_' })
 
-export const downloadToFileAndMemory = ({ queue, options }, url) => {
-  const filename = resolve(options.folder, sanitizeUrl(url))
+export const downloadToFileAndMemory = ({ folder }, { queue }, url) => {
+  const filename = resolve(folder, sanitizeUrl(url))
 
   return queue
     .add(() => fetch(url))
@@ -29,8 +29,8 @@ export const downloadToFileAndMemory = ({ queue, options }, url) => {
       filename
     }))
 }
-export const downloadToFileOnly = ({ queue, logger, options }, url) => {
-  const filename = resolve(options.folder, sanitizeUrl(url))
+export const downloadToFileOnly = ({ folder }, { queue, logger }, url) => {
+  const filename = resolve(folder, sanitizeUrl(url))
 
   return (
     queue
@@ -64,7 +64,7 @@ export const downloadToFileOnly = ({ queue, logger, options }, url) => {
   )
 }
 
-export const downloadToMemoryOnly = ({ queue }, url) =>
+export const downloadToMemoryOnly = (runParams, { queue }, url) =>
   queue
     .add(() => fetch(url))
     .then(response => response.text())
@@ -72,8 +72,8 @@ export const downloadToMemoryOnly = ({ queue }, url) =>
       downloadValue
     }))
 
-export const readFromFile = ({ options }, url) => {
-  const filename = resolve(options.folder, sanitizeUrl(url))
+export const readFromFile = ({ folder }, dependencies, url) => {
+  const filename = resolve(folder, sanitizeUrl(url))
 
   return readFile(filename).then(buffer => ({
     downloadValue: buffer.toString()

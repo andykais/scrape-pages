@@ -9,7 +9,7 @@ class Queuer {
     const queueEmitter = new EventEmitter()
     // event emitter to keep track of each task finishing
 
-    // based on the run options it may use the conditional rate limiter or a simple concurrent limiter
+    // based on the run params it may use the conditional rate limiter or a simple concurrent limiter
     const concurrentController = rateLimit
       ? rateLimitToggle(this._executeTask, toggler, {
           ...rateLimit,

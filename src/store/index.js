@@ -23,12 +23,11 @@ class Store {
     this.flatConfig = makeFlatConfig(config)
   }
 
-  init = async folder => {
+  init = async ({ folder }) => {
     this.db = new DB(folder)
     await this.db.run('PRAGMA journal_mode = WAL')
     await this.db.exec(CREATE_TABLES)
     // TODO optimize queries by creating dynamic sql ahead of time
-    // find which are returned from options, create one for each individually and one for all combined
   }
 
   insertCompletedFile = (scraper, value, url) => {}
@@ -77,7 +76,7 @@ class Store {
         acc.concat([name, parentId, downloadId, parseIndex, parsedValue]),
       []
     )
-    console.log(insertRows)
+    if (name === 'score') console.log(name, insertRows)
     return this.db.run(insertBatchParsedValuesSql, insertRows)
   }
 

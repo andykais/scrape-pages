@@ -14,28 +14,22 @@ class ScrapePages {
     this.scrapingSetup = scraper(this.config.scrape)
   }
 
-  initDependencies = (input, optionsAll) => {
+  initDependencies = runParams => {
     this.store = new Store(this.config)
     this.emitter = new Emitter()
     this.logger = new Logger({ log_level: 3 })
-    this.queue = new Queue(optionsAll, this.emitter.toggler)
+    this.queue = new Queue(runParams, this.emitter.toggler)
     console.log('initted dependencies')
   }
 
   // TODO add parsable input for this first parse step
-  runSetup = async (input = {}, optionsAll, optionsNamed = {}) => {
-    const flatOptions = fillInDefaultOptions(
-      this.config,
-      optionsAll,
-      optionsNamed
-    )
-    if (!this.isValidInput(input)) throw new Error('invalid input')
+  // runSetup = async ()
+  runSetup = async runParams => {
+    const flatRunParams = fillInDefaultOptions(this.config, runParams)
+    if (!this.isValidInput(runParams.input)) throw new Error('invalid input')
 
     this.logger.cli('Making folders.')
-    await mkdirp(optionsAll.folder)
-    this.scrapingScheme = await this.scrapingSetup({
-      input,
-      flatOptions,
+    this.scrapingScheme = await this.scrapingSetup(flatRunParams, {
       queue: this.queue,
       emitter: this.emitter,
       logger: this.logger,
@@ -43,7 +37,7 @@ class ScrapePages {
     })
 
     this.logger.cli('Setting up SQLite database.')
-    await this.store.init(optionsAll.folder)
+    await this.store.init(runParams)
     // console.log(await this.store.db.all(`SELECT parsedValue FROM parsedTree WHERE scraper in ('post')`))
     // const scraperValues = await this.store.getOrderedScrapers([
     // 'post',
@@ -56,13 +50,13 @@ class ScrapePages {
     // )
     // process.exit(0)
 
-    this.logger.cli('Begin downloading with inputs', input)
+    this.logger.cli('Begin downloading with inputs', runParams.input)
     return this.scrapingScheme([{}])
   }
 
-  run = (...args) => {
-    this.initDependencies(...args)
-    this.runSetup(...args).then(scrapingObservable => {
+  run = runParams => {
+    this.initDependencies(runParams)
+    this.runSetup(runParams).then(scrapingObservable => {
       scrapingObservable.subscribe(
         undefined,
         error => {
@@ -79,7 +73,8 @@ class ScrapePages {
           // .all('SELECT id, complete, url FROM downloads WHERE complete = 1')
           // .then(v => console.log('downloaded', v.length))
           this.store
-            .getOrderedScrapers(['post', 'post-list'])
+            // .getOrderedScrapers(['score', 'num-comments', 'post-list'])
+            .getOrderedScrapers(['num-comments'])
             .then(output =>
               console.log('parsed', output.map(o => o.parsedValue))
             )
@@ -88,9 +83,9 @@ class ScrapePages {
     })
     return this.emitter.emitter
   }
-  runAsPromise = async (...args) => {
-    this.initDependencies(...args)
-    const scrapingObservable = await this.runSetup(...args)
+  runAsPromise = async runParams => {
+    this.initDependencies(runParams)
+    const scrapingObservable = await this.runSetup(runParams)
     return scrapingObservable.toPromise()
   }
 

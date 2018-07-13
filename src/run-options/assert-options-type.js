@@ -3,8 +3,6 @@
 
 import { reify, assert } from 'flow-runtime'
 import type { Type } from 'flow-runtime'
-import type { OptionsAll, OptionsNamed } from './type'
+import type { Options } from './type'
 
-export const assertOptionsAllType = (options: OptionsAll) => true
-
-export const assertOptionsNamedType = (options: OptionsNamed) => true
+export const assertOptionsType = (options: Options) => true

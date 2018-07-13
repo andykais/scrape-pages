@@ -22,13 +22,13 @@ const populateTemplate = (config, { input }, { value, incrementIndex }) => {
   }
 }
 
-export default config => runParams => {
-  const { store, options, queue } = runParams
+export default config => (runParams, dependencies) => {
+  const { store, queue } = dependencies
 
   const shouldDownloadToMemory = Boolean(
     config.scrapeEach.length || config.parse
   )
-  const shouldDownloadToFile = options.cache
+  const shouldDownloadToFile = runParams.cache
   const completedDownloadFetcher =
     shouldDownloadToMemory && shouldDownloadToFile
       ? readFromFile
@@ -46,39 +46,9 @@ export default config => runParams => {
   return async url => {
     const { downloadValue, filename } = await incompleteDownloadFetcher(
       runParams,
+      dependencies,
       url
     )
     return { downloadValue, filename }
-
-    // const { incrementIndex, loopIndex, value } = downloadParams
-    // const url = populateTemplate(config, runParams, downloadParams)
-    // const urlString = url.toString()
-
-    // const completedDownload = await store.getCachedDownload(urlString)
-
-    // const downloadIntoMemory = Boolean(config.scrapeEach.length || config.parse)
-    // const downloadIntoFile = options.cache
-
-    // if (completedDownload && completedDownload.complete) {
-    // const { downloadValue } = await completedDownloadFetcher(runParams, url)
-    // return { downloadValue, downloadId: completedDownload.id }
-    // } else {
-    // const downloadId =
-    // completedDownload && completedDownload.id
-    // ? completedDownload.id
-    // : await store.insertQueuedDownload({
-    // scraper: config.name,
-    // loopIndex: 0,
-    // incrementIndex,
-    // url: url.toString()
-    // })
-
-    // const { downloadValue, filename } = await incompleteDownloadFetcher(
-    // runParams,
-    // url
-    // )
-    // await store.markDownloadComplete({ downloadId, filename })
-    // return { downloadValue, downloadId }
-    // }
   }
 }
