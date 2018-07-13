@@ -14,7 +14,7 @@ import {
   MARK_DOWNLOAD_COMPLETE,
   INSERT_PARSED_VALUES,
   SELECT_PARSED_VALUES_WHERE_PARENT_ID_IS,
-  SELECT_PARSED_VALUES_WHERE_PARENT_ID_IS_NULL
+  SELECT_PARSED_VALUES_WHERE_DOWNLOAD_ID_IS
 } from './sql-templates'
 
 class Store {
@@ -39,7 +39,10 @@ class Store {
 
   areChildrenCompleted = url => false
 
-  getCachedDownload = url => this.db.get(SELECT_DOWNLOAD_WHERE_URL_IS, [url])
+  getCachedDownload = async url => {
+    const result = await this.db.get(SELECT_DOWNLOAD_WHERE_URL_IS, [url])
+    return result || {}
+  }
   // TODO batch this call? (less readable but doable)
   insertQueuedDownload = ({
     scraper,
@@ -62,34 +65,33 @@ class Store {
     })
   }
 
-  insertBatchParsedValues = ({ name, parentId, downloadId, values }) => {
-    const valuesString = Array(values.length)
+  insertBatchParsedValues = ({ name, parentId, downloadId, parsedValues }) => {
+    const valuesString = Array(parsedValues.length)
       .fill('(?, ?, ?, ?, ?)')
       .join(',')
     const insertBatchParsedValuesSql = format(INSERT_PARSED_VALUES, {
       values: valuesString
     })
-    const insertRows = values.reduce(
+    const insertRows = parsedValues.reduce(
       (acc, parsedValue, parseIndex) =>
         acc.concat([name, parentId, downloadId, parseIndex, parsedValue]),
       []
     )
-    console.log(parentId)
+    console.log(insertRows)
     return this.db.run(insertBatchParsedValuesSql, insertRows)
   }
+
   getParsedValuesFromParentId = (
     parentId = -1 // undefined is treated as -1 for selecting
   ): Array<{ id: number, parsedValue: string }> => {
     console.log({ parentId })
     return this.db.all(SELECT_PARSED_VALUES_WHERE_PARENT_ID_IS, [parentId])
   }
-  // insertParsedValue = (
-  // scraper,
-  // downloadId,
-  // parentId,
-  // parseIndex,
-  // value
-  // ): number => -1
+
+  getParsedValuesFromDownloadId = downloadId => {
+    console.log({ downloadId })
+    return this.db.all(SELECT_PARSED_VALUES_WHERE_DOWNLOAD_ID_IS, [downloadId])
+  }
 
   getOrderedScrapers = scrapers => {
     const scraperConfigs = scrapers.map(s => this.flatConfig[s])
@@ -105,7 +107,6 @@ class Store {
 
     const selectedScrapers = scrapers.map(s => `'${s}'`).join(',')
 
-    console.log({ orderLevelColumnSql, waitingJoinsSql, selectedScrapers })
     const selectOrderedSql = format(SELECT_ORDERED_AS_TREE, {
       orderLevelColumnSql,
       waitingJoinsSql,
@@ -116,12 +117,6 @@ class Store {
 
     return this.db.all(selectOrderedSql)
   }
-
-  getOrderedFromTo = (startLevel, parentLevel): Promise<Array<{}>> =>
-    this.db.all(RECURSIVE_ORDER_FROM_CHILD_TO_PARENT_SQL, [
-      startLevel,
-      parentLevel
-    ])
 }
 
 export default Store

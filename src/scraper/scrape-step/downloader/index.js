@@ -2,7 +2,7 @@ import urlDownloader from './variations/url-downloader'
 import identityDownloader from './variations/identity-downloader'
 
 export const incrementShouldKeepGoing = config => (
-  { parsedValues },
+  parsedValues,
   incrementIndex
 ) => {
   const { increment, initialIndex, incrementUntil } = config.download

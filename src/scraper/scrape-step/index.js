@@ -4,6 +4,7 @@ import { mkdirp } from '../../util/fs-promise'
 import * as Rx from 'rxjs'
 import * as ops from 'rxjs/operators'
 import { takeWhileHardStop } from '../../util/rxjs-operators'
+import { constructUrl } from './construct-url'
 
 // init setup
 const scraper = config => {
@@ -22,7 +23,8 @@ const scraper = config => {
     const downloader = downloaderSetup(runParams)
     const parser = parserSetup(runParams)
 
-    await mkdirp(runParams.options.folder)
+    const { queue, store, options } = runParams
+    await mkdirp(options.folder)
     const children = await Promise.all(
       childrenSetup.map(child => child(scraperRunParams))
     )
@@ -33,24 +35,45 @@ const scraper = config => {
         ops.flatMap(({ parsedValue: value, id: parentId }) =>
           Rx.interval().pipe(
             ops.flatMap(async incrementIndex => {
-              // db write start, download, db write complete
-              const loopIndex = 0
-              const { downloadValue, downloadId } = await downloader({
-                incrementIndex,
-                loopIndex,
-                value
+              const url = constructUrl(config, runParams, {
+                value,
+                incrementIndex
               })
 
-              const parsedValues = await parser({
-                parentId,
-                downloadId,
-                value: downloadValue
-              })
-              console.log(parsedValues, {
-                progressing: runParams.queue.inProgress,
-                queued: runParams.queue.pending
-              })
-              return parsedValues
+              const {
+                id: downloadId,
+                complete
+              } = await store.getCachedDownload(url.toString())
+
+              if (complete) {
+                const parsedValues = await store.getParsedValuesFromDownloadId(
+                  downloadId
+                )
+                return parsedValues
+              } else {
+                const downloadId = await store.insertQueuedDownload({
+                  scraper: config.name,
+                  loopIndex: 0,
+                  incrementIndex,
+                  url: url.toString()
+                })
+
+                const { downloadValue, filename } = await downloader(url)
+
+                const parsedValues = parser(downloadValue)
+
+                await store.markDownloadComplete({ downloadId, filename })
+                await store.insertBatchParsedValues({
+                  name: config.name,
+                  parentId,
+                  downloadId,
+                  parsedValues
+                })
+                const parsedValuesWithId = await store.getParsedValuesFromDownloadId(
+                  downloadId
+                )
+                return parsedValuesWithId
+              }
             }, 1),
             takeWhileHardStop(incrementShouldKeepGoing(config)),
             ops.flatMap(parsedValues =>
