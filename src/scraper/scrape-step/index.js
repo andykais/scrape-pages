@@ -1,10 +1,10 @@
+import * as Rx from 'rxjs'
+import * as ops from 'rxjs/operators'
 import chooseParser from './parser'
 import chooseDownloader, { incrementShouldKeepGoing } from './downloader'
 import { mkdirp } from '../../util/fs-promise'
-import * as Rx from 'rxjs'
-import * as ops from 'rxjs/operators'
-import { takeWhileHardStop } from '../../util/rxjs-operators'
-import { constructUrl } from './construct-url'
+import { fromAsyncGenerator } from '../../util/rxjs-observables'
+import { okToIncrement } from './downloader/ok-to-increment'
 
 // init setup
 const scraper = config => {
@@ -30,41 +30,29 @@ const scraper = config => {
     return parentValues => {
       return Rx.from(parentValues).pipe(
         ops.flatMap(({ parsedValue: value, id: parentId }) =>
-          Rx.interval().pipe(
-            ops.flatMap(async incrementIndex => {
-              const url = constructUrl(config, runParams, {
-                value,
-                incrementIndex
+          fromAsyncGenerator(async function*() {
+            let incrementIndex = 0
+            do {
+              const { id: downloadId } = await store.getCompletedDownload({
+                incrementIndex,
+                parentId
               })
-
-              if (config.name === 'post-list') console.log('post-list')
-              if (config.name === 'downloadOnly') console.log('downloadOnly')
-              if (config.name === 'score') {
-                console.log(config.name, url)
-              }
-
-              const {
-                id: downloadId,
-                complete
-              } = await store.getCachedDownload(url.toString())
-
-              if (complete) {
-                const parsedValues = await store.getParsedValuesFromDownloadId(
+              if (downloadId) {
+                const parsedValuesWithId = await store.getParsedValuesFromDownloadId(
                   downloadId
                 )
-                if (config.name === 'downloadOnly')
-                  console.log('downloadOnly', parsedValues.length)
-                return parsedValues
+                yield parsedValuesWithId
               } else {
-                const downloadId = await store.insertQueuedDownload({
-                  scraper: config.name,
-                  loopIndex: 0,
+                const {
+                  downloadValue,
+                  downloadId,
+                  filename
+                } = await downloader({
                   incrementIndex,
-                  url: url.toString()
+                  loopIndex: 0,
+                  parentId,
+                  value
                 })
-
-                const { downloadValue, filename } = await downloader(url)
-
                 const parsedValues = parser(downloadValue)
 
                 await store.markDownloadComplete({ downloadId, filename })
@@ -77,18 +65,16 @@ const scraper = config => {
                 const parsedValuesWithId = await store.getParsedValuesFromDownloadId(
                   downloadId
                 )
-                if (config.name === 'downloadOnly') {
-                  console.log(config.name, parsedValuesWithId.length)
-                }
-                return parsedValuesWithId
+                yield parsedValuesWithId
               }
-            }, 1),
-            takeWhileHardStop(incrementShouldKeepGoing(config)),
+              incrementIndex++
+            } while (okToIncrement(config, incrementIndex))
+          }).pipe(
+            ops.takeWhile(parsedValues => parsedValues.length),
             ops.flatMap(parsedValues =>
               children.map(child => child(parsedValues))
             ),
             ops.mergeAll()
-            // ops.mergeAll() // not sure if necessary??
           )
         )
       )

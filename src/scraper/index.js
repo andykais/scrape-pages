@@ -69,14 +69,10 @@ class ScrapePages {
           this.logger.cli('Done!')
           this.queue.closeQueue()
           this.emitter.emitDone()
-          // this.store.db
-          // .all('SELECT id, complete, url FROM downloads WHERE complete = 1')
-          // .then(v => console.log('downloaded', v.length))
           this.store
-            // .getOrderedScrapers(['score', 'num-comments', 'post-list'])
-            .getOrderedScrapers(['num-comments'])
+            .getOrderedScrapers(['title', 'score'])
             .then(output =>
-              console.log('parsed', output.map(o => o.parsedValue))
+              console.log(output.map(o => o.parsedValue))
             )
         }
       )

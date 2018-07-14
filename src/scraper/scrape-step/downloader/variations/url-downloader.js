@@ -1,6 +1,7 @@
 import { resolve, basename } from 'path'
 import sanitize from 'sanitize-filename'
 import format from 'string-template'
+import { constructUrl } from '../construct-url'
 import {
   downloadToFileAndMemory,
   downloadToMemoryOnly,
@@ -29,26 +30,39 @@ export default config => (runParams, dependencies) => {
     config.scrapeEach.length || config.parse
   )
   const shouldDownloadToFile = runParams.cache
-  const completedDownloadFetcher =
-    shouldDownloadToMemory && shouldDownloadToFile
-      ? readFromFile
-      : shouldDownloadToMemory
-        ? downloadToMemoryOnly
-        : () => {}
 
-  const incompleteDownloadFetcher =
+  // const completedDownloadFetcher =
+  // shouldDownloadToMemory && shouldDownloadToFile
+  // ? readFromFile
+  // : shouldDownloadToMemory
+  // ? downloadToMemoryOnly
+  // : () => {}
+
+  const fetcher =
     shouldDownloadToMemory && shouldDownloadToFile
       ? downloadToFileAndMemory
       : shouldDownloadToMemory
         ? downloadToMemoryOnly
         : downloadToFileOnly
 
-  return async url => {
-    const { downloadValue, filename } = await incompleteDownloadFetcher(
+  return async ({ value, parentId, loopIndex, incrementIndex }) => {
+    // console.log({ incrementIndex })
+    const url = constructUrl(config, runParams, {
+      value,
+      incrementIndex
+    })
+    const downloadId = await store.insertQueuedDownload({
+      scraper: config.name,
+      parentId,
+      loopIndex,
+      incrementIndex,
+      url: url.toString()
+    })
+    const { downloadValue, filename } = await fetcher(
       runParams,
       dependencies,
       url
     )
-    return { downloadValue, filename }
+    return { downloadValue, downloadId, filename }
   }
 }

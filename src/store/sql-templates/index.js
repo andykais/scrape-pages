@@ -15,3 +15,5 @@ export { default as INSERT_PARSED_VALUES } from './insert-parsed-values.sql'
 export { default as SELECT_PARSED_VALUES_WHERE_PARENT_ID_IS  } from './select-parsed-values-where-parent-id-is.sql'
 
 export { default as SELECT_PARSED_VALUES_WHERE_DOWNLOAD_ID_IS } from './select-parsed-values-where-download-id-is.sql'
+
+export { default as SELECT_COMPLETED_DOWNLOAD } from './select-completed-download.sql'

@@ -14,7 +14,8 @@ import {
   MARK_DOWNLOAD_COMPLETE,
   INSERT_PARSED_VALUES,
   SELECT_PARSED_VALUES_WHERE_PARENT_ID_IS,
-  SELECT_PARSED_VALUES_WHERE_DOWNLOAD_ID_IS
+  SELECT_PARSED_VALUES_WHERE_DOWNLOAD_ID_IS,
+  SELECT_COMPLETED_DOWNLOAD
 } from './sql-templates'
 
 class Store {
@@ -38,6 +39,19 @@ class Store {
 
   areChildrenCompleted = url => false
 
+  getCompletedDownload = async ({
+    incrementIndex,
+    loopIndex = 0,
+    parentId = -1
+  }) => {
+    const result = await this.db.get(SELECT_COMPLETED_DOWNLOAD, [
+      loopIndex,
+      incrementIndex,
+      parentId
+    ])
+    return result || {}
+  }
+
   getCachedDownload = async url => {
     const result = await this.db.get(SELECT_DOWNLOAD_WHERE_URL_IS, [url])
     return result || {}
@@ -45,16 +59,21 @@ class Store {
   // TODO batch this call? (less readable but doable)
   insertQueuedDownload = ({
     scraper,
+    parentId,
     loopIndex,
     incrementIndex,
     url
   }): number => {
-    return this.db.run(INSERT_QUEUED_DOWNLOAD, {
-      $scraper: scraper,
-      $loopIndex: loopIndex,
-      $incrementIndex: incrementIndex,
-      $url: url
-    })
+    console.log({ scraper, parentId, incrementIndex, url })
+    return this.db.run(
+      INSERT_QUEUED_DOWNLOAD,
+      [scraper, parentId, loopIndex, incrementIndex, url]
+      // $scraper: scraper,
+      // $loopIndex: loopIndex,
+      // $incrementIndex: incrementIndex,
+      // $url: url
+      // }
+    )
   }
 
   markDownloadComplete = ({ downloadId, filename }) => {
@@ -65,9 +84,16 @@ class Store {
   }
 
   insertBatchParsedValues = ({ name, parentId, downloadId, parsedValues }) => {
+    if (!parsedValues.length) return Promise.resolve([])
     const valuesString = Array(parsedValues.length)
       .fill('(?, ?, ?, ?, ?)')
       .join(',')
+    if (name === 'post')
+      console.log('batch', {
+        parentId,
+        downloadId,
+        parsedValues: parsedValues.length
+      })
     const insertBatchParsedValuesSql = format(INSERT_PARSED_VALUES, {
       values: valuesString
     })
@@ -88,12 +114,15 @@ class Store {
   }
 
   getParsedValuesFromDownloadId = downloadId => {
-    console.log({ downloadId })
+    // console.log({ downloadId })
     return this.db.all(SELECT_PARSED_VALUES_WHERE_DOWNLOAD_ID_IS, [downloadId])
   }
 
   getOrderedScrapers = scrapers => {
-    const scraperConfigs = scrapers.map(s => this.flatConfig[s])
+    const scraperConfigs = scrapers.map(s => this.flatConfig[s]).filter(c => c)
+    if (!scraperConfigs.length) return Promise.resolve([])
+
+    console.log({ scraperConfigs })
     const lowestDepth = Math.max(...scraperConfigs.map(s => s.depth))
     const orderLevelColumnSql = makeDynamicOrderLevelColumn(
       this.flatConfig,
@@ -119,69 +148,3 @@ class Store {
 }
 
 export default Store
-
-/*
-new Store({ input: '', scrape: {} }, '').getLevelsNested([
-  'media',
-  'tags-copyright',
-  'tags-artist'
-])
-
-const fullData = {
-  gallery: [
-    {
-      file,
-      complete: true,
-      children: {
-        post: [
-          {
-            file,
-            complete: true,
-            children: {
-              tagsCopyright: [{ value: 'cool' }],
-              media: [{ value: 'filename' }]
-            }
-          }
-        ]
-      }
-    }
-  ]
-}
-
-const expectedForJustImages = [filename1, filename2, filename3]
-
-const expectedForImagesAndTags = [
-  {
-    tagsCopyright: ['cool', 'fun'],
-    tagsArtist: ['banksy'],
-    media: [filename]
-  }
-]
-
-const expectedTagsForTaggedGallery = [
-  {
-    tagsCopyright: ['cool', 'fun'],
-    tagsArtist: ['banksy'],
-    media: [filename]
-  }
-]
-
-const alternatively = [
-  {
-    name: 'media',
-    filename
-  },
-  {
-    name: 'tagsCopyright',
-    value: 'cool'
-  },
-  {
-    name: 'tagsCopyright',
-    value: 'cool'
-  },
-  {
-    name: 'tagsArtist',
-    value: 'banksy'
-  }
-]
-*/

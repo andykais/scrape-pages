@@ -6,7 +6,7 @@ type OptionsAny = {|
 |}
 
 export type Options = {|
-  input: Input,
+  input?: Input,
   ...OptionsAny,
   folder: string,
   maxConcurrent?: number,
