@@ -1,54 +1,66 @@
-import fillInDefaults from '../fill-in-defaults'
+import { fillInDefaults } from '../'
 
 describe('filled in defaults', () => {
-  const simpleConfig = global.__SIMPLE_CONFIG__
-
-  const fullConfigGuess = {
-    input: undefined,
-    scrape: {
-      name: 'level_0_index_0',
-      download: {
-        increment: 0,
-        initialIndex: 0,
-        incrementUntil: undefined,
-        template: simpleConfig.scrape.download,
-        regexCleanup: undefined
-      },
-      parse: {
-        ...simpleConfig.scrape.parse,
-        expect: 'html',
-        regexCleanup: undefined
-      },
-      scrapeEach: [
-        {
-          name: 'level_1_index_0',
-          download: {
-            increment: 0,
-            initialIndex: 0,
-            incrementUntil: undefined,
-            template: simpleConfig.scrape.scrapeEach.download,
-            regexCleanup: undefined
-          },
-          parse: undefined,
-          scrapeEach: []
-        }
-      ]
+  describe('simple config', () => {
+    const simpleConfig = global.__SIMPLE_CONFIG__
+    const fullConfig = fillInDefaults(simpleConfig)
+    const fullConfigGuess = {
+      input: [],
+      scrape: {
+        name: 'level_0_index_0',
+        download: {
+          increment: 0,
+          initialIndex: 0,
+          incrementUntil: undefined,
+          template: simpleConfig.scrape.download,
+          regexCleanup: undefined
+        },
+        parse: {
+          ...simpleConfig.scrape.parse,
+          expect: 'html',
+          regexCleanup: undefined
+        },
+        scrapeEach: [
+          {
+            name: 'level_1_index_0',
+            download: {
+              increment: 0,
+              initialIndex: 0,
+              incrementUntil: undefined,
+              template: simpleConfig.scrape.scrapeEach.download,
+              regexCleanup: undefined
+            },
+            parse: undefined,
+            scrapeEach: []
+          }
+        ]
+      }
     }
-  }
 
-  // TODO test that input matches output for defaults
-  test('for a full filled in config should match itself', () => {
-    const fullConfig = fillInDefaults(fullConfigGuess)
-    expect(fullConfig).toStrictEqual(fullConfigGuess)
+    it('should match itself for a full filled in config', () => {
+      const fullConfigFromGuess = fillInDefaults(fullConfigGuess)
+      expect(fullConfigFromGuess).toStrictEqual(fullConfigGuess)
+    })
+
+    it('should match the guessed full config', () => {
+      expect(fullConfig).toStrictEqual(fullConfigGuess)
+    })
+
+    it('filled in version should adhere to configuration flow type', () => {
+      expect(fullConfig).toBeConfigType()
+    })
   })
 
-  test('for simple config should match in expected full config', () => {
-    const fullConfig = fillInDefaults(simpleConfig)
-    expect(fullConfig).toStrictEqual(fullConfigGuess)
-  })
+  describe('gallery post img tag config', () => {
+    const galleryPostImgTag = global.__GALLERY_POST_IMG_TAG__
+    const fullConfig = fillInDefaults(galleryPostImgTag)
 
-  test('for simple config should adhere to configuration flow type', () => {
-    const fullConfig = fillInDefaults(simpleConfig)
-    expect(fullConfig).toBeConfigType()
+    it('should match configuration flow type', () => {
+      expect(fullConfig).toBeConfigType()
+    })
+    it('should match itself for a full filled in config', () => {
+      const fullConfigFromGuess = fillInDefaults(fullConfig)
+      expect(fullConfigFromGuess).toStrictEqual(fullConfig)
+    })
   })
 })

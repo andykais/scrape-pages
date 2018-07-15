@@ -1,5 +1,11 @@
 # scrape-pages
 
+
+
+[![Travis branch](https://img.shields.io/travis/andykais/scrape-pages/master.svg)](https://travis-ci.com/andykais/scrape-pages/branches)
+![license](https://img.shields.io/github/license/andykais/scrape-pages.svg)
+
+
 This package scrapes sites based on a config object. To understand how to use it, take a look at the config
 [flow type](./src/configuration/type.js) and example config files in the [tests](tests/config/) directory.
 
