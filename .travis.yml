@@ -1,0 +1,24 @@
+language: node_js
+
+stages:
+  - test
+  - lint
+
+cache:
+  directories:
+    - $HOME/.npm
+
+jobs:
+  include:
+    - stage: test
+      node_js: "10"
+      script: npm run test:unit
+    - stage: test
+      node_js: "9"
+      script: npm run test:unit
+    - stage: test
+      node_js: "8"
+      script: npm run test:unit
+    - stage: lint
+      node_js: "10"
+      script: npm run lint

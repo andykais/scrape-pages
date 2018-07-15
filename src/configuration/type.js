@@ -1,3 +1,5 @@
+// @flow
+
 type RegexRemove = string
 type RegexReplace = {|
   select: string,
@@ -33,9 +35,12 @@ type ParseSelectorOnly = string
 type Parse = ParseSelectorOnly | ParseDetailed
 
 // toplevel url builder
+// TODO put cookies and headers in here as templates
 type UrlBuilderBase = {|
   template?: string, // template for url, will be filled using variables available
-  regexCleanup?: Regex
+  regexCleanup?: Regex,
+  cookieTemplates?: { [string]: string },
+  headerTemplates?: { [string]: string }
   // increment?: 0
   // increment: false // TODO reenable after fix with flow-runtime
 |}
@@ -50,15 +55,28 @@ type UrlBuilderTemplateOnly = string
 // when undefined, identity is used
 type UrlBuilder = UrlBuilderTemplateOnly | UrlBuilderBase | UrlBuilderIncrement
 
+type ParserName = string
 // recursing parser
 // TODO handle the cases where there is no parser,
 type ScrapeCriteriaBase = {|
-  name?: string,
+  name?: ParserName,
   download?: UrlBuilder,
-  parse?: Parse,
-  scrapeEach?: ScrapeCriteria
+  parse?: Parse
 |}
-type ScrapeCriteria = ScrapeCriteriaBase | Array<ScrapeCriteriaBase>
+type ScrapeCriteriaLooper = {|
+  ...ScrapeCriteriaBase,
+  loopBackTo?: ParserName // this specifies which parser to return to with the current value, it cannot have children
+|}
+type ScrapeCriteriaWithChildren = {|
+  ...ScrapeCriteriaBase,
+  scrapeEach: ScrapeCriteria
+|}
+type ScrapeCriteriaOptions =
+  | ScrapeCriteriaBase
+  | ScrapeCriteriaLooper
+  | ScrapeCriteriaWithChildren
+
+type ScrapeCriteria = ScrapeCriteriaOptions | Array<ScrapeCriteriaOptions>
 
 export type Config = {|
   input?: Input | Array<Input>,
