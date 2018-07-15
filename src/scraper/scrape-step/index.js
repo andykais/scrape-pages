@@ -33,12 +33,12 @@ const scraper = config => {
           fromAsyncGenerator(async function*() {
             let incrementIndex = 0
             do {
-              const { id: downloadId } = await store.getCompletedDownload({
+              const { id: downloadId } = await store.selectCompletedDownload({
                 incrementIndex,
                 parentId
               })
               if (downloadId) {
-                const parsedValuesWithId = await store.getParsedValuesFromDownloadId(
+                const parsedValuesWithId = await store.selectParsedValues(
                   downloadId
                 )
                 yield parsedValuesWithId
@@ -55,14 +55,14 @@ const scraper = config => {
                 })
                 const parsedValues = parser(downloadValue)
 
-                await store.markDownloadComplete({ downloadId, filename })
+                await store.updateDownloadToComplete({ downloadId, filename })
                 await store.insertBatchParsedValues({
                   name: config.name,
                   parentId,
                   downloadId,
                   parsedValues
                 })
-                const parsedValuesWithId = await store.getParsedValuesFromDownloadId(
+                const parsedValuesWithId = await store.selectParsedValues(
                   downloadId
                 )
                 yield parsedValuesWithId

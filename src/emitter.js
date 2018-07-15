@@ -29,8 +29,8 @@ class ScrapeEmitter {
     this.emitter.emit('progress', id, progress)
   }
 
-  emitDone() {
-    this.emitter.emit('done')
+  emitDone(queryFor) {
+    this.emitter.emit('done', queryFor)
   }
 
   emitError(error) {

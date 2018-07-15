@@ -11,16 +11,4 @@ export default config => ({ store }) => value => {
     .filter(val => val !== undefined)
 
   return parsedValues
-  // // write values to db
-  // await store.insertBatchParsedValues({
-    // name: config.name,
-    // parentId,
-    // downloadId,
-    // values: parsedValues
-  // })
-  // const parsedValuesWithId = await store.getParsedValuesFromParentId(parentId)
-  // console.log('withid', parsedValuesWithId.length)
-  // return parsedValuesWithId
-  // // return { parsedValues }
-  // // return { parsedValues, nextParentId }
 }

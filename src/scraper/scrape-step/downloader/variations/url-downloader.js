@@ -11,18 +11,6 @@ import {
 
 const sanitizeUrl = url => sanitize(url.toString(), { replacement: '_' })
 
-const populateTemplate = (config, { input }, { value, incrementIndex }) => {
-  const { initialIndex, increment } = config.download
-  const index = initialIndex + incrementIndex * increment
-  const templateVals = { ...input, value, index }
-  const populatedUriString = format(config.download.template, templateVals)
-  try {
-    return new URL(populatedUriString)
-  } catch (e) {
-    throw new Error(`cannot create url from "${populatedUriString}"`)
-  }
-}
-
 export default config => (runParams, dependencies) => {
   const { store, queue } = dependencies
 
@@ -30,13 +18,6 @@ export default config => (runParams, dependencies) => {
     config.scrapeEach.length || config.parse
   )
   const shouldDownloadToFile = runParams.cache
-
-  // const completedDownloadFetcher =
-  // shouldDownloadToMemory && shouldDownloadToFile
-  // ? readFromFile
-  // : shouldDownloadToMemory
-  // ? downloadToMemoryOnly
-  // : () => {}
 
   const fetcher =
     shouldDownloadToMemory && shouldDownloadToFile
@@ -46,7 +27,6 @@ export default config => (runParams, dependencies) => {
         : downloadToFileOnly
 
   return async ({ value, parentId, loopIndex, incrementIndex }) => {
-    // console.log({ incrementIndex })
     const url = constructUrl(config, runParams, {
       value,
       incrementIndex
