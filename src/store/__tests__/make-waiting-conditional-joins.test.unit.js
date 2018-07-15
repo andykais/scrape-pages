@@ -12,7 +12,7 @@ describe('make waiting conditional joins', () => {
     const scrapersToGetOut = ['tag', 'img']
     const joinSql = makeWaitingConditionalJoins(flatConfig, scrapersToGetOut)
     expect(joinSql).toBe(
-      `CASE WHEN cte.startLevel = 'tag' AND cte.recurseDepth IN ('0') THEN cte.id ELSE cte.parentId END`
+      `CASE WHEN cte.scraper = 'tag' AND cte.recurseDepth IN (0) THEN cte.id ELSE cte.parentId END`
     )
   })
 
@@ -20,7 +20,14 @@ describe('make waiting conditional joins', () => {
     const scrapersToGetOut = ['tag', 'img', 'img-parse']
     const joinSql = makeWaitingConditionalJoins(flatConfig, scrapersToGetOut)
     expect(joinSql).toBe(
-      `CASE WHEN cte.startLevel = 'tag' AND cte.recurseDepth IN ('0') THEN cte.id WHEN cte.startLevel = 'img-parse' AND cte.recurseDepth IN ('0') THEN cte.id ELSE cte.parentId END`
+      `CASE WHEN cte.scraper = 'tag' AND cte.recurseDepth IN (0) THEN cte.id WHEN cte.scraper = 'img-parse' AND cte.recurseDepth IN (0) THEN cte.id ELSE cte.parentId END`
+    )
+  })
+
+  it('should wait multiple levels when scrapers are multiple depths apart', () => {
+    const joinSql = makeWaitingConditionalJoins(flatConfig, ['gallery', 'tag'])
+    expect(joinSql).toBe(
+      `CASE WHEN cte.scraper = 'gallery' AND cte.recurseDepth IN (0,1) THEN cte.id ELSE cte.parentId END`
     )
   })
 })

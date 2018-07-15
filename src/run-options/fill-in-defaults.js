@@ -25,7 +25,7 @@ const fillInDefaults = (config, runParams) => {
     }
     return acc
   }, {})
-  
+
   return options
 }
 export { fillInDefaults }

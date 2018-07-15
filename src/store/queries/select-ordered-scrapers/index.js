@@ -14,10 +14,7 @@ export default (flatConfig, database) => {
       flatConfig,
       scrapers
     )
-    const waitingJoinsSql = makeWaitingConditionalJoins(
-      flatConfig,
-      scrapers
-    )
+    const waitingJoinsSql = makeWaitingConditionalJoins(flatConfig, scrapers)
 
     const selectedScrapers = scrapers.map(s => `'${s}'`).join(',')
 

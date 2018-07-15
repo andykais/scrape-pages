@@ -4,7 +4,7 @@ import * as ops from 'rxjs/operators'
 import { rateLimitToggle } from './util/rxjs-operators'
 
 class Queuer {
-  constructor({ maxConcurrent = 1, rateLimit, }, toggler) {
+  constructor({ maxConcurrent = 1, rateLimit }, toggler) {
     // node event emitter
     const queueEmitter = new EventEmitter()
     // event emitter to keep track of each task finishing
@@ -21,7 +21,7 @@ class Queuer {
     const source = Rx.fromEvent(queueEmitter, 'task').pipe(
       // stop accepting new values after 'close' event is emitted
       ops.takeUntil(Rx.fromEvent(queueEmitter, 'close')),
-      concurrentController,
+      concurrentController
     )
 
     this.pending = 0
