@@ -1,7 +1,11 @@
 import * as Rx from 'rxjs'
 import * as ops from 'rxjs/operators'
 
-const rateLimitToggle = (func, toggler, {  limit, rate, maxConcurrent, useLimiterFirst = true}) => {
+const rateLimitToggle = (
+  func,
+  toggler,
+  { limit, rate, maxConcurrent, useLimiterFirst = true }
+) => {
   const rateTimer = Rx.timer(0, rate).pipe(ops.mapTo(true))
   return source =>
     new Rx.Observable(subscriber => {

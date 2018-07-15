@@ -39,8 +39,8 @@ type Parse = ParseSelectorOnly | ParseDetailed
 type UrlBuilderBase = {|
   template?: string, // template for url, will be filled using variables available
   regexCleanup?: Regex,
-  cookieTemplates?: {[string]: string},
-  headerTemplates?: {[string]: string}
+  cookieTemplates?: { [string]: string },
+  headerTemplates?: { [string]: string }
   // increment?: 0
   // increment: false // TODO reenable after fix with flow-runtime
 |}
