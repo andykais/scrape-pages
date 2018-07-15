@@ -19,11 +19,9 @@ class ScrapePages {
     this.emitter = new Emitter()
     this.logger = new Logger({ log_level: 3 })
     this.queue = new Queue(runParams, this.emitter.toggler)
-    console.log('initted dependencies')
   }
 
   // TODO add parsable input for this first parse step
-  // runSetup = async ()
   runSetup = async runParams => {
     const flatRunParams = fillInDefaultOptions(this.config, runParams)
     if (!this.isValidInput(runParams.input)) throw new Error('invalid input')
@@ -38,17 +36,6 @@ class ScrapePages {
 
     this.logger.cli('Setting up SQLite database.')
     await this.store.init(runParams)
-    // console.log(await this.store.db.all(`SELECT parsedValue FROM parsedTree WHERE scraper in ('post')`))
-    // const scraperValues = await this.store.getOrderedScrapers([
-    // 'post',
-    // 'post-list'
-    // ])
-    // console.log(
-    // scraperValues
-    // .map(({ id, url, parseIndex, parsedValue, recurseDepth}) => [url])
-    // // .map(({ url, parsedValue }) => ({ url, value: parsedValue }))
-    // )
-    // process.exit(0)
 
     this.logger.cli('Begin downloading with inputs', runParams.input)
     return this.scrapingScheme([{}])
@@ -68,12 +55,7 @@ class ScrapePages {
           // TODO add timer to show how long it took
           this.logger.cli('Done!')
           this.queue.closeQueue()
-          this.emitter.emitDone()
-          this.store
-            .getOrderedScrapers(['title', 'score'])
-            .then(output =>
-              console.log(output.map(o => o.parsedValue))
-            )
+          this.emitter.emitDone(this.store.queryFor)
         }
       )
     })

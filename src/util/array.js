@@ -13,3 +13,32 @@ export const findMax = (array, isGreaterThan) => {
     else return max
   }, init)
 }
+
+export const groupBy = (
+  array,
+  key,
+  value,
+  includeGroupByKey = false,
+  resultSelector = v => v
+) => {
+  const { length } = array
+  let collector = {}
+  const groupedArray = []
+
+  for (let i = 0; i < length; i++) {
+    const item = array[i]
+    const itemValue = item[key]
+
+    if (itemValue === value && i !== 0) {
+      groupedArray.push(collector)
+      collector = {}
+    }
+    if (includeGroupByKey || itemValue !== key) {
+      const collectorArray = collector[itemValue] || []
+      collector[itemValue] = collectorArray
+      collectorArray.push(resultSelector(item))
+    }
+  }
+  groupedArray.push(collector)
+  return groupedArray
+}

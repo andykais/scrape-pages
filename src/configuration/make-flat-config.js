@@ -6,7 +6,6 @@ const makeFlatConfig = fullConfig => {
     horizontalIndex = 0
   ) => {
     const { name } = config
-    // console.log(config)
     const childConfigs = config.scrapeEach.reduce(
       (acc, scraper, horizontalIndex) => ({
         ...acc,

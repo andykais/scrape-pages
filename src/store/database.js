@@ -14,6 +14,21 @@ class DB {
     // .Database(resolve(downloadFolder, 'store.sql'))
   }
 
+  prepare = (sql, params) =>
+    new Promise((resolve, reject) => {
+      const statement = this.database.prepare(sql, params, error => {
+        if (error) reject(error)
+        else resolve(statement)
+      })
+    })
+  bind = (statment, params) =>
+    new Promise((resolve, reject) =>
+      statement.bind(params, error => {
+        if (error) reject(error)
+        else resolve()
+      })
+    )
+
   _run = (method: string) => (sql: string, values: Array<any> = []) =>
     new Promise((resolve, reject) => {
       this.database[method](sql, values, function(error, result) {

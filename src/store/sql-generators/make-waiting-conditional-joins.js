@@ -2,18 +2,14 @@ const makeWaitingConditionalJoins = (flatConfig, scraperNames) => {
   const levels = scraperNames
     .map(name => flatConfig[name])
     .sort((a, b) => b.depth - a.depth)
-  console.log(levels, scraperNames)
   const lowestDepth = levels[0].depth
   const levelsThatWillWait = levels.filter(l => l.depth !== lowestDepth)
 
-  // console.log(lowestDepth)
-  // console.log(levels)
-  // console.log(levelsThatWillWait)
   const caseJoins = levelsThatWillWait
     .map(level => {
       const waitingSteps = Array(lowestDepth - level.depth)
         .fill(level.depth)
-        .map((d, i) => lowestDepth - d + i - 1)
+        .map((d, i) => lowestDepth - d + i - 2)
         .map(recurseDepth => `${recurseDepth}`)
         .join(',')
 

@@ -2,13 +2,14 @@ import path from 'path'
 import fs from 'fs'
 import { promisify } from 'util'
 
-const { readFile, exists, mkdir } = fs.promises
+const [exists, readFile, mkdir] = [fs.readFile, fs.exists, fs.mkdir].map(
+  promisify
+)
 
 export { exists, readFile }
 
 export const mkdirp = async folder => {
   try {
-    console.log('trying', folder)
     await mkdir(folder)
   } catch (e) {
     if (e.code === 'ENOENT') {
