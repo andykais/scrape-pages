@@ -4,7 +4,7 @@ export default config => ({ emitter }, { store }) => async ({
   incrementIndex,
   value
 }) => {
-  const downloadId = await store.insertQueuedDownload({
+  const { id: downloadId } = await store.insertQueuedDownload({
     scraper: config.name,
     parentId,
     loopIndex,

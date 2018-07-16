@@ -26,7 +26,7 @@ export default config => (runParams, dependencies) => {
       value,
       incrementIndex
     })
-    const downloadId = await store.insertQueuedDownload({
+    const { id: downloadId } = await store.insertQueuedDownload({
       scraper: config.name,
       parentId,
       loopIndex,
