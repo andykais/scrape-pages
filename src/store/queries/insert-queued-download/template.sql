@@ -1,4 +1,4 @@
-INSERT INTO downloads (
+INSERT OR IGNORE INTO downloads (
   scraper,
   parseParentId,
   loopIndex,
