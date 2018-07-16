@@ -1,32 +1,30 @@
 import EventEmitter from 'events'
 import * as Rx from 'rxjs'
+import { makeFlatConfig } from './configuration/make-flat-config'
 
 class ScrapeEmitter {
-  constructor() {
-    this.limiters = []
+  forScraper = {}
+
+  constructor(config) {
     this._emitter = new EventEmitter()
-    this.emitter.on('limit', this.setLimitersTo)
+    const flatConfig = makeFlatConfig(config)
+    for (const name of Object.keys(flatConfig)) {
+      this.forScraper[name] = {
+        emitQueuedDownload: id => {
+          this.emitter.emit(`${name}:queued`, id)
+        },
+        emitProgress: (id, progress) => {
+          this.emitter.emit(`${name}:progress`, id, progress)
+        },
+        emitCompletedDownload: id => {
+          this.emitter.emit(`${name}:complete`, id)
+        }
+      }
+    }
   }
 
-  registerLimiter(setLimiterFunc) {
-    this.limiters.push(setLimiterFunc)
-  }
-
-  // val: 'on' | 'off' | 'default'
-  setLimitersTo(val) {
-    this.limiters.forEach(func => func(val))
-  }
-
-  emitStoreWrite(db) {
-    this.emitter.emit('storeChange', db)
-  }
-
-  emitTotalQueuedChanged(queuedTotals) {
-    this.emitter.emit('queued', queuedTotals)
-  }
-
-  emitFileProgress(id, progress) {
-    this.emitter.emit('progress', id, progress)
+  hasListenerFor(eventName) {
+    return Boolean(this.emitter.listenerCount(eventName))
   }
 
   emitDone(queryFor) {

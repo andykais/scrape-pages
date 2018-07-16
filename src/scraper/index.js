@@ -16,7 +16,7 @@ class ScrapePages {
 
   initDependencies = runParams => {
     this.store = new Store(this.config)
-    this.emitter = new Emitter()
+    this.emitter = new Emitter(this.config)
     this.logger = new Logger({ log_level: 3 })
     this.queue = new Queue(runParams, this.emitter.toggler)
   }
@@ -59,7 +59,10 @@ class ScrapePages {
         }
       )
     })
-    return this.emitter.emitter
+    return {
+      emitter: this.emitter.emitter,
+      queryFor: this.store.queryFor
+    }
   }
   runAsPromise = async runParams => {
     this.initDependencies(runParams)
