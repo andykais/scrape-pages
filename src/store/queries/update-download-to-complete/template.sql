@@ -1,5 +1,5 @@
 UPDATE downloads
 SET
-  filename = $filename,
+  filename = ?,
   complete = 1
-WHERE id = $downloadId
+WHERE id = ?
