@@ -1,7 +1,6 @@
-import https from 'https'
 import fetch from 'node-fetch'
 import { createWriteStream } from 'fs'
-import { resolve, basename } from 'path'
+import { resolve } from 'path'
 import sanitize from 'sanitize-filename'
 import { readFile, exists, mkdirp } from '../../../util/fs-promise'
 
@@ -32,36 +31,21 @@ export const downloadToFileAndMemory = ({ folder }, { queue }, url) => {
 export const downloadToFileOnly = ({ folder }, { queue, logger }, url) => {
   const filename = resolve(folder, sanitizeUrl(url))
 
-  return (
-    queue
-      .add(
-        () =>
-          new Promise(resolve => {
-            const req = https.request(url.toString(), response =>
-              resolve(response)
-            )
-
-            req.end()
-          })
-      )
-      // .add(() => fetch(url))
-      .then(
-        response =>
-          new Promise((resolve, reject) => {
-            const dest = createWriteStream(filename)
-            // response.body.pipe(dest)
-            // response.body.on('error', error => reject(error))
-            response.pipe(dest)
-            response.on('error', error => reject(error))
-            dest.on('error', error => reject(error))
-            dest.on('close', resolve)
-          })
-      )
-      .then(buffer => ({
-        downloadValue: buffer.toString(),
-        filename
-      }))
-  )
+  return queue
+    .add(() => fetch(url))
+    .then(
+      response =>
+        new Promise((resolve, reject) => {
+          const dest = createWriteStream(filename)
+          response.body.pipe(dest)
+          response.body.on('error', error => reject(error))
+          dest.on('error', error => reject(error))
+          dest.on('close', resolve)
+        })
+    )
+    .then(buffer => ({
+      filename
+    }))
 }
 
 export const downloadToMemoryOnly = (runParams, { queue }, url) =>

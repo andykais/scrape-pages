@@ -10,7 +10,7 @@ export type Options = {|
   ...OptionsAny,
   folder: string,
   maxConcurrent?: number,
-  rateLimit: {|
+  rateLimit?: {|
     rate: number,
     limit: number
   |},

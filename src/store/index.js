@@ -40,12 +40,24 @@ class Store {
       }, {})
     )
 
+    // TODO move this into sql
+    const objectPicker = (object, selections) => {
+      const accepted = {}
+      for (const selection of selections) {
+        const value = object[selection]
+        if (value) {
+          accepted[selection] = value
+        }
+      }
+      return accepted
+    }
     const groupedRows = groupBy(
       result,
       'scraper',
       group_by,
       scrapers[group_by],
-      selector => selector[scrapers[selector.scraper][0]]
+      selector => objectPicker(selector, scrapers[selector.scraper])
+      // selector => selector[scrapers[selector.scraper][0]]
     )
     return groupedRows
   }
