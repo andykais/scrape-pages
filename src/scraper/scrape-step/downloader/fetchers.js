@@ -6,7 +6,29 @@ import { readFile, exists, mkdirp } from '../../../util/fs-promise'
 
 const sanitizeUrl = url => sanitize(url.toString(), { replacement: '_' })
 
-export const downloadToFileAndMemory = ({ folder }, { queue }, url) => {
+const emitProgressIfListenersAttached = (
+  emitter,
+  response,
+  name,
+  downloadId
+) => {
+  if (emitter.hasListenerFor(`${name}:progress`)) {
+    const contentLength = response.headers.get('content-length')
+    let bytesLength = 0
+    response.body.on('data', data => {
+      bytesLength += data.length
+      emitter.forScraper[name].emitProgress(bytesLength / contentLength)
+    })
+  }
+}
+
+export const downloadToFileAndMemory = (
+  { name },
+  { folder },
+  { queue, emitter },
+  downloadId,
+  url
+) => {
   const filename = resolve(folder, sanitizeUrl(url))
 
   return queue
@@ -14,11 +36,14 @@ export const downloadToFileAndMemory = ({ folder }, { queue }, url) => {
     .then(
       response =>
         new Promise((resolve, reject) => {
+          const contentLength = response.headers.get('content-length')
+          const hasProgressListener = emitter.hasListenerFor(`${name}:progress`)
           const dest = createWriteStream(filename)
           const buffers = []
           response.body.pipe(dest)
           response.body.on('error', error => reject(error))
           response.body.on('data', data => buffers.push(data))
+          emitProgressIfListenersAttached(emitter, response, name, downloadId)
           dest.on('error', error => reject(error))
           dest.on('close', () => resolve(Buffer.concat(buffers)))
         })
@@ -28,7 +53,13 @@ export const downloadToFileAndMemory = ({ folder }, { queue }, url) => {
       filename
     }))
 }
-export const downloadToFileOnly = ({ folder }, { queue, logger }, url) => {
+export const downloadToFileOnly = (
+  { name },
+  { folder },
+  { queue, emitter },
+  downloadId,
+  url
+) => {
   const filename = resolve(folder, sanitizeUrl(url))
 
   return queue
@@ -38,6 +69,7 @@ export const downloadToFileOnly = ({ folder }, { queue, logger }, url) => {
         new Promise((resolve, reject) => {
           const dest = createWriteStream(filename)
           response.body.pipe(dest)
+          emitProgressIfListenersAttached(emitter, response, name, downloadId)
           response.body.on('error', error => reject(error))
           dest.on('error', error => reject(error))
           dest.on('close', resolve)
@@ -48,21 +80,22 @@ export const downloadToFileOnly = ({ folder }, { queue, logger }, url) => {
     }))
 }
 
-export const downloadToMemoryOnly = (runParams, { queue }, url) =>
+export const downloadToMemoryOnly = (
+  { name },
+  runParams,
+  { queue, emitter },
+  downloadId,
+  url
+) =>
   queue
     .add(() => fetch(url))
-    .then(response => response.text())
+    .then(response => {
+      emitProgressIfListenersAttached(emitter, response, name, downloadId)
+      return response.text()
+    })
     .then(downloadValue => ({
       downloadValue
     }))
-
-export const readFromFile = ({ folder }, dependencies, url) => {
-  const filename = resolve(folder, sanitizeUrl(url))
-
-  return readFile(filename).then(buffer => ({
-    downloadValue: buffer.toString()
-  }))
-}
 
 // const headers = {
 // Host: url.host,

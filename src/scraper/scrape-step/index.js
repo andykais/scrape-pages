@@ -20,7 +20,7 @@ const scraper = config => {
     const downloader = downloaderSetup(runParams, dependencies)
     const parser = parserSetup(runParams, dependencies)
 
-    const { queue, store } = dependencies
+    const { queue, store, emitter } = dependencies
     await mkdirp(runParams.folder)
     const children = await Promise.all(
       childrenSetup.map(child => child(flatRunParams, dependencies))
@@ -62,6 +62,9 @@ const scraper = config => {
                   downloadId,
                   parsedValues
                 })
+                emitter.forScraper[config.name].emitCompletedDownload(
+                  downloadId
+                )
                 const parsedValuesWithId = await store.selectParsedValues(
                   downloadId
                 )

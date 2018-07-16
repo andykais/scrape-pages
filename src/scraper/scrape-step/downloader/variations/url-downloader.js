@@ -1,18 +1,13 @@
 import { resolve, basename } from 'path'
-import sanitize from 'sanitize-filename'
-import format from 'string-template'
 import { constructUrl } from '../construct-url'
 import {
   downloadToFileAndMemory,
   downloadToMemoryOnly,
-  downloadToFileOnly,
-  readFromFile
+  downloadToFileOnly
 } from '../fetchers'
 
-const sanitizeUrl = url => sanitize(url.toString(), { replacement: '_' })
-
 export default config => (runParams, dependencies) => {
-  const { store, queue } = dependencies
+  const { store, queue, emitter } = dependencies
 
   const shouldDownloadToMemory = Boolean(
     config.scrapeEach.length || config.parse
@@ -38,9 +33,12 @@ export default config => (runParams, dependencies) => {
       incrementIndex,
       url: url.toString()
     })
+    emitter.forScraper[config.name].emitQueuedDownload(downloadId)
     const { downloadValue, filename } = await fetcher(
+      config,
       runParams,
       dependencies,
+      downloadId,
       url
     )
     return { downloadValue, downloadId, filename }

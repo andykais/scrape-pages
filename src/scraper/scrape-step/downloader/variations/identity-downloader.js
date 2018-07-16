@@ -1,4 +1,4 @@
-export default config => (runParams, { store }) => async ({
+export default config => ({ emitter }, { store }) => async ({
   parentId,
   loopIndex,
   incrementIndex,
@@ -10,5 +10,6 @@ export default config => (runParams, { store }) => async ({
     loopIndex,
     incrementIndex
   })
+  emitter.forScraper[config.name].emitQueuedDownload(downloadId)
   return { downloadValue: value, downloadId }
 }

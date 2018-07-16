@@ -3,7 +3,7 @@ import SQL_TEMPLATE from './template.sql'
 
 export default (flatConfig, database) => {
   return ({ name, parentId, downloadId, parsedValues }) => {
-    console.log(name, 'insert', parsedValues.length, 'values')
+    // console.log(name, 'insert', parsedValues.length, 'values')
 
     if (!parsedValues.length) return []
 
