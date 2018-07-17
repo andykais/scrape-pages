@@ -1,5 +1,6 @@
 import SQL_TEMPLATE from './template.sql'
 
 export default (flatConfig, database) => {
-  return downloadId => database.all(SQL_TEMPLATE, [downloadId])
+  const statement = database.prepare(SQL_TEMPLATE)
+  return downloadId => statement.all(downloadId)
 }

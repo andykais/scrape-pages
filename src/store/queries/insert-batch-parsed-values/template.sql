@@ -4,4 +4,4 @@ INSERT INTO parsedTree (
   downloadId,
   parseIndex,
   parsedValue
-) VALUES {values}
+) VALUES (?,?,?,?,?)
