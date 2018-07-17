@@ -11,13 +11,28 @@ class Store {
     this.flatConfig = makeFlatConfig(config)
   }
 
-  init = async ({ folder }) => {
-    this.db = new DB(folder)
-    await this.db.run('PRAGMA journal_mode = WAL')
+  init = ({ folder }) => {
+    this.database = new DB(folder)
+    this.database.pragma('journal_mode = WAL')
 
-    await queries.createTables(this.flatConfig, this.db)()
+    queries.createTables(this.flatConfig, this.database)()
     for (const key of Object.keys(queries)) {
-      this[key] = await queries[key](this.flatConfig, this.db)
+      this[key] = queries[key](this.flatConfig, this.database)
+    }
+    // helper statements
+    this.beginTransaction = this.database.prepare('BEGIN TRANSACTION')
+    this.commitTransaction = this.database.prepare('COMMIT')
+    this.rollbackTransaction = this.database.prepare('ROLLBACK')
+  }
+
+  asTransaction = func => (...args) => {
+    this.beginTransaction.run()
+    try {
+      const result = func(...args)
+      this.commitTransaction.run()
+      return result
+    } finally {
+      if (this.database.inTransaction) this.rollbackTransaction.run()
     }
   }
 
