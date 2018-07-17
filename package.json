@@ -1,7 +1,7 @@
 {
   "name": "scrape-pages",
   "version": "3.0.0",
-  "description": "",
+  "description": "generalized scraping using a single config object for any site that can be scraped without a headless browser",
   "main": "lib/main.js",
   "scripts": {
     "scratchwork": "node webpack.dev.js",
@@ -10,7 +10,7 @@
     "test": "jest",
     "test:unit": "jest unit",
     "test:integrations": "jest integration --detectOpenHandles",
-    "prepublishOnly": "npm install && npm run build"
+    "prepublishOnly": "npm run build"
   },
   "repository": {
     "type": "git",
