@@ -10,7 +10,6 @@ This package scrapes sites for text and files based on a single config file repr
 ## Installation
 
 ```bash
-# NOT AVAILABLE YET
 npm install scrape-pages
 ```
 

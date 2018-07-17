@@ -20,11 +20,13 @@ jobs:
       node_js: "8"
       script: npm run test:unit
     - stage: lint
-      node_js: "10"
+      node_js: "8"
       script: npm run lint
 
 deploy:
   provider: npm
+  email: $NPM_EMAIL
   api_key: $NPM_AUTH_TOKEN
   on:
     tags: true
+    node: "8"
