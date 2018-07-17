@@ -19,7 +19,7 @@ const initNodemon = (() => {
       executed = true
       nodemon({
         script: './scratchwork/index.js',
-        watch: [`${__dirname}/dist`, `${__dirname}/scratchwork`]
+        watch: [`${__dirname}/lib`, `${__dirname}/scratchwork`]
       }).on('restart', () =>
         console.log('Restarting scratchwork/index.js...\n')
       )

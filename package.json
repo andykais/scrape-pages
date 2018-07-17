@@ -1,20 +1,25 @@
 {
   "name": "scrape-pages",
-  "version": "1.0.0",
+  "version": "3.0.0",
   "description": "",
-  "main": "src/index.js",
+  "main": "lib/main.js",
   "scripts": {
     "scratchwork": "node webpack.dev.js",
     "build": "webpack -p",
     "lint": "git ls-files '*.js' '*.json' | xargs prettier -l",
     "test": "jest",
     "test:unit": "jest unit",
-    "test:integrations": "jest integration --detectOpenHandles"
+    "test:integrations": "jest integration --detectOpenHandles",
+    "prepublishOnly": "npm run build"
   },
   "repository": {
     "type": "git",
     "url": "git+ssh://git@github.com/andykais/scrape-pages.git"
   },
+  "files": [
+    "lib/*",
+    "package-lock.json"
+  ],
   "author": "Andrew Kaiser",
   "license": "MIT",
   "devDependencies": {
@@ -34,7 +39,6 @@
     "nodemon": "^1.17.5",
     "prettier": "^1.13.5",
     "raw-loader": "^0.5.1",
-    "source-map-support": "^0.5.6",
     "webpack": "^4.12.0",
     "webpack-cli": "^3.0.6",
     "webpack-node-externals": "^1.7.2"
@@ -43,12 +47,12 @@
     "artoo-js": "^0.4.0",
     "better-sqlite3": "^4.1.4",
     "chalk": "^2.4.1",
-    "cheerio": "^1.0.0-rc.2",
     "flow-runtime": "^0.17.0",
     "mime-types": "^2.1.18",
     "node-fetch": "^2.1.2",
     "rxjs": "^6.2.0",
     "sanitize-filename": "^1.6.1",
+    "source-map-support": "^0.5.6",
     "string-template": "^1.0.0"
   },
   "jest": {
