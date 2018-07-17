@@ -1,6 +1,7 @@
 WITH cte AS (
   SELECT
     parsedTree.id,
+    downloads.id as downloadId,
     url,
     filename,
     parsedValue,
@@ -16,6 +17,7 @@ WITH cte AS (
   UNION ALL
   SELECT
     pTree.id,
+    cte.downloadId,
     cte.url,
     cte.filename,
     cte.parsedValue,
@@ -37,8 +39,11 @@ WITH cte AS (
   incrementIndex,
   levelOrder
 )
-SELECT *
---  id, url, parsedValue, parentId, parseIndex, incrementIndex, recurseDepth, currentScraper, scraper, levelOrder
+SELECT
+--  *
+scraper,
+id, parsedValue,
+downloadId, url, filename
 FROM cte
 WHERE recurseDepth = {lowestDepth}
 ORDER BY
@@ -46,4 +51,3 @@ ORDER BY
   incrementIndex,
   parseIndex,
   levelOrder
-;

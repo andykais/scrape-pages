@@ -24,7 +24,7 @@ export default (flatConfig, database) => {
       selectedScrapers,
       lowestDepth
     })
-
-    return database.all(selectOrderedSql)
+    const statement = database.prepare(selectOrderedSql)
+    return statement.all()
   }
 }

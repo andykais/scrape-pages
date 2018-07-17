@@ -21,10 +21,10 @@ const rateLimitToggle = (
       }
       const dequeue = useRateLimit => {
         const availableSlots = useRateLimit
-          ? limit
-          : Math.min(maxConcurrent, maxConcurrent - inProgress)
+          ? Math.min(limit, maxConcurrent - inProgress)
+          : maxConcurrent - inProgress
         const numberToDequeue = Math.min(availableSlots, queue.length)
-        const nextVals = queue.splice(0, numberToDequeue)
+        const nextVals = numberToDequeue ? queue.splice(0, numberToDequeue) : []
         inProgress += numberToDequeue
         return nextVals
       }
@@ -36,7 +36,7 @@ const rateLimitToggle = (
           ),
           ops.takeWhile(() => !closed || queue.length),
           ops.mergeMap(dequeue),
-          ops.mergeMap(val => func(val), maxConcurrent) // must manage the max concurrent number manually
+          ops.mergeMap(val => func(val)) // must manage the max concurrent number manually
         )
         .subscribe(val => {
           inProgress--
