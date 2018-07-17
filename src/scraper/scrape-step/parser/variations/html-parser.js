@@ -1,14 +1,18 @@
 import cheerio from 'cheerio'
-import artoo from 'artoo-js'
-
-artoo.bootstrap(cheerio)
 
 export default config => ({ store }) => value => {
-  // parse from config
+  const { selector, attribute } = config.parse
   const $ = cheerio.load(value)
-  const parsedValues = $(config.parse.selector)
-    .scrape(config.parse.attribute)
-    .filter(val => val !== undefined)
-
-  return parsedValues
+  const selection = $(selector)
+  const values = []
+  if (attribute) {
+    selection.attr(attribute, (i, attributeVal) => {
+      values.push(attributeVal)
+    })
+  } else {
+    selection.text((i, textVal) => {
+      values.push(textVal)
+    })
+  }
+  return values
 }

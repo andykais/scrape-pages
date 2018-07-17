@@ -10,7 +10,7 @@
     "test": "jest",
     "test:unit": "jest unit",
     "test:integrations": "jest integration --detectOpenHandles",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm install && npm run build"
   },
   "repository": {
     "type": "git",
@@ -44,9 +44,9 @@
     "webpack-node-externals": "^1.7.2"
   },
   "dependencies": {
-    "artoo-js": "^0.4.0",
     "better-sqlite3": "^4.1.4",
     "chalk": "^2.4.1",
+    "cheerio": "^1.0.0-rc.2",
     "flow-runtime": "^0.17.0",
     "mime-types": "^2.1.18",
     "node-fetch": "^2.1.2",
