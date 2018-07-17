@@ -41,6 +41,7 @@
   },
   "dependencies": {
     "artoo-js": "^0.4.0",
+    "better-sqlite3": "^4.1.4",
     "chalk": "^2.4.1",
     "cheerio": "^1.0.0-rc.2",
     "flow-runtime": "^0.17.0",
@@ -48,7 +49,6 @@
     "node-fetch": "^2.1.2",
     "rxjs": "^6.2.0",
     "sanitize-filename": "^1.6.1",
-    "sqlite3": "^4.0.1",
     "string-template": "^1.0.0"
   },
   "jest": {

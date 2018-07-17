@@ -26,13 +26,18 @@ export default config => (runParams, dependencies) => {
       value,
       incrementIndex
     })
-    const { id: downloadId } = await store.insertQueuedDownload({
+    const downloadId = store.asTransaction(params => {
+      store.insertQueuedDownload(params)
+      const { id } = store.selectQueuedDownload(params)
+      return id
+    })({
       scraper: config.name,
       parentId,
       loopIndex,
       incrementIndex,
       url: url.toString()
     })
+
     emitter.forScraper[config.name].emitQueuedDownload(downloadId)
     const { downloadValue, filename } = await fetcher(
       config,

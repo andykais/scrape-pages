@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS parsedTree (
   parsedValue TEXT,
   identity BIT,
   FOREIGN KEY (parentId) REFERENCES parsedTree(id)
-  FOREIGN KEY(downloadId) REFERENCES download(id)
+  FOREIGN KEY(downloadId) REFERENCES downloads(id)
 );
 
 --  horizontalIndex INT, -- index used for consitent order when two parsers are next to each other (priority low and only under certain circumstances)
