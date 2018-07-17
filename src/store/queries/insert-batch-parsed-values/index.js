@@ -8,22 +8,5 @@ export default (flatConfig, database) => {
       const parsedValue = parsedValues[parseIndex]
       statement.run(name, parentId, downloadId, parseIndex, parsedValue)
     }
-    // return
-    // // console.log(name, 'insert', parsedValues.length, 'values')
-
-    // if (!parsedValues.length) return []
-
-    // const valuesString = Array(parsedValues.length)
-    // .fill('(?, ?, ?, ?, ?)')
-    // .join(',')
-    // const insertBatchParsedValuesSql = format(SQL_TEMPLATE, {
-    // values: valuesString
-    // })
-    // const insertRows = parsedValues.reduce(
-    // (acc, parsedValue, parseIndex) =>
-    // acc.concat([name, parentId, downloadId, parseIndex, parsedValue]),
-    // []
-    // )
-    // return database.run(insertBatchParsedValuesSql, insertRows)
   }
 }

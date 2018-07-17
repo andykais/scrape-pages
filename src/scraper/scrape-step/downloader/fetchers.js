@@ -21,8 +21,8 @@ const emitProgressIfListenersAttached = (
   if (emitter.hasListenerFor(`${name}:progress`)) {
     const contentLength = response.headers.get('content-length')
     let bytesLength = 0
-    response.body.on('data', data => {
-      bytesLength += data.length
+    response.body.on('data', chunk => {
+      bytesLength += chunk.length
       emitter.forScraper[name].emitProgress(bytesLength / contentLength)
     })
   }
@@ -49,7 +49,7 @@ export const downloadToFileAndMemory = (
       return new Promise((resolve, reject) => {
         response.body.pipe(dest)
         response.body.on('error', error => reject(error))
-        response.body.on('data', data => buffers.push(data))
+        response.body.on('data', chunk => buffers.push(chunk))
         emitProgressIfListenersAttached(emitter, response, name, downloadId)
         dest.on('error', error => reject(error))
         dest.on('close', () => resolve(Buffer.concat(buffers)))
