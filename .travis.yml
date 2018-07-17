@@ -22,3 +22,9 @@ jobs:
     - stage: lint
       node_js: "10"
       script: npm run lint
+
+deploy:
+  provider: npm
+  api_key: $NPM_AUTH_TOKEN
+  on:
+    tags: true

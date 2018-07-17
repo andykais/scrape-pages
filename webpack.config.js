@@ -21,7 +21,7 @@ module.exports = {
   },
   plugins: [],
   output: {
-    path: `${__dirname}/dist`,
+    path: `${__dirname}/lib`,
     filename: 'main.js',
     library: 'scrape-pages',
     libraryTarget: 'umd'
