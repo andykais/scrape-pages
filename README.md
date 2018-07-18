@@ -20,7 +20,7 @@ lets download the five most recent images from nasa's image of the day archive
 ```javascript
 const ScrapePages = require('scrape-pages')
 // create a config file
-const iotd = {
+const config = {
   scrape: {
     download: 'https://apod.nasa.gov/apod/archivepix.html',
     parse: {
@@ -40,7 +40,7 @@ const iotd = {
   }
 }
 // load the config into a new 'scraper'
-const siteScraper = new PageScraper(config)
+const siteScraper = new ScrapePages(config)
 
 // begin scraping
 const { emitter, queryFor } = siteScraper.run({ folder: './downloads' })
