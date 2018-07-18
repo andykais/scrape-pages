@@ -1,7 +1,28 @@
 {
-  presets: ['stage-2', 'react'],
+  presets: [
+    [
+      'env',
+      {
+        target: {
+          node: 'current'
+        }
+      }
+    ]
+  ],
   plugins: [
     'transform-decorators-legacy',
+    'transform-class-properties',
+    'transform-object-rest-spread',
+    'transform-async-generator-functions',
+    'transform-async-to-generator',
+    'transform-flow-strip-types',
+    [
+      'transform-runtime',
+      {
+        polyfill: false,
+        regenerator: true
+      }
+    ],
     [
       'flow-runtime',
       {
@@ -10,11 +31,12 @@
         warn: false
         // optInOnly: true
       }
-    ]
+    ],
+    'add-module-exports'
   ],
   env: {
     test: {
-      presets: [['env'], 'stage-2', 'react']
+      presets: [['env'], 'stage-2', 'flow']
     }
   }
 }
