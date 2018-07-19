@@ -28,64 +28,61 @@ const emitProgressIfListenersAttached = (
   }
 }
 
-export const downloadToFileAndMemory = (
+export const downloadToFileAndMemory = async (
   { name },
   { folder },
   { queue, emitter },
   downloadId,
   url
 ) => {
-  const filename = resolve(folder, sanitizeUrl(url))
+  const downloadFolder = resolve(folder, downloadId.toString())
+  const filename = resolve(downloadFolder, sanitizeUrl(url))
 
-  return queue
-    .add(() => fetch(url))
-    .then(response => {
-      verifyResponseOk(response, url)
-      const contentLength = response.headers.get('content-length')
-      const hasProgressListener = emitter.hasListenerFor(`${name}:progress`)
-      const dest = createWriteStream(filename)
-      const buffers = []
+  await mkdirp(downloadFolder)
+  const response = await queue.add(() => fetch(url))
+  verifyResponseOk(response, url)
+  const contentLength = response.headers.get('content-length')
+  const hasProgressListener = emitter.hasListenerFor(`${name}:progress`)
+  const dest = createWriteStream(filename)
+  const buffers = []
 
-      return new Promise((resolve, reject) => {
-        response.body.pipe(dest)
-        response.body.on('error', error => reject(error))
-        response.body.on('data', chunk => buffers.push(chunk))
-        emitProgressIfListenersAttached(emitter, response, name, downloadId)
-        dest.on('error', error => reject(error))
-        dest.on('close', () => resolve(Buffer.concat(buffers)))
-      })
-    })
-    .then(buffer => ({
-      downloadValue: buffer.toString(),
-      filename
-    }))
+  const buffer = await new Promise((resolve, reject) => {
+    response.body.pipe(dest)
+    response.body.on('error', error => reject(error))
+    response.body.on('data', chunk => buffers.push(chunk))
+    emitProgressIfListenersAttached(emitter, response, name, downloadId)
+    dest.on('error', error => reject(error))
+    dest.on('close', () => resolve(Buffer.concat(buffers)))
+  })
+  return {
+    downloadValue: buffer.toString(),
+    filename
+  }
 }
-export const downloadToFileOnly = (
+export const downloadToFileOnly = async (
   { name },
   { folder },
   { queue, emitter },
   downloadId,
   url
 ) => {
-  const filename = resolve(folder, sanitizeUrl(url))
+  const downloadFolder = resolve(folder, downloadId.toString())
+  await mkdirp(downloadFolder)
+  const filename = resolve(downloadFolder, sanitizeUrl(url))
 
-  return queue
-    .add(() => fetch(url))
-    .then(
-      response =>
-        new Promise((resolve, reject) => {
-          verifyResponseOk(response, url)
-          const dest = createWriteStream(filename)
-          response.body.pipe(dest)
-          emitProgressIfListenersAttached(emitter, response, name, downloadId)
-          response.body.on('error', error => reject(error))
-          dest.on('error', error => reject(error))
-          dest.on('close', resolve)
-        })
-    )
-    .then(buffer => ({
-      filename
-    }))
+  const response = await queue.add(() => fetch(url))
+  const buffer = await new Promise((resolve, reject) => {
+    verifyResponseOk(response, url)
+    const dest = createWriteStream(filename)
+    response.body.pipe(dest)
+    emitProgressIfListenersAttached(emitter, response, name, downloadId)
+    response.body.on('error', error => reject(error))
+    dest.on('error', error => reject(error))
+    dest.on('close', resolve)
+  })
+  return {
+    filename
+  }
 }
 
 export const downloadToMemoryOnly = (
