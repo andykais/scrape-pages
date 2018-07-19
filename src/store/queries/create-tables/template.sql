@@ -28,7 +28,6 @@ CREATE TABLE IF NOT EXISTS parsedTree (
 );
 
 --  horizontalIndex INT, -- index used for consitent order when two parsers are next to each other (priority low and only under certain circumstances)
-CREATE UNIQUE INDEX IF NOT EXISTS urlIndex ON downloads(url);
 CREATE UNIQUE INDEX IF NOT EXISTS downloadId ON downloads(id);
 CREATE UNIQUE INDEX IF NOT EXISTS indexes ON downloads(scraper, loopIndex, incrementIndex, parseParentId);
 COMMIT;

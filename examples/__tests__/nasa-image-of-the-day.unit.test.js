@@ -1,8 +1,9 @@
 import nasaIotdConfig from '../nasa-image-of-the-day.config'
+import { assertConfigType } from '../../src/configuration'
 
 describe('nasa iotd config', () => {
   test('is properly typed', () => {
-    expect(nasaIotdConfig).toBeConfigType()
+    assertConfigType(nasaIotdConfig)
   })
 
   // TODO

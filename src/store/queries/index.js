@@ -6,8 +6,6 @@ export { default as selectCompletedDownload } from './select-completed-download'
 
 export { default as insertQueuedDownload } from './insert-queued-download'
 
-export { default as selectQueuedDownload } from './select-queued-download'
-
 export {
   default as updateDownloadToComplete
 } from './update-download-to-complete'
