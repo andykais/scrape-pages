@@ -72,7 +72,6 @@ class Store {
       group_by,
       scrapers[group_by],
       selector => objectPicker(selector, scrapers[selector.scraper])
-      // selector => selector[scrapers[selector.scraper][0]]
     )
     return groupedRows
   }

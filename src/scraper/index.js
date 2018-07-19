@@ -44,11 +44,11 @@ class ScrapePages {
   run = runParams => {
     this.initDependencies(runParams)
     this.runSetup(runParams).then(scrapingObservable => {
-      scrapingObservable.subscribe(
+      const subscription = scrapingObservable.subscribe(
         undefined,
         error => {
           this.emitter.emitError(error)
-          scrapingObservable.unsubscribe()
+          subscription.unsubscribe()
           // TODO unsubscribe from queue
         },
         () => {
@@ -58,11 +58,13 @@ class ScrapePages {
           this.emitter.emitDone(this.store.queryFor)
         }
       )
+
+      this.emitter.onStop(() => {
+        subscription.unsubscribe()
+        this.logger.cli('Exited manually.')
+      })
     })
-    return {
-      emitter: this.emitter.emitter,
-      queryFor: this.store.queryFor
-    }
+    return this.emitter.emitter
   }
   runAsPromise = async runParams => {
     this.initDependencies(runParams)
