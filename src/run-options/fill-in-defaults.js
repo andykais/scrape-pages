@@ -2,8 +2,18 @@ import { resolve } from 'path'
 import { makeFlatConfig } from '../configuration/make-flat-config'
 import { assertOptionsType } from './assert-options-type'
 
+const assertValidInput = (config, { input }) => {
+  for (const key of Object.keys(config.input)) {
+    if (input[key] === undefined) {
+      throw new Error(`Invalid Input! Missing key '${key}'.`)
+    }
+  }
+}
+
 const fillInDefaults = (config, runParams) => {
   assertOptionsType(runParams)
+  assertValidInput(config, runParams)
+
   const flatConfig = makeFlatConfig(config)
   const { optionsEach = {}, ...globalOptions } = runParams
 
