@@ -37,10 +37,11 @@ type Parse = ParseSelectorOnly | ParseDetailed
 // toplevel url builder
 // TODO put cookies and headers in here as templates
 type UrlBuilderBase = {|
-  template?: string, // template for url, will be filled using variables available
-  regexCleanup?: Regex,
+  method?: 'GET' | 'POST' | 'PUT' | 'DELETE',
+  urlTemplate: string,
   cookieTemplates?: { [string]: string },
-  headerTemplates?: { [string]: string }
+  headerTemplates?: { [string]: string },
+  regexCleanup?: Regex
   // increment?: 0
   // increment: false // TODO reenable after fix with flow-runtime
 |}
@@ -51,7 +52,7 @@ type UrlBuilderIncrement = {|
   incrementUntil?: number
 |}
 type UrlBuilderTemplateOnly = string
-// defaults to { template: '{parse}', expect: 'html' }
+// defaults to { urlTemplate: '{parse}', expect: 'html' }
 // when undefined, identity is used
 type UrlBuilder = UrlBuilderTemplateOnly | UrlBuilderBase | UrlBuilderIncrement
 

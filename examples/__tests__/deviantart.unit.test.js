@@ -3,7 +3,6 @@ import { assertConfigType } from '../../src/configuration'
 
 describe('deviantart config', () => {
   test('is properly typed', () => {
-    expect(deviantartConfig).toBeConfigType()
     assertConfigType(deviantartConfig)
   })
 

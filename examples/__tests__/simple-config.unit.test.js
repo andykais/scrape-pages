@@ -1,8 +1,9 @@
+import { assertConfigType } from '../../src/configuration'
 describe('simple config', () => {
   const simpleConfig = global.__SIMPLE_CONFIG__
 
   test('is properly typed', () => {
-    expect(simpleConfig).toBeConfigType()
+    assertConfigType(simpleConfig)
   })
 
   // TODO

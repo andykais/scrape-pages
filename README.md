@@ -1,7 +1,8 @@
 # scrape-pages
 
 [![Travis branch](https://img.shields.io/travis/andykais/scrape-pages/master.svg)](https://travis-ci.com/andykais/scrape-pages/branches)
-![license](https://img.shields.io/github/license/andykais/scrape-pages.svg)
+[![npm](https://img.shields.io/npm/v/scrape-pages.svg)](https://www.npmjs.com/package/scrape-pages)
+[![license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/andykais/scrape-pages/blob/master/LICENSE)
 
 This package scrapes sites for text and files based on a single config file representing the crawler's flow.
 
@@ -34,25 +35,29 @@ const config = {
         attribute: 'href'
       },
       scrapeEach: {
+        name: 'image',
         download: 'https://apod.nasa.gov/apod/{value}'
       }
     }
   }
 }
+
 // load the config into a new 'scraper'
 const siteScraper = new ScrapePages(config)
-
 // begin scraping
-const { emitter, queryFor } = siteScraper.run({ folder: './downloads' })
+const emitter = siteScraper.run({ folder: './downloads' })
 
-emitter.on('done', () => {
-  console.log('finished downloading.')
-  queryFor({ scrapers: { images: ['filename'] } }).then(images => {
-    console.log(images)
-    // [{
-    //   images: [{ filename: 'img1.jpg' }, { filename: 'img2.jpg' }, ...]
-    // }]
-  })
+emitter.on('image:complete', (queryFor, { id }) =>
+  console.log('COMPLETED image', id)
+)
+
+emitter.on('done', async queryFor => {
+  console.log('finished.')
+  const result = await queryFor({ scrapers: { images: ['filename'] } })
+  console.log(result)
+  // [{
+  //   images: [{ filename: 'img1.jpg' }, { filename: 'img2.jpg' }, ...]
+  // }]
 })
 ```
 
@@ -67,19 +72,24 @@ For now, the flow typings for the surface api are the only documentation that ex
 
 The scraper instance created from a config object is meant to be reusable and cached. It only knows about the
 config object. `scraper.run` can be called multiple times, and, as long as different folders are
-provided, each run will work independently. `scraper.run` returns **emitter** and **queryFor**
+provided, each run will work independently. `scraper.run` returns **emitter**
 
-#### emitter
+### emitter
 
-standard event emitter which emits several events
-
+#### Listenable events
+each event will return the **queryFor** function as its first argument
 - `'done'`: when the scraper has completed
 - `'error'`: when the scraper encounters an error (this also stops the scraper)
 - `'<scraper>:progress'`: emits progress of download until completed
 - `'<scraper>:queued'`: when a download is queued
 - `'<scraper>:complete'`: when a download is completed
 
-#### queryFor
+#### Emittable events
+
+- '`useRateLimiter'`: pass a boolean to turn on or off the rate limit defined in the run options
+- `'stop'`: emit this event to stop the crawler (note that any in progress promises will still complete)
+
+### queryFor
 
 This function is used to get data back out of the scraper whenever you need it. The function takes an object
 with three keys:
@@ -99,6 +109,13 @@ The pattern to download data from a website is largely similar. It can be summed
 
 What varies is how much nested url grabbing is required and in which steps data is saved.
 This project is an attempt to generalize that process into a single static config file.
+
+Describing a site crawler with a single config enforces structure, and familiarity that is less common with
+other scraping libraries. Not only does this make yours surface api much more condensed, and immediately
+recognizable, it also opens the door to sharing and collaboration, since passing json objects around the web
+is safer than executable code.
+Hopefully, this means that users can agree on common configs for different sites, and in time, begin to contribute common scraping patterns.
+
 Generally, if you could scrape the page without executing javascript in a headless browser,
 this package should be able to scrape what you wish. However, it is important to note that if you are doing high volume production level scraping, it is always better to write
 your own scraper code.

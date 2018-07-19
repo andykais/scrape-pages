@@ -3,7 +3,7 @@ export default {
   scrape: {
     download: {
       increment: 24,
-      template:
+      urlTemplate:
         'https://{artist}.deviantart.com/gallery/?catpath=/&offset={_index}'
     },
     parse: {

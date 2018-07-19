@@ -24,7 +24,6 @@ class ScrapePages {
   // TODO add parsable input for this first parse step
   runSetup = async runParams => {
     const flatRunParams = fillInDefaultOptions(this.config, runParams)
-    if (!this.isValidInput(runParams.input)) throw new Error('invalid input')
 
     this.logger.cli('Making folders.')
     this.scrapingScheme = await this.scrapingSetup(flatRunParams, {
@@ -44,11 +43,11 @@ class ScrapePages {
   run = runParams => {
     this.initDependencies(runParams)
     this.runSetup(runParams).then(scrapingObservable => {
-      scrapingObservable.subscribe(
+      const subscription = scrapingObservable.subscribe(
         undefined,
         error => {
           this.emitter.emitError(error)
-          scrapingObservable.unsubscribe()
+          subscription.unsubscribe()
           // TODO unsubscribe from queue
         },
         () => {
@@ -58,20 +57,19 @@ class ScrapePages {
           this.emitter.emitDone(this.store.queryFor)
         }
       )
+
+      this.emitter.onStop(() => {
+        subscription.unsubscribe()
+        this.logger.cli('Exited manually.')
+      })
     })
-    return {
-      emitter: this.emitter.emitter,
-      queryFor: this.store.queryFor
-    }
+    return this.emitter.emitter
   }
   runAsPromise = async runParams => {
     this.initDependencies(runParams)
     const scrapingObservable = await this.runSetup(runParams)
     return scrapingObservable.toPromise()
   }
-
-  isValidInput = input =>
-    Object.keys(this.config.input).every(key => input[key])
 }
 
 export default ScrapePages
