@@ -1,7 +1,8 @@
 # scrape-pages
 
 [![Travis branch](https://img.shields.io/travis/andykais/scrape-pages/master.svg)](https://travis-ci.com/andykais/scrape-pages/branches)
-![license](https://img.shields.io/github/license/andykais/scrape-pages.svg)
+[![npm](https://img.shields.io/npm/v/scrape-pages.svg)](https://www.npmjs.com/package/scrape-pages)
+[![license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/andykais/scrape-pages/blob/master/LICENSE)
 
 This package scrapes sites for text and files based on a single config file representing the crawler's flow.
 
@@ -69,9 +70,9 @@ The scraper instance created from a config object is meant to be reusable and ca
 config object. `scraper.run` can be called multiple times, and, as long as different folders are
 provided, each run will work independently. `scraper.run` returns **emitter** and **queryFor**
 
-#### emitter
+### emitter
 
-standard event emitter which emits several events
+#### Listenable events
 
 - `'done'`: when the scraper has completed
 - `'error'`: when the scraper encounters an error (this also stops the scraper)
@@ -79,7 +80,11 @@ standard event emitter which emits several events
 - `'<scraper>:queued'`: when a download is queued
 - `'<scraper>:complete'`: when a download is completed
 
-#### queryFor
+#### Emittable events
+
+- '`useRateLimiter'`: pass a boolean to turn on or off the rate limit defined in the run options
+
+### queryFor
 
 This function is used to get data back out of the scraper whenever you need it. The function takes an object
 with three keys:
