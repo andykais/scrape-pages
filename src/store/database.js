@@ -1,4 +1,3 @@
-// @flow
 import { resolve } from 'path'
 import BetterSqlite3Database from 'better-sqlite3'
 

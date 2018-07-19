@@ -3,7 +3,7 @@ export default {
   scrape: {
     download: {
       increment: 50,
-      template:
+      urlTemplate:
         'https://{username}.tumblr.com/api/read/json?start={_index}&num=50',
       regexCleanup: 'var tumblr_api_read = '
     },

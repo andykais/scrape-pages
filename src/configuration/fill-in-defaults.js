@@ -7,12 +7,15 @@ const assignDownloadDefaults = download => {
     regexCleanup: undefined,
     increment: 0,
     initialIndex: 0,
-    incrementUntil: undefined
+    incrementUntil: undefined,
+    headerTemplates: {},
+    cookieTemplates: {},
+    method: 'GET'
   }
   return typeof download === 'string'
     ? {
         ...defaults,
-        template: download
+        urlTemplate: download
       }
     : {
         ...defaults,

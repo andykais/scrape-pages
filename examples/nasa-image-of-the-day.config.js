@@ -2,7 +2,7 @@
 export default {
   scrape: {
     download: {
-      template: 'https://www.nasa.gov/multimedia/imagegallery/iotd.html'
+      urlTemplate: 'https://www.nasa.gov/multimedia/imagegallery/iotd.html'
     },
     parse: {
       selector: '.gallery-card img',
