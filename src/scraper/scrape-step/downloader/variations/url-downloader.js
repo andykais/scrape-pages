@@ -1,5 +1,5 @@
 import { resolve, basename } from 'path'
-import { constructUrl } from '../construct-url'
+import { constructFetch } from '../construct-url'
 import {
   downloadToFileAndMemory,
   downloadToMemoryOnly,
@@ -22,7 +22,7 @@ export default config => (runParams, dependencies) => {
         : downloadToFileOnly
 
   return async ({ value, parentId, loopIndex, incrementIndex }) => {
-    const url = constructUrl(config, runParams, {
+    const { url, fetchOptions } = constructFetch(config, runParams, {
       value,
       incrementIndex
     })
@@ -39,8 +39,11 @@ export default config => (runParams, dependencies) => {
       config,
       runParams,
       dependencies,
-      downloadId,
-      url
+      {
+        downloadId,
+        url,
+        fetchOptions
+      }
     )
     return { downloadValue, downloadId, filename }
   }

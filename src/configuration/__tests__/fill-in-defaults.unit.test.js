@@ -1,4 +1,5 @@
 import { fillInDefaults } from '../'
+import { assertConfigType } from '../assert-config-type'
 
 describe('filled in defaults', () => {
   describe('simple config', () => {
@@ -9,10 +10,13 @@ describe('filled in defaults', () => {
       scrape: {
         name: 'level_0_index_0',
         download: {
+          method: 'GET',
+          urlTemplate: simpleConfig.scrape.download,
+          cookieTemplates: {},
+          headerTemplates: {},
           increment: 0,
           initialIndex: 0,
           incrementUntil: undefined,
-          template: simpleConfig.scrape.download,
           regexCleanup: undefined
         },
         parse: {
@@ -24,10 +28,13 @@ describe('filled in defaults', () => {
           {
             name: 'level_1_index_0',
             download: {
+              method: 'GET',
+              urlTemplate: simpleConfig.scrape.scrapeEach.download,
+              cookieTemplates: {},
+              headerTemplates: {},
               increment: 0,
               initialIndex: 0,
               incrementUntil: undefined,
-              template: simpleConfig.scrape.scrapeEach.download,
               regexCleanup: undefined
             },
             parse: undefined,
@@ -47,7 +54,7 @@ describe('filled in defaults', () => {
     })
 
     it('filled in version should adhere to configuration flow type', () => {
-      expect(fullConfig).toBeConfigType()
+      assertConfigType(fullConfig)
     })
   })
 
@@ -56,7 +63,7 @@ describe('filled in defaults', () => {
     const fullConfig = fillInDefaults(galleryPostImgTag)
 
     it('should match configuration flow type', () => {
-      expect(fullConfig).toBeConfigType()
+      assertConfigType(fullConfig)
     })
     it('should match itself for a full filled in config', () => {
       const fullConfigFromGuess = fillInDefaults(fullConfig)

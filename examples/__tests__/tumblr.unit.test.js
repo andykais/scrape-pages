@@ -1,8 +1,10 @@
+// @flow
 import tumblrConfig from '../tumblr.config'
+import { assertConfigType } from '../../src/configuration/assert-config-type'
 
 describe('tumblr config', () => {
   test('is properly typed', () => {
-    expect(tumblrConfig).toBeConfigType()
+    assertConfigType(tumblrConfig)
   })
 
   // TODO

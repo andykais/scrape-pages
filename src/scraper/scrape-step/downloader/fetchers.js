@@ -32,13 +32,12 @@ export const downloadToFileAndMemory = (
   { name },
   { folder },
   { queue, emitter },
-  downloadId,
-  url
+  { downloadId, url, fetchOptions }
 ) => {
   const filename = resolve(folder, sanitizeUrl(url))
 
   return queue
-    .add(() => fetch(url))
+    .add(() => fetch(url, fetchOptions))
     .then(response => {
       verifyResponseOk(response, url)
       const contentLength = response.headers.get('content-length')
@@ -64,13 +63,12 @@ export const downloadToFileOnly = (
   { name },
   { folder },
   { queue, emitter },
-  downloadId,
-  url
+  { downloadId, url, fetchOptions }
 ) => {
   const filename = resolve(folder, sanitizeUrl(url))
 
   return queue
-    .add(() => fetch(url))
+    .add(() => fetch(url, fetchOptions))
     .then(
       response =>
         new Promise((resolve, reject) => {
@@ -92,11 +90,10 @@ export const downloadToMemoryOnly = (
   { name },
   runParams,
   { queue, emitter },
-  downloadId,
-  url
+  { downloadId, url, fetchOptions }
 ) =>
   queue
-    .add(() => fetch(url))
+    .add(() => fetch(url, fetchOptions))
     .then(response => {
       verifyResponseOk(response, url)
       emitProgressIfListenersAttached(emitter, response, name, downloadId)
