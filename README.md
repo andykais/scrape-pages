@@ -72,12 +72,12 @@ For now, the flow typings for the surface api are the only documentation that ex
 
 The scraper instance created from a config object is meant to be reusable and cached. It only knows about the
 config object. `scraper.run` can be called multiple times, and, as long as different folders are
-provided, each run will work independently. `scraper.run` returns **emitter** and **queryFor**
+provided, each run will work independently. `scraper.run` returns **emitter**
 
 ### emitter
 
 #### Listenable events
-
+each event will return the **queryFor** function as its first argument
 - `'done'`: when the scraper has completed
 - `'error'`: when the scraper encounters an error (this also stops the scraper)
 - `'<scraper>:progress'`: emits progress of download until completed

@@ -24,7 +24,6 @@ class ScrapePages {
   // TODO add parsable input for this first parse step
   runSetup = async runParams => {
     const flatRunParams = fillInDefaultOptions(this.config, runParams)
-    if (!this.isValidInput(runParams.input)) throw new Error('invalid input')
 
     this.logger.cli('Making folders.')
     this.scrapingScheme = await this.scrapingSetup(flatRunParams, {
@@ -71,9 +70,6 @@ class ScrapePages {
     const scrapingObservable = await this.runSetup(runParams)
     return scrapingObservable.toPromise()
   }
-
-  isValidInput = input =>
-    Object.keys(this.config.input).every(key => input[key])
 }
 
 export default ScrapePages

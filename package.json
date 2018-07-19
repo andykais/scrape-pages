@@ -1,6 +1,6 @@
 {
   "name": "scrape-pages",
-  "version": "3.0.1",
+  "version": "3.0.2",
   "description": "generalized scraping using a single config object for any site that can be scraped without a headless browser",
   "main": "lib/main.js",
   "module": "src/index.js",

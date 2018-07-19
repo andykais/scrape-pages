@@ -1,4 +1,3 @@
-// @flow
 import tumblrConfig from '../tumblr.config'
 import { assertConfigType } from '../../src/configuration/assert-config-type'
 
