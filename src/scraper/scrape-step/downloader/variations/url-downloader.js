@@ -26,11 +26,7 @@ export default config => (runParams, dependencies) => {
       value,
       incrementIndex
     })
-    const downloadId = store.asTransaction(params => {
-      store.insertQueuedDownload(params)
-      const { id } = store.selectQueuedDownload(params)
-      return id
-    })({
+    const downloadId = store.insertQueuedDownload({
       scraper: config.name,
       parentId,
       loopIndex,

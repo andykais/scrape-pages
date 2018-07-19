@@ -35,25 +35,29 @@ const config = {
         attribute: 'href'
       },
       scrapeEach: {
+        name: 'image',
         download: 'https://apod.nasa.gov/apod/{value}'
       }
     }
   }
 }
+
 // load the config into a new 'scraper'
 const siteScraper = new ScrapePages(config)
-
 // begin scraping
-const { emitter, queryFor } = siteScraper.run({ folder: './downloads' })
+const emitter = siteScraper.run({ folder: './downloads' })
 
-emitter.on('done', () => {
-  console.log('finished downloading.')
-  queryFor({ scrapers: { images: ['filename'] } }).then(images => {
-    console.log(images)
-    // [{
-    //   images: [{ filename: 'img1.jpg' }, { filename: 'img2.jpg' }, ...]
-    // }]
-  })
+emitter.on('image:complete', (queryFor, { id }) =>
+  console.log('COMPLETED image', id)
+)
+
+emitter.on('done', async queryFor => {
+  console.log('finished.')
+  const result = await queryFor({ scrapers: { images: ['filename'] } })
+  console.log(result)
+  // [{
+  //   images: [{ filename: 'img1.jpg' }, { filename: 'img2.jpg' }, ...]
+  // }]
 })
 ```
 
@@ -83,6 +87,7 @@ provided, each run will work independently. `scraper.run` returns **emitter** an
 #### Emittable events
 
 - '`useRateLimiter'`: pass a boolean to turn on or off the rate limit defined in the run options
+- `'stop'`: emit this event to stop the crawler (note that any in progress promises will still complete)
 
 ### queryFor
 
