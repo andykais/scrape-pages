@@ -3,7 +3,9 @@ language: node_js
 stages:
   - test
   - lint
-  - deploy
+  - name: deploy
+    if: tag IS present
+
 
 cache:
   directories:
@@ -25,10 +27,9 @@ jobs:
       script: npm run lint
     - stage: deploy
       node_js: "8"
-      if: tag IS present
-      script: skip
       deploy:
         provider: npm
+        skip_cleanup: true
         email: $NPM_EMAIL
         api_key: $NPM_AUTH_TOKEN
         on:
