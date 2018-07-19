@@ -104,6 +104,13 @@ The pattern to download data from a website is largely similar. It can be summed
 
 What varies is how much nested url grabbing is required and in which steps data is saved.
 This project is an attempt to generalize that process into a single static config file.
+
+Describing a site crawler with a single config enforces structure, and familiarity that is less common with
+other scraping libraries. Not only does this make yours surface api much more condensed, and immediately
+recognizable, it also opens the door to sharing and collaboration, since passing json objects around the web
+is safer than executable code.
+Hopefully, this means that users can agree on common configs for different sites, and in time, begin to contribute common scraping patterns.
+
 Generally, if you could scrape the page without executing javascript in a headless browser,
 this package should be able to scrape what you wish. However, it is important to note that if you are doing high volume production level scraping, it is always better to write
 your own scraper code.
