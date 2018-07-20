@@ -35,7 +35,8 @@ const scraper = config => {
             do {
               const { id: downloadId } = store.selectCompletedDownload({
                 incrementIndex,
-                parentId
+                parentId,
+                scraper: config.name
               })
               if (downloadId) {
                 const parsedValuesWithId = store.selectParsedValues(downloadId)

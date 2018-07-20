@@ -10,6 +10,7 @@ const assertValidInput = (config, { input }) => {
   }
 }
 
+// TODO rename to normalizeConfig
 const fillInDefaults = (config, runParams) => {
   assertOptionsType(runParams)
   assertValidInput(config, runParams)

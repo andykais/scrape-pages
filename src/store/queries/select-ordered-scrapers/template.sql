@@ -11,7 +11,7 @@ WITH cte AS (
     0 as recurseDepth,
     parsedTree.scraper,
     parsedTree.scraper AS currentScraper,
-    {orderLevelColumnSql} as levelOrder
+    0 as levelOrder
   FROM parsedTree INNER JOIN downloads ON parsedTree.downloadId = downloads.id
   WHERE parsedTree.scraper in ({selectedScrapers})
   UNION ALL
@@ -27,7 +27,7 @@ WITH cte AS (
     cte.recurseDepth + 1,
     cte.scraper,
     pTree.scraper AS currentScraper,
-    cte.levelOrder
+    {orderLevelColumnSql} as levelOrder
   FROM cte
   INNER JOIN parsedTree as pTree ON
   {waitingJoinsSql} = pTree.id
@@ -41,9 +41,9 @@ WITH cte AS (
 )
 SELECT
 --  *
-scraper,
-id, parsedValue,
-downloadId, url, filename
+  scraper,
+  id, parsedValue,
+  downloadId, url, filename
 FROM cte
 WHERE recurseDepth = {lowestDepth}
 ORDER BY

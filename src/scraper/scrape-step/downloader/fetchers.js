@@ -6,9 +6,11 @@ import { readFile, exists, mkdirp } from '../../../util/fs-promise'
 
 const sanitizeUrl = url => sanitize(url.toString(), { replacement: '_' })
 
-const verifyResponseOk = (response, url) => {
+const verifyResponseOk = (name, response, url) => {
   if (!response.ok) {
-    throw new Error(`${url.toString()} status ${response.status}`)
+    throw new Error(
+      `scraper ${name} status ${response.status} for ${url.toString()}`
+    )
   }
 }
 
@@ -39,7 +41,7 @@ export const downloadToFileAndMemory = async (
 
   await mkdirp(downloadFolder)
   const response = await queue.add(() => fetch(url, fetchOptions))
-  verifyResponseOk(response, url)
+  verifyResponseOk(name, response, url)
   const contentLength = response.headers.get('content-length')
   const hasProgressListener = emitter.hasListenerFor(`${name}:progress`)
   const dest = createWriteStream(filename)
@@ -70,7 +72,7 @@ export const downloadToFileOnly = async (
 
   const response = await queue.add(() => fetch(url, fetchOptions))
   const buffer = await new Promise((resolve, reject) => {
-    verifyResponseOk(response, url)
+    verifyResponseOk(name, response, url)
     const dest = createWriteStream(filename)
     response.body.pipe(dest)
     emitProgressIfListenersAttached(emitter, response, name, downloadId)
@@ -92,7 +94,7 @@ export const downloadToMemoryOnly = (
   queue
     .add(() => fetch(url, fetchOptions))
     .then(response => {
-      verifyResponseOk(response, url)
+      verifyResponseOk(name, response, url)
       emitProgressIfListenersAttached(emitter, response, name, downloadId)
       return response.text()
     })

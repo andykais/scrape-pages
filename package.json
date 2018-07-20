@@ -2,6 +2,11 @@
   "name": "scrape-pages",
   "version": "3.0.3",
   "description": "generalized scraping using a single config object for any site that can be scraped without a headless browser",
+  "keywords": [
+    "crawler",
+    "scraper",
+    "http"
+  ],
   "main": "lib/main.js",
   "module": "src/index.js",
   "scripts": {
