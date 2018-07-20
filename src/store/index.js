@@ -3,7 +3,7 @@ import DB from './database'
 import type { Config } from '../configuration/type'
 import { makeFlatConfig } from '../configuration'
 import * as queries from './queries'
-import { groupBy } from '../util/array'
+import { groupBy as groupByKey } from '../util/array'
 
 class Store {
   constructor(config) {
@@ -36,14 +36,14 @@ class Store {
     }
   }
 
-  queryFor = async ({ scrapers, group_by }) => {
+  queryFor = async ({ scrapers, groupBy }) => {
     const scraperNames = Object.keys(scrapers)
 
     const matchingScrapers = scraperNames.filter(s => this.flatConfig[s])
     if (!matchingScrapers.length) return [{}]
 
     const matchingAll = Array.from(
-      new Set(scraperNames.concat(group_by))
+      new Set(scraperNames.concat(groupBy))
     ).filter(s => this.flatConfig[s])
 
     const result = await this.selectOrderedScrapers(matchingAll)
@@ -54,6 +54,32 @@ class Store {
         return acc
       }, {})
     )
+
+    const headers = [
+      'id',
+      'parentId',
+      'incrementIndex',
+      'levelOrder',
+      'recurseDepth',
+      'currentScraper',
+      'filename',
+      'parsedValue',
+      'scraper'
+    ]
+    // console.log([
+    // headers.join(' | '),
+    // ...result.map(r => {
+    // return headers
+    // .map(key =>
+    // (r[key] === null ? 'NULL' : r[key])
+    // .toString()
+    // .replace(/\n/g, '')
+    // .padStart(key === 'scraper' ? 0 : key.length)
+    // .slice(key === 'scraper' ? null : -key.length)
+    // )
+    // .join(' | ')
+    // })
+    // ])
 
     // TODO move this into sql
     const objectPicker = (object, selections) => {
@@ -66,11 +92,11 @@ class Store {
       }
       return accepted
     }
-    const groupedRows = groupBy(
+    const groupedRows = groupByKey(
       result,
       'scraper',
-      group_by,
-      scrapers[group_by],
+      groupBy,
+      scrapers[groupBy],
       selector => objectPicker(selector, scrapers[selector.scraper])
     )
     return groupedRows

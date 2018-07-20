@@ -33,7 +33,7 @@ export const groupBy = (
       groupedArray.push(collector)
       collector = {}
     }
-    if (includeGroupByKey || itemValue !== key) {
+    if (includeGroupByKey || itemValue !== value) {
       const collectorArray = collector[itemValue] || []
       collector[itemValue] = collectorArray
       collectorArray.push(resultSelector(item))

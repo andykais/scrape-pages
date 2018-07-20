@@ -7,11 +7,11 @@ export default config => ({ store }) => value => {
   const values = []
   if (attribute) {
     selection.attr(attribute, (i, attributeVal) => {
-      values.push(attributeVal)
+      if (attributeVal.length) values.push(attributeVal)
     })
   } else {
     selection.text((i, textVal) => {
-      values.push(textVal)
+      if (textVal.length) values.push(textVal)
     })
   }
   return values

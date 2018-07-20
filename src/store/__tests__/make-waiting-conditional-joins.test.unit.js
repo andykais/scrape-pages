@@ -1,5 +1,4 @@
 import { makeFlatConfig, fillInDefaults } from '../../configuration'
-import { findLowestCommonParent } from '../sql-generators/util/find-lowest-common-parent'
 import { makeWaitingConditionalJoins } from '../sql-generators'
 
 // should only give the higher one when their depths are unequal
