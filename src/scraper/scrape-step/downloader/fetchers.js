@@ -39,8 +39,8 @@ export const downloadToFileAndMemory = async (
   const downloadFolder = resolve(folder, downloadId.toString())
   const filename = resolve(downloadFolder, sanitizeUrl(url))
 
-  await mkdirp(downloadFolder)
   const response = await queue.add(() => fetch(url, fetchOptions))
+  await mkdirp(downloadFolder)
   verifyResponseOk(name, response, url)
   const contentLength = response.headers.get('content-length')
   const hasProgressListener = emitter.hasListenerFor(`${name}:progress`)
@@ -67,10 +67,10 @@ export const downloadToFileOnly = async (
   { downloadId, url, fetchOptions }
 ) => {
   const downloadFolder = resolve(folder, downloadId.toString())
-  await mkdirp(downloadFolder)
   const filename = resolve(downloadFolder, sanitizeUrl(url))
 
   const response = await queue.add(() => fetch(url, fetchOptions))
+  await mkdirp(downloadFolder)
   const buffer = await new Promise((resolve, reject) => {
     verifyResponseOk(name, response, url)
     const dest = createWriteStream(filename)

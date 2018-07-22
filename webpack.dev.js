@@ -16,9 +16,10 @@ const initNodemon = (() => {
   let executed = false
   return () => {
     if (!executed) {
+      const scriptFile = process.argv[2] || 'index.js'
       executed = true
       nodemon({
-        script: './scratchwork/index.js',
+        script: `./scratchwork/${scriptFile}`,
         watch: [`${__dirname}/lib`, `${__dirname}/scratchwork`]
       }).on('restart', () =>
         console.log('Restarting scratchwork/index.js...\n')
