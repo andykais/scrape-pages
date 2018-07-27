@@ -4,8 +4,10 @@ module.exports = {
   target: 'node',
   mode: 'development',
   devtool: 'source-map',
-  // entry: ['babel-polyfill', `${__dirname}/src/index.js`],
-  entry: `${__dirname}/src/index.js`,
+  entry: {
+    main: `${__dirname}/src/index.js`,
+    'normalize-config': './src/configuration/normalize'
+  },
   module: {
     rules: [
       {
@@ -22,7 +24,7 @@ module.exports = {
   plugins: [],
   output: {
     path: `${__dirname}/lib`,
-    filename: 'main.js',
+    filename: '[name].js',
     library: 'scrape-pages',
     libraryTarget: 'umd'
   },

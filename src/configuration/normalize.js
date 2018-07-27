@@ -84,4 +84,4 @@ const fillInDefaults = config => {
     scrape: fullConfig
   }
 }
-export { fillInDefaults }
+export default fillInDefaults
