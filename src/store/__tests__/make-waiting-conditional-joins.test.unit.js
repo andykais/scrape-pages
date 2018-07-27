@@ -1,10 +1,10 @@
-import { makeFlatConfig, fillInDefaults } from '../../configuration'
+import { makeFlatConfig, normalizeConfig } from '../../configuration'
 import { makeWaitingConditionalJoins } from '../sql-generators'
 
 // should only give the higher one when their depths are unequal
 describe('make waiting conditional joins', () => {
   const galleryPostImgTag = global.__GALLERY_POST_IMG_TAG__
-  const fullConfig = fillInDefaults(galleryPostImgTag)
+  const fullConfig = normalizeConfig(galleryPostImgTag)
   const flatConfig = makeFlatConfig(fullConfig)
 
   it('should wait for the lowest level respective to its own depth', () => {

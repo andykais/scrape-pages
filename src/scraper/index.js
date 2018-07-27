@@ -5,12 +5,12 @@ import Logger from '../logger'
 import Queue from '../queue-observable'
 import scraper from './scrape-step'
 import { mkdirp } from '../util/fs-promise'
-import { fillInDefaults as fillInDefaultConfigs } from '../configuration'
-import { fillInDefaults as fillInDefaultOptions } from '../run-options'
+import { normalizeConfig } from '../configuration'
+import { normalizeOptions } from '../run-options'
 
 class ScrapePages {
   constructor(config) {
-    this.config = fillInDefaultConfigs(config)
+    this.config = normalizeConfig(config)
     this.scrapingSetup = scraper(this.config.scrape)
   }
 
@@ -23,7 +23,7 @@ class ScrapePages {
 
   // TODO add parsable input for this first parse step
   runSetup = async runParams => {
-    const flatRunParams = fillInDefaultOptions(this.config, runParams)
+    const flatRunParams = normalizeOptions(this.config, runParams)
 
     this.logger.cli('Making folders.')
     this.scrapingScheme = await this.scrapingSetup(flatRunParams, {

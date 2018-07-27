@@ -1,10 +1,10 @@
-import { makeFlatConfig, fillInDefaults } from '../../configuration'
+import { makeFlatConfig, normalizeConfig } from '../../configuration'
 import { makeDynamicOrderLevelColumn } from '../sql-generators'
 
 // should only give the higher one when their depths are unequal
 describe('make dynamic order level column', () => {
   const galleryPostImgTag = global.__GALLERY_POST_IMG_TAG__
-  const fullConfig = fillInDefaults(galleryPostImgTag)
+  const fullConfig = normalizeConfig(galleryPostImgTag)
   const flatConfig = makeFlatConfig(fullConfig)
 
   it(`should always be '0' when there arent any cases`, () => {

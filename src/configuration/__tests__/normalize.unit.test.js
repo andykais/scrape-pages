@@ -1,10 +1,10 @@
-import { fillInDefaults } from '../'
+import { normalizeConfig } from '../'
 import { assertConfigType } from '../assert-config-type'
 
 describe('filled in defaults', () => {
   describe('simple config', () => {
     const simpleConfig = global.__SIMPLE_CONFIG__
-    const fullConfig = fillInDefaults(simpleConfig)
+    const fullConfig = normalizeConfig(simpleConfig)
     const fullConfigGuess = {
       input: [],
       scrape: {
@@ -45,7 +45,7 @@ describe('filled in defaults', () => {
     }
 
     it('should match itself for a full filled in config', () => {
-      const fullConfigFromGuess = fillInDefaults(fullConfigGuess)
+      const fullConfigFromGuess = normalizeConfig(fullConfigGuess)
       expect(fullConfigFromGuess).toStrictEqual(fullConfigGuess)
     })
 
@@ -60,13 +60,13 @@ describe('filled in defaults', () => {
 
   describe('gallery post img tag config', () => {
     const galleryPostImgTag = global.__GALLERY_POST_IMG_TAG__
-    const fullConfig = fillInDefaults(galleryPostImgTag)
+    const fullConfig = normalizeConfig(galleryPostImgTag)
 
     it('should match configuration flow type', () => {
       assertConfigType(fullConfig)
     })
     it('should match itself for a full filled in config', () => {
-      const fullConfigFromGuess = fillInDefaults(fullConfig)
+      const fullConfigFromGuess = normalizeConfig(fullConfig)
       expect(fullConfigFromGuess).toStrictEqual(fullConfig)
     })
   })
