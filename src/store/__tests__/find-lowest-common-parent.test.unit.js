@@ -1,9 +1,9 @@
-import { makeFlatConfig, fillInDefaults } from '../../configuration'
+import { makeFlatConfig, normalizeConfig } from '../../configuration'
 import { findLowestCommonParent } from '../sql-generators/util/find-lowest-common-parent'
 
 describe('find lowest common parent', () => {
   const galleryPostImgTag = global.__GALLERY_POST_IMG_TAG__
-  const fullConfig = fillInDefaults(galleryPostImgTag)
+  const fullConfig = normalizeConfig(galleryPostImgTag)
   const flatConfig = makeFlatConfig(fullConfig)
 
   it('should select the proper parent from flat config', () => {

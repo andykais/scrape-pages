@@ -1,4 +1,4 @@
-import { fillInDefaults, makeFlatConfig } from '../'
+import { normalizeConfig, makeFlatConfig } from '../'
 
 describe('config recurser', () => {
   const galleryPostImgTag = global.__GALLERY_POST_IMG_TAG__
@@ -37,7 +37,7 @@ describe('config recurser', () => {
   }
 
   test('flat config matches expected', () => {
-    const fullConfig = fillInDefaults(galleryPostImgTag)
+    const fullConfig = normalizeConfig(galleryPostImgTag)
     const flatConfig = makeFlatConfig(fullConfig)
     expect(flatConfig).toStrictEqual(flatConfigGuess)
   })
