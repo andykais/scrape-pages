@@ -1,4 +1,4 @@
-export { fillInDefaults } from './fill-in-defaults'
+export { default as normalizeConfig } from './normalize'
 
 export { makeFlatConfig } from './make-flat-config'
 
