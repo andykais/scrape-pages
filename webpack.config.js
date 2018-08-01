@@ -1,3 +1,4 @@
+const { resolve } = require('path')
 const nodeExternals = require('webpack-node-externals')
 
 module.exports = {
@@ -5,8 +6,17 @@ module.exports = {
   mode: 'development',
   devtool: 'source-map',
   entry: {
-    main: `${__dirname}/src/index.js`,
-    'normalize-config': './src/configuration/normalize'
+    index: resolve(__dirname, `./src/index.js`),
+    'normalize-config/index': resolve(
+      __dirname,
+      './src/configuration/normalize'
+    )
+  },
+  output: {
+    path: resolve(__dirname, `${__dirname}/lib`),
+    filename: '[name].js',
+    library: 'scrape-pages',
+    libraryTarget: 'umd'
   },
   module: {
     rules: [
@@ -22,11 +32,5 @@ module.exports = {
     ]
   },
   plugins: [],
-  output: {
-    path: `${__dirname}/lib`,
-    filename: '[name].js',
-    library: 'scrape-pages',
-    libraryTarget: 'umd'
-  },
   externals: [nodeExternals()]
 }

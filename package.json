@@ -7,8 +7,7 @@
     "scraper",
     "http"
   ],
-  "main": "lib/main.js",
-  "module": "src/index.js",
+  "main": "./index.js",
   "scripts": {
     "scratchwork": "node webpack.dev.js",
     "build": "webpack -p",
