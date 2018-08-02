@@ -5,6 +5,8 @@ stages:
   - lint
   - name: deploy
     if: tag IS present
+  - name: deploy-website
+    if: branch = master
 
 
 cache:
@@ -34,5 +36,13 @@ jobs:
         skip_cleanup: true
         email: $NPM_EMAIL
         api_key: $NPM_AUTH_TOKEN
-        on:
-          tags: true
+    - stage: deploy-website
+      node_js: "8"
+      before_install: cd website
+      script: npm run build
+      deploy:
+        provider: pages
+        local-dir: website/dist
+        skip-cleanup: true
+        github-token: $GITHUB_TOKEN  # Set in the settings page of your repository, as a secure variable
+        keep-history: true
