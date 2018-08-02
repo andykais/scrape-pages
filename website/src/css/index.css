@@ -1,0 +1,137 @@
+:root {
+  --primary: #78909c;
+  --primary-dark: #4b636e;
+  --secondary: #bcaaa4;
+  --secondary-light: white;
+  --font-size: 16px;
+}
+html,
+body {
+  font-size: var(--font-size);
+  padding: 0;
+  margin: 0;
+  font-family: sans-serif;
+  height: 100%;
+}
+body {
+  display: flex;
+  flex-direction: column;
+}
+h1,
+h2,
+h3,
+h4,
+h5 {
+  margin: 0;
+}
+a {
+  text-decoration: none;
+  position: relative;
+  color: white;
+}
+i {
+  font-size: 26px;
+  line-height: 20px;
+}
+button i {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+#navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 10px;
+  background-color: var(--primary-dark);
+  color: white;
+}
+#title-container {
+  padding: 12px 0;
+}
+#container {
+  display: flex;
+  flex-grow: 1;
+}
+#user-input {
+  margin: 10px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+#user-input.hidden {
+  margin: 0;
+  overflow: hidden;
+  width: 0;
+}
+#user-input label {
+  display: block;
+}
+#user-input textarea {
+  width: 300px;
+  font-size: 12px;
+  flex-grow: 1;
+  margin-bottom: 10px;
+  font-family:monospace;
+}
+#user-input .invalid:focus {
+  outline: none !important;
+  border-color: green;
+  box-shadow: 0 0 1px 2px red;
+}
+#normalize-button {
+  font-size: var(--font-size);
+}
+#hide-button-container {
+  position: relative;
+  z-index: 99;
+}
+#hide-button {
+  position: absolute;
+  width: 40px;
+  height: 25px;
+}
+#tree-container {
+  font-family: monospace;
+  display: inline-block;
+  background-color: var(--primary);
+  overflow: scroll;
+  width: 100%;
+  min-height: 200px;
+}
+#tree-container > svg {
+  position:relative;
+}
+.link {
+  fill: none;
+  stroke: var(--primary-dark);
+  stroke-width: 2px;
+}
+.arrow {
+  fill: var(--primary-dark);
+}
+.scrape-step {
+  background-color: var(--secondary-light);
+  white-space: nowrap;
+  overflow: hidden;
+  border: 1px solid var(--primary-dark);
+  box-shadow: 1px 1px 1px var(--primary-dark);
+}
+.name {
+  background-color: var(--secondary);
+}
+.name,
+.download {
+  border-bottom: solid 0.5px;
+}
+.name,
+.download,
+.parse {
+  padding: 0 1px;
+  height: 24px;
+  line-height: 24px;
+}
+.identity {
+  font-family: STIXGeneral-Italic;
+}

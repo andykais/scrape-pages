@@ -1,6 +1,5 @@
 // @flow
 
-import expect from 'expect'
 import type { Config } from '../src/configuration/type'
 
 // setup reusable variables
