@@ -39,12 +39,12 @@ module.exports = {
     ]),
     new HtmlWebpackPlugin({
       template: 'src/index.html'
-    }),
+    })
     // new AddAssetHtmlPlugin({ filepath: 'css/all.min.css' }),
     // new HtmlWebpackIncludeAssetsPlugin({
-      // assets: ['file.css'],
-      // append: false,
-      // publicPath: 'css/'
+    // assets: ['file.css'],
+    // append: false,
+    // publicPath: 'css/'
     // })
   ]
 }

@@ -1,65 +1,65 @@
 const config = {
   input: [],
   scrape: {
-    name: "mainpage",
+    name: 'mainpage',
     download: {
       increment: 0,
       initialIndex: 0,
       headerTemplates: {},
       cookieTemplates: {},
-      method: "GET",
-      urlTemplate: "mainpage"
+      method: 'GET',
+      urlTemplate: 'mainpage'
     },
-    parse: { expect: "html", selector: "batchID" },
+    parse: { expect: 'html', selector: 'batchID' },
     scrapeEach: [
       {
-        name: "grid",
+        name: 'grid',
         download: {
           increment: 1,
           initialIndex: 0,
           headerTemplates: {},
           cookieTemplates: {},
-          method: "GET",
-          urlTemplate: "batchPage{batchID}"
+          method: 'GET',
+          urlTemplate: 'batchPage{batchID}'
         },
         scrapeNext: {
           name: 'next-batchid',
           parse: {
-            selector: "batchID",
-            expect: "html"
+            selector: 'batchID',
+            expect: 'html'
           }
         },
         scrapeEach: [
           {
-            name: "tag",
-            parse: { expect: "html", selector: "span.tag" },
+            name: 'tag',
+            parse: { expect: 'html', selector: 'span.tag' },
             scrapeEach: []
           },
           {
-            name: "parse-image-page",
-            parse: { expect: "html", selector: "li a.images" },
+            name: 'parse-image-page',
+            parse: { expect: 'html', selector: 'li a.images' },
             scrapeEach: [
               {
-                name: "image-page",
+                name: 'image-page',
                 download: {
                   increment: 0,
                   initialIndex: 0,
                   headerTemplates: {},
                   cookieTemplates: {},
-                  method: "GET",
-                  urlTemplate: "imagepage{imageID}"
+                  method: 'GET',
+                  urlTemplate: 'imagepage{imageID}'
                 },
-                parse: { expect: "html", selector: "img" },
+                parse: { expect: 'html', selector: 'img' },
                 scrapeEach: [
                   {
-                    name: "image",
+                    name: 'image',
                     download: {
                       increment: 0,
                       initialIndex: 0,
                       headerTemplates: {},
                       cookieTemplates: {},
-                      method: "GET",
-                      urlTemplate: "{src}"
+                      method: 'GET',
+                      urlTemplate: '{src}'
                     },
                     scrapeEach: []
                   }
@@ -71,4 +71,4 @@ const config = {
       }
     ]
   }
-};
+}

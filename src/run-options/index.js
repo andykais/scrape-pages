@@ -1,3 +1,3 @@
-export { normalizeOptions } from './normaize'
+export { normalizeOptions } from './normalize'
 
 export { assertOptionsType } from './assert-options-type'
