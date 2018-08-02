@@ -72,7 +72,7 @@ const standardizeInput = input => {
   else return input
 }
 
-const fillInDefaults = config => {
+const normalizeConfig = config => {
   assertConfigType(config)
 
   const input = standardizeInput(config.input)
@@ -84,4 +84,4 @@ const fillInDefaults = config => {
     scrape: fullConfig
   }
 }
-export default fillInDefaults
+export default normalizeConfig

@@ -1,4 +1,5 @@
 const { resolve } = require('path')
+const CopyWebpackPlugin = require('copy-webpack-plugin')
 const nodeExternals = require('webpack-node-externals')
 
 module.exports = {
@@ -31,6 +32,13 @@ module.exports = {
       }
     ]
   },
-  plugins: [],
+  plugins: [
+    new CopyWebpackPlugin([
+      'package.json',
+      'package-lock.json',
+      'LICENSE',
+      'README.md'
+    ])
+  ],
   externals: [nodeExternals()]
 }

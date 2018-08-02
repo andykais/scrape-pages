@@ -3,8 +3,8 @@
     [
       'env',
       {
-        target: {
-          node: 'current'
+        targets: {
+          node: '8'
         }
       }
     ]
@@ -16,13 +16,6 @@
     'transform-async-generator-functions',
     'transform-async-to-generator',
     'transform-flow-strip-types',
-    [
-      'transform-runtime',
-      {
-        polyfill: false,
-        regenerator: true
-      }
-    ],
     [
       'flow-runtime',
       {

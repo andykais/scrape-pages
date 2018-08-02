@@ -7,24 +7,19 @@
     "scraper",
     "http"
   ],
-  "main": "./index.js",
+  "main": "index.js",
   "scripts": {
     "scratchwork": "node webpack.dev.js",
     "build": "webpack -p",
     "lint": "git ls-files '*.js' '*.json' | xargs prettier -l",
     "test": "jest",
     "test:unit": "jest unit",
-    "test:integrations": "jest integration --detectOpenHandles",
-    "prepublishOnly": "npm run build"
+    "test:integrations": "jest integration --detectOpenHandles"
   },
   "repository": {
     "type": "git",
     "url": "git+ssh://git@github.com/andykais/scrape-pages.git"
   },
-  "files": [
-    "lib/*",
-    "package-lock.json"
-  ],
   "author": "Andrew Kaiser",
   "license": "MIT",
   "devDependencies": {
@@ -38,10 +33,10 @@
     "babel-plugin-transform-class-properties": "^6.24.1",
     "babel-plugin-transform-decorators-legacy": "^1.3.5",
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
-    "babel-plugin-transform-runtime": "^6.23.0",
     "babel-preset-env": "^1.7.0",
     "babel-preset-flow": "^6.23.0",
     "babel-preset-stage-2": "^6.24.1",
+    "copy-webpack-plugin": "^4.5.2",
     "flow-bin": "^0.75.0",
     "jest": "^23.1.0",
     "jest-raw-loader": "^1.0.1",

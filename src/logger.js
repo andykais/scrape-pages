@@ -1,4 +1,3 @@
-import chalk from 'chalk'
 import { tap } from 'rxjs/operators'
 
 class Logger {
@@ -14,13 +13,6 @@ class Logger {
     WRN: false,
     CLI: false,
     ERR: false
-  }
-
-  colors = {
-    DEBUG: chalk,
-    WRN: chalk.yellow,
-    CLI: chalk,
-    ERR: chalk.red
   }
 
   out = {
@@ -40,7 +32,7 @@ class Logger {
   _log = prefix => (...messages) => {
     if (this.allowed[prefix] === undefined) console.log(prefix, ...messages)
     if (this.allowed[prefix]) {
-      this.out[prefix](this.colors[prefix](prefix, ...messages))
+      this.out[prefix]([prefix](prefix, ...messages))
     }
   }
 
