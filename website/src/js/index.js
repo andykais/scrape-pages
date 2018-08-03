@@ -1,34 +1,91 @@
-import { initDiagram, defaultConfig } from './dag'
-// import normalize from 'scrape-pages/normalize-config'
+import { initDiagram, updateDiagram } from './dag'
+import defaultConfig from './default-config'
+import { getConfigFromUrl, setUrlToConfig } from './history'
+import normalize from 'scrape-pages/normalize-config'
 
 import '../css/index.css'
 
-window.onload = () => {
-  const updater = initDiagram()
-  updater(defaultConfig)
+const thenRender = func => (...args) => {
+  func(...args)
+  render()
+}
 
-  const userInput = document.querySelector('#config-input')
-  userInput.placeholder = JSON.stringify(defaultConfig, null, 2)
-  const updateFromInput = e => {
+const initialConfig = getConfigFromUrl() || defaultConfig
+
+const state = {
+  configIsOpen: true,
+  valid: true,
+  inputConfig: JSON.stringify(initialConfig, null, 2),
+  fullConfig: normalize(initialConfig)
+}
+
+const elements = {
+  shareIcon: null,
+  configInputDiv: null,
+  configInput: null,
+  normalizeButton: null,
+  hideButton: null,
+  hideButtonIcon: null,
+  flowErrorBlock: null,
+  d3Elements: null
+}
+
+const stateChangers = {
+  handleConfigInput: thenRender(e => {
     try {
-      const newConfig = JSON.parse(e.target.value)
-      updater(newConfig)
-      userInput.className = ''
+      state.inputConfig = e.target.value
+      state.fullConfig = normalize(JSON.parse(state.inputConfig))
+      state.valid = true
+      state.flowError = null
+      setUrlToConfig(state.inputConfig)
     } catch (e) {
-      if (e.name !== 'SyntaxError') throw e
-      userInput.className = 'invalid'
+      if (!['SyntaxError', 'RuntimeTypeError'].includes(e.name)) throw e
+      if (e.name === 'RuntimeTypeError') {
+        console.log('here')
+        state.flowError = e.toString()
+      }
+      state.valid = false
     }
-  }
-  userInput.onchange = updateFromInput
-  userInput.onkeyup = updateFromInput
-  const inputContainer = document.getElementById('user-input')
+  }),
+  handleHideButtonClick: thenRender(() => {
+    state.configIsOpen = !state.configIsOpen
+  }),
+  handleNormalizeButtonClick: thenRender(() => {
+    state.inputConfig = JSON.stringify(state.fullConfig, null, 2)
+    setUrlToConfig(state.inputConfig)
+  }),
+  handleShareIconClick: thenRender(() => {
+    window.alert('Just copy the url to share with someone!')
+  })
+}
 
-  const hideButton = document.getElementById('hide-button')
-  let configOpen = true
-  hideButton.onclick = () => {
-    configOpen = !configOpen
-    inputContainer.className = configOpen ? '' : 'hidden'
-    const icon = hideButton.children[0]
-    icon.className = configOpen ? 'fas fa-caret-left' : 'fas fa-caret-right'
-  }
+const render = () => {
+  elements.configInput.value = state.inputConfig
+  updateDiagram(elements.d3Elements)(state.fullConfig)
+  elements.configInputDiv.className = state.configIsOpen ? '' : 'hidden'
+  elements.hideButtonIcon.className = state.configIsOpen
+    ? 'fas fa-caret-left'
+    : 'fas fa-caret-right'
+  elements.configInput.className = state.valid ? '' : 'invalid'
+  elements.normalizeButton.disabled = !state.valid
+  elements.flowErrorBlock.textContent = state.flowError
+  elements.flowErrorBlock.className = state.flowError ? 'show-error' : ''
+}
+
+window.onload = () => {
+  elements.shareIcon = document.getElementById('share')
+  elements.configInputDiv = document.getElementById('user-input')
+  elements.normalizeButton = document.getElementById('normalize-button')
+  elements.configInput = document.getElementById('config-input')
+  elements.hideButton = document.getElementById('hide-button')
+  elements.hideButtonIcon = document.querySelector('#hide-button i')
+  elements.flowErrorBlock = document.getElementById('flow-error-block')
+  elements.d3Elements = initDiagram()
+
+  elements.configInput.oninput = stateChangers.handleConfigInput
+  elements.hideButton.onclick = stateChangers.handleHideButtonClick
+  elements.normalizeButton.onclick = stateChangers.handleNormalizeButtonClick
+  elements.shareIcon.onclick = stateChangers.handleShareIconClick
+
+  render()
 }
