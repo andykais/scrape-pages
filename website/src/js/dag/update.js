@@ -10,7 +10,6 @@ const traverse = (root, func, i = 0) => {
 }
 const downloadText = configStep => {
   const download = configStep.download ? 'Download' : 'identity(x) = x'
-  const content = configStep.parse ? 'HTML' : 'file'
   return download
 }
 const parseText = configStep => {

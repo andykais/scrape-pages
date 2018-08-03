@@ -10,7 +10,7 @@ export default () => {
     height: 'width'
   }
 
-  const margin = { top: 20, right: 20, bottom: 20, left: 20 }
+  const margin = { top: 50, right: 50, bottom: 50, left: 50 }
   // dynamically set these later
   let width = 200,
     height = 400
@@ -49,6 +49,17 @@ export default () => {
     .y(d => d[get.y])
 
   // update function, call it on text box change
+  return {
+    get,
+    rectNode,
+    margin,
+    baseSvg,
+    svgGroup,
+    nodeGroup,
+    linkGroup,
+    diagonal
+  }
+
   const updater = updateFunc({
     get,
     rectNode,
