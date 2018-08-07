@@ -4,17 +4,14 @@
       'env',
       {
         targets: {
-          node: '8'
+          node: 8
         }
       }
-    ]
+    ],
+    'stage-2'
   ],
   plugins: [
     'transform-decorators-legacy',
-    'transform-class-properties',
-    'transform-object-rest-spread',
-    'transform-async-generator-functions',
-    'transform-async-to-generator',
     'transform-flow-strip-types',
     [
       'flow-runtime',
