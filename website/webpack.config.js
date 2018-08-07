@@ -26,14 +26,6 @@ module.exports = {
     new MiniCssExtractPlugin(),
     new CopyWebpackPlugin([
       {
-        from: 'node_modules/@fortawesome/fontawesome-free/css/all.min.css',
-        to: 'css/'
-      },
-      {
-        from: 'node_modules/@fortawesome/fontawesome-free/webfonts',
-        to: 'webfonts/'
-      },
-      {
         from: 'CNAME'
       }
     ]),
