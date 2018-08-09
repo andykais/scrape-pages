@@ -1,17 +1,33 @@
 const { resolve } = require('path')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const nodeExternals = require('webpack-node-externals')
+const TerserPlugin = require('terser-webpack-plugin')
+const NodemonPlugin = require('nodemon-webpack-plugin')
+const CleanTerminalPlugin = require('clean-terminal-webpack-plugin')
 
-module.exports = {
+const devPlugins = env => {
+  if (env) {
+    const plugins = [new CleanTerminalPlugin()]
+    if (env.scratchfile !== true) {
+      plugins.push(
+        new NodemonPlugin({
+          script: env.scratchfile,
+          watch: [resolve('./lib'), resolve(env.scratchfile)]
+        })
+      )
+    }
+    return plugins
+  }
+  return []
+}
+
+module.exports = env => ({
   target: 'node',
   mode: 'development',
   devtool: 'source-map',
   entry: {
     index: resolve(__dirname, `./src/index.js`),
-    'normalize-config/index': resolve(
-      __dirname,
-      './src/configuration/normalize'
-    )
+    'normalize-config': resolve(__dirname, './src/configuration/normalize')
   },
   output: {
     path: resolve(__dirname, `${__dirname}/lib`),
@@ -38,7 +54,11 @@ module.exports = {
       'package-lock.json',
       'LICENSE',
       'README.md'
-    ])
+    ]),
+    ...devPlugins(env)
   ],
+  optimization: {
+    minimizer: [new TerserPlugin()]
+  },
   externals: [nodeExternals()]
-}
+})

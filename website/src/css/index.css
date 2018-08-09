@@ -130,9 +130,8 @@ button i {
   font-family: monospace;
   display: inline-block;
   background-color: var(--primary);
-  /* overflow: scroll; */
-  width: 100%;
   min-height: 100%;
+  min-width: 100%;
 }
 #tree-container > svg {
   position: relative;
