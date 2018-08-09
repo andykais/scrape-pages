@@ -1,3 +1,4 @@
+const { resolve } = require('path')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const HtmlWebpackIncludeAssetsPlugin = require('html-webpack-include-assets-plugin')
@@ -22,6 +23,14 @@ module.exports = {
       }
     ]
   },
+  resolve: {
+    alias: {
+      'flow-runtime': resolve(
+        __dirname,
+        'node_modules/flow-runtime/dist/flow-runtime.es2015.js'
+      )
+    }
+  },
   plugins: [
     new MiniCssExtractPlugin(),
     new CopyWebpackPlugin([
@@ -32,11 +41,5 @@ module.exports = {
     new HtmlWebpackPlugin({
       template: 'src/index.html'
     })
-    // new AddAssetHtmlPlugin({ filepath: 'css/all.min.css' }),
-    // new HtmlWebpackIncludeAssetsPlugin({
-    // assets: ['file.css'],
-    // append: false,
-    // publicPath: 'css/'
-    // })
   ]
 }
