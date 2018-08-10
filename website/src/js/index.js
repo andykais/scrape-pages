@@ -26,6 +26,7 @@ const elements = {
   normalizeButton: null,
   hideButton: null,
   hideButtonIcon: null,
+  treeContainer: null,
   flowErrorBlock: null,
   d3Elements: null
 }
@@ -69,6 +70,7 @@ const render = () => {
   elements.configInput.className = state.valid ? '' : 'invalid'
   elements.normalizeButton.disabled = !state.valid
   elements.flowErrorBlock.textContent = state.flowError
+  elements.treeContainer.className = state.flowError ? 'hide-tree' : ''
   elements.flowErrorBlock.className = state.flowError ? 'show-error' : ''
 }
 
@@ -79,6 +81,7 @@ window.onload = () => {
   elements.configInput = document.getElementById('config-input')
   elements.hideButton = document.getElementById('hide-button')
   elements.hideButtonIcon = document.querySelector('#hide-button i')
+  elements.treeContainer = document.getElementById('tree-container')
   elements.flowErrorBlock = document.getElementById('flow-error-block')
   elements.d3Elements = initDiagram()
 
