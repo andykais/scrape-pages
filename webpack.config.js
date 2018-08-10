@@ -26,11 +26,11 @@ module.exports = env => ({
   mode: 'development',
   devtool: 'source-map',
   entry: {
-    index: resolve(__dirname, `./src/index.js`),
-    'normalize-config': resolve(__dirname, './src/configuration/normalize')
+    index: './src/index.js',
+    'normalize-config': './src/configuration/normalize'
   },
   output: {
-    path: resolve(__dirname, `${__dirname}/lib`),
+    path: resolve(__dirname, 'lib'),
     filename: '[name].js',
     library: 'scrape-pages',
     libraryTarget: 'umd'

@@ -1,0 +1,69 @@
+#config-dependent-content {
+  display: inline-block;
+  position: relative;
+  overflow: scroll;
+  width: 100%;
+}
+#flow-error-block {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 98;
+  background-color: var(--flow-error);
+  color: var(--secondary-light);
+  white-space: pre-wrap;
+  padding: 30px;
+  width: 100%;
+  min-height: 100%;
+  min-height: -webkit-fill-available;
+  display: none;
+}
+#flow-error-block.show-error {
+  display: block;
+}
+
+#tree-container {
+  font-family: monospace;
+  display: inline-block;
+  background-color: var(--primary);
+  min-height: 100%;
+  min-width: 100%;
+}
+#tree-container.hide-tree {
+  display: none;
+}
+#tree-container > svg {
+  position: relative;
+}
+.link {
+  fill: none;
+  stroke: var(--primary-dark);
+  stroke-width: 2px;
+}
+.arrow {
+  fill: var(--primary-dark);
+}
+.scrape-step {
+  background-color: var(--secondary-light);
+  white-space: nowrap;
+  overflow: hidden;
+  border: 1px solid var(--primary-dark);
+  box-shadow: 1px 1px 1px var(--primary-dark);
+}
+.name {
+  background-color: var(--secondary);
+}
+.name,
+.download {
+  border-bottom: solid 0.5px;
+}
+.name,
+.download,
+.parse {
+  padding: 0 1px;
+  height: 24px;
+  line-height: 24px;
+}
+.identity {
+  font-family: STIXGeneral-Italic;
+}

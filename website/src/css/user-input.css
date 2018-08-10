@@ -1,0 +1,39 @@
+#user-input {
+  margin: 10px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+#user-input.hidden {
+  margin: 0;
+  overflow: hidden;
+  width: 0;
+}
+#user-input label {
+  display: block;
+}
+#user-input textarea {
+  /* width: 300px; */
+  font-size: 12px;
+  flex-grow: 1;
+  margin-bottom: 10px;
+  font-family: monospace;
+  white-space: nowrap;
+}
+#user-input .invalid:focus {
+  outline: none !important;
+  border-color: green;
+  box-shadow: 0 0 1px 2px red;
+}
+#normalize-button {
+  font-size: var(--font-size);
+}
+#hide-button-container {
+  position: relative;
+  z-index: 99;
+}
+#hide-button {
+  position: absolute;
+  width: 40px;
+  height: 25px;
+}
