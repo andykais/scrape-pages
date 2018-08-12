@@ -8,6 +8,10 @@ stages:
   - name: deploy-website
     if: branch = master
 
+branches:
+  except:
+    - gh-pages
+
 
 cache:
   directories:
@@ -38,28 +42,6 @@ jobs:
         skip_cleanup: true
         on:
           tags: true
-      # before_deploy:
-        # - npm version --no-git-tag-version "$TRAVIS_TAG"
-        # - npm run build
-        # - cd lib
-      # deploy:
-        # - provider: npm
-          # skip_cleanup: true
-          # email: $NPM_EMAIL
-          # api_key: $NPM_AUTH_TOKEN
-          # on:
-            # tags: true
-        # - provider: script
-          # skip_cleanup: true
-          # script:
-            # cd ..
-            # && git checkout -b master
-            # && git add package.json package-lock.json
-            # && git commit --message "$TRAVIS_TAG"
-            # && git remote add deploy https://${GITHUB_TOKEN}@github.com/${TRAVIS_REPO_SLUG}.git
-            # && git push deploy master
-          # on:
-            # tags: true
 
     - stage: deploy-website
       node_js: "8"
