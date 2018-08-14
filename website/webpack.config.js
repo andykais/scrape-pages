@@ -44,6 +44,11 @@ module.exports = {
     new CopyWebpackPlugin([
       {
         from: 'CNAME'
+      },
+      {
+        // https://docs.travis-ci.com/user/customizing-the-build/#Building-Specific-Branches
+        // > Note that for historical reasons .travis.yml needs to be present on all active branches of your project.
+        from: '../.travis.yml'
       }
     ]),
     new HtmlWebpackPlugin({

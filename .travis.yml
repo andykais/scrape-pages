@@ -8,11 +8,6 @@ stages:
   - name: deploy-website
     if: branch = master
 
-branches:
-  except:
-    - gh-pages
-
-
 cache:
   directories:
     - $HOME/.npm
