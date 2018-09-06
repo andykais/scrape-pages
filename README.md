@@ -1,6 +1,6 @@
 # scrape-pages
 
-[![Travis branch](https://img.shields.io/travis/andykais/scrape-pages/master.svg)](https://travis-ci.com/andykais/scrape-pages/branches)
+[![Travis Master Build Status](https://travis-ci.com/andykais/scrape-pages.svg?branch=master)](https://travis-ci.com/andykais/scrape-pages)
 [![npm](https://img.shields.io/npm/v/scrape-pages.svg)](https://www.npmjs.com/package/scrape-pages)
 [![license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/andykais/scrape-pages/blob/master/LICENSE)
 
@@ -65,7 +65,7 @@ For more real world examples, visit the [examples](examples) directory
 
 ## Documentation
 
-For now, the flow typings for the surface api are the only documentation that exist.
+For now, [flow](https://flow.org/) typings for the surface api are the only documentation that exist.
 
 - for config object documentation see the [config flow file](src/configuration/type.js)
 - for runtime options documentation see the [run options flow file](src/run-options/type.js)
