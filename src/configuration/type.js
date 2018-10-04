@@ -41,7 +41,7 @@ type UrlBuilderBase = {|
   urlTemplate: string,
   cookieTemplates?: { [string]: string },
   headerTemplates?: { [string]: string },
-  regexCleanup?: Regex
+  // regexCleanup?: Regex
   // increment?: 0
   // increment: false // TODO reenable after fix with flow-runtime
 |}

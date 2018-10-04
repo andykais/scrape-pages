@@ -6,8 +6,8 @@
 
 This package scrapes sites for text and files based on a single config file representing the crawler's flow.
 
-:warning: This project is under active development. Expect bugs and frequent api changes.
-
+:warning: This project is under active development. Expect bugs and frequent api changes. If you wish to see
+progress, check out the [github projects boards](https://github.com/andykais/scrape-pages/projects)
 ## Installation
 
 ```bash

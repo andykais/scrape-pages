@@ -16,7 +16,7 @@ class ScrapePages {
 
   initDependencies = runParams => {
     this.store = new Store(this.config)
-    this.emitter = new Emitter(this.config)
+    this.emitter = new Emitter(this.config, this.store.queryFor)
     this.logger = new Logger({ log_level: 3 })
     this.queue = new Queue(runParams, this.emitter.toggler)
   }
