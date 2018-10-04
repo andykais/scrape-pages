@@ -9,7 +9,7 @@ const sanitizeUrl = url => sanitize(url.toString(), { replacement: '_' })
 const verifyResponseOk = (name, response, url) => {
   if (!response.ok) {
     throw new Error(
-      `scraper ${name} status ${response.status} for ${url.toString()}`
+      `scraper '${name}' status ${response.status} for ${url.toString()}`
     )
   }
 }
