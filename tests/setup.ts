@@ -1,10 +1,7 @@
-// @flow
-
-import type { Config } from '../src/configuration/type'
+import { Config } from '../src/configuration/config'
 
 // setup reusable variables
-
-global.__SIMPLE_CONFIG__ = {
+const __SIMPLE_CONFIG__: Config = {
   scrape: {
     download: 'example-site.com/images',
     parse: {
@@ -16,7 +13,8 @@ global.__SIMPLE_CONFIG__ = {
     }
   }
 }
-global.__GALLERY_POST_IMG_TAG__ = ({
+
+const __GALLERY_POST_IMG_TAG__: Config = {
   scrape: {
     name: 'gallery',
     download: 'https://gallery.com/cool', // save url before and after under name === gallery
@@ -54,4 +52,9 @@ global.__GALLERY_POST_IMG_TAG__ = ({
       ]
     }
   }
-}: Config)
+}
+
+export default {
+  __SIMPLE_CONFIG__,
+  __GALLERY_POST_IMG_TAG__
+}

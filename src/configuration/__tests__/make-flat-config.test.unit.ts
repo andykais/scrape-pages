@@ -1,9 +1,11 @@
+import { FlatConfig } from '../config'
 import { normalizeConfig, makeFlatConfig } from '../'
+import globalVals from '../../../tests/setup'
 
 describe('config recurser', () => {
-  const galleryPostImgTag = global.__GALLERY_POST_IMG_TAG__
+  const galleryPostImgTag = globalVals.__GALLERY_POST_IMG_TAG__
 
-  const flatConfigGuess = {
+  const flatConfigGuess: FlatConfig = {
     gallery: {
       depth: 0,
       horizontalIndex: 0,
