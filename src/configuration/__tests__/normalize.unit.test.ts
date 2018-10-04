@@ -1,43 +1,40 @@
 import { normalizeConfig } from '../'
-import { assertConfigType } from '../assert-config-type'
+import globalVals from '../../../tests/setup'
+import { Config } from '../config'
 
 describe('filled in defaults', () => {
   describe('simple config', () => {
-    const simpleConfig = global.__SIMPLE_CONFIG__
+    const simpleConfig = globalVals.__SIMPLE_CONFIG__
     const fullConfig = normalizeConfig(simpleConfig)
-    const fullConfigGuess = {
+    const fullConfigGuess: Config = {
       input: [],
       scrape: {
         name: 'level_0_index_0',
         download: {
           method: 'GET',
-          urlTemplate: simpleConfig.scrape.download,
+          urlTemplate: (simpleConfig.scrape as any).download,
           cookieTemplates: {},
           headerTemplates: {},
-          increment: 0,
-          initialIndex: 0,
-          incrementUntil: undefined
+          increment: 0
           // regexCleanup: undefined
         },
         parse: {
-          ...simpleConfig.scrape.parse,
-          expect: 'html',
-          regexCleanup: undefined
+          ...(simpleConfig.scrape as any).parse,
+          expect: 'html'
         },
+        regexCleanup: undefined,
         scrapeEach: [
           {
             name: 'level_1_index_0',
             download: {
               method: 'GET',
-              urlTemplate: simpleConfig.scrape.scrapeEach.download,
+              urlTemplate: (simpleConfig.scrape as any).scrapeEach.download,
               cookieTemplates: {},
               headerTemplates: {},
-              increment: 0,
-              initialIndex: 0,
-              incrementUntil: undefined
-              // regexCleanup: undefined
+              increment: 0
             },
             parse: undefined,
+            regexCleanup: undefined,
             scrapeEach: []
           }
         ]
@@ -52,19 +49,12 @@ describe('filled in defaults', () => {
     it('should match the guessed full config', () => {
       expect(fullConfig).toStrictEqual(fullConfigGuess)
     })
-
-    it('filled in version should adhere to configuration flow type', () => {
-      assertConfigType(fullConfig)
-    })
   })
 
   describe('gallery post img tag config', () => {
-    const galleryPostImgTag = global.__GALLERY_POST_IMG_TAG__
+    const galleryPostImgTag = globalVals.__GALLERY_POST_IMG_TAG__
     const fullConfig = normalizeConfig(galleryPostImgTag)
 
-    it('should match configuration flow type', () => {
-      assertConfigType(fullConfig)
-    })
     it('should match itself for a full filled in config', () => {
       const fullConfigFromGuess = normalizeConfig(fullConfig)
       expect(fullConfigFromGuess).toStrictEqual(fullConfig)

@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "outDir": "./lib/",
+    "sourceMap": true,
+    "noImplicitAny": true,
+    "lib": ["es2015", "es2017"],
+    "module": "commonjs",
+    "target": "es2017",
+    "allowJs": true,
+    "esModuleInterop": true
+  }
+}

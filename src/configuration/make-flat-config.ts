@@ -1,10 +1,12 @@
-const makeFlatConfig = fullConfig => {
+import { FullConfig, FlatConfig } from './config'
+
+const makeFlatConfig = (fullConfig: FullConfig): FlatConfig => {
   const recurse = (
-    config,
-    parentName = null,
+    config: FullConfig['scrape'],
+    parentName: string = null,
     depth = 0,
     horizontalIndex = 0
-  ) => {
+  ): FlatConfig => {
     const { name } = config
     const childConfigs = config.scrapeEach.reduce(
       (acc, scraper, horizontalIndex) => ({
