@@ -4,7 +4,7 @@ const assignDownloadDefaults = download => {
   if (download === undefined) return undefined
 
   const defaults = {
-    regexCleanup: undefined,
+    // regexCleanup: undefined,
     increment: 0,
     initialIndex: 0,
     incrementUntil: undefined,

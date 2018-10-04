@@ -16,7 +16,7 @@ global.__SIMPLE_CONFIG__ = {
     }
   }
 }
-global.__GALLERY_POST_IMG_TAG__ = {
+global.__GALLERY_POST_IMG_TAG__ = ({
   scrape: {
     name: 'gallery',
     download: 'https://gallery.com/cool', // save url before and after under name === gallery
@@ -54,4 +54,4 @@ global.__GALLERY_POST_IMG_TAG__ = {
       ]
     }
   }
-}
+}: Config)

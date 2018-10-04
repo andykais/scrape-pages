@@ -16,8 +16,8 @@ describe('filled in defaults', () => {
           headerTemplates: {},
           increment: 0,
           initialIndex: 0,
-          incrementUntil: undefined,
-          regexCleanup: undefined
+          incrementUntil: undefined
+          // regexCleanup: undefined
         },
         parse: {
           ...simpleConfig.scrape.parse,
@@ -34,8 +34,8 @@ describe('filled in defaults', () => {
               headerTemplates: {},
               increment: 0,
               initialIndex: 0,
-              incrementUntil: undefined,
-              regexCleanup: undefined
+              incrementUntil: undefined
+              // regexCleanup: undefined
             },
             parse: undefined,
             scrapeEach: []
