@@ -1,3 +1,3 @@
-import { Config } from './config'
+import { ConfigInit } from './types'
 
-export const assertConfigType = (config: Config) => {}
+export const assertConfigType = (config: ConfigInit) => {}

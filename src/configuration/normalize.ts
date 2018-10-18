@@ -1,50 +1,58 @@
 import {
-  UrlMethods,
+  DownloadConfigInit,
   DownloadConfig,
+  ParseConfigInit,
   ParseConfig,
-  ScrapeConfig,
-  Config,
-  FullConfig
-} from './config'
+  ScrapeConfigInit,
+  ConfigInit,
+  Config
+} from './types'
 import { assertConfigType } from './runtime/assert'
 const runtimeAssertConfig: any = assertConfigType
 
 const downloadDefaults: Partial<DownloadConfig> = {
   method: 'GET',
-  increment: 0,
+  incrementUntil: 0,
   headerTemplates: {},
   cookieTemplates: {}
 }
-const assignDownloadDefaults = (download: DownloadConfig): DownloadConfig =>
+const assignDownloadDefaults = (download: DownloadConfigInit): DownloadConfig =>
   typeof download === 'string'
     ? {
         ...downloadDefaults,
-        urlTemplate: download
+        urlTemplate: download,
+        method: downloadDefaults.method,
+        incrementUntil: downloadDefaults.incrementUntil
       }
     : {
         ...downloadDefaults,
-        ...download
+        ...download,
+        method: download.method || downloadDefaults.method,
+        incrementUntil:
+          download.incrementUntil || downloadDefaults.incrementUntil
       }
 
 const parseDefaults: Partial<ParseConfig> = {
   expect: 'html',
   attribute: undefined
 }
-const assignParseDefaults = (parse: ParseConfig): ParseConfig =>
+const assignParseDefaults = (parse: ParseConfigInit): ParseConfig =>
   typeof parse === 'string'
     ? {
         ...parseDefaults,
-        selector: parse
+        selector: parse,
+        expect: parseDefaults.expect
       }
     : {
         ...parseDefaults,
-        ...parse
+        ...parse,
+        expect: parse.expect || parseDefaults.expect
       }
 
 const fillInDefaultsRecurse = (level = 0, parentName = '') => (
-  scrapeConfig: ScrapeConfig,
+  scrapeConfig: ScrapeConfigInit,
   index = 0
-): FullConfig['scrape'] => {
+): Config['scrape'] => {
   if (!scrapeConfig) return undefined
 
   const { name, download, regexCleanup, parse, scrapeEach = [] } = scrapeConfig
@@ -64,12 +72,12 @@ const fillInDefaultsRecurse = (level = 0, parentName = '') => (
   }
 }
 
-const standardizeInput = (input: Config['input']): Config['input'] => {
+const standardizeInput = (input: ConfigInit['input']): Config['input'] => {
   if (!input) return []
   else return Array.isArray(input) ? input : [input]
 }
 
-const normalizeConfig = (config: Config): FullConfig => {
+const normalizeConfig = (config: ConfigInit): Config => {
   runtimeAssertConfig(config)
 
   const input = standardizeInput(config.input)

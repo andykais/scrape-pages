@@ -4,27 +4,15 @@ const nodeExternals = require('webpack-node-externals')
 const TerserPlugin = require('terser-webpack-plugin')
 const NodemonPlugin = require('nodemon-webpack-plugin')
 const CleanTerminalPlugin = require('clean-terminal-webpack-plugin')
-// const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin')
 
-const devPlugins = env =>
-  env
-    ? [
-        new CleanTerminalPlugin(),
-        ...((env.scratchfile !== true &&
-          new NodemonPlugin({
-            script: env.scratchfile,
-            watch: [resolve('./lib'), resolve(env.scratchfile)]
-          })) ||
-          [])
-      ]
-    : []
+const devPlugins = env => [new CleanTerminalPlugin()]
 
-module.exports = env => ({
+module.exports = (env, argv) => ({
   target: 'node',
   mode: 'development',
   devtool: 'inline-source-map',
   entry: {
-    // index: './src/index.ts',
+    index: './src/index.ts',
     'normalize-config': './src/configuration/normalize.ts'
   },
   output: {
@@ -48,19 +36,11 @@ module.exports = env => ({
         exclude: /node_modules/,
         use: [
           {
-            loader: 'ts-loader'
-            // options: {
-            // transpileOnly: true
-            // }
+            loader: 'ts-loader',
+            options: {
+              transpileOnly: true
+            }
           }
-          // {
-          // loader: resolve(__dirname, 'loader.js'),
-          // options: {
-          // files: [
-          // resolve(__dirname, 'src/configuration/assert-config-type.ts')
-          // ]
-          // }
-          // }
         ]
       },
       {
@@ -70,14 +50,13 @@ module.exports = env => ({
     ]
   },
   plugins: [
-    // new ForkTsCheckerWebpackPlugin(),
     new CopyWebpackPlugin([
       'package.json',
       'package-lock.json',
       'LICENSE',
       'README.md'
     ]),
-    ...devPlugins(env)
+    ...(argv.mode === 'development' ? devPlugins : [])
   ],
   optimization: {
     minimizer: [new TerserPlugin()]
