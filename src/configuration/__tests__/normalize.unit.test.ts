@@ -1,12 +1,12 @@
 import { normalizeConfig } from '../'
-import globalVals from '../../../tests/setup'
-import { Config } from '../config'
+import * as globalVals from '../../../tests/setup'
+import { ConfigInit } from '../types'
 
 describe('filled in defaults', () => {
   describe('simple config', () => {
     const simpleConfig = globalVals.__SIMPLE_CONFIG__
     const fullConfig = normalizeConfig(simpleConfig)
-    const fullConfigGuess: Config = {
+    const fullConfigGuess: ConfigInit = {
       input: [],
       scrape: {
         name: 'level_0_index_0',
@@ -15,7 +15,7 @@ describe('filled in defaults', () => {
           urlTemplate: (simpleConfig.scrape as any).download,
           cookieTemplates: {},
           headerTemplates: {},
-          increment: 0
+          incrementUntil: 0
           // regexCleanup: undefined
         },
         parse: {
@@ -31,7 +31,7 @@ describe('filled in defaults', () => {
               urlTemplate: (simpleConfig.scrape as any).scrapeEach.download,
               cookieTemplates: {},
               headerTemplates: {},
-              increment: 0
+              incrementUntil: 0
             },
             parse: undefined,
             regexCleanup: undefined,

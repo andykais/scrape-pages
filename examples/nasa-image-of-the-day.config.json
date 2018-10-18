@@ -1,0 +1,21 @@
+{
+  "scrape": {
+    "download": {
+      "urlTemplate": "https://apod.nasa.gov/apod/archivepix.html"
+    },
+    "parse": {
+      "selector": "body > b > a:nth-child(-n+10)",
+      "attribute": "href"
+    },
+    "scrapeEach": {
+      "download": "https://apod.nasa.gov/apod/{{value}}",
+      "parse": {
+        "selector": "body > center:nth-child(1) > p:nth-child(3) > a > img",
+        "attribute": "src"
+      },
+      "scrapeEach": {
+        "download": "https://apod.nasa.gov/apod/{{value}}"
+      }
+    }
+  }
+}

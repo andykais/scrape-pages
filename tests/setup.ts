@@ -1,7 +1,7 @@
-import { Config } from '../src/configuration/config'
+import { ConfigInit } from '../src/configuration/types'
 
 // setup reusable variables
-const __SIMPLE_CONFIG__: Config = {
+export const __SIMPLE_CONFIG__: ConfigInit = {
   scrape: {
     download: 'example-site.com/images',
     parse: {
@@ -14,7 +14,7 @@ const __SIMPLE_CONFIG__: Config = {
   }
 }
 
-const __GALLERY_POST_IMG_TAG__: Config = {
+export const __GALLERY_POST_IMG_TAG__: ConfigInit = {
   scrape: {
     name: 'gallery',
     download: 'https://gallery.com/cool', // save url before and after under name === gallery
@@ -52,9 +52,4 @@ const __GALLERY_POST_IMG_TAG__: Config = {
       ]
     }
   }
-}
-
-export default {
-  __SIMPLE_CONFIG__,
-  __GALLERY_POST_IMG_TAG__
 }

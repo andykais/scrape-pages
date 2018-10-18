@@ -1,8 +1,8 @@
-import { FullConfig, FlatConfig } from './config'
+import { Config, FlatConfig } from './types'
 
-const makeFlatConfig = (fullConfig: FullConfig): FlatConfig => {
+const makeFlatConfig = (fullConfig: Config): FlatConfig => {
   const recurse = (
-    config: FullConfig['scrape'],
+    config: Config['scrape'],
     parentName: string = null,
     depth = 0,
     horizontalIndex = 0

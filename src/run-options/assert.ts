@@ -1,3 +1,3 @@
-// import { Config } from './config'
+import { RunOptionsInit } from './types'
 
-export default (options: number) => {}
+export const assertOptionsType = (options: RunOptionsInit) => {}
