@@ -3,10 +3,8 @@ language: node_js
 stages:
   - test
   - lint
-  - name: deploy
-    if: tag IS present
-  - name: deploy-website
-    if: branch = master
+  - deploy
+  - deploy-website
 
 cache:
   directories:
@@ -29,6 +27,7 @@ jobs:
       script: npm run lint
 
     - stage: deploy
+      if: tag IS present
       node_js: "8"
       script: skip
       deploy:
@@ -39,6 +38,7 @@ jobs:
           tags: true
 
     - stage: deploy-website
+      if: branch = master
       node_js: "8"
       before_install: cd website
       script: npm run build
