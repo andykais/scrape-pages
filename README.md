@@ -8,6 +8,7 @@ This package scrapes sites for text and files based on a single config file repr
 
 :warning: This project is under active development. Expect bugs and frequent api changes. If you wish to see
 progress, check out the [github projects boards](https://github.com/andykais/scrape-pages/projects)
+
 ## Installation
 
 ```bash
@@ -65,10 +66,11 @@ For more real world examples, visit the [examples](examples) directory
 
 ## Documentation
 
-For now, [flow](https://flow.org/) typings for the surface api are the only documentation that exist.
+Detailed usage documentation is coming, but for now, [typescript](https://www.typescriptlang.org/) typings
+exist for the surface API.
 
-- for config object documentation see the [config flow file](src/configuration/type.js)
-- for runtime options documentation see the [run options flow file](src/run-options/type.js)
+- for scraper config object documentation see [src/configuration/types.ts](src/configuration/types.ts)
+- for runtime options documentation see [src/run-options/types.ts](src/run-options/types.ts)
 
 The scraper instance created from a config object is meant to be reusable and cached. It only knows about the
 config object. `scraper.run` can be called multiple times, and, as long as different folders are
@@ -77,7 +79,9 @@ provided, each run will work independently. `scraper.run` returns **emitter**
 ### emitter
 
 #### Listenable events
+
 each event will return the **queryFor** function as its first argument
+
 - `'done'`: when the scraper has completed
 - `'error'`: when the scraper encounters an error (this also stops the scraper)
 - `'<scraper>:progress'`: emits progress of download until completed
