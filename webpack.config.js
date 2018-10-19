@@ -5,29 +5,15 @@ const TerserPlugin = require('terser-webpack-plugin')
 const NodemonPlugin = require('nodemon-webpack-plugin')
 const CleanTerminalPlugin = require('clean-terminal-webpack-plugin')
 
-const devPlugins = env => {
-  if (env) {
-    const plugins = [new CleanTerminalPlugin()]
-    if (env.scratchfile !== true) {
-      plugins.push(
-        new NodemonPlugin({
-          script: env.scratchfile,
-          watch: [resolve('./lib'), resolve(env.scratchfile)]
-        })
-      )
-    }
-    return plugins
-  }
-  return []
-}
+const devPlugins = env => [new CleanTerminalPlugin()]
 
-module.exports = env => ({
+module.exports = (env, argv) => ({
   target: 'node',
   mode: 'development',
-  devtool: 'source-map',
+  devtool: 'inline-source-map',
   entry: {
-    index: './src/index.js',
-    'normalize-config': './src/configuration/normalize'
+    index: './src/index.ts',
+    'normalize-config': './src/configuration/normalize.ts'
   },
   output: {
     path: resolve(__dirname, 'lib'),
@@ -35,12 +21,27 @@ module.exports = env => ({
     library: 'scrape-pages',
     libraryTarget: 'umd'
   },
+  resolve: {
+    extensions: ['.ts', '.js']
+  },
   module: {
     rules: [
       {
         test: /\.js$/,
         exclude: /node_modules/,
         use: ['babel-loader']
+      },
+      {
+        test: /\.ts$/,
+        exclude: /node_modules/,
+        use: [
+          {
+            loader: 'ts-loader',
+            options: {
+              transpileOnly: true
+            }
+          }
+        ]
       },
       {
         test: /\.sql$/,
@@ -55,7 +56,7 @@ module.exports = env => ({
       'LICENSE',
       'README.md'
     ]),
-    ...devPlugins(env)
+    ...(argv.mode === 'development' ? devPlugins : [])
   ],
   optimization: {
     minimizer: [new TerserPlugin()]
