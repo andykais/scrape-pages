@@ -1,14 +1,20 @@
+/**
+ * priority queue
+ * higher numbers equal higher priority
+ * e.g. priority one is popped before priority zero
+ */
 export class PriorityQueue<T = any> {
   private priorities: number[] = []
   private queue: { [priority: number]: T[] } = {}
   public length = 0
 
-  // there are a limited amount of priorities available at the start
+  // all priorities used in the push function are defined in the constructor
   constructor(availablePriorities: number[]) {
     for (const priority of availablePriorities) {
       this.priorities.push(priority)
       this.queue[priority] = []
     }
+    this.priorities.sort((a: number, b: number) => b - a)
   }
 
   pop = () => {

@@ -17,7 +17,6 @@ type Input = InputSimple | InputCleaned
 // }}}
 
 // DownloadConfig {{{
-// url builder with possible instructions to `increment` itself
 type UrlTemplate = string
 type UrlMethods = 'GET' | 'POST' | 'PUT' | 'DELETE'
 interface DownloadConfigInterface {
@@ -25,12 +24,11 @@ interface DownloadConfigInterface {
   urlTemplate: UrlTemplate
   cookieTemplates?: { [CookieName: string]: string }
   headerTemplates?: { [HeaderName: string]: string }
-  incrementUntil?: 'empty' | number
+  regexCleanup?: RegexCleanup
 }
 export type DownloadConfigInit = UrlTemplate | DownloadConfigInterface
 export interface DownloadConfig extends DownloadConfigInterface {
   method: UrlMethods
-  incrementUntil: 'empty' | number
 }
 // }}}
 
@@ -41,6 +39,7 @@ interface ParseConfigInterface {
   expect?: ExpectedFormats
   selector: Selector
   attribute?: string
+  regexCleanup?: RegexCleanup
 }
 export type ParseConfigInit = Selector | ParseConfigInterface
 export interface ParseConfig extends ParseConfigInterface {
@@ -52,7 +51,7 @@ export interface ScrapeConfigInit {
   name?: string
   download?: DownloadConfigInit
   parse?: ParseConfigInit
-  regexCleanup?: RegexCleanup
+  incrementUntil?: 'failed-download' | 'empty-parse' | number
   scrapeEach?: ScrapeConfigInit | ScrapeConfigInit[]
 }
 
@@ -62,12 +61,14 @@ export interface ConfigInit {
 }
 
 // returned by ./normalize.ts
-export interface ScrapeConfig extends ScrapeConfigInit {
+export interface ScrapeConfig {
   name: string
   download?: DownloadConfig
   parse?: ParseConfig
+  incrementUntil: 'failed-download' | 'empty-parse' | number
   scrapeEach: ScrapeConfig[]
 }
+
 export interface Config extends ConfigInit {
   scrape: ScrapeConfig
 }

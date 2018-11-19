@@ -14,15 +14,14 @@ describe('filled in defaults', () => {
           method: 'GET',
           urlTemplate: (simpleConfig.scrape as any).download,
           cookieTemplates: {},
-          headerTemplates: {},
-          incrementUntil: 0
+          headerTemplates: {}
           // regexCleanup: undefined
         },
         parse: {
           ...(simpleConfig.scrape as any).parse,
           expect: 'html'
         },
-        regexCleanup: undefined,
+        incrementUntil: 0,
         scrapeEach: [
           {
             name: 'level_1_index_0',
@@ -30,11 +29,10 @@ describe('filled in defaults', () => {
               method: 'GET',
               urlTemplate: (simpleConfig.scrape as any).scrapeEach.download,
               cookieTemplates: {},
-              headerTemplates: {},
-              incrementUntil: 0
+              headerTemplates: {}
             },
             parse: undefined,
-            regexCleanup: undefined,
+            incrementUntil: 0,
             scrapeEach: []
           }
         ]

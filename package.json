@@ -14,7 +14,7 @@
     "compile": "webpack --mode=production",
     "compile:runtime": "tsr --compilerOptions '{\"outDir\": \"src/configuration/runtime/\"}' src/configuration/assert.ts && tsr --compilerOptions '{\"outDir\": \"src/run-options/runtime\"}' src/run-options/assert.ts",
     "clean": "rimraf lib",
-    "lint": "git ls-files '*.js' '*.json' | xargs prettier -l",
+    "lint": "git ls-files '*.ts' '*.json' | xargs prettier -l",
     "typecheck": "tsc --noEmit --project tsconfig.json",
     "typecheck:watch": "npm run typecheck -- --watch",
     "test": "jest",

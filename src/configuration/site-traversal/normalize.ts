@@ -12,7 +12,6 @@ const runtimeAssertConfig: any = assertConfigType
 
 const downloadDefaults: Partial<DownloadConfig> = {
   method: 'GET',
-  incrementUntil: 0,
   headerTemplates: {},
   cookieTemplates: {}
 }
@@ -21,15 +20,12 @@ const assignDownloadDefaults = (download: DownloadConfigInit): DownloadConfig =>
     ? {
         ...downloadDefaults,
         urlTemplate: download,
-        method: downloadDefaults.method,
-        incrementUntil: downloadDefaults.incrementUntil
+        method: downloadDefaults.method
       }
     : {
         ...downloadDefaults,
         ...download,
-        method: download.method || downloadDefaults.method,
-        incrementUntil:
-          download.incrementUntil || downloadDefaults.incrementUntil
+        method: download.method || downloadDefaults.method
       }
 
 const parseDefaults: Partial<ParseConfig> = {
@@ -55,7 +51,13 @@ const fillInDefaultsRecurse = (level = 0, parentName = '') => (
 ): Config['scrape'] => {
   if (!scrapeConfig) return undefined
 
-  const { name, download, regexCleanup, parse, scrapeEach = [] } = scrapeConfig
+  const {
+    name,
+    download,
+    parse,
+    incrementUntil,
+    scrapeEach = []
+  } = scrapeConfig
 
   const internalName = `${parentName}${
     parentName ? '-' : ''
@@ -65,7 +67,7 @@ const fillInDefaultsRecurse = (level = 0, parentName = '') => (
     name: name || internalName,
     download: download && assignDownloadDefaults(download),
     parse: parse && assignParseDefaults(parse),
-    regexCleanup: regexCleanup,
+    incrementUntil: incrementUntil || 0,
     scrapeEach: Array.isArray(scrapeEach)
       ? scrapeEach.map(fillInDefaultsRecurse(level + 1, parentName))
       : [fillInDefaultsRecurse(level + 1)(scrapeEach)]

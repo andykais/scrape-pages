@@ -1,7 +1,7 @@
 import SQL_TEMPLATE from './template.sql'
 import { CreateQuery } from '../../types'
 
-type SelectedRow = {
+export type SelectedRow = {
   id: number,
   parsedValue?: string
 }
