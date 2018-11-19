@@ -1,5 +1,5 @@
 // type imports
-import { FlatConfig, ConfigPositionInfo } from '../../configuration/types'
+import { FlatConfig, ConfigPositionInfo } from '../../configuration/site-traversal/types'
 
 const makeWaitingConditionalJoins = (flatConfig: FlatConfig, scraperNames: string[]) => {
   const levels = scraperNames

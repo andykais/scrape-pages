@@ -1,4 +1,4 @@
-import compileTemplate from '../../../util/handlebars'
+import { compileTemplate } from '../../../util/handlebars'
 import {
   makeDynamicOrderLevelColumn,
   makeWaitingConditionalJoins
@@ -15,7 +15,10 @@ type SelectedRow = {
   filename?: string
 }
 type Statement = (scrapers: string[]) => SelectedRow[]
-export const query: CreateQuery<Statement> = (flatConfig, database) => scrapers => {
+export const query: CreateQuery<Statement> = (
+  flatConfig,
+  database
+) => scrapers => {
   const scraperConfigs = scrapers.map(s => flatConfig[s]).filter(c => c)
 
   const lowestDepth = Math.max(...scraperConfigs.map(s => s.depth))
@@ -30,6 +33,7 @@ export const query: CreateQuery<Statement> = (flatConfig, database) => scrapers 
     selectedScrapers,
     lowestDepth
   })
+  // console.log(selectOrderedSql)
   const statement = database.prepare(selectOrderedSql)
   return statement.all()
 }

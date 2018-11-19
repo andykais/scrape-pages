@@ -1,5 +1,5 @@
 import deviantartConfig from '../deviantart.config.json'
-import { assertConfigType } from '../../src/configuration'
+import { assertConfigType } from '../../src/configuration/site-traversal'
 
 describe('deviantart config', () => {
   test('is properly typed', () => {

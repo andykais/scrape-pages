@@ -5,7 +5,7 @@ const TerserPlugin = require('terser-webpack-plugin')
 const NodemonPlugin = require('nodemon-webpack-plugin')
 const CleanTerminalPlugin = require('clean-terminal-webpack-plugin')
 
-const devPlugins = env => [new CleanTerminalPlugin()]
+const devPlugins = [new CleanTerminalPlugin()]
 
 module.exports = (env, argv) => ({
   target: 'node',
@@ -13,7 +13,7 @@ module.exports = (env, argv) => ({
   devtool: 'inline-source-map',
   entry: {
     index: './src/index.ts',
-    'normalize-config': './src/configuration/normalize.ts'
+    'normalize-config': './src/configuration/site-traversal/normalize.ts'
   },
   output: {
     path: resolve(__dirname, 'lib'),

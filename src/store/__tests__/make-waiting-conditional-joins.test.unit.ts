@@ -1,4 +1,4 @@
-import { makeFlatConfig, normalizeConfig } from '../../configuration'
+import { makeFlatConfig, normalizeConfig } from '../../configuration/site-traversal'
 import { makeWaitingConditionalJoins } from '../sql-generators'
 import * as globalVals from '../../../tests/setup'
 

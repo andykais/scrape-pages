@@ -3,9 +3,13 @@ type Input = { [inputName: string]: number | string | boolean }
 interface OptionsAny {
   cache?: boolean
 }
-// options for each scraper
+
+interface ScraperOptionsInit extends OptionsAny {
+  downloadPriority?: number
+}
 interface ScraperOptions extends OptionsAny {
-  // useLimiter?: boolean
+  cache: boolean
+  downloadPriority: number
 }
 
 export interface Parallelism {
@@ -20,11 +24,11 @@ export interface RunOptionsInit extends OptionsAny, Parallelism {
   input?: Input
   folder: string
   optionsEach?: {
-    [name: string]: ScraperOptions
+    [name: string]: ScraperOptionsInit
   }
 }
 
-export interface RunOptions extends OptionsAny, Parallelism, ScraperOptions {
+export interface RunOptions extends ScraperOptions {
   input: Input
   folder: string
 }

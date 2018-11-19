@@ -1,4 +1,4 @@
-import { assertConfigType } from '../../src/configuration'
+import { assertConfigType } from '../../src/configuration/site-traversal'
 import * as globalVals from '../../tests/setup'
 
 describe('simple config', () => {

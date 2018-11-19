@@ -1,6 +1,6 @@
 import Store from '../store'
 import Emitter from '../emitter'
-import Queue from '../queue-observable'
+import Queue from '../queue'
 import Logger from '../logger'
 
 export type Dependencies = {

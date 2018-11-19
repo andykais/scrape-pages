@@ -5,8 +5,8 @@ import { resolve } from 'path'
 import sanitize from 'sanitize-filename'
 import { readFile, exists, mkdirp } from '../../../../../util/fs'
 // type imports
-import { ScrapeConfig } from '../../../../../configuration/types'
-import { RunOptions } from '../../../../../run-options/types'
+import { ScrapeConfig } from '../../../../../configuration/site-traversal/types'
+import { RunOptions } from '../../../../../configuration/run-options/types'
 import { Dependencies } from '../../../../types'
 import { ConstructedFetch } from './construct-url'
 
@@ -57,14 +57,17 @@ type Fetcher = (
 }>
 export const downloadToFileAndMemory: Fetcher = async (
   { name },
-  { folder },
+  { folder, downloadPriority },
   { queue, emitter },
   { downloadId, url, fetchOptions }
 ) => {
   const downloadFolder = resolve(folder, downloadId.toString())
   const filename = resolve(downloadFolder, sanitizeUrl(url))
 
-  const response = await queue.add(() => fetch(url.toString(), fetchOptions))
+  const response = await queue.add(
+    () => fetch(url.toString(), fetchOptions),
+    downloadPriority
+  )
   await mkdirp(downloadFolder)
   verifyResponseOk(name, response, url)
   const contentLength = response.headers.get('content-length')
@@ -87,14 +90,17 @@ export const downloadToFileAndMemory: Fetcher = async (
 }
 export const downloadToFileOnly: Fetcher = async (
   { name },
-  { folder },
+  { folder, downloadPriority },
   { queue, emitter },
   { downloadId, url, fetchOptions }
 ) => {
   const downloadFolder = resolve(folder, downloadId.toString())
   const filename = resolve(downloadFolder, sanitizeUrl(url))
 
-  const response = await queue.add(() => fetch(url.toString(), fetchOptions))
+  const response = await queue.add(
+    () => fetch(url.toString(), fetchOptions),
+    downloadPriority
+  )
   await mkdirp(downloadFolder)
   const buffer = await new Promise((resolve, reject) => {
     verifyResponseOk(name, response, url)
@@ -112,12 +118,12 @@ export const downloadToFileOnly: Fetcher = async (
 
 export const downloadToMemoryOnly: Fetcher = (
   { name },
-  runParams,
+  { downloadPriority },
   { queue, emitter },
   { downloadId, url, fetchOptions }
 ) =>
   queue
-    .add(() => fetch(url.toString(), fetchOptions))
+    .add(() => fetch(url.toString(), fetchOptions), downloadPriority)
     .then(response => {
       verifyResponseOk(name, response, url)
       emitProgressIfListenersAttached(emitter, response, name, downloadId)

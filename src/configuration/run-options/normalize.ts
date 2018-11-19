@@ -1,9 +1,9 @@
 import { resolve } from 'path'
-import { makeFlatConfig } from '../configuration/make-flat-config'
+import { makeFlatConfig } from '../site-traversal/make-flat-config'
 import { assertOptionsType } from './'
 // type imports
 import { RunOptionsInit, FlatRunOptions } from './types'
-import { Config } from '../configuration/types'
+import { Config } from '../site-traversal/types'
 
 const assertValidInput = (config: Config, runParams: RunOptionsInit) => {
   const configInputKeys = Object.keys(config.input)
@@ -34,6 +34,7 @@ const normalizeOptions = (config: Config, runParams: RunOptionsInit) => {
     input: {},
     cache: true,
     useLimiter: true,
+    downloadPriority: 0,
     ...globalOptions // user preferences for all things override
   }
 

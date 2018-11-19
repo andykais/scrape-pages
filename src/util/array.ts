@@ -1,12 +1,12 @@
 export const groupBy = <T>(
-  array: {[key: string]: any}[],
+  array: { [key: string]: any }[],
   key: string,
   value: T,
   includeGroupByKey = false,
   resultSelector: (v: any) => any = v => v
 ) => {
   const { length } = array
-  let collector: {[key:string]: any} = {}
+  let collector: { [key: string]: any } = {}
   const groupedArray = []
 
   for (let i = 0; i < length; i++) {

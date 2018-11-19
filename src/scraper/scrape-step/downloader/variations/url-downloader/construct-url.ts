@@ -1,8 +1,8 @@
 import { URL } from 'url'
-import compileTemplate from '../../../../../util/handlebars'
+import { compileTemplate } from '../../../../../util/handlebars'
 // type imports
-import { ScrapeConfig } from '../../../../../configuration/types'
-import { RunOptions } from '../../../../../run-options/types'
+import { ScrapeConfig } from '../../../../../configuration/site-traversal/types'
+import { RunOptions } from '../../../../../configuration/run-options/types'
 import { Dependencies } from '../../../../types'
 import { DownloadParams } from '../../'
 

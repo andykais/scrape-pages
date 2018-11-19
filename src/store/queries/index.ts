@@ -1,5 +1,5 @@
 import DB from '../database'
-import { FlatConfig } from '../../configuration/types'
+import { FlatConfig } from '../../configuration/site-traversal/types'
 
 export { query as createTables } from './create-tables'
 import { query as selectOrderedScrapers } from './select-ordered-scrapers'

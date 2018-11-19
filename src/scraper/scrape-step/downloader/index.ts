@@ -1,8 +1,8 @@
 import { downloader as urlDownloader } from './variations/url-downloader'
 import { downloader as identityDownloader } from './variations/identity-downloader'
 // type imports
-import { ScrapeConfig } from '../../../configuration/types'
-import { RunOptions } from '../../../run-options/types'
+import { ScrapeConfig } from '../../../configuration/site-traversal/types'
+import { RunOptions } from '../../../configuration/run-options/types'
 import { Dependencies } from '../../types'
 
 export type DownloadParams = {

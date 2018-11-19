@@ -1,4 +1,4 @@
-import { FlatConfig, ConfigPositionInfo } from '../../../configuration/types'
+import { FlatConfig, ConfigPositionInfo } from '../../../configuration/site-traversal/types'
 /*
  *   G
  *   |

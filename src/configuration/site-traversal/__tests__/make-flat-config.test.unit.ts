@@ -1,6 +1,6 @@
 import { FlatConfig } from '../types'
 import { normalizeConfig, makeFlatConfig } from '../'
-import * as globalVals from '../../../tests/setup'
+import * as globalVals from '../../../../tests/setup'
 
 describe('config recurser', () => {
   const galleryPostImgTag = globalVals.__GALLERY_POST_IMG_TAG__

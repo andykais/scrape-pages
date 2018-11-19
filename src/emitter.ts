@@ -1,7 +1,7 @@
 import EventEmitter from 'events'
 import * as Rx from 'rxjs'
-import { makeFlatConfig } from './configuration/make-flat-config'
-import { Config } from './configuration/types'
+import { makeFlatConfig } from './configuration/site-traversal/make-flat-config'
+import { Config } from './configuration/site-traversal/types'
 
 class ScrapeEmitter {
   private _emitter: EventEmitter

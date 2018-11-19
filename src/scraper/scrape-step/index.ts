@@ -5,8 +5,8 @@ import setParserConfig from './parser'
 import { mkdirpSync } from '../../util/fs'
 import { fromAsyncGenerator } from '../../util/rxjs/observables'
 import { okToIncrement } from './downloader/ok-to-increment'
-import { ScrapeConfig } from '../../configuration/types'
-import { FlatRunOptions } from '../../run-options/types'
+import { ScrapeConfig } from '../../configuration/site-traversal/types'
+import { FlatRunOptions } from '../../configuration/run-options/types'
 import { Dependencies } from '../types'
 
 type ScrapeValue = (parentValues: any[]) => Rx.Observable<any>
