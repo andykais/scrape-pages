@@ -1,4 +1,7 @@
-import { makeFlatConfig, normalizeConfig } from '../../configuration/site-traversal'
+import {
+  makeFlatConfig,
+  normalizeConfig
+} from '../../configuration/site-traversal'
 import { makeDynamicOrderLevelColumn } from '../sql-generators'
 import * as globalVals from '../../../tests/setup'
 

@@ -13,7 +13,6 @@ export default (config: ScrapeConfig) => {
     json: jsonParser
   }
 
-
   return config.parse
     ? parsers[config.parse.expect](config)
     : identityParser(config)

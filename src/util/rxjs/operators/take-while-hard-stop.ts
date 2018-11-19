@@ -1,8 +1,8 @@
 import * as Rx from 'rxjs'
 
-const takeWhileHardStop = <T>(predicate: (value: T, index: number) => boolean) => (
-  source: Rx.Observable<T>
-) =>
+const takeWhileHardStop = <T>(
+  predicate: (value: T, index: number) => boolean
+) => (source: Rx.Observable<T>) =>
   new Rx.Observable(destination => {
     let index = 0
     const subscription = source.subscribe({

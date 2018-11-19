@@ -1,6 +1,9 @@
 import { findLowestCommonParent } from './util/find-lowest-common-parent'
 // type imports
-import { FlatConfig, ConfigPositionInfo } from '../../configuration/site-traversal/types'
+import {
+  FlatConfig,
+  ConfigPositionInfo
+} from '../../configuration/site-traversal/types'
 
 const makeDynamicOrderLevelColumn = (
   flatConfig: FlatConfig,
