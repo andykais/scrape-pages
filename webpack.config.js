@@ -2,7 +2,6 @@ const { resolve } = require('path')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const nodeExternals = require('webpack-node-externals')
 const TerserPlugin = require('terser-webpack-plugin')
-const NodemonPlugin = require('nodemon-webpack-plugin')
 const CleanTerminalPlugin = require('clean-terminal-webpack-plugin')
 
 const devPlugins = [new CleanTerminalPlugin()]
