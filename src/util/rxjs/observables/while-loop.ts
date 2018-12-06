@@ -25,7 +25,7 @@ const asyncLoop = async <In, Out>(
   observer.complete()
 }
 
-export const whileLoopObservable = <In,Out>(
+export const whileLoopObservable = <In, Out>(
   inLoopFunction: (initialVal: In, index: number) => Promise<Out>,
   conditional: (loopValue: Out, index: number) => boolean,
   initialVal: In

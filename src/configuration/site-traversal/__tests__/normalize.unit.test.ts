@@ -33,9 +33,11 @@ describe('filled in defaults', () => {
             },
             parse: undefined,
             incrementUntil: 0,
-            scrapeEach: []
+            scrapeEach: [],
+            scrapeNext: undefined
           }
-        ]
+        ],
+        scrapeNext: undefined
       }
     }
 
