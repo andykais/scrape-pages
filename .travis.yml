@@ -1,12 +1,13 @@
 language: node_js
 
 stages:
+  - typecheck
   - test
   - lint
   - name: deploy
     if: tag IS present
   - name: deploy-website
-    if: branch = master
+    if: branch = master AND head_branch = master
 
 cache:
   directories:

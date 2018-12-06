@@ -2,12 +2,11 @@ const { resolve } = require('path')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const nodeExternals = require('webpack-node-externals')
 const TerserPlugin = require('terser-webpack-plugin')
-const NodemonPlugin = require('nodemon-webpack-plugin')
 const CleanTerminalPlugin = require('clean-terminal-webpack-plugin')
 
 const devPlugins = [new CleanTerminalPlugin()]
 
-module.exports = (env, argv) => ({
+module.exports = (env, { mode }) => ({
   target: 'node',
   mode: 'development',
   devtool: 'inline-source-map',
@@ -54,7 +53,7 @@ module.exports = (env, argv) => ({
       'LICENSE',
       'README.md'
     ]),
-    ...(argv.mode === 'development' ? devPlugins : [])
+    ...(mode === 'development' ? devPlugins : [])
   ],
   optimization: {
     minimizer: [new TerserPlugin()]
