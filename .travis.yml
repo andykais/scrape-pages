@@ -1,13 +1,16 @@
 language: node_js
 
 stages:
-  - typecheck
-  - test
-  - lint
-  - name: deploy
+  - name: typecheck
+    if: branch = master OR env(TRAVIS_PULL_REQUEST)
+  - name: test
+    if: branch = master OR env(TRAVIS_PULL_REQUEST)
+  - name: lint
+    if: branch = master OR env(TRAVIS_PULL_REQUEST)
+  - name: deploy-npm
     if: tag IS present
   - name: deploy-website
-    if: branch = master AND head_branch = master
+    if: branch = master AND NOT env(TRAVIS_PULL_REQUEST)
 
 cache:
   directories:
@@ -16,25 +19,25 @@ cache:
 jobs:
   include:
     - stage: typecheck
-      node_js: "8"
+      node_js: '8'
       script: npm run typecheck
 
     - stage: test
-      node_js: "10"
+      node_js: '10'
       script: npm run test:unit
     - stage: test
-      node_js: "9"
+      node_js: '9'
       script: npm run test:unit
     - stage: test
-      node_js: "8"
+      node_js: '8'
       script: npm run test:unit
 
     - stage: lint
-      node_js: "8"
+      node_js: '8'
       script: npm run lint
 
-    - stage: deploy
-      node_js: "8"
+    - stage: deploy-npm
+      node_js: '8'
       script: skip
       deploy:
         provider: script
@@ -44,7 +47,7 @@ jobs:
           tags: true
 
     - stage: deploy-website
-      node_js: "8"
+      node_js: '8'
       before_install: cd website
       script: npm run build
       deploy:
