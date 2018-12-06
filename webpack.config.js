@@ -29,19 +29,17 @@ module.exports = (env, argv) => ({
       {
         test: /\.js$/,
         exclude: /node_modules/,
-        use: ['babel-loader']
+        loader: 'babel-loader'
       },
       {
         test: /\.ts$/,
         exclude: /node_modules/,
-        use: [
-          {
-            loader: 'ts-loader',
-            options: {
-              transpileOnly: true
-            }
+        loader: {
+          loader: 'ts-loader',
+          options: {
+            transpileOnly: true
           }
-        ]
+        }
       },
       {
         test: /\.sql$/,

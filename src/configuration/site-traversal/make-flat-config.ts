@@ -15,6 +15,8 @@ const makeFlatConfig = (fullConfig: Config): FlatConfig => {
       }),
       {}
     )
+    const scrapeNextConfig = config.scrapeNext ? recurse(config.scrapeNext) : {}
+
     return {
       [name]: {
         name,
@@ -22,6 +24,7 @@ const makeFlatConfig = (fullConfig: Config): FlatConfig => {
         depth,
         horizontalIndex
       },
+      ...scrapeNextConfig,
       ...childConfigs
     }
   }

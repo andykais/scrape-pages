@@ -20,7 +20,7 @@ const selectAttrVals = (
   const values: string[] = []
   const selection = $(selector)
   selection.attr(attribute, (i: number, attributeVal: string) => {
-    if (attributeVal.length) values.push(attributeVal)
+    if (attributeVal) values.push(attributeVal)
   })
   return values
 }

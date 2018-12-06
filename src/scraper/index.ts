@@ -23,6 +23,7 @@ class ScrapePages {
 
   constructor(config: ConfigInit) {
     this.config = normalizeConfig(config)
+    console.log({ config: config.scrape.parse })
     this.configuredScraper = scraper(this.config.scrape)
   }
 

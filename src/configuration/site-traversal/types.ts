@@ -47,11 +47,14 @@ export interface ParseConfig extends ParseConfigInterface {
 }
 // }}}
 
+type Incrementers = 'failed-download' | 'empty-parse' | number
+
 export interface ScrapeConfigInit {
   name?: string
   download?: DownloadConfigInit
   parse?: ParseConfigInit
-  incrementUntil?: 'failed-download' | 'empty-parse' | number
+  incrementUntil?: Incrementers
+  scrapeNext?: ScrapeConfigInit
   scrapeEach?: ScrapeConfigInit | ScrapeConfigInit[]
 }
 
@@ -65,7 +68,8 @@ export interface ScrapeConfig {
   name: string
   download?: DownloadConfig
   parse?: ParseConfig
-  incrementUntil: 'failed-download' | 'empty-parse' | number
+  incrementUntil: Incrementers
+  scrapeNext?: ScrapeConfig // scrape next only increments until 'empty-parse'
   scrapeEach: ScrapeConfig[]
 }
 

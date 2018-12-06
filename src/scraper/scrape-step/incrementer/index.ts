@@ -1,20 +1,32 @@
+import * as Rx from 'rxjs'
+import * as ops from 'rxjs/operators'
 import { fromAsyncGenerator } from '../../../util/rxjs/observables'
 import { ScrapeConfig } from '../../../configuration/site-traversal/types'
 import { ParsedValue } from '../'
+import { whileLoopObservable } from '../../../util/rxjs/observables/while-loop'
 
 const incrementUntilEmptyParse = (
-  incrementIndex: number,
-  parsedCount: number
-): boolean => !!parsedCount
+  parsedValues: ParsedValue[],
+  incrementIndex: number
+): boolean => !!parsedValues.length
 
 const incrementUntilNumericIndex = (incrementUntil: number) => (
-  incrementIndex: number,
-  parsedCount: number
+  parsedValues: ParsedValue[],
+  incrementIndex: number
 ): boolean => incrementUntil >= incrementIndex
 
 const incrementAlways = () => true
 
-type DownloadParseFunction = (incrementIndex: number) => Promise<ParsedValue[]>
+export type DownloadParseFunction = (
+  parsedValueWithId: ParsedValue,
+  incrementIndex: number
+) => Promise<ParsedValue[]>
+
+type StatefulVars = {
+  parsedCount: number
+  incrementIndex: number
+  nextPromises: Promise<{}>[]
+}
 
 const incrementer = ({ name, incrementUntil }: ScrapeConfig) => {
   const okToIncrementWhileLoop =
@@ -24,22 +36,39 @@ const incrementer = ({ name, incrementUntil }: ScrapeConfig) => {
         ? incrementAlways // failed download is handled in the try catch
         : incrementUntilNumericIndex(incrementUntil)
 
-  return (asyncFunction: DownloadParseFunction) =>
-    fromAsyncGenerator(async function*() {
-      let parsedCount = 0
-      let incrementIndex = 0
-      do {
-        try {
-          const result = await asyncFunction(incrementIndex)
-          parsedCount = result.length
-          yield result
-        } catch (e) {
-          // if error is also from fetcher
-          if (incrementUntil === 'failed-download') break
-          else throw e
-        }
-        incrementIndex++
-      } while (okToIncrementWhileLoop(incrementIndex, parsedCount))
-    })
+  const okToIncrementScrapeNext =
+    incrementUntil === 'empty-parse'
+      ? incrementUntilEmptyParse
+      : incrementUntil === 'failed-download'
+        ? incrementAlways // failed download is handled in the try catch
+        : incrementUntilNumericIndex(incrementUntil)
+
+  return (
+    asyncFunction: DownloadParseFunction,
+    scrapeNextChild: (
+      parsedValues: ParsedValue[]
+    ) => Rx.Observable<ParsedValue[]>
+  ) => {
+    return (parsedValueWithId: ParsedValue): Rx.Observable<ParsedValue[]> =>
+      whileLoopObservable(
+        asyncFunction,
+        okToIncrementWhileLoop,
+        parsedValueWithId
+      ).pipe(
+        ops.expand((parsedValues, index) => {
+          if (name === 'next-batch-id')
+            console.log(name, { index }, 'downloading', parsedValues.length)
+          return scrapeNextChild(parsedValues).pipe(
+            ops.flatMap(parsedValues =>
+              // TODO get proper scrape next index for asyncFunction
+              parsedValues.map(parsedValue => asyncFunction(parsedValue, index))
+            ),
+            ops.mergeAll(),
+            ops.takeWhile(incrementUntilEmptyParse)
+          )
+        })
+      )
+  }
 }
+
 export default incrementer

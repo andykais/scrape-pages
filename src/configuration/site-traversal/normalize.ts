@@ -56,18 +56,20 @@ const fillInDefaultsRecurse = (level = 0, parentName = '') => (
     download,
     parse,
     incrementUntil,
+    scrapeNext,
     scrapeEach = []
   } = scrapeConfig
 
   const internalName = `${parentName}${
     parentName ? '-' : ''
-  }level_${level}_index_${index}`
+  }level_${level}_index_${index}${scrapeNext ? '_next' : ''}`
 
   return {
     name: name || internalName,
     download: download && assignDownloadDefaults(download),
     parse: parse && assignParseDefaults(parse),
     incrementUntil: incrementUntil || 0,
+    scrapeNext: fillInDefaultsRecurse(level + 1, parentName)(scrapeNext),
     scrapeEach: Array.isArray(scrapeEach)
       ? scrapeEach.map(fillInDefaultsRecurse(level + 1, parentName))
       : [fillInDefaultsRecurse(level + 1)(scrapeEach)]
