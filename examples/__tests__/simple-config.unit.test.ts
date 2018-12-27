@@ -4,7 +4,7 @@ import * as globalVals from '../../tests/setup'
 describe('simple config', () => {
   const simpleConfig = globalVals.__SIMPLE_CONFIG__
 
-  test('is properly typed', () => {
+  it('is properly typed', () => {
     assertConfigType(simpleConfig)
   })
 

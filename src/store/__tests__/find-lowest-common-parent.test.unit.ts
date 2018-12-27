@@ -1,3 +1,4 @@
+import { expect } from 'chai'
 import {
   makeFlatConfig,
   normalizeConfig
@@ -16,7 +17,7 @@ describe('find lowest common parent', () => {
       flatConfig['img'],
       flatConfig['tag']
     )
-    expect(parent).toStrictEqual(flatConfig['post'])
+    expect(parent).to.be.deep.equal(flatConfig['post'])
   })
 
   it('should select one of the two if one is a child of the other', () => {
@@ -25,7 +26,7 @@ describe('find lowest common parent', () => {
       flatConfig['img-parse'],
       flatConfig['img']
     )
-    expect(parent).toStrictEqual(flatConfig['img-parse'])
+    expect(parent).to.be.deep.equal(flatConfig['img-parse'])
   })
 
   it('should select one of the two if one is a child of the other (toplevel)', () => {
@@ -34,6 +35,6 @@ describe('find lowest common parent', () => {
       flatConfig['gallery'],
       flatConfig['post']
     )
-    expect(parent).toStrictEqual(flatConfig['gallery'])
+    expect(parent).to.be.deep.equal(flatConfig['gallery'])
   })
 })

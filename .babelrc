@@ -1,24 +1,14 @@
 {
   "presets": [
     [
-      "env",
+      "@babel/env",
       {
         "targets": {
           "node": "8.0"
         }
       }
     ],
-    "stage-2"
+    "@babel/typescript"
   ],
-  "plugins": [
-    "transform-flow-strip-types",
-    [
-      "flow-runtime",
-      {
-        "assert": false,
-        "annotate": false
-      }
-    ],
-    "add-module-exports"
-  ]
+  "plugins": ["@babel/plugin-proposal-class-properties"]
 }

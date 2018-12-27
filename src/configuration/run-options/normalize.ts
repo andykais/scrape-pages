@@ -7,14 +7,13 @@ import { Config } from '../site-traversal/types'
 
 const assertValidInput = (config: Config, runParams: RunOptionsInit) => {
   const configInputKeys = Object.keys(config.input)
-  const runParamsInputKeys = Object.keys(runParams.input)
+  const runParamsInputKeys = runParams.input ? Object.keys(runParams.input) : []
   if (configInputKeys.length < runParamsInputKeys.length) {
     const missingKeys = runParamsInputKeys
       .filter(key => !configInputKeys.includes(key))
       .join()
     throw new Error(`Invalid input! Options has extra key(s) [${missingKeys}]`)
-  }
-  if (configInputKeys.length > runParamsInputKeys.length) {
+  } else if (configInputKeys.length > runParamsInputKeys.length) {
     const missingKeys = configInputKeys
       .filter(key => !runParamsInputKeys.includes(key))
       .join()
@@ -22,13 +21,13 @@ const assertValidInput = (config: Config, runParams: RunOptionsInit) => {
   }
 }
 
-// TODO rename to normalizeConfig
 const normalizeOptions = (config: Config, runParams: RunOptionsInit) => {
   assertOptionsType(runParams)
-  assertValidInput(config, runParams)
 
   const flatConfig = makeFlatConfig(config)
   const { optionsEach = {}, ...globalOptions } = runParams
+
+  assertValidInput(config, runParams)
 
   const defaults = {
     input: {},

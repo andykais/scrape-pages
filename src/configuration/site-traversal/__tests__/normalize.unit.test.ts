@@ -1,6 +1,7 @@
 import { normalizeConfig } from '../'
 import * as globalVals from '../../../../tests/setup'
 import { ConfigInit } from '../types'
+import { expect } from 'chai'
 
 describe('filled in defaults', () => {
   describe('simple config', () => {
@@ -43,11 +44,11 @@ describe('filled in defaults', () => {
 
     it('should match itself for a full filled in config', () => {
       const fullConfigFromGuess = normalizeConfig(fullConfigGuess)
-      expect(fullConfigFromGuess).toStrictEqual(fullConfigGuess)
+      expect(fullConfigFromGuess).to.be.deep.equal(fullConfigGuess)
     })
 
     it('should match the guessed full config', () => {
-      expect(fullConfig).toStrictEqual(fullConfigGuess)
+      expect(fullConfig).to.be.deep.equal(fullConfigGuess)
     })
   })
 
@@ -57,7 +58,7 @@ describe('filled in defaults', () => {
 
     it('should match itself for a full filled in config', () => {
       const fullConfigFromGuess = normalizeConfig(fullConfig)
-      expect(fullConfigFromGuess).toStrictEqual(fullConfig)
+      expect(fullConfigFromGuess).to.be.deep.equal(fullConfig)
     })
   })
 })

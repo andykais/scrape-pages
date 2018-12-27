@@ -6,7 +6,7 @@ const CleanTerminalPlugin = require('clean-terminal-webpack-plugin')
 
 const devPlugins = [new CleanTerminalPlugin()]
 
-module.exports = (env, { mode }) => ({
+module.exports = (env, { mode = 'development' } = {}) => ({
   target: 'node',
   mode: 'development',
   devtool: 'inline-source-map',
@@ -26,19 +26,9 @@ module.exports = (env, { mode }) => ({
   module: {
     rules: [
       {
-        test: /\.js$/,
+        test: /\.(ts|js)$/,
         exclude: /node_modules/,
         loader: 'babel-loader'
-      },
-      {
-        test: /\.ts$/,
-        exclude: /node_modules/,
-        loader: {
-          loader: 'ts-loader',
-          options: {
-            transpileOnly: true
-          }
-        }
       },
       {
         test: /\.sql$/,

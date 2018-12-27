@@ -1,3 +1,4 @@
+import { expect } from 'chai'
 import { FlatConfig } from '../types'
 import { normalizeConfig, makeFlatConfig } from '../'
 import * as globalVals from '../../../../tests/setup'
@@ -38,9 +39,9 @@ describe('config recurser', () => {
     }
   }
 
-  test('flat config matches expected', () => {
+  it('matches expected flat config', () => {
     const fullConfig = normalizeConfig(galleryPostImgTag)
     const flatConfig = makeFlatConfig(fullConfig)
-    expect(flatConfig).toStrictEqual(flatConfigGuess)
+    expect(flatConfig).to.be.deep.equal(flatConfigGuess)
   })
 })
