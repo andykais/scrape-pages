@@ -1,5 +1,5 @@
 import { assertConfigType } from '../../src/configuration/site-traversal'
-import * as globalVals from '../../tests/setup'
+import * as globalVals from '../../testing/setup'
 
 describe('simple config', () => {
   const simpleConfig = globalVals.__SIMPLE_CONFIG__

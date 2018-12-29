@@ -4,12 +4,17 @@ import Store from '../store'
 import Logger from '../logger'
 import Queue from '../queue'
 import scraper from './scrape-step'
+import { mkdirp, mkdir, rmrf } from '../util/fs'
 import { normalizeConfig } from '../configuration/site-traversal'
 import { normalizeOptions } from '../configuration/run-options'
 // type imports
 import { LogType } from '../logger'
 import { Config, ConfigInit } from '../configuration/site-traversal/types'
-import { RunOptionsInit } from '../configuration/run-options/types'
+import {
+  RunOptionsInit,
+  FlatRunOptions
+} from '../configuration/run-options/types'
+import { Dependencies } from './types'
 
 class ScrapePages {
   config: Config
@@ -23,15 +28,33 @@ class ScrapePages {
 
   constructor(config: ConfigInit) {
     this.config = normalizeConfig(config)
-    console.log({ config: config.scrape.parse })
     this.configuredScraper = scraper(this.config.scrape)
   }
 
+  initResources = async (
+    runParams: RunOptionsInit,
+    flatRunParams: FlatRunOptions
+  ) => {
+    if (runParams.cleanFolder) {
+      this.logger.info(`Cleaning ${runParams.folder}`)
+      await rmrf(runParams.folder)
+    }
+
+    this.logger.info('Making folders.')
+    await mkdirp(runParams.folder)
+    for (const { folder } of Object.values(flatRunParams)) await mkdirp(folder)
+
+    this.logger.info('Setting up SQLite database.')
+    // syncronous db creation
+    this.store.init(runParams)
+
+    this.logger.info('Begin downloading with inputs', runParams.input)
+  }
+
   // TODO add parsable input for this first parse step
-  runSetup = (runParams: RunOptionsInit, logLevel: LogType) => {
+  initDependencies = (runParams: RunOptionsInit, logLevel: LogType) => {
     const flatRunParams = normalizeOptions(this.config, runParams)
 
-    // init dependencies
     this.store = new Store(this.config)
     this.emitter = new Emitter(this.config, this.store)
     this.logger = new Logger({ logLevel })
@@ -40,8 +63,6 @@ class ScrapePages {
     ) as Rx.Observable<boolean> // deal with incoming values on this event as truthy or falsey
     this.queue = new Queue(runParams, flatRunParams, rateLimiterEventStream)
 
-    this.logger.info('Making folders.')
-    // calls synchronous mkdirp
     this.scrapingScheme = this.configuredScraper(flatRunParams, {
       queue: this.queue,
       emitter: this.emitter,
@@ -49,16 +70,14 @@ class ScrapePages {
       store: this.store
     })
 
-    this.logger.info('Setting up SQLite database.')
-    // syncronous db creation
-    this.store.init(runParams)
-
-    this.logger.info('Begin downloading with inputs', runParams.input)
-    return this.scrapingScheme([{ parsedValue: '' }])
+    return Rx.concat(
+      this.initResources(runParams, flatRunParams),
+      this.scrapingScheme([{ parsedValue: '' }])
+    )
   }
 
   run = (runParams: RunOptionsInit, logLevel: LogType = 'ERROR') => {
-    const scrapingObservable = this.runSetup(runParams, logLevel)
+    const scrapingObservable = this.initDependencies(runParams, logLevel)
     const subscription = scrapingObservable.subscribe(
       undefined,
       error => {

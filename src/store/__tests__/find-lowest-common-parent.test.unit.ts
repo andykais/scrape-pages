@@ -4,7 +4,7 @@ import {
   normalizeConfig
 } from '../../configuration/site-traversal'
 import { findLowestCommonParent } from '../sql-generators/util/find-lowest-common-parent'
-import * as globalVals from '../../../tests/setup'
+import * as globalVals from '../../../testing/setup'
 
 describe('find lowest common parent', () => {
   const galleryPostImgTag = globalVals.__GALLERY_POST_IMG_TAG__

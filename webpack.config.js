@@ -8,6 +8,9 @@ const devPlugins = [new CleanTerminalPlugin()]
 
 module.exports = (env, { mode = 'development' } = {}) => ({
   target: 'node',
+  node: {
+    __dirname: true
+  },
   mode: 'development',
   devtool: 'inline-source-map',
   entry: {

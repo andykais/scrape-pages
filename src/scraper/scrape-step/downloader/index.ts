@@ -7,7 +7,7 @@ import { Dependencies } from '../../types'
 
 export type DownloadParams = {
   parentId?: number
-  loopIndex: number
+  scrapeNextIndex: number
   incrementIndex: number
   value?: string
 }

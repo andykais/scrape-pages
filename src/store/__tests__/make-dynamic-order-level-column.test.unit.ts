@@ -4,7 +4,7 @@ import {
   normalizeConfig
 } from '../../configuration/site-traversal'
 import { makeDynamicOrderLevelColumn } from '../sql-generators'
-import * as globalVals from '../../../tests/setup'
+import * as globalVals from '../../../testing/setup'
 
 // should only give the higher one when their depths are unequal
 describe('make dynamic order level column', () => {

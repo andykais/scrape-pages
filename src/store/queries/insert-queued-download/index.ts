@@ -5,7 +5,7 @@ type Statement = (
   params: {
     scraper: string
     parentId?: number
-    loopIndex: number
+    scrapeNextIndex: number
     incrementIndex: number
     url?: string
   }
@@ -13,11 +13,11 @@ type Statement = (
 export const query: CreateQuery<Statement> = (flatConfig, database) => {
   // TODO batch this call? (less readable but doable)
   const statement = database.prepare(SQL_TEMPLATE)
-  return ({ scraper, parentId, loopIndex, incrementIndex, url }) => {
+  return ({ scraper, parentId, scrapeNextIndex, incrementIndex, url }) => {
     const info = statement.run(
       scraper,
       parentId,
-      loopIndex,
+      scrapeNextIndex,
       incrementIndex,
       url
     )

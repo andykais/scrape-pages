@@ -50,7 +50,11 @@ class ScrapeEmitter {
   }
 
   emitError(error: Error) {
-    this.emitter.emit('error', error)
+    if (this.emitter.listenerCount('error')) {
+      this.emitter.emit('error', error)
+    } else {
+      throw error
+    }
   }
 
   get emitter() {

@@ -1,5 +1,5 @@
 import ScrapePages from '../index'
-import * as globalVals from '../../../tests/setup'
+import * as globalVals from '../../../testing/setup'
 
 describe('scrape-pages class', () => {
   const simpleConfig = globalVals.__SIMPLE_CONFIG__

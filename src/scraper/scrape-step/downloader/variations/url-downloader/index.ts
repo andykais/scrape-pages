@@ -26,7 +26,7 @@ export const downloader: DownloaderType = config => (
         : downloadToFileOnly
 
   return async downloadParams => {
-    const { value, parentId, loopIndex, incrementIndex } = downloadParams
+    const { value, parentId, scrapeNextIndex, incrementIndex } = downloadParams
     const { url, fetchOptions } = constructFetch(
       config,
       runParams,
@@ -35,7 +35,7 @@ export const downloader: DownloaderType = config => (
     const downloadId = store.qs.insertQueuedDownload({
       scraper: config.name,
       parentId,
-      loopIndex,
+      scrapeNextIndex,
       incrementIndex,
       url: url.toString()
     })

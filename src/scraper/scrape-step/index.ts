@@ -49,7 +49,9 @@ const scraper = (config: ScrapeConfig) => {
     const downloadParseFunction: DownloadParseFunction = async (
       { parsedValue: value, id: parentId },
       incrementIndex
+      // ,scrapeNextIndex
     ) => {
+      console.log('download', value)
       if (['image', 'image-page'].includes(config.name))
         console.log('begin', config.name, { value, parentId })
       if (['next-batch-id'].includes(config.name))
@@ -65,9 +67,10 @@ const scraper = (config: ScrapeConfig) => {
         if (config.name === 'next-batch-id') console.log(config.name, 'loaded')
         return parsedValuesWithId
       } else {
+        console.log(config.name, 'downloading')
         const { downloadValue, downloadId, filename } = await downloader({
           incrementIndex,
-          loopIndex: 0,
+          scrapeNextIndex: 0,
           parentId,
           value
         })
@@ -104,19 +107,6 @@ const scraper = (config: ScrapeConfig) => {
         ),
         ops.mergeAll()
       )
-
-    // ops.flatMap(({ parsedValue: value, id: parentId }) =>
-    // getIncrementObservable(downloadParseFunction).pipe(
-    // // TODO add filter and use hard stop
-    // // ops.takeWhile(
-    // // (parsedValues: ParsedValue[]) => !!parsedValues.length
-    // // ),
-    // ops.flatMap(parsedValues =>
-    // children.map(child => child(parsedValues))
-    // ),
-    // ops.mergeAll()
-    // )
-    // )
   }
 }
 export default scraper

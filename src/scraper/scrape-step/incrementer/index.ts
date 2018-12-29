@@ -17,6 +17,12 @@ const incrementUntilNumericIndex = (incrementUntil: number) => (
 
 const incrementAlways = () => true
 
+const catchFetchError = (e: Error) => {
+  if (e.name === 'FetchError') return Rx.empty()
+  else return Rx.throwError(e)
+}
+const throwAnyError = (e: Error) => Rx.throwError(e)
+
 export type DownloadParseFunction = (
   parsedValueWithId: ParsedValue,
   incrementIndex: number
@@ -43,6 +49,9 @@ const incrementer = ({ name, incrementUntil }: ScrapeConfig) => {
         ? incrementAlways // failed download is handled in the try catch
         : incrementUntilNumericIndex(incrementUntil)
 
+  const ignoreFetchError =
+    incrementUntil === 'failed-download' ? catchFetchError : throwAnyError
+
   return (
     asyncFunction: DownloadParseFunction,
     scrapeNextChild: (
@@ -55,18 +64,23 @@ const incrementer = ({ name, incrementUntil }: ScrapeConfig) => {
         okToIncrementWhileLoop,
         parsedValueWithId
       ).pipe(
-        ops.expand((parsedValues, index) => {
-          if (name === 'next-batch-id')
-            console.log(name, { index }, 'downloading', parsedValues.length)
-          return scrapeNextChild(parsedValues).pipe(
-            ops.flatMap(parsedValues =>
-              // TODO get proper scrape next index for asyncFunction
-              parsedValues.map(parsedValue => asyncFunction(parsedValue, index))
-            ),
-            ops.mergeAll(),
-            ops.takeWhile(incrementUntilEmptyParse)
+        ops.catchError(ignoreFetchError),
+        ops.flatMap((parsedValues, incrementIndex) =>
+          Rx.of(parsedValues).pipe(
+            ops.expand(parsedValues =>
+              scrapeNextChild(parsedValues).pipe(
+                ops.flatMap((parsedValues, scrapeNextIndex) =>
+                  // TODO get proper scrape next index for asyncFunction
+                  parsedValues.map(parsedValue =>
+                    asyncFunction(parsedValue, incrementIndex)
+                  )
+                ),
+                ops.mergeAll(),
+                ops.takeWhile(incrementUntilEmptyParse)
+              )
+            )
           )
-        })
+        )
       )
   }
 }

@@ -1,5 +1,5 @@
 SELECT id FROM downloads
-WHERE loopIndex = ?
+WHERE scrapeNextIndex = ?
 AND incrementIndex = ?
 AND IFNULL(parseParentId, -1) = ?
 AND complete = 1

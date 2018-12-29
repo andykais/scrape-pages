@@ -23,6 +23,7 @@ export interface Parallelism {
 export interface RunOptionsInit extends OptionsAny, Parallelism {
   input?: Input
   folder: string
+  cleanFolder?: boolean
   optionsEach?: {
     [name: string]: ScraperOptionsInit
   }

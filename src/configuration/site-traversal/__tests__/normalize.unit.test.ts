@@ -1,5 +1,5 @@
 import { normalizeConfig } from '../'
-import * as globalVals from '../../../../tests/setup'
+import * as globalVals from '../../../../testing/setup'
 import { ConfigInit } from '../types'
 import { expect } from 'chai'
 

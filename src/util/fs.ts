@@ -2,11 +2,17 @@ import path from 'path'
 import fs from 'fs'
 import { promisify } from 'util'
 
-const [exists, readFile, mkdir] = [fs.readFile, fs.exists, fs.mkdir].map(
-  promisify
-)
+const [exists, readFile, mkdir, readdir, stat, unlink, rmdir] = [
+  fs.readFile,
+  fs.exists,
+  fs.mkdir,
+  fs.readdir,
+  fs.stat,
+  fs.unlink,
+  fs.rmdir
+].map(promisify)
 
-export { exists, readFile }
+export { mkdir, exists, readFile, readdir, stat, unlink }
 
 export const mkdirpSync = (folder: string) => {
   try {
@@ -29,6 +35,20 @@ export const mkdirp = async (folder: string) => {
       await mkdirp(folder)
     } else if (e.code !== 'EEXIST') {
       throw e
+    }
+  }
+}
+
+export const rmrf = async (folder: string) => {
+  const files = await readdir(folder)
+  for (const file of files) {
+    const fullPath = path.resolve(folder, file)
+    const fileStats = await stat(fullPath)
+    if (fileStats.isDirectory()) {
+      await rmrf(fullPath)
+      await rmdir(fullPath)
+    } else {
+      await unlink(fullPath)
     }
   }
 }
