@@ -1,10 +1,10 @@
 import { expect } from 'chai'
 import { FlatConfig } from '../types'
 import { normalizeConfig, makeFlatConfig } from '../'
-import * as globalVals from '../../../../testing/setup'
+import * as testingConfigs from '../../../../testing/resources/testing-configs'
 
 describe('config recurser', () => {
-  const galleryPostImgTag = globalVals.__GALLERY_POST_IMG_TAG__
+  const galleryPostImgTag = testingConfigs.__GALLERY_POST_IMG_TAG__
 
   const flatConfigGuess: FlatConfig = {
     gallery: {

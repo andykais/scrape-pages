@@ -48,15 +48,9 @@ const scraper = (config: ScrapeConfig) => {
 
     const downloadParseFunction: DownloadParseFunction = async (
       { parsedValue: value, id: parentId },
-      incrementIndex
-      // ,scrapeNextIndex
+      incrementIndex,
+      scrapeNextIndex = 0
     ) => {
-      console.log('download', value)
-      if (['image', 'image-page'].includes(config.name))
-        console.log('begin', config.name, { value, parentId })
-      if (['next-batch-id'].includes(config.name))
-        console.log('begin', config.name, { parentId })
-
       const { id: downloadId } = store.qs.selectCompletedDownload({
         incrementIndex,
         parentId,
@@ -64,10 +58,8 @@ const scraper = (config: ScrapeConfig) => {
       })
       if (downloadId) {
         const parsedValuesWithId = store.qs.selectParsedValues(downloadId)
-        if (config.name === 'next-batch-id') console.log(config.name, 'loaded')
         return parsedValuesWithId
       } else {
-        console.log(config.name, 'downloading')
         const { downloadValue, downloadId, filename } = await downloader({
           incrementIndex,
           scrapeNextIndex: 0,
@@ -75,8 +67,6 @@ const scraper = (config: ScrapeConfig) => {
           value
         })
         const parsedValues = parser(downloadValue)
-        if (['next-batch-id', 'batch-id', 'batch-page'].includes(config.name))
-          console.log(config.name, { parsedValues })
 
         const parsedValuesWithId = store.asTransaction(() => {
           store.qs.updateDownloadToComplete({ downloadId, filename })

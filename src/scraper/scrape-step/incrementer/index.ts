@@ -25,7 +25,8 @@ const throwAnyError = (e: Error) => Rx.throwError(e)
 
 export type DownloadParseFunction = (
   parsedValueWithId: ParsedValue,
-  incrementIndex: number
+  incrementIndex: number,
+  scrapeNextIndex?: number
 ) => Promise<ParsedValue[]>
 
 type StatefulVars = {
@@ -72,7 +73,11 @@ const incrementer = ({ name, incrementUntil }: ScrapeConfig) => {
                 ops.flatMap((parsedValues, scrapeNextIndex) =>
                   // TODO get proper scrape next index for asyncFunction
                   parsedValues.map(parsedValue =>
-                    asyncFunction(parsedValue, incrementIndex)
+                    asyncFunction(
+                      parsedValue,
+                      incrementIndex,
+                      scrapeNextIndex + 1
+                    )
                   )
                 ),
                 ops.mergeAll(),

@@ -34,10 +34,11 @@ WITH cte AS (
   INNER JOIN downloads as pDownloads
   ON pTree.downloadId = pDownloads.id
   ORDER BY
-  recurseDepth,
-  parseIndex,
-  incrementIndex,
-  levelOrder
+  recurseDepth, -- recurseDepth ensures that we move from the bottom of the tree to the top
+  parseIndex, -- parseIndex orders by appearance on html/json
+  incrementIndex, -- incrementIndex handles `incrementUntil`
+  levelOrder, -- see make-dynamic-order-level-column.ts
+  parentId -- parentId handles `scrapeNext`
 )
 SELECT
 --  *

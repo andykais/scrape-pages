@@ -1,11 +1,11 @@
 import { normalizeConfig } from '../'
-import * as globalVals from '../../../../testing/setup'
+import * as testingConfigs from '../../../../testing/resources/testing-configs'
 import { ConfigInit } from '../types'
 import { expect } from 'chai'
 
 describe('filled in defaults', () => {
   describe('simple config', () => {
-    const simpleConfig = globalVals.__SIMPLE_CONFIG__
+    const simpleConfig = testingConfigs.__SIMPLE_CONFIG__
     const fullConfig = normalizeConfig(simpleConfig)
     const fullConfigGuess: ConfigInit = {
       input: [],
@@ -53,7 +53,7 @@ describe('filled in defaults', () => {
   })
 
   describe('gallery post img tag config', () => {
-    const galleryPostImgTag = globalVals.__GALLERY_POST_IMG_TAG__
+    const galleryPostImgTag = testingConfigs.__GALLERY_POST_IMG_TAG__
     const fullConfig = normalizeConfig(galleryPostImgTag)
 
     it('should match itself for a full filled in config', () => {

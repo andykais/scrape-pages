@@ -1,0 +1,104 @@
+[
+  {
+    "image": [
+      {
+        "scraper": "image",
+        "parsedValue": null,
+        "url": "http://increment-gallery-site.com/image/the.jpg",
+        "filename": -1
+      }
+    ],
+    "tag": [
+      {
+        "scraper": "tag",
+        "parsedValue": "one",
+        "url": null,
+        "filename": -1
+      },
+      {
+        "scraper": "tag",
+        "parsedValue": "two",
+        "url": null,
+        "filename": -1
+      }
+    ]
+  },
+  {
+    "image": [
+      {
+        "scraper": "image",
+        "parsedValue": null,
+        "url": "http://increment-gallery-site.com/image/quick.jpg",
+        "filename": -1
+      }
+    ],
+    "tag": [
+      {
+        "scraper": "tag",
+        "parsedValue": "one",
+        "url": null,
+        "filename": -1
+      },
+      {
+        "scraper": "tag",
+        "parsedValue": "two",
+        "url": null,
+        "filename": -1
+      }
+    ]
+  },
+  {
+    "image": [
+      {
+        "scraper": "image",
+        "parsedValue": null,
+        "url": "http://increment-gallery-site.com/image/brown.jpg",
+        "filename": -1
+      }
+    ],
+    "tag": [
+      {
+        "scraper": "tag",
+        "parsedValue": "four",
+        "url": null,
+        "filename": -1
+      },
+      {
+        "scraper": "tag",
+        "parsedValue": "five",
+        "url": null,
+        "filename": -1
+      }
+    ]
+  },
+  {
+    "image": [
+      {
+        "scraper": "image",
+        "parsedValue": null,
+        "url": "http://increment-gallery-site.com/image/fox.jpg",
+        "filename": -1
+      }
+    ],
+    "tag": [
+      {
+        "scraper": "tag",
+        "parsedValue": "three",
+        "url": null,
+        "filename": -1
+      },
+      {
+        "scraper": "tag",
+        "parsedValue": "four",
+        "url": null,
+        "filename": -1
+      },
+      {
+        "scraper": "tag",
+        "parsedValue": "five",
+        "url": null,
+        "filename": -1
+      }
+    ]
+  }
+]

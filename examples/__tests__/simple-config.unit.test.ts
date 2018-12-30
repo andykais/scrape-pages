@@ -1,8 +1,8 @@
 import { assertConfigType } from '../../src/configuration/site-traversal'
-import * as globalVals from '../../testing/setup'
+import * as testingConfigs from '../../testing/resources/testing-configs'
 
-describe('simple config', () => {
-  const simpleConfig = globalVals.__SIMPLE_CONFIG__
+describe('example simple config', () => {
+  const simpleConfig = testingConfigs.__SIMPLE_CONFIG__
 
   it('is properly typed', () => {
     assertConfigType(simpleConfig)

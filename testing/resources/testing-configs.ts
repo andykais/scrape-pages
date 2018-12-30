@@ -1,4 +1,4 @@
-import { ConfigInit } from '../src/configuration/site-traversal/types'
+import { ConfigInit } from '../../src/configuration/site-traversal/types'
 
 // setup reusable variables
 export const __SIMPLE_CONFIG__: ConfigInit = {

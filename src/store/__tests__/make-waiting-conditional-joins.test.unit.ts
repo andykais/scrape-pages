@@ -4,11 +4,11 @@ import {
   normalizeConfig
 } from '../../configuration/site-traversal'
 import { makeWaitingConditionalJoins } from '../sql-generators'
-import * as globalVals from '../../../testing/setup'
+import * as testingConfigs from '../../../testing/resources/testing-configs'
 
 // should only give the higher one when their depths are unequal
 describe('make waiting conditional joins', () => {
-  const galleryPostImgTag = globalVals.__GALLERY_POST_IMG_TAG__
+  const galleryPostImgTag = testingConfigs.__GALLERY_POST_IMG_TAG__
   const fullConfig = normalizeConfig(galleryPostImgTag)
   const flatConfig = makeFlatConfig(fullConfig)
 

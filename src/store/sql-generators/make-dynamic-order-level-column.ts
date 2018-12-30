@@ -5,6 +5,10 @@ import {
   ConfigPositionInfo
 } from '../../configuration/site-traversal/types'
 
+/**
+ * ensures that when multiple scrapes are selected at once, the proper order is attached at each level of the
+ * tree
+ */
 const makeDynamicOrderLevelColumn = (
   flatConfig: FlatConfig,
   scraperNames: string[]

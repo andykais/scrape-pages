@@ -21,14 +21,23 @@ export const config: ConfigInit = {
         scrapeEach: {
           name: 'image-page',
           download: 'http://scrape-next-site.com{{ value }}',
-          parse: {
-            selector: 'img',
-            attribute: 'src'
-          },
-          scrapeEach: {
-            name: 'image',
-            download: 'http://scrape-next-site.com{{ value }}'
-          }
+          scrapeEach: [
+            {
+              name: 'tag',
+              parse: '#tags > li'
+            },
+            {
+              name: 'image-parse',
+              parse: {
+                selector: 'img',
+                attribute: 'src'
+              },
+              scrapeEach: {
+                name: 'image',
+                download: 'http://scrape-next-site.com{{ value }}'
+              }
+            }
+          ]
         }
       }
     }

@@ -13,6 +13,8 @@ type Statement = (
 export const query: CreateQuery<Statement> = (flatConfig, database) => {
   const statement = database.prepare(SQL_TEMPLATE)
   return ({ incrementIndex, scrapeNextIndex = 0, parentId = -1, scraper }) => {
-    return statement.get([scrapeNextIndex, incrementIndex, parentId, scraper]) || {}
+    return (
+      statement.get([scrapeNextIndex, incrementIndex, parentId, scraper]) || {}
+    )
   }
 }

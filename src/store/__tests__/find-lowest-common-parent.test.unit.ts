@@ -4,10 +4,10 @@ import {
   normalizeConfig
 } from '../../configuration/site-traversal'
 import { findLowestCommonParent } from '../sql-generators/util/find-lowest-common-parent'
-import * as globalVals from '../../../testing/setup'
+import * as testingConfigs from '../../../testing/resources/testing-configs'
 
 describe('find lowest common parent', () => {
-  const galleryPostImgTag = globalVals.__GALLERY_POST_IMG_TAG__
+  const galleryPostImgTag = testingConfigs.__GALLERY_POST_IMG_TAG__
   const fullConfig = normalizeConfig(galleryPostImgTag)
   const flatConfig = makeFlatConfig(fullConfig)
 
