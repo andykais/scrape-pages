@@ -1,7 +1,7 @@
 import { parser as htmlParser } from './variations/html-parser'
 import { parser as jsonParser } from './variations/json-parser'
 import { parser as identityParser } from './variations/identity-parser'
-import { ScrapeConfig } from '../../../configuration/types'
+import { ScrapeConfig } from '../../../configuration/site-traversal/types'
 
 export type ParserType = (
   config: ScrapeConfig

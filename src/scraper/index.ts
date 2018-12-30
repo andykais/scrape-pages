@@ -1,14 +1,20 @@
+import * as Rx from 'rxjs'
 import Emitter from '../emitter'
 import Store from '../store'
 import Logger from '../logger'
-import Queue from '../queue-observable'
+import Queue from '../queue'
 import scraper from './scrape-step'
-import { normalizeConfig } from '../configuration'
-import { normalizeOptions } from '../run-options'
+import { mkdirp, mkdir, rmrf } from '../util/fs'
+import { normalizeConfig } from '../configuration/site-traversal'
+import { normalizeOptions } from '../configuration/run-options'
 // type imports
 import { LogType } from '../logger'
-import { Config, ConfigInit } from '../configuration/types'
-import { RunOptionsInit } from '../run-options/types'
+import { Config, ConfigInit } from '../configuration/site-traversal/types'
+import {
+  RunOptionsInit,
+  FlatRunOptions
+} from '../configuration/run-options/types'
+import { Dependencies } from './types'
 
 class ScrapePages {
   config: Config
@@ -25,55 +31,72 @@ class ScrapePages {
     this.configuredScraper = scraper(this.config.scrape)
   }
 
-  // TODO add parsable input for this first parse step
-  runSetup = async (runParams: RunOptionsInit) => {
-    const flatRunParams = normalizeOptions(this.config, runParams)
+  initResources = async (
+    runParams: RunOptionsInit,
+    flatRunParams: FlatRunOptions
+  ) => {
+    if (runParams.cleanFolder) {
+      this.logger.info(`Cleaning ${runParams.folder}`)
+      await rmrf(runParams.folder)
+    }
 
     this.logger.info('Making folders.')
-    this.scrapingScheme = await this.configuredScraper(flatRunParams, {
+    await mkdirp(runParams.folder)
+    for (const { folder } of Object.values(flatRunParams)) await mkdirp(folder)
+
+    this.logger.info('Setting up SQLite database.')
+    // syncronous db creation
+    this.store.init(runParams)
+
+    this.logger.info('Begin downloading with inputs', runParams.input)
+  }
+
+  // TODO add parsable input for this first parse step
+  initDependencies = (runParams: RunOptionsInit, logLevel: LogType) => {
+    const flatRunParams = normalizeOptions(this.config, runParams)
+
+    this.store = new Store(this.config)
+    this.emitter = new Emitter(this.config, this.store)
+    this.logger = new Logger({ logLevel })
+    const rateLimiterEventStream = this.emitter.getRxEventStream(
+      'useRateLimiter'
+    ) as Rx.Observable<boolean> // deal with incoming values on this event as truthy or falsey
+    this.queue = new Queue(runParams, flatRunParams, rateLimiterEventStream)
+
+    this.scrapingScheme = this.configuredScraper(flatRunParams, {
       queue: this.queue,
       emitter: this.emitter,
       logger: this.logger,
       store: this.store
     })
 
-    this.logger.info('Setting up SQLite database.')
-    await this.store.init(runParams)
-
-    this.logger.info('Begin downloading with inputs', runParams.input)
-    return this.scrapingScheme([{ parsedValue: '' }])
+    return Rx.concat(
+      this.initResources(runParams, flatRunParams),
+      this.scrapingScheme([{ parsedValue: '' }])
+    )
   }
 
   run = (runParams: RunOptionsInit, logLevel: LogType = 'ERROR') => {
-    // init dependencies
-    this.store = new Store(this.config)
-    this.emitter = new Emitter(this.config, this.store)
-    this.logger = new Logger({ logLevel })
-    this.queue = new Queue(
-      runParams,
-      this.emitter.getRxEventStream('useRateLimiter')
+    const scrapingObservable = this.initDependencies(runParams, logLevel)
+    const subscription = scrapingObservable.subscribe(
+      undefined,
+      error => {
+        this.emitter.emitError(error)
+        subscription.unsubscribe()
+        this.queue.closeQueue()
+      },
+      () => {
+        // TODO add timer to show how long it took
+        this.logger.info('Done!')
+        this.queue.closeQueue()
+        this.emitter.emitDone()
+      }
     )
 
-    this.runSetup(runParams).then(scrapingObservable => {
-      const subscription = scrapingObservable.subscribe(
-        undefined,
-        error => {
-          this.emitter.emitError(error)
-          subscription.unsubscribe()
-          this.queue.closeQueue()
-        },
-        () => {
-          // TODO add timer to show how long it took
-          this.logger.info('Done!')
-          this.queue.closeQueue()
-          this.emitter.emitDone()
-        }
-      )
-
-      this.emitter.onStop(() => {
-        subscription.unsubscribe()
-        this.logger.info('Exited manually.')
-      })
+    this.emitter.onStop(() => {
+      this.queue.closeQueue()
+      subscription.unsubscribe()
+      this.logger.info('Exited manually.')
     })
     return this.emitter.emitter
   }

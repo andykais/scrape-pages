@@ -1,7 +1,7 @@
 INSERT OR IGNORE INTO downloads (
   scraper,
   parseParentId,
-  loopIndex,
+  scrapeNextIndex,
   incrementIndex,
   url
 

@@ -1,16 +1,12 @@
 language: node_js
 
 stages:
-  - name: typecheck
-    if: branch = master OR env(TRAVIS_PULL_REQUEST)
-  - name: test
-    if: branch = master OR env(TRAVIS_PULL_REQUEST)
-  - name: lint
-    if: branch = master OR env(TRAVIS_PULL_REQUEST)
+  - name: typecheck-test-lint
+    if: branch = master OR type IN (pull_request)
   - name: deploy-npm
     if: tag IS present
   - name: deploy-website
-    if: branch = master AND NOT env(TRAVIS_PULL_REQUEST)
+    if: branch = master AND NOT type IN (pull_request)
 
 cache:
   directories:
@@ -18,21 +14,26 @@ cache:
 
 jobs:
   include:
-    - stage: typecheck
+    - stage: typecheck-test-lint
+      name: typecheck
       node_js: '8'
       script: npm run typecheck
 
-    - stage: test
+    - stage: typecheck-test-lint
+      name: test
       node_js: '10'
       script: npm run test:unit
-    - stage: test
+    - stage: typecheck-test-lint
+      name: test
       node_js: '9'
       script: npm run test:unit
-    - stage: test
+    - stage: typecheck-test-lint
+      name: test
       node_js: '8'
       script: npm run test:unit
 
-    - stage: lint
+    - stage: typecheck-test-lint
+      name: lint
       node_js: '8'
       script: npm run lint
 

@@ -13,7 +13,7 @@ WITH cte AS (
     parsedTree.scraper AS currentScraper,
     0 as levelOrder
   FROM parsedTree INNER JOIN downloads ON parsedTree.downloadId = downloads.id
-  WHERE parsedTree.scraper in ({selectedScrapers})
+  WHERE parsedTree.scraper in ({{{ selectedScrapers }}})
   UNION ALL
   SELECT
     pTree.id,
@@ -27,25 +27,28 @@ WITH cte AS (
     cte.recurseDepth + 1,
     cte.scraper,
     pTree.scraper AS currentScraper,
-    {orderLevelColumnSql} as levelOrder
+    {{{orderLevelColumnSql}}} as levelOrder
   FROM cte
-  INNER JOIN parsedTree as pTree ON
-  {waitingJoinsSql} = pTree.id
-  INNER JOIN downloads as pDownloads ON
-  pTree.downloadId = pDownloads.id
+  INNER JOIN parsedTree as pTree
+  ON {{{ waitingJoinsSql }}} = pTree.id
+  INNER JOIN downloads as pDownloads
+  ON pTree.downloadId = pDownloads.id
   ORDER BY
-  recurseDepth,
-  parseIndex,
-  incrementIndex,
-  levelOrder
+  recurseDepth, -- recurseDepth ensures that we move from the bottom of the tree to the top
+  parseIndex, -- parseIndex orders by appearance on html/json
+  incrementIndex, -- incrementIndex handles `incrementUntil`
+  levelOrder, -- see make-dynamic-order-level-column.ts
+  parentId -- parentId handles `scrapeNext`
 )
 SELECT
 --  *
   scraper,
-  id, parsedValue,
-  downloadId, url, filename
+  --  id,
+  parsedValue,
+  --  downloadId,
+  url, filename
 FROM cte
-WHERE recurseDepth = {lowestDepth}
+WHERE recurseDepth = {{lowestDepth}}
 ORDER BY
   recurseDepth,
   incrementIndex,

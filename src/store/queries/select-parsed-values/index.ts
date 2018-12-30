@@ -1,8 +1,8 @@
 import SQL_TEMPLATE from './template.sql'
 import { CreateQuery } from '../../types'
 
-type SelectedRow = {
-  id: number,
+export type SelectedRow = {
+  id: number
   parsedValue?: string
 }
 type Statement = (downloadId: number) => SelectedRow[]

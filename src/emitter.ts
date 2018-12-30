@@ -1,7 +1,7 @@
 import EventEmitter from 'events'
 import * as Rx from 'rxjs'
-import { makeFlatConfig } from './configuration/make-flat-config'
-import { Config } from './configuration/types'
+import { makeFlatConfig } from './configuration/site-traversal/make-flat-config'
+import { Config } from './configuration/site-traversal/types'
 
 class ScrapeEmitter {
   private _emitter: EventEmitter
@@ -50,7 +50,11 @@ class ScrapeEmitter {
   }
 
   emitError(error: Error) {
-    this.emitter.emit('error', error)
+    if (this.emitter.listenerCount('error')) {
+      this.emitter.emit('error', error)
+    } else {
+      throw error
+    }
   }
 
   get emitter() {
