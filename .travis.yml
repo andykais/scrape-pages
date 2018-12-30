@@ -20,17 +20,17 @@ jobs:
       script: npm run typecheck
 
     - stage: typecheck-test-lint
-      name: test
+      name: test node:10
       node_js: '10'
-      script: npm run test:unit
+      script: npm run test:unit && npm run test:functional
     - stage: typecheck-test-lint
-      name: test
+      name: test node:9
       node_js: '9'
-      script: npm run test:unit
+      script: npm run test:unit && npm run test:functional
     - stage: typecheck-test-lint
-      name: test
+      name: test node:8
       node_js: '8'
-      script: npm run test:unit
+      script: npm run test:unit && npm run test:functional
 
     - stage: typecheck-test-lint
       name: lint
