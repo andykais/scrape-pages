@@ -2,9 +2,14 @@ const { resolve } = require('path')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const nodeExternals = require('webpack-node-externals')
 const TerserPlugin = require('terser-webpack-plugin')
-const CleanTerminalPlugin = require('clean-terminal-webpack-plugin')
 
-const devPlugins = [new CleanTerminalPlugin()]
+class ClearTerminalInWatchMode {
+  apply(compiler) {
+    compiler.hooks.afterCompile.tap('ClearTerminalInWatchMode', () => {
+      if (compiler.watchMode) console.clear()
+    })
+  }
+}
 
 module.exports = (env, { mode = 'development' } = {}) => ({
   target: 'node',
@@ -46,7 +51,7 @@ module.exports = (env, { mode = 'development' } = {}) => ({
       'LICENSE',
       'README.md'
     ]),
-    ...(mode === 'development' ? devPlugins : [])
+    new ClearTerminalInWatchMode()
   ],
   optimization: {
     minimizer: [new TerserPlugin()]
