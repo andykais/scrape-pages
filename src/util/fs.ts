@@ -14,18 +14,6 @@ const [exists, readFile, mkdir, readdir, stat, unlink, rmdir] = [
 
 export { mkdir, exists, readFile, readdir, stat, unlink }
 
-export const mkdirpSync = (folder: string) => {
-  try {
-    fs.mkdirSync(folder)
-  } catch (e) {
-    if (e.code === 'ENOENT') {
-      mkdirpSync(path.dirname(folder))
-      mkdirpSync(folder)
-    } else if (e.code !== 'EEXIST') {
-      throw e
-    }
-  }
-}
 export const mkdirp = async (folder: string) => {
   try {
     await mkdir(folder)

@@ -3,7 +3,6 @@ import * as ops from 'rxjs/operators'
 import setDownloaderConfig from './downloader'
 import setParserConfig from './parser'
 import incrementer from './incrementer'
-import { mkdirpSync } from '../../util/fs'
 // type imports
 import { ScrapeConfig } from '../../configuration/site-traversal/types'
 import { FlatRunOptions } from '../../configuration/run-options/types'
@@ -11,10 +10,6 @@ import { Dependencies } from '../types'
 import { SelectedRow as ParsedValueWithId } from '../../store/queries/select-parsed-values'
 import { DownloadParseFunction } from './incrementer'
 
-type ScrapeValue = (parentValues: any[]) => Rx.Observable<any>
-type ScrapeStep = (
-  config: ScrapeConfig
-) => (flatRunParams: FlatRunOptions, dependencies: Dependencies) => ScrapeValue
 type InputValue = {
   parsedValue: string
   id?: number // nonexistent
@@ -36,9 +31,8 @@ const scraper = (config: ScrapeConfig) => {
     const downloader = setDownloaderOptions(runParams, dependencies)
     const parser = setParserOptions()
 
-    const { queue, store, emitter } = dependencies
-    // simpler to keep this synchronous
-    mkdirpSync(runParams.folder)
+    const { queue, store, emitter, logger } = dependencies
+    const scraperLogger = logger.scraper(config.name)
     const children = childrenSetup.map(child =>
       child(flatRunParams, dependencies)
     )
@@ -58,6 +52,7 @@ const scraper = (config: ScrapeConfig) => {
       })
       if (downloadId) {
         const parsedValuesWithId = store.qs.selectParsedValues(downloadId)
+        scraperLogger.cachedValues(downloadId, parsedValuesWithId)
         return parsedValuesWithId
       } else {
         const { downloadValue, downloadId, filename } = await downloader({
@@ -79,6 +74,8 @@ const scraper = (config: ScrapeConfig) => {
           emitter.forScraper[config.name].emitCompletedDownload(downloadId)
           return store.qs.selectParsedValues(downloadId)
         })()
+
+        scraperLogger.newValues(downloadId, parsedValuesWithId)
         return parsedValuesWithId
       }
     }
@@ -89,6 +86,9 @@ const scraper = (config: ScrapeConfig) => {
         ops.flatMap(
           getIncrementObservable(downloadParseFunction, scrapeNextChild)
         ),
+        // ops.catchError(e =>
+        //   Rx.throwError(new VError(e, `scraper '${config.name}'`))
+        // ),
         ops.flatMap(
           parsedValues =>
             children.length

@@ -47,6 +47,7 @@
     "@types/node-fetch": "^2.1.2",
     "@types/sanitize-filename": "^1.1.28",
     "@types/source-map-support": "^0.4.1",
+    "@types/verror": "^1.10.3",
     "babel-loader": "^8.0.4",
     "chai": "^4.2.0",
     "chai-exclude": "^1.0.12",
@@ -74,6 +75,7 @@
     "rxjs": "^6.3.3",
     "sanitize-filename": "^1.6.1",
     "source-map-support": "^0.5.6",
-    "ts-runtime": "^0.2.0"
+    "ts-runtime": "^0.2.0",
+    "verror": "^1.10.0"
   }
 }

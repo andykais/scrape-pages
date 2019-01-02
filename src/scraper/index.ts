@@ -1,7 +1,8 @@
 import * as Rx from 'rxjs'
+import VError from 'verror'
 import Emitter from '../emitter'
 import Store from '../store'
-import Logger from '../logger'
+import Logger, { LogOptions } from '../logger'
 import Queue from '../queue'
 import scraper from './scrape-step'
 import { mkdirp, mkdir, rmrf } from '../util/fs'
@@ -52,12 +53,12 @@ class ScrapePages {
   }
 
   // TODO add parsable input for this first parse step
-  initDependencies = (runParams: RunOptionsInit, logLevel: LogType) => {
+  initDependencies = (runParams: RunOptionsInit, logOptions: LogOptions) => {
     const flatRunParams = normalizeOptions(this.config, runParams)
 
     this.store = new Store(this.config)
     this.emitter = new Emitter(this.config, this.store)
-    this.logger = new Logger({ logLevel })
+    this.logger = new Logger(logOptions)
     const rateLimiterEventStream = this.emitter.getRxEventStream(
       'useRateLimiter'
     ) as Rx.Observable<boolean> // deal with incoming values on this event as truthy or falsey
@@ -76,12 +77,13 @@ class ScrapePages {
     )
   }
 
-  run = (runParams: RunOptionsInit, logLevel: LogType = 'ERROR') => {
-    const scrapingObservable = this.initDependencies(runParams, logLevel)
+  run = (runParams: RunOptionsInit, logOptions?: LogOptions) => {
+    const scrapingObservable = this.initDependencies(runParams, logOptions)
     const subscription = scrapingObservable.subscribe(
       undefined,
       error => {
-        this.emitter.emitError(error)
+        this.emitter.emitError(error.cause ? VError.fullStack(error) : error)
+        // this.emitter.emitError(VError.fullStack(error))
         subscription.unsubscribe()
         this.queue.closeQueue()
       },
