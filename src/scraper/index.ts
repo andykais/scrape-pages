@@ -82,8 +82,7 @@ class ScrapePages {
     const subscription = scrapingObservable.subscribe(
       undefined,
       error => {
-        this.emitter.emitError(error.cause ? VError.fullStack(error) : error)
-        // this.emitter.emitError(VError.fullStack(error))
+        this.emitter.emitError(VError.fullStack(error))
         subscription.unsubscribe()
         this.queue.closeQueue()
       },

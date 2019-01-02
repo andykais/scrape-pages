@@ -7,6 +7,7 @@ import {
 } from './fetchers'
 import { DownloaderType } from '../../'
 
+// DROPME
 export const downloader: DownloaderType = config => (
   runParams,
   dependencies
@@ -32,13 +33,15 @@ export const downloader: DownloaderType = config => (
       runParams,
       downloadParams
     )
-    const downloadId = store.qs.insertQueuedDownload({
-      scraper: config.name,
-      parentId,
-      scrapeNextIndex,
-      incrementIndex,
-      url: url.toString()
-    })
+    const downloadId = store.qs.insertQueuedDownload(
+      config.name,
+      {
+        parentId,
+        scrapeNextIndex,
+        incrementIndex
+      },
+      url
+    )
 
     emitter.forScraper[config.name].emitQueuedDownload(downloadId)
     const { downloadValue, filename } = await fetcher(

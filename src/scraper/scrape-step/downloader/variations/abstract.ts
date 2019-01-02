@@ -20,9 +20,11 @@ export type DownloadParams = {
   parentId?: number
   scrapeNextIndex: number
   incrementIndex: number
-  value?: string
+  value: string
 }
-export class Downloader {
+
+type DownloadData = {}
+export abstract class AbstractDownloader {
   config: ScrapeConfig
   runParams: RunOptions
   dependencies: Dependencies
@@ -49,12 +51,9 @@ export class Downloader {
     return { downloadValue, downloadId, filename }
   }
   // implement these methods
-  constructDownload = ({ value }: DownloadParams): any => ({ value })
-  retrieve = (
+  abstract constructDownload({ value }: DownloadParams): DownloadData
+  abstract retrieve(
     downloadId: number,
-    downloadParams: any
-  ): { downloadValue: string; filename?: string } => ({
-    downloadValue: downloadParams.value,
-    filename: null
-  })
+    downloadParams: DownloadData
+  ): { downloadValue: string; filename?: string }
 }

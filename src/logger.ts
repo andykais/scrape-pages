@@ -50,6 +50,10 @@ class ScraperLogger {
         parsedValuesWithId.map(v => v.parsedValue)
       )
     )
+
+  // public downloadInProgress = (downloadId: number, response: Fetch.Response) => {
+  // this.emitter.forScraper(this.name).emitProgress()
+  // }
 }
 
 class Logger {

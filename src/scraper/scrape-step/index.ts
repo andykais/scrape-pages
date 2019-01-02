@@ -1,6 +1,7 @@
 import * as Rx from 'rxjs'
 import * as ops from 'rxjs/operators'
-import setDownloaderConfig from './downloader'
+import VError from 'verror'
+import { downloaderClassFactory } from './downloader'
 import setParserConfig from './parser'
 import incrementer from './incrementer'
 // type imports
@@ -18,7 +19,7 @@ export type ParsedValue = InputValue | ParsedValueWithId
 
 // init setup
 const scraper = (config: ScrapeConfig) => {
-  const setDownloaderOptions = setDownloaderConfig(config)
+  // const setDownloaderOptions = setDownloaderConfig(config)
   const setParserOptions = setParserConfig(config)
   const getIncrementObservable = incrementer(config)
   const childrenSetup = config.scrapeEach.map(scrapeConfig =>
@@ -28,7 +29,8 @@ const scraper = (config: ScrapeConfig) => {
   // run setup
   return (flatRunParams: FlatRunOptions, dependencies: Dependencies) => {
     const runParams = flatRunParams[config.name]
-    const downloader = setDownloaderOptions(runParams, dependencies)
+    const downloader = downloaderClassFactory(config, runParams, dependencies)
+    // const downloader = setDownloaderOptions(runParams, dependencies)
     const parser = setParserOptions()
 
     const { queue, store, emitter, logger } = dependencies
@@ -55,7 +57,7 @@ const scraper = (config: ScrapeConfig) => {
         scraperLogger.cachedValues(downloadId, parsedValuesWithId)
         return parsedValuesWithId
       } else {
-        const { downloadValue, downloadId, filename } = await downloader({
+        const { downloadValue, downloadId, filename } = await downloader.run({
           incrementIndex,
           scrapeNextIndex: 0,
           parentId,
@@ -86,9 +88,11 @@ const scraper = (config: ScrapeConfig) => {
         ops.flatMap(
           getIncrementObservable(downloadParseFunction, scrapeNextChild)
         ),
-        // ops.catchError(e =>
-        //   Rx.throwError(new VError(e, `scraper '${config.name}'`))
-        // ),
+        ops.catchError(e =>
+          Rx.throwError(
+            new VError({ name: e.name, cause: e }, `scraper '${config.name}'`)
+          )
+        ),
         ops.flatMap(
           parsedValues =>
             children.length
