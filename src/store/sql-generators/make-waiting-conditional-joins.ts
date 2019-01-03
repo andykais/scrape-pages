@@ -1,7 +1,6 @@
 // type imports
 import {
   FlatConfig,
-  ConfigPositionInfo
 } from '../../configuration/site-traversal/types'
 
 const makeWaitingConditionalJoins = (

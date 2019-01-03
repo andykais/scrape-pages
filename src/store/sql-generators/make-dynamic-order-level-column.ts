@@ -44,7 +44,6 @@ const makeDynamicOrderLevelColumn = (
       .map(commonParentName => {
         const orderAtRecurseDepth =
           lowestDepth - flatConfig[commonParentName].depth - 1
-        const orderAtScraper = flatConfig[commonParentName].name
         const scrapersToOrder = ancestors[commonParentName]
         return scrapersToOrder
           .map(({ name, depth, horizontalIndex }) => {

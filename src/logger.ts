@@ -25,9 +25,13 @@ class ScraperLogger {
     console.log(`scraper "${this.name}:"`, ...messages)
   }
   private assignIfPermitted = <T extends Function>(func: T) => {
-    type FunctionArguments = ArgumentTypes<typeof func>
-    return (...args: FunctionArguments) => {
-      func(...args)
+    if (this.isPermitted) {
+      type FunctionArguments = ArgumentTypes<typeof func>
+      return (...args: FunctionArguments) => {
+        func(...args)
+      }
+    } else {
+      return () => {}
     }
   }
   public constructor(name: string, isPermitted: boolean) {
@@ -53,6 +57,7 @@ class ScraperLogger {
 class Logger {
   private permittedLogLevel: LogType
   private permittedScrapers: string[]
+  private logFile?: string
 
   private isPermitted = (logLevel: LogType): boolean =>
     logLevelConstants[logLevel] <= logLevelConstants[this.permittedLogLevel]
@@ -62,7 +67,9 @@ class Logger {
   ) => (this.isPermitted(logType) ? logger : () => {})
 
   // TODO handle logFile outputs
-  private output = (prefix: string) => console.log
+  private output = (prefix: string) => (...args: any[]) => {
+    console.log(prefix, ...args)
+  }
 
   public constructor({
     logLevel = 'ERROR',
@@ -71,6 +78,7 @@ class Logger {
   }: LogOptions = {}) {
     this.permittedScrapers = logScrapers
     this.permittedLogLevel = logLevel
+    this.logFile = logFile
     // setup loggers
     this.debug = this.assignIfPermitted(this.debug, 'DEBUG')
     this.info = this.assignIfPermitted(this.info, 'INFO')

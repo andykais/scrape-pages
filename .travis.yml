@@ -33,9 +33,9 @@ jobs:
       script: npm run test:unit && npm run test:functional
 
     - stage: typecheck-test-lint
-      name: lint
+      name: check formatting
       node_js: '8'
-      script: npm run lint
+      script: npm run format:check
 
     - stage: deploy-npm
       node_js: '8'

@@ -18,12 +18,10 @@ export interface Queue<T> {
 const rateLimitToggle = <V>(
   {
     toggler,
-    executor,
-    timer
+    executor
   }: {
     toggler: Rx.Observable<boolean>
     executor: () => Promise<any>
-    timer?: typeof Rx.timer
   },
   {
     limit,
@@ -75,7 +73,7 @@ const rateLimitToggle = <V>(
         })
 
       source.subscribe({
-        next(val) {
+        next() {
           plannedExecutions++
           concurrentLimiter.next(false)
         },

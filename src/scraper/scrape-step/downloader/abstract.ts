@@ -16,7 +16,6 @@ export abstract class AbstractDownloader<DownloadData> {
   protected config: ScrapeConfig
   protected runParams: RunOptions
   protected deps: Dependencies
-  protected insertDownloadData = true
 
   public constructor(
     config: ScrapeConfig,
@@ -39,6 +38,8 @@ export abstract class AbstractDownloader<DownloadData> {
 
     return {
       downloadId,
+      // downloadValue conditional is for identity parser,
+      // essentially, if there was no data that went into a download, then nothing important was recieved
       downloadValue: downloadData ? downloadValue : downloadParams.value,
       filename
     }

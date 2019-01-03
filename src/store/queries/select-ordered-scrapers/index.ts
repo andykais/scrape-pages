@@ -33,7 +33,6 @@ export const query: CreateQuery<Statement> = (
     selectedScrapers,
     lowestDepth
   })
-  // console.log(selectOrderedSql)
   const statement = database.prepare(selectOrderedSql)
   return statement.all()
 }

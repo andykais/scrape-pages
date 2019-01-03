@@ -1,0 +1,10 @@
+{
+  "parser": "eslint-plugin-typescript/parser",
+  "plugins": ["typescript"],
+  "rules": {
+    "no-unused-expressions": "error",
+    "no-unused-vars": "error",
+    "typescript/no-unused-vars": "error",
+    "no-console": "warn"
+  }
+}

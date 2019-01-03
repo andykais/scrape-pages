@@ -1,6 +1,5 @@
 import { Database } from './database'
 import { makeFlatConfig } from '../configuration/site-traversal'
-import * as queries from './queries'
 import { groupBy as groupByKey } from '../util/array'
 import { Config, FlatConfig } from '../configuration/site-traversal/types'
 import { createTables, createStatements } from './queries'
@@ -63,17 +62,18 @@ class Store {
     // }, {})
     // )
 
-    const headers = [
-      'id',
-      'parentId',
-      'incrementIndex',
-      'levelOrder',
-      'recurseDepth',
-      'currentScraper',
-      'filename',
-      'parsedValue',
-      'scraper'
-    ]
+    /** logging helper
+    // const headers = [
+    //   'id',
+    //   'parentId',
+    //   'incrementIndex',
+    //   'levelOrder',
+    //   'recurseDepth',
+    //   'currentScraper',
+    //   'filename',
+    //   'parsedValue',
+    //   'scraper'
+    // ]
     // console.log([
     // headers.join(' | '),
     // ...result.map(r => {
@@ -88,6 +88,7 @@ class Store {
     // .join(' | ')
     // })
     // ])
+    */
 
     // TODO move this into sql
     // const objectPicker = (

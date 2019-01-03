@@ -1,3 +1,4 @@
+// type imports
 import { Database } from '../database'
 import { FlatConfig } from '../../configuration/site-traversal/types'
 

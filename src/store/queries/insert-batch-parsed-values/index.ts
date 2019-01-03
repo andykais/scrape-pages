@@ -6,7 +6,7 @@ type Statement = (
     name: string
     parentId?: number
     downloadId: number
-    parsedValues: string[]
+    parsedValues: string[] | [string | undefined]
   }
 ) => void
 export const query: CreateQuery<Statement> = (flatConfig, database) => {
