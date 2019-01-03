@@ -1,4 +1,4 @@
-import DB from '../database'
+import { Database } from '../database'
 import { FlatConfig } from '../../configuration/site-traversal/types'
 
 export { query as createTables } from './create-tables'
@@ -9,7 +9,10 @@ import { query as updateDownloadToComplete } from './update-download-to-complete
 import { query as insertBatchParsedValues } from './insert-batch-parsed-values'
 import { query as selectParsedValues } from './select-parsed-values'
 
-export const createStatements = (flatConfig: FlatConfig, database: DB) => ({
+export const createStatements = (
+  flatConfig: FlatConfig,
+  database: Database
+) => ({
   selectOrderedScrapers: selectOrderedScrapers(flatConfig, database),
   selectCompletedDownload: selectCompletedDownload(flatConfig, database),
   insertQueuedDownload: insertQueuedDownload(flatConfig, database),

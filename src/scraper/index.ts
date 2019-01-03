@@ -1,10 +1,10 @@
 import * as Rx from 'rxjs'
 import VError from 'verror'
-import Emitter from '../emitter'
-import Store from '../store'
-import Logger, { LogOptions } from '../logger'
-import Queue from '../queue'
-import scraper from './scrape-step'
+import { Emitter } from '../emitter'
+import { Store } from '../store'
+import { Logger, LogOptions } from '../logger'
+import { Queue } from '../queue'
+import { scraperStep } from './scrape-step'
 import { mkdirp, mkdir, rmrf } from '../util/fs'
 import { normalizeConfig } from '../configuration/site-traversal'
 import { normalizeOptions } from '../configuration/run-options'
@@ -19,8 +19,8 @@ import { Dependencies } from './types'
 
 class ScrapePages {
   config: Config
-  configuredScraper: ReturnType<typeof scraper>
-  scrapingScheme: ReturnType<ReturnType<typeof scraper>>
+  configuredScraper: ReturnType<typeof scraperStep>
+  scrapingScheme: ReturnType<ReturnType<typeof scraperStep>>
   // dependencies
   store: Store
   emitter: Emitter
@@ -29,7 +29,7 @@ class ScrapePages {
 
   constructor(config: ConfigInit) {
     this.config = normalizeConfig(config)
-    this.configuredScraper = scraper(this.config.scrape)
+    this.configuredScraper = scraperStep(this.config.scrape)
   }
 
   initResources = async (
@@ -103,4 +103,4 @@ class ScrapePages {
   }
 }
 
-export default ScrapePages
+export { ScrapePages }

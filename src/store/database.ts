@@ -6,4 +6,4 @@ class Database extends BetterSqlite3Database {
     super(resolve(folder, 'store.sqlite'))
   }
 }
-export default Database
+export { Database }

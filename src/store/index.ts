@@ -1,4 +1,4 @@
-import DB from './database'
+import { Database } from './database'
 import { makeFlatConfig } from '../configuration/site-traversal'
 import * as queries from './queries'
 import { groupBy as groupByKey } from '../util/array'
@@ -8,7 +8,7 @@ import { createTables, createStatements } from './queries'
 class Store {
   private config: Config
   private flatConfig: FlatConfig
-  private database: DB
+  private database: Database
   public qs: ReturnType<typeof createStatements>
 
   constructor(config: Config) {
@@ -17,7 +17,7 @@ class Store {
   }
 
   init = ({ folder }: { folder: string }) => {
-    this.database = new DB(folder)
+    this.database = new Database(folder)
     this.database.pragma('journal_mode = WAL')
 
     createTables(this.flatConfig, this.database)()
@@ -116,4 +116,4 @@ class Store {
   }
 }
 
-export default Store
+export { Store }

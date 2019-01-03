@@ -90,4 +90,4 @@ const incrementer = ({ name, incrementUntil }: ScrapeConfig) => {
   }
 }
 
-export default incrementer
+export { incrementer }

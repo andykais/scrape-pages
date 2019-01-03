@@ -4,7 +4,7 @@ import * as Fetch from 'node-fetch'
 // type imports
 import { makeFlatConfig } from './configuration/site-traversal/make-flat-config'
 import { Config } from './configuration/site-traversal/types'
-import Store from './store'
+import { Store } from './store'
 
 class ScraperEmitter {
   private emitter: EventEmitter
@@ -80,4 +80,4 @@ class Emitter {
     this.emitter.on('stop', cb)
   }
 }
-export default Emitter
+export { Emitter }

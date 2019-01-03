@@ -3,7 +3,7 @@ import * as ops from 'rxjs/operators'
 import VError from 'verror'
 import { downloaderClassFactory } from './downloader'
 import { parserClassFactory } from './parser'
-import incrementer from './incrementer'
+import { incrementer } from './incrementer'
 // type imports
 import { ScrapeConfig } from '../../configuration/site-traversal/types'
 import { FlatRunOptions } from '../../configuration/run-options/types'
@@ -18,10 +18,10 @@ type InputValue = {
 export type ParsedValue = InputValue | ParsedValueWithId
 
 // init setup
-const scraper = (config: ScrapeConfig) => {
+const scraperStep = (config: ScrapeConfig) => {
   const getIncrementObservable = incrementer(config)
   const childrenSetup = config.scrapeEach.map(scrapeConfig =>
-    scraper(scrapeConfig)
+    scraperStep(scrapeConfig)
   )
 
   // run setup
@@ -36,7 +36,7 @@ const scraper = (config: ScrapeConfig) => {
       child(flatRunParams, dependencies)
     )
     const scrapeNextChild = config.scrapeNext
-      ? scraper(config.scrapeNext)(flatRunParams, dependencies)
+      ? scraperStep(config.scrapeNext)(flatRunParams, dependencies)
       : (parentValues: ParsedValue[]) => Rx.empty()
 
     const downloadParseFunction: DownloadParseFunction = async (
@@ -100,4 +100,4 @@ const scraper = (config: ScrapeConfig) => {
       )
   }
 }
-export default scraper
+export { scraperStep }

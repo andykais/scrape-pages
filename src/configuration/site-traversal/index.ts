@@ -1,4 +1,4 @@
-export { default as normalizeConfig } from './normalize'
+export { normalizeConfig } from './normalize'
 
 export { makeFlatConfig } from './make-flat-config'
 

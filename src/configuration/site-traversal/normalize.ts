@@ -92,4 +92,4 @@ const normalizeConfig = (config: ConfigInit): Config => {
     scrape: fullConfig
   }
 }
-export default normalizeConfig
+export { normalizeConfig }

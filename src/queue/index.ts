@@ -10,7 +10,7 @@ import { PriorityQueue } from './priority-queue'
 import { Task } from '../util/rxjs/operators/conditional-rate-limiter'
 
 type ErrorCallback = (error: Error, value: any) => void
-class Queuer {
+class Queue {
   private isOpen: boolean
   private enqueueSubject: Rx.Subject<any>
   // private taskObservable: Rx.Observable<{}>
@@ -86,4 +86,4 @@ class Queuer {
     return this.queuePromise
   }
 }
-export default Queuer
+export { Queue }
