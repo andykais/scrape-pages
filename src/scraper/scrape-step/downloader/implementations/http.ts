@@ -3,7 +3,7 @@ import { createWriteStream } from 'fs'
 import path from 'path'
 import { readFile, exists, mkdirp, sanitizeFilename } from '../../../../util/fs'
 
-import { AbstractDownloader, DownloadParams } from './abstract'
+import { AbstractDownloader, DownloadParams } from '../abstract'
 import { compileTemplate } from '../../../../util/handlebars'
 // type imports
 import { URL } from 'url'

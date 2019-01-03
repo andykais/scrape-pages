@@ -1,4 +1,4 @@
-import { AbstractDownloader, DownloadParams } from './abstract'
+import { AbstractDownloader, DownloadParams } from '../abstract'
 
 type DownloadData = string
 /**

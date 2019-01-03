@@ -2,7 +2,7 @@ import * as Rx from 'rxjs'
 import * as ops from 'rxjs/operators'
 import VError from 'verror'
 import { downloaderClassFactory } from './downloader'
-import setParserConfig from './parser'
+import { parserClassFactory } from './parser'
 import incrementer from './incrementer'
 // type imports
 import { ScrapeConfig } from '../../configuration/site-traversal/types'
@@ -19,8 +19,6 @@ export type ParsedValue = InputValue | ParsedValueWithId
 
 // init setup
 const scraper = (config: ScrapeConfig) => {
-  // const setDownloaderOptions = setDownloaderConfig(config)
-  const setParserOptions = setParserConfig(config)
   const getIncrementObservable = incrementer(config)
   const childrenSetup = config.scrapeEach.map(scrapeConfig =>
     scraper(scrapeConfig)
@@ -30,8 +28,7 @@ const scraper = (config: ScrapeConfig) => {
   return (flatRunParams: FlatRunOptions, dependencies: Dependencies) => {
     const runParams = flatRunParams[config.name]
     const downloader = downloaderClassFactory(config, runParams, dependencies)
-    // const downloader = setDownloaderOptions(runParams, dependencies)
-    const parser = setParserOptions()
+    const parser = parserClassFactory(config, runParams, dependencies)
 
     const { queue, store, emitter, logger } = dependencies
     const scraperLogger = logger.scraper(config.name)
@@ -63,7 +60,7 @@ const scraper = (config: ScrapeConfig) => {
           parentId,
           value
         })
-        const parsedValues = parser(downloadValue)
+        const parsedValues = parser.run(downloadValue)
 
         const parsedValuesWithId = store.asTransaction(() => {
           store.qs.updateDownloadToComplete({ downloadId, filename })

@@ -1,6 +1,6 @@
-import { ScrapeConfig } from '../../../../configuration/site-traversal/types'
-import { RunOptions } from '../../../../configuration/run-options/types'
-import { Dependencies } from '../../../types'
+import { ScrapeConfig } from '../../../configuration/site-traversal/types'
+import { RunOptions } from '../../../configuration/run-options/types'
+import { Dependencies } from '../../types'
 
 export type DownloadParams = {
   parentId?: number

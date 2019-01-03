@@ -10,6 +10,7 @@ export const downloaderClassFactory = (
   runParams: RunOptions,
   dependencies: Dependencies
 ) => {
+  // TODO use type guards
   if (config.download)
     return new HttpDownloader(config, runParams, dependencies)
   else return new IdentityDownloader(config, runParams, dependencies)
