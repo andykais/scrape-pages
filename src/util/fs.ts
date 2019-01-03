@@ -29,15 +29,21 @@ export const mkdirp = async (folder: string) => {
 }
 
 export const rmrf = async (folder: string) => {
-  const files = await readdir(folder)
-  for (const file of files) {
-    const fullPath = path.resolve(folder, file)
-    const fileStats = await stat(fullPath)
-    if (fileStats.isDirectory()) {
-      await rmrf(fullPath)
-      await rmdir(fullPath)
-    } else {
-      await unlink(fullPath)
+  try {
+    const files = await readdir(folder)
+    for (const file of files) {
+      const fullPath = path.resolve(folder, file)
+      const fileStats = await stat(fullPath)
+      if (fileStats.isDirectory()) {
+        await rmrf(fullPath)
+        await rmdir(fullPath)
+      } else {
+        await unlink(fullPath)
+      }
+    }
+  } catch (e) {
+    if (e.code !== 'ENOENT') {
+      throw e
     }
   }
 }
