@@ -36,8 +36,8 @@ const makeDynamicOrderLevelColumn = (
           }
         }
       }
-      ancestors[min.name] = ancestors[min.name] || []
-      ancestors[min.name].push(current)
+      ancestors[min!.name] = ancestors[min!.name] || []
+      ancestors[min!.name].push(current)
     }
 
     const diagonalOrderColumn = Object.keys(ancestors)

@@ -12,12 +12,16 @@ const assertValidInput = (config: Config, runParams: RunOptionsInit) => {
     const missingKeys = runParamsInputKeys
       .filter(key => !configInputKeys.includes(key))
       .join()
-    throw new Error(`Invalid input! Options has extra key(s) [${missingKeys}]`)
-  } else if (configInputKeys.length > runParamsInputKeys.length) {
+    throw new RangeError(
+      `Invalid input! Options has extra key(s) [${missingKeys}]`
+    )
+  } else if (!configInputKeys.every(key => runParamsInputKeys.includes(key))) {
     const missingKeys = configInputKeys
       .filter(key => !runParamsInputKeys.includes(key))
       .join()
-    throw new Error(`Invalid input! Config is missing key(s) [${missingKeys}]`)
+    throw new Error(
+      `Invalid input! Options is missing keys(s) [${missingKeys}]`
+    )
   }
 }
 

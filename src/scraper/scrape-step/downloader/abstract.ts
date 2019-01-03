@@ -6,7 +6,7 @@ export type DownloadParams = {
   parentId?: number
   scrapeNextIndex: number
   incrementIndex: number
-  value: string
+  value?: string
 }
 type RetrieveValue = { downloadValue?: string; filename?: string }
 /**
@@ -30,15 +30,18 @@ export abstract class AbstractDownloader<DownloadData> {
     const downloadId = this.deps.store.qs.insertQueuedDownload(
       this.config.name,
       downloadParams,
-      this.insertDownloadData ? downloadData : undefined
+      downloadData
     )
-    // this.logger.queuedDownload(downloadId)
     const { downloadValue, filename } = await this.retrieve(
       downloadId,
       downloadData
     )
 
-    return { downloadId, downloadValue, filename }
+    return {
+      downloadId,
+      downloadValue: downloadData ? downloadValue : downloadParams.value,
+      filename
+    }
   }
   // implement these methods
   protected abstract constructDownload(

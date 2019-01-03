@@ -28,6 +28,7 @@ interface DownloadConfigInterface {
 export type DownloadConfigInit = UrlTemplate | DownloadConfigInterface
 export interface DownloadConfig extends DownloadConfigInterface {
   method: UrlMethods
+  headerTemplates: { [HeaderName: string]: string }
 }
 // }}}
 
@@ -73,6 +74,7 @@ export interface ScrapeConfig {
 }
 
 export interface Config extends ConfigInit {
+  input: Input[]
   scrape: ScrapeConfig
 }
 

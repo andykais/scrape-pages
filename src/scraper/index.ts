@@ -53,7 +53,7 @@ class ScrapePages {
   }
 
   // TODO add parsable input for this first parse step
-  initDependencies = (runParams: RunOptionsInit, logOptions: LogOptions) => {
+  initDependencies = (runParams: RunOptionsInit, logOptions?: LogOptions) => {
     const flatRunParams = normalizeOptions(this.config, runParams)
 
     this.store = new Store(this.config)

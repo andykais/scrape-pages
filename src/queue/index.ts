@@ -9,7 +9,7 @@ import {
 import { PriorityQueue } from './priority-queue'
 import { Task } from '../util/rxjs/operators/conditional-rate-limiter'
 
-type ErrorCallback = (error: Error, value: any) => void
+type ErrorCallback = (error?: Error, value?: any) => void
 class Queue {
   private isOpen: boolean
   private enqueueSubject: Rx.Subject<any>
@@ -53,13 +53,16 @@ class Queue {
 
   private executor = <T>(): Promise<T> => {
     const taskWithCallback = this.queue.pop()
+    if (!taskWithCallback) {
+      throw new TypeError('queue popped an undefined task.')
+    }
     return taskWithCallback()
   }
 
   private wrapTask = (task: Task, callback: ErrorCallback): Task => () =>
     task()
-      .then(value => callback(null, value))
-      .catch(error => callback(error, null))
+      .then(value => callback(undefined, value))
+      .catch(error => callback(error, undefined))
 
   // returns a promise that resolves or rejects according to the promise passed in
   add = <T>(task: () => Promise<T>, priority: number): Promise<T> => {

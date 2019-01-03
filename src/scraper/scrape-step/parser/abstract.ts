@@ -19,8 +19,8 @@ export abstract class AbstractParser {
   ) {
     Object.assign(this, { config, runParams, deps, ...config.parse })
   }
-  public run = (value: string) => {
-    return this.parse(value)
+  public run = (value?: string) => {
+    return value ? this.parse(value) : []
   }
   protected abstract parse: (value: string) => string[]
 }

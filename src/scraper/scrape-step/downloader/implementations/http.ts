@@ -45,9 +45,9 @@ export class Downloader extends AbstractDownloader<DownloadData> {
   ) {
     super(config, runParams, deps)
     // set templates
-    this.urlTemplate = compileTemplate(config.download.urlTemplate)
+    this.urlTemplate = compileTemplate(config.download!.urlTemplate)
     this.headerTemplates = new Map()
-    Object.entries(config.download.headerTemplates).forEach(
+    Object.entries(config.download!.headerTemplates).forEach(
       ([key, templateStr]) =>
         this.headerTemplates.set(key, compileTemplate(templateStr))
     )
@@ -77,7 +77,7 @@ export class Downloader extends AbstractDownloader<DownloadData> {
     for (const [key, template] of this.headerTemplates) {
       headers[key] = template(templateVals)
     }
-    return [url, { headers, method: this.config.download.method }]
+    return [url, { headers, method: this.config.download!.method }]
   }
 
   protected retrieve = (downloadId: number, downloadData: DownloadData) => {
@@ -147,7 +147,7 @@ export class Downloader extends AbstractDownloader<DownloadData> {
       dest.on('close', resolve)
     })
     return {
-      downloadValue: null,
+      downloadValue: undefined,
       filename
     }
   }

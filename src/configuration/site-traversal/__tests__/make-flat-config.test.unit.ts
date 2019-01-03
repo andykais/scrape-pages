@@ -11,7 +11,7 @@ describe('config recurser', () => {
       depth: 0,
       horizontalIndex: 0,
       name: 'gallery',
-      parentName: null
+      parentName: undefined
     },
     post: {
       depth: 1,

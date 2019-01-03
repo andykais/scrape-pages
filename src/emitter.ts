@@ -23,7 +23,9 @@ class ScraperEmitter {
   public emitProgress = (id: number, response: Fetch.Response) => {
     const emitKey = `${this.name}:progress`
     if (this.emitter.listenerCount(emitKey)) {
-      const contentLength = parseInt(response.headers.get('content-length'))
+      const contentLength = parseInt(
+        response.headers.get('content-length') || '0'
+      )
       let bytesLength = 0
       response.body.on('data', chunk => {
         bytesLength += chunk.length

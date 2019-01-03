@@ -53,3 +53,7 @@ export const __GALLERY_POST_IMG_TAG__: ConfigInit = {
     }
   }
 }
+
+export const __EMPTY_CONFIG__: ConfigInit = {
+  scrape: {}
+}

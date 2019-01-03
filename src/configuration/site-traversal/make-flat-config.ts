@@ -3,7 +3,7 @@ import { Config, FlatConfig } from './types'
 const makeFlatConfig = (fullConfig: Config): FlatConfig => {
   const recurse = (
     config: Config['scrape'],
-    parentName: string = null,
+    parentName?: string,
     depth = 0,
     horizontalIndex = 0
   ): FlatConfig => {

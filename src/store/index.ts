@@ -47,9 +47,9 @@ class Store {
     const matchingScrapers = scrapers.filter(s => this.flatConfig[s])
     if (!matchingScrapers.length) return [{}]
 
-    const matchingAll = Array.from(new Set(scrapers.concat(groupBy))).filter(
-      s => this.flatConfig[s]
-    )
+    const matchingAll = Array.from(
+      new Set(scrapers.concat(groupBy === undefined ? [] : groupBy))
+    ).filter(s => this.flatConfig[s])
     // const matchingAll = Array.from(
     // new Set(scraperNames.concat(groupBy))
     // ).filter(s => this.flatConfig[s])
@@ -108,7 +108,7 @@ class Store {
       result,
       'scraper',
       groupBy,
-      scrapers.includes(groupBy),
+      groupBy !== undefined && scrapers.includes(groupBy),
       selector => selector
       // selector => objectPicker(selector, scrapers[selector.scraper])
     )

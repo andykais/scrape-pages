@@ -1,6 +1,7 @@
 import * as Rx from 'rxjs'
 import * as ops from 'rxjs/operators'
 
+// TODO replace any with T
 export type Task = () => Promise<any>
 export interface Queue<T> {
   push: Function
@@ -69,14 +70,14 @@ const rateLimitToggle = <V>(
         )
         .subscribe(val => {
           inProgressExecutions--
-          concurrentLimiter.next(null)
+          concurrentLimiter.next(false)
           subscriber.next(val)
         })
 
       source.subscribe({
         next(val) {
           plannedExecutions++
-          concurrentLimiter.next(null)
+          concurrentLimiter.next(false)
         },
         complete() {
           closed = true

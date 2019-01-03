@@ -10,16 +10,19 @@ import {
 import { assertConfigType } from './runtime/assert'
 const runtimeAssertConfig: any = assertConfigType
 
-const downloadDefaults: Partial<DownloadConfig> = {
+const downloadDefaults: {
+  headerTemplates: DownloadConfig['headerTemplates']
+  method: DownloadConfig['method']
+} = {
   method: 'GET',
   headerTemplates: {}
 }
+// TODO use type guards
 const assignDownloadDefaults = (download: DownloadConfigInit): DownloadConfig =>
   typeof download === 'string'
     ? {
         ...downloadDefaults,
-        urlTemplate: download,
-        method: downloadDefaults.method
+        urlTemplate: download
       }
     : {
         ...downloadDefaults,
@@ -27,7 +30,10 @@ const assignDownloadDefaults = (download: DownloadConfigInit): DownloadConfig =>
         method: download.method || downloadDefaults.method
       }
 
-const parseDefaults: Partial<ParseConfig> = {
+const parseDefaults: {
+  expect: ParseConfig['expect']
+  attribute: ParseConfig['attribute']
+} = {
   expect: 'html',
   attribute: undefined
 }
@@ -35,8 +41,7 @@ const assignParseDefaults = (parse: ParseConfigInit): ParseConfig =>
   typeof parse === 'string'
     ? {
         ...parseDefaults,
-        selector: parse,
-        expect: parseDefaults.expect
+        selector: parse
       }
     : {
         ...parseDefaults,
@@ -48,8 +53,6 @@ const fillInDefaultsRecurse = (level = 0, parentName = '') => (
   scrapeConfig: ScrapeConfigInit,
   index = 0
 ): Config['scrape'] => {
-  if (!scrapeConfig) return undefined
-
   const {
     name,
     download,
@@ -65,10 +68,12 @@ const fillInDefaultsRecurse = (level = 0, parentName = '') => (
 
   return {
     name: name || internalName,
-    download: download && assignDownloadDefaults(download),
-    parse: parse && assignParseDefaults(parse),
+    download:
+      download === undefined ? undefined : assignDownloadDefaults(download),
+    parse: parse === undefined ? undefined : assignParseDefaults(parse),
     incrementUntil: incrementUntil || 0,
-    scrapeNext: fillInDefaultsRecurse(level + 1, parentName)(scrapeNext),
+    scrapeNext:
+      scrapeNext && fillInDefaultsRecurse(level + 1, parentName)(scrapeNext),
     scrapeEach: Array.isArray(scrapeEach)
       ? scrapeEach.map(fillInDefaultsRecurse(level + 1, parentName))
       : [fillInDefaultsRecurse(level + 1)(scrapeEach)]

@@ -13,26 +13,36 @@ import {
  */
 export const findLowestCommonParent = (
   flatConfig: FlatConfig,
-  level1: ConfigPositionInfo,
-  level2: ConfigPositionInfo
+  scraperA: ConfigPositionInfo,
+  scraperB: ConfigPositionInfo
 ): FlatConfig['name'] => {
-  if (level1.parentName === null) return level1
-  if (level2.parentName === null) return level2
+  if (scraperA.parentName === null) return scraperA
+  if (scraperB.parentName === null) return scraperB
   const recurse = (
-    level1?: ConfigPositionInfo,
-    level2?: ConfigPositionInfo
-  ): ConfigPositionInfo => {
-    const level1Parent = flatConfig[level1.parentName]
-    const level2Parent = flatConfig[level2.parentName]
-    if (level1 === level2) return level1
-    if (!level1 || !level2 || !level1Parent || !level2Parent) return null
+    scraperA?: ConfigPositionInfo,
+    scraperB?: ConfigPositionInfo
+  ): Voidable<ConfigPositionInfo> => {
+    if (scraperA === scraperB) return scraperA
+    if (
+      scraperA === undefined ||
+      scraperB === undefined ||
+      scraperA.parentName === undefined ||
+      scraperB.parentName === undefined
+    )
+      return
 
-    const commonParent1 = recurse(level1Parent, level2)
+    const scraperAParent = flatConfig[scraperA.parentName]
+    const scraperBParent = flatConfig[scraperB.parentName]
+    if (!scraperAParent || !scraperBParent) return
+
+    const commonParent1 = recurse(scraperAParent, scraperB)
     if (commonParent1) return commonParent1
 
-    const commonParent2 = recurse(level1, level2Parent)
+    const commonParent2 = recurse(scraperA, scraperBParent)
     if (commonParent2) return commonParent2
   }
   // make sure the level lower on the tree is second
-  return recurse(...[level1, level2].sort((a, b) => b.depth - a.depth))
+  return (
+    recurse(...[scraperA, scraperB].sort((a, b) => b.depth - a.depth)) || scraperA
+  )
 }

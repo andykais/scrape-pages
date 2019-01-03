@@ -56,11 +56,11 @@ class Logger {
   public error: (...args: any[]) => void
   public tap: (...args: any[]) => void
 
-  public constructor(
-    { logLevel, logScrapers = [], logFile }: LogOptions = {
-      logLevel: 'ERROR'
-    }
-  ) {
+  public constructor({
+    logLevel = 'ERROR',
+    logScrapers = [],
+    logFile
+  }: LogOptions = {}) {
     this.permittedScrapers = logScrapers
     this.permittedLogLevel = logLevel
     // setup loggers

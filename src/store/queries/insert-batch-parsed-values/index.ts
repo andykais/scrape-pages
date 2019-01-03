@@ -4,7 +4,7 @@ import { CreateQuery } from '../../types'
 type Statement = (
   params: {
     name: string
-    parentId: number
+    parentId?: number
     downloadId: number
     parsedValues: string[]
   }
