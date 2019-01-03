@@ -22,6 +22,7 @@ class ScraperLogger {
   private isPermitted: boolean
 
   private log = (...messages: any[]) => {
+    /* eslint-disable-next-line no-console */
     console.log(`scraper "${this.name}:"`, ...messages)
   }
   private assignIfPermitted = <T extends Function>(func: T) => {
@@ -68,6 +69,7 @@ class Logger {
 
   // TODO handle logFile outputs
   private output = (prefix: string) => (...args: any[]) => {
+    /* eslint-disable-next-line no-console */
     console.log(prefix, ...args)
   }
 
@@ -89,7 +91,7 @@ class Logger {
   public debug = this.output('DEBUG')
   public info = this.output('INFO')
   public warn = this.output('WARN')
-  public error = console.error
+  public error = this.output('ERROR')
   public tap = (name = 'TAP') => tap(this.output(name))
 
   public scraper = (name: string) => {

@@ -1,7 +1,7 @@
 import fetch, * as Fetch from 'node-fetch'
 import { createWriteStream } from 'fs'
 import path from 'path'
-import { readFile, exists, mkdirp, sanitizeFilename } from '../../../../util/fs'
+import { mkdirp, sanitizeFilename } from '../../../../util/fs'
 
 import { AbstractDownloader, DownloadParams } from '../abstract'
 import { compileTemplate } from '../../../../util/handlebars'
@@ -134,7 +134,7 @@ export class Downloader extends AbstractDownloader<DownloadData> {
       this.runParams.downloadPriority
     )
     await mkdirp(downloadFolder)
-    const buffer = await new Promise((resolve, reject) => {
+    await new Promise((resolve, reject) => {
       this.verifyResponseOk(response, url)
       const dest = createWriteStream(filename)
       response.body.pipe(dest)

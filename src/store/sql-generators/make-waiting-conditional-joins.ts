@@ -1,7 +1,5 @@
 // type imports
-import {
-  FlatConfig,
-} from '../../configuration/site-traversal/types'
+import { FlatConfig } from '../../configuration/site-traversal/types'
 
 const makeWaitingConditionalJoins = (
   flatConfig: FlatConfig,

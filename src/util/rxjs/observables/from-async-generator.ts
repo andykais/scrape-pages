@@ -1,5 +1,4 @@
 import * as Rx from 'rxjs'
-import * as ops from 'rxjs/operators'
 
 const translateAsyncGeneratorToObservable = async (
   generator: () => AsyncIterableIterator<any>,

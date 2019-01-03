@@ -1,4 +1,3 @@
-import EventEmitter from 'events'
 import * as Rx from 'rxjs'
 import * as ops from 'rxjs/operators'
 import { rateLimitToggle } from '../util/rxjs/operators'

@@ -30,19 +30,18 @@ const scraperStep = (config: ScrapeConfig) => {
     const downloader = downloaderClassFactory(config, runParams, dependencies)
     const parser = parserClassFactory(config, runParams, dependencies)
 
-    const { queue, store, emitter, logger } = dependencies
+    const { store, emitter, logger } = dependencies
     const scraperLogger = logger.scraper(config.name)
     const children = childrenSetup.map(child =>
       child(flatRunParams, dependencies)
     )
     const scrapeNextChild = config.scrapeNext
       ? scraperStep(config.scrapeNext)(flatRunParams, dependencies)
-      : (parentValues: ParsedValue[]) => Rx.empty()
+      : () => Rx.empty()
 
     const downloadParseFunction: DownloadParseFunction = async (
       { parsedValue: value, id: parentId },
-      incrementIndex,
-      scrapeNextIndex = 0
+      incrementIndex
     ) => {
       const { id: downloadId } = store.qs.selectCompletedDownload({
         incrementIndex,
@@ -56,7 +55,6 @@ const scraperStep = (config: ScrapeConfig) => {
       } else {
         const { downloadValue, downloadId, filename } = await downloader.run({
           incrementIndex,
-          scrapeNextIndex: 0,
           parentId,
           value
         })

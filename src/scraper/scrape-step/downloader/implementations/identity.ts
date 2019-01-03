@@ -1,4 +1,4 @@
-import { AbstractDownloader, DownloadParams } from '../abstract'
+import { AbstractDownloader } from '../abstract'
 
 type DownloadData = void
 /**
@@ -7,9 +7,9 @@ type DownloadData = void
 export class Downloader extends AbstractDownloader<DownloadData> {
   protected insertDownloadData = false
 
-  protected constructDownload = ({ value }: DownloadParams): DownloadData => {}
+  protected constructDownload = (): DownloadData => {}
 
-  protected retrieve = (downloadId: number, downloadData: DownloadData) => ({
+  protected retrieve = () => ({
     downloadValue: undefined,
     filename: undefined
   })

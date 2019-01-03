@@ -1,19 +1,22 @@
 import * as Rx from 'rxjs'
 import * as ops from 'rxjs/operators'
-import { fromAsyncGenerator } from '../../../util/rxjs/observables'
 import { ScrapeConfig } from '../../../configuration/site-traversal/types'
 import { ParsedValue } from '../'
 import { whileLoopObservable } from '../../../util/rxjs/observables/while-loop'
 
-const incrementUntilEmptyParse = (
+type OkToIncrementWhileLoop = (
   parsedValues: ParsedValue[],
   incrementIndex: number
+) => boolean
+
+const incrementUntilEmptyParse: OkToIncrementWhileLoop = (
+  parsedValues
 ): boolean => !!parsedValues.length
 
-const incrementUntilNumericIndex = (incrementUntil: number) => (
-  parsedValues: ParsedValue[],
-  incrementIndex: number
-): boolean => incrementUntil >= incrementIndex
+const incrementUntilNumericIndex = (
+  incrementUntil: number
+): OkToIncrementWhileLoop => (parsedValues, incrementIndex): boolean =>
+  incrementUntil >= incrementIndex
 
 const incrementAlways = () => true
 
@@ -25,8 +28,7 @@ const throwAnyError = (e: Error) => Rx.throwError(e)
 
 export type DownloadParseFunction = (
   parsedValueWithId: ParsedValue,
-  incrementIndex: number,
-  scrapeNextIndex?: number
+  incrementIndex: number
 ) => Promise<ParsedValue[]>
 
 type StatefulVars = {
@@ -35,15 +37,8 @@ type StatefulVars = {
   nextPromises: Promise<{}>[]
 }
 
-const incrementer = ({ name, incrementUntil }: ScrapeConfig) => {
-  const okToIncrementWhileLoop =
-    incrementUntil === 'empty-parse'
-      ? incrementUntilEmptyParse
-      : incrementUntil === 'failed-download'
-        ? incrementAlways // failed download is handled in the try catch
-        : incrementUntilNumericIndex(incrementUntil)
-
-  const okToIncrementScrapeNext =
+const incrementer = ({ incrementUntil }: ScrapeConfig) => {
+  const okToIncrementWhileLoop: OkToIncrementWhileLoop =
     incrementUntil === 'empty-parse'
       ? incrementUntilEmptyParse
       : incrementUntil === 'failed-download'
@@ -70,14 +65,9 @@ const incrementer = ({ name, incrementUntil }: ScrapeConfig) => {
           Rx.of(parsedValues).pipe(
             ops.expand(parsedValues =>
               scrapeNextChild(parsedValues).pipe(
-                ops.flatMap((parsedValues, scrapeNextIndex) =>
-                  // TODO get proper scrape next index for asyncFunction
+                ops.flatMap(parsedValues =>
                   parsedValues.map(parsedValue =>
-                    asyncFunction(
-                      parsedValue,
-                      incrementIndex,
-                      scrapeNextIndex + 1
-                    )
+                    asyncFunction(parsedValue, incrementIndex)
                   )
                 ),
                 ops.mergeAll(),

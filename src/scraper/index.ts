@@ -5,17 +5,15 @@ import { Store } from '../store'
 import { Logger, LogOptions } from '../logger'
 import { Queue } from '../queue'
 import { scraperStep } from './scrape-step'
-import { mkdirp, mkdir, rmrf } from '../util/fs'
+import { mkdirp, rmrf } from '../util/fs'
 import { normalizeConfig } from '../configuration/site-traversal'
 import { normalizeOptions } from '../configuration/run-options'
 // type imports
-import { LogType } from '../logger'
 import { Config, ConfigInit } from '../configuration/site-traversal/types'
 import {
   RunOptionsInit,
   FlatRunOptions
 } from '../configuration/run-options/types'
-import { Dependencies } from './types'
 
 class ScrapePages {
   config: Config
