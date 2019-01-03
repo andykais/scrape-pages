@@ -21,40 +21,48 @@ class ScraperLogger {
   private name: string
   private isPermitted: boolean
 
-  private logIfPermitted = <T extends Function>(func: T) => {
+  private log = (...messages: any[]) => {
+    console.log(`scraper "${this.name}:"`, ...messages)
+  }
+  private assignIfPermitted = <T extends Function>(func: T) => {
     type FunctionArguments = ArgumentTypes<typeof func>
     return (...args: FunctionArguments) => {
-      if (this.isPermitted) {
-        console.log(`scraper "${this.name}":`, ...func(...args))
-      }
+      func(...args)
     }
   }
   public constructor(name: string, isPermitted: boolean) {
     Object.assign(this, { name, isPermitted })
+    this.cachedValues = this.assignIfPermitted(this.cachedValues)
+    this.newValues = this.assignIfPermitted(this.newValues)
   }
-  public cachedValues = this.logIfPermitted(
-    (downloadId: number, parsedValuesWithId: ParsedValue[]) => [
+  public cachedValues = (
+    downloadId: number,
+    parsedValuesWithId: ParsedValue[]
+  ) =>
+    this.log(
       `id:${downloadId} retrieved values`,
       parsedValuesWithId.map(v => v.parsedValue)
-    ]
-  )
-  public newValues = this.logIfPermitted(
-    (downloadId: number, parsedValuesWithId: ParsedValue[]) => [
+    )
+  public newValues = (downloadId: number, parsedValuesWithId: ParsedValue[]) =>
+    this.log(
       `id:${downloadId} inserted values`,
       parsedValuesWithId.map(v => v.parsedValue)
-    ]
-  )
+    )
 }
 
 class Logger {
   private permittedLogLevel: LogType
   private permittedScrapers: string[]
 
-  public debug: (...args: any[]) => void
-  public info: (...args: any[]) => void
-  public warn: (...args: any[]) => void
-  public error: (...args: any[]) => void
-  public tap: (...args: any[]) => void
+  private isPermitted = (logLevel: LogType): boolean =>
+    logLevelConstants[logLevel] <= logLevelConstants[this.permittedLogLevel]
+  private assignIfPermitted = <T extends Function>(
+    logger: T,
+    logType: LogType
+  ) => (this.isPermitted(logType) ? logger : () => {})
+
+  // TODO handle logFile outputs
+  private output = (prefix: string) => console.log
 
   public constructor({
     logLevel = 'ERROR',
@@ -64,27 +72,17 @@ class Logger {
     this.permittedScrapers = logScrapers
     this.permittedLogLevel = logLevel
     // setup loggers
-    this.debug = this.isPermitted('DEBUG') ? this._log('DEBUG') : () => {}
-    this.info = this.isPermitted('INFO') ? this._log() : () => {}
-    this.warn = this.isPermitted('WARN') ? this._log('WARN') : () => {}
-    this.error = this.isPermitted('ERROR')
-      ? this._log('ERRO', console.error)
-      : () => {}
-    this.tap = this.isPermitted('DEBUG')
-      ? (name = 'TAP') => tap(this._log(name))
-      : () => tap
+    this.debug = this.assignIfPermitted(this.debug, 'DEBUG')
+    this.info = this.assignIfPermitted(this.info, 'INFO')
+    this.warn = this.assignIfPermitted(this.warn, 'WARN')
+    this.error = this.assignIfPermitted(this.error, 'ERROR')
+    this.tap = this.isPermitted('DEBUG') ? this.tap : () => tap()
   }
-  private isPermitted = (logLevel: LogType): boolean =>
-    logLevelConstants[logLevel] <= logLevelConstants[this.permittedLogLevel]
-
-  private _log = (prefix?: string, logger = console.log) =>
-    prefix
-      ? (...messages: any[]) => {
-          logger(prefix, ...messages)
-        }
-      : (...messages: any[]) => {
-          logger(...messages)
-        }
+  public debug = this.output('DEBUG')
+  public info = this.output('INFO')
+  public warn = this.output('WARN')
+  public error = console.error
+  public tap = (name = 'TAP') => tap(this.output(name))
 
   public scraper = (name: string) => {
     const scraperIsPermitted = this.permittedScrapers.includes(name)

@@ -9,10 +9,7 @@ export class Downloader extends AbstractDownloader<DownloadData> {
 
   protected constructDownload = ({ value }: DownloadParams): DownloadData => {}
 
-  protected retrieve = (
-    downloadId: number,
-    downloadData: DownloadData
-  )  => ({
+  protected retrieve = (downloadId: number, downloadData: DownloadData) => ({
     downloadValue: undefined,
     filename: undefined
   })

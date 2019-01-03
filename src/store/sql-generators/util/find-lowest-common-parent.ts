@@ -43,6 +43,7 @@ export const findLowestCommonParent = (
   }
   // make sure the level lower on the tree is second
   return (
-    recurse(...[scraperA, scraperB].sort((a, b) => b.depth - a.depth)) || scraperA
+    recurse(...[scraperA, scraperB].sort((a, b) => b.depth - a.depth)) ||
+    scraperA
   )
 }
