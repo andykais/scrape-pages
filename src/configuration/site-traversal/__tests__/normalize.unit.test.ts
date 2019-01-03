@@ -14,7 +14,6 @@ describe('filled in defaults', () => {
         download: {
           method: 'GET',
           urlTemplate: (simpleConfig.scrape as any).download,
-          cookieTemplates: {},
           headerTemplates: {}
           // regexCleanup: undefined
         },
@@ -29,7 +28,6 @@ describe('filled in defaults', () => {
             download: {
               method: 'GET',
               urlTemplate: (simpleConfig.scrape as any).scrapeEach.download,
-              cookieTemplates: {},
               headerTemplates: {}
             },
             parse: undefined,

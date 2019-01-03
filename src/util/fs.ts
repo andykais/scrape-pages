@@ -1,6 +1,7 @@
 import path from 'path'
 import fs from 'fs'
 import { promisify } from 'util'
+import sanitize from 'sanitize-filename'
 
 const [exists, readFile, mkdir, readdir, stat, unlink, rmdir] = [
   fs.readFile,
@@ -40,3 +41,6 @@ export const rmrf = async (folder: string) => {
     }
   }
 }
+
+export const sanitizeFilename = (filename: string) =>
+  sanitize(filename, { replacement: '_' })

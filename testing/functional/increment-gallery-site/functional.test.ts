@@ -45,11 +45,12 @@ describe('increment gallery site', () => {
         .excludingEvery('filename')
         .to.be.deep.equal(expectedQueryResult.map(_.omit('tag')))
     })
-    it('should group tags and images together that were found on the same page', () => {
+    it.only('should group tags and images together that were found on the same page', () => {
       const result = scraperQueryForFunction({
         scrapers: ['image', 'tag'],
         groupBy: 'image-page'
       })
+      console.log(result[0].tag[0], typeof result[0].tag[0].url)
       expect(result)
         .excludingEvery('filename')
         .to.be.deep.equal(expectedQueryResult)

@@ -12,8 +12,7 @@ const runtimeAssertConfig: any = assertConfigType
 
 const downloadDefaults: Partial<DownloadConfig> = {
   method: 'GET',
-  headerTemplates: {},
-  cookieTemplates: {}
+  headerTemplates: {}
 }
 const assignDownloadDefaults = (download: DownloadConfigInit): DownloadConfig =>
   typeof download === 'string'

@@ -73,7 +73,7 @@ const scraper = (config: ScrapeConfig) => {
             downloadId,
             parsedValues
           })
-          emitter.forScraper[config.name].emitCompletedDownload(downloadId)
+          emitter.scraper[config.name].emitCompletedDownload(downloadId)
           return store.qs.selectParsedValues(downloadId)
         })()
 

@@ -18,42 +18,32 @@ export type LogOptions = {
 }
 
 class ScraperLogger {
-  name: string
-  isPermitted: boolean
+  private name: string
+  private isPermitted: boolean
 
-  constructor(name: string, isPermitted: boolean) {
+  private logIfPermitted = <T extends Function>(func: T) => {
+    type FunctionArguments = ArgumentTypes<typeof func>
+    return (...args: FunctionArguments) => {
+      if (this.isPermitted) {
+        console.log(`scraper "${this.name}":`, ...func(...args))
+      }
+    }
+  }
+  public constructor(name: string, isPermitted: boolean) {
     Object.assign(this, { name, isPermitted })
-    if (!isPermitted) this.log = () => {}
   }
-  private log = (...messages: any[]) => {
-    if (this.isPermitted) console.log(`scraper "${this.name}:"`, ...messages)
-  }
-  private ifPermitted = (func: Function) => {
-    if (this.isPermitted) func()
-  }
-
-  public cachedValues = (
-    downloadId: number,
-    parsedValuesWithId: ParsedValue[]
-  ) =>
-    this.ifPermitted(() =>
-      this.log(
-        `id:${downloadId} retrieved values`,
-        parsedValuesWithId.map(v => v.parsedValue)
-      )
-    )
-
-  public newValues = (downloadId: number, parsedValuesWithId: ParsedValue[]) =>
-    this.ifPermitted(() =>
-      this.log(
-        `id:${downloadId} inserted values`,
-        parsedValuesWithId.map(v => v.parsedValue)
-      )
-    )
-
-  // public downloadInProgress = (downloadId: number, response: Fetch.Response) => {
-  // this.emitter.forScraper(this.name).emitProgress()
-  // }
+  public cachedValues = this.logIfPermitted(
+    (downloadId: number, parsedValuesWithId: ParsedValue[]) => [
+      `id:${downloadId} retrieved values`,
+      parsedValuesWithId.map(v => v.parsedValue)
+    ]
+  )
+  public newValues = this.logIfPermitted(
+    (downloadId: number, parsedValuesWithId: ParsedValue[]) => [
+      `id:${downloadId} inserted values`,
+      parsedValuesWithId.map(v => v.parsedValue)
+    ]
+  )
 }
 
 class Logger {
@@ -66,7 +56,7 @@ class Logger {
   public error: (...args: any[]) => void
   public tap: (...args: any[]) => void
 
-  constructor(
+  public constructor(
     { logLevel, logScrapers = [], logFile }: LogOptions = {
       logLevel: 'ERROR'
     }

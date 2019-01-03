@@ -22,7 +22,6 @@ type UrlMethods = 'GET' | 'POST' | 'PUT' | 'DELETE'
 interface DownloadConfigInterface {
   method?: UrlMethods
   urlTemplate: UrlTemplate
-  cookieTemplates?: { [CookieName: string]: string }
   headerTemplates?: { [HeaderName: string]: string }
   regexCleanup?: RegexCleanup
 }

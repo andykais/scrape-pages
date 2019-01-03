@@ -20,12 +20,20 @@ class ScraperEmitter {
     this.emitter.emit(`${this.name}:queued`, this.store.queryFor, { id })
     this.emitter.emit('queued', this.store.queryFor, { name: this.name, id })
   }
-  // public emitProgress = (id: number, response: Fetch.Response) => {}
-  public emitProgress = (id: number, progress: number) => {
-    this.emitter.emit(`${this.name}:progress`, this.store.queryFor, {
-      id,
-      progress
-    })
+  public emitProgress = (id: number, response: Fetch.Response) => {
+    const emitKey = `${this.name}:progress`
+    if (this.emitter.listenerCount(emitKey)) {
+      const contentLength = parseInt(response.headers.get('content-length'))
+      let bytesLength = 0
+      response.body.on('data', chunk => {
+        bytesLength += chunk.length
+        const progress = bytesLength / contentLength
+        this.emitter.emit(emitKey, this.store.queryFor, {
+          id,
+          progress
+        })
+      })
+    }
   }
   public emitCompletedDownload = (id: number) => {
     this.emitter.emit(`${this.name}:complete`, this.store.queryFor, { id })
@@ -36,9 +44,7 @@ class ScraperEmitter {
 class Emitter {
   private store: Store
   public emitter: EventEmitter
-  public forScraper: {
-    [scraper: string]: ScraperEmitter
-  } = {}
+  public scraper: { [scraper: string]: ScraperEmitter } = {}
 
   constructor(config: Config, store: Store) {
     // TODO replace w/ store.queryFor
@@ -47,7 +53,7 @@ class Emitter {
 
     const flatConfig = makeFlatConfig(config)
     for (const name of Object.keys(flatConfig)) {
-      this.forScraper[name] = new ScraperEmitter(name, this.emitter, this.store)
+      this.scraper[name] = new ScraperEmitter(name, this.emitter, this.store)
     }
   }
 
