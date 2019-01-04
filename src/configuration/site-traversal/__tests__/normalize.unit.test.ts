@@ -3,7 +3,7 @@ import * as testingConfigs from '../../../../testing/resources/testing-configs'
 import { ConfigInit } from '../types'
 import { expect } from 'chai'
 
-describe('filled in defaults', () => {
+describe('normalize config with', () => {
   describe('simple config', () => {
     const simpleConfig = testingConfigs.__SIMPLE_CONFIG__
     const fullConfig = normalizeConfig(simpleConfig)
@@ -18,7 +18,8 @@ describe('filled in defaults', () => {
           // regexCleanup: undefined
         },
         parse: {
-          ...(simpleConfig.scrape as any).parse,
+          selector: (simpleConfig.scrape.parse as any).selector,
+          attribute: (simpleConfig.scrape.parse as any).attribute,
           expect: 'html'
         },
         incrementUntil: 0,

@@ -1,4 +1,4 @@
-type Input = { [inputName: string]: number | string | boolean }
+export type Input = { [inputName: string]: number | string | boolean }
 
 interface OptionsAny {
   cache?: boolean
