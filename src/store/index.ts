@@ -3,6 +3,8 @@ import { makeFlatConfig } from '../configuration/site-traversal'
 import { groupBy as groupByKey } from '../util/array'
 import { Config, FlatConfig } from '../configuration/site-traversal/types'
 import { createTables, createStatements } from './queries'
+// type imports
+import { Transaction } from 'better-sqlite3'
 
 class Store {
   private config: Config
@@ -23,15 +25,8 @@ class Store {
     this.qs = createStatements(this.flatConfig, this.database)
   }
 
-  asTransaction = <T>(func: () => T) => (): T => {
-    this.qs.beginTransaction.run()
-    try {
-      const result = func()
-      this.qs.commitTransaction.run()
-      return result
-    } finally {
-      if (this.database.inTransaction) this.qs.rollbackTransaction.run()
-    }
+  transaction = <T>(func: () => T) => (): Transaction => {
+    return this.database.transaction(() => func())
   }
 
   queryFor = ({

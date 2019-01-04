@@ -18,6 +18,6 @@ export const query: CreateQuery<Statement> = (flatConfig, database) => {
       incrementIndex,
       JSON.stringify(downloadData)
     )
-    return info.lastInsertROWID as number
+    return info.lastInsertRowid as number
   }
 }
