@@ -17,8 +17,7 @@ class ScraperEmitter {
     this.name = name
   }
   public emitQueuedDownload = (id: number) => {
-    this.emitter.emit(`${this.name}:queued`, this.store.queryFor, { id })
-    this.emitter.emit('queued', this.store.queryFor, { name: this.name, id })
+    this.emitter.emit(`${this.name}:queued`, this.store.queryFor, id)
   }
   public emitProgress = (id: number, response: Fetch.Response) => {
     const emitKey = `${this.name}:progress`
@@ -30,16 +29,12 @@ class ScraperEmitter {
       response.body.on('data', chunk => {
         bytesLength += chunk.length
         const progress = bytesLength / contentLength
-        this.emitter.emit(emitKey, this.store.queryFor, {
-          id,
-          progress
-        })
+        this.emitter.emit(emitKey, progress, id)
       })
     }
   }
   public emitCompletedDownload = (id: number) => {
-    this.emitter.emit(`${this.name}:complete`, this.store.queryFor, { id })
-    this.emitter.emit('complete', this.store.queryFor, { name: this.name, id })
+    this.emitter.emit(`${this.name}:complete`, this.store.queryFor, id)
   }
 }
 
