@@ -16,7 +16,7 @@ const getConfigInputValues = (config: Config, runParams: RunOptionsInit) => {
   for (const inputKey of configInputKeys) {
     if (initInputs[inputKey] === undefined) {
       const missingKeys = configInputKeys
-        .filter(key => initInputs[inputKey] === undefined)
+        .filter(key => initInputs[key] === undefined)
         .join()
       throw new Error(
         `Invalid input! Options is missing keys(s) [${missingKeys}]`

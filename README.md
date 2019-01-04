@@ -17,7 +17,7 @@ npm install scrape-pages
 
 ## Usage
 
-lets download the five most recent images from nasa's image of the day archive
+lets download the five most recent images from NASA's image of the day archive
 
 ```javascript
 const ScrapePages = require('scrape-pages')
@@ -46,8 +46,11 @@ const config = {
 // load the config into a new 'scraper'
 const siteScraper = new ScrapePages(config)
 // begin scraping
-const emitter = siteScraper.run({ folder: './downloads' })
+const runOptions = { folder: './downloads' }
+const logOptions = { logLevel: 'INFO', logFile: './nasa-download.log' }
+const emitter = siteScraper.run(runOptions, logOptions)
 
+// emits each time an image finishes downloading
 emitter.on('image:complete', (queryFor, { id }) =>
   console.log('COMPLETED image', id)
 )
@@ -66,19 +69,35 @@ For more real world examples, visit the [examples](examples) directory
 
 ## Documentation
 
-Detailed usage documentation is coming, but for now, [typescript](https://www.typescriptlang.org/) typings
-exist for the surface API.
-
-- for scraper config object documentation see [src/configuration/types.ts](src/configuration/types.ts)
-- for runtime options documentation see [src/run-options/types.ts](src/run-options/types.ts)
-
 The scraper instance created from a config object is meant to be reusable and cached. It only knows about the
 config object. `scraper.run` can be called multiple times, and, as long as different folders are
 provided, each run will work independently. `scraper.run` returns **emitter**
 
+### scraper class constructor
+
+| param  | type         | required | type file                                                |
+| ------ | ------------ | -------- | -------------------------------------------------------- |
+| config | `ConfigInit` | Yes      | [src/configuration/types.ts](src/configuration/types.ts) |
+
+### scraper class run method
+
+| param      | type             | required | type file                                            |
+| ---------- | ---------------- | -------- | ---------------------------------------------------- |
+| runOptions | `RunOptionsInit` | Yes      | [src/run-options/types.ts](src/run-options/types.ts) |
+| logOptions | `LogOptions`     | No       | [src/run-options/types.ts](src/run-options/types.ts) |
+
+
 ### emitter
 
+
 #### Listenable events
+| event                  | callback arguments | description                                |
+| ---                    | ---                | ---                                        |
+| `'done'`               | queryFor           | when the scraper has completed             |
+| `'error'`              |                    | if the scraper encounters an error         |
+| `'<scraper>:progress'` |                    | emits progress of download until completed |
+| `'<scraper>:queued'`   |                    | when a download is queued                  |
+| `'<scraper>:complete'` |                    | when a download is completed               |
 
 each event will return the **queryFor** function as its first argument
 

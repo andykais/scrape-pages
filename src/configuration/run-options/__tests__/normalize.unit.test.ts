@@ -17,13 +17,13 @@ describe('normalize run options with', () => {
           cache: true,
           downloadPriority: 0,
           folder: '/nonexistent/level_0_index_0',
-          input: {},
+          input: {}
         },
         level_1_index_0: {
           cache: true,
           downloadPriority: 0,
           folder: '/nonexistent/level_1_index_0',
-          input: {},
+          input: {}
         }
       }
       expect(runOptionsExpected).to.be.deep.equal(runOptions)
@@ -47,7 +47,6 @@ describe('normalize run options with', () => {
         input: { username: 'johnnybravo', password: 'sunglasses' },
         folder: '/nonexistent'
       }
-      const missingInputs = fullConfig.input.join()
       const runOptions = normalizeOptions(fullConfig, runOptionsInit)
       const normalizedInput = runOptions['level_0_index_0'].input
 

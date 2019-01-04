@@ -25,8 +25,8 @@ class Store {
     this.qs = createStatements(this.flatConfig, this.database)
   }
 
-  transaction = <T>(func: () => T) => (): Transaction => {
-    return this.database.transaction(() => func())
+  transaction = <T>(func: () => T): Transaction => {
+    return this.database.transaction(func)
   }
 
   queryFor = ({
