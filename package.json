@@ -21,7 +21,8 @@
     "typecheck:watch": "npm run typecheck -- --watch",
     "test:watch": "mocha-webpack --watch",
     "test:unit": "mocha-webpack **/*.unit.test.ts",
-    "test:functional": "mocha-webpack **/*functional.test.ts"
+    "test:functional": "mocha-webpack **/*functional.test.ts",
+    "test:watch": "mocha-webpack --grep node_modules -i **/*.test.ts --watch"
   },
   "repository": {
     "type": "git",
