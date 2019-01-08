@@ -1,10 +1,11 @@
 {
   "parser": "eslint-plugin-typescript/parser",
-  "plugins": ["typescript"],
+  "plugins": ["typescript", "no-only-tests"],
   "rules": {
     "no-unused-expressions": "error",
     "no-console": "warn",
     "typescript/no-unused-vars": "error",
-    "typescript/explicit-member-accessibility": "error"
+    "typescript/explicit-member-accessibility": "error",
+    "no-only-tests/no-only-tests": "error"
   }
 }

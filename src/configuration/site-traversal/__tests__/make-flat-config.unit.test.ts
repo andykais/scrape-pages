@@ -3,7 +3,7 @@ import { FlatConfig } from '../types'
 import { normalizeConfig, makeFlatConfig } from '../'
 import * as testingConfigs from '../../../../testing/resources/testing-configs'
 
-describe('config recurser', () => {
+describe('make flat config', () => {
   const galleryPostImgTag = testingConfigs.__GALLERY_POST_IMG_TAG__
 
   const flatConfigGuess: FlatConfig = {

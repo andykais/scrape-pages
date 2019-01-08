@@ -60,7 +60,7 @@ const scraperStep = (config: ScrapeConfig) => {
         })
         const parsedValues = parser.run(downloadValue)
 
-        const parsedValuesWithId = store.asTransaction(() => {
+        store.transaction(() => {
           store.qs.updateDownloadToComplete({ downloadId, filename })
           store.qs.insertBatchParsedValues({
             name: config.name,
@@ -69,8 +69,8 @@ const scraperStep = (config: ScrapeConfig) => {
             parsedValues
           })
           emitter.scraper[config.name].emitCompletedDownload(downloadId)
-          return store.qs.selectParsedValues(downloadId)
         })()
+        const parsedValuesWithId = store.qs.selectParsedValues(downloadId)
 
         scraperLogger.newValues(downloadId, parsedValuesWithId)
         return parsedValuesWithId
