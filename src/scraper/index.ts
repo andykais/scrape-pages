@@ -16,21 +16,21 @@ import {
 } from '../configuration/run-options/types'
 
 class ScrapePages {
-  config: Config
-  configuredScraper: ReturnType<typeof scraperStep>
-  scrapingScheme: ReturnType<ReturnType<typeof scraperStep>>
+  private config: Config
+  private configuredScraper: ReturnType<typeof scraperStep>
+  private scrapingScheme: ReturnType<ReturnType<typeof scraperStep>>
   // dependencies
-  store: Store
-  emitter: Emitter
-  logger: Logger
-  queue: Queue
+  private store: Store
+  private emitter: Emitter
+  private logger: Logger
+  private queue: Queue
 
-  constructor(config: ConfigInit) {
+  public constructor(config: ConfigInit) {
     this.config = normalizeConfig(config)
     this.configuredScraper = scraperStep(this.config.scrape)
   }
 
-  initResources = async (
+  private initResources = async (
     runParams: RunOptionsInit,
     flatRunParams: FlatRunOptions
   ) => {
@@ -51,7 +51,7 @@ class ScrapePages {
   }
 
   // TODO add parsable input for this first parse step
-  initDependencies = (runParams: RunOptionsInit, logOptions?: LogOptions) => {
+  private initDependencies = (runParams: RunOptionsInit, logOptions?: LogOptions) => {
     const flatRunParams = normalizeOptions(this.config, runParams)
 
     this.store = new Store(this.config)
@@ -75,7 +75,7 @@ class ScrapePages {
     )
   }
 
-  run = (runParams: RunOptionsInit, logOptions?: LogOptions) => {
+  public run = (runParams: RunOptionsInit, logOptions?: LogOptions) => {
     const scrapingObservable = this.initDependencies(runParams, logOptions)
     const subscription = scrapingObservable.subscribe(
       undefined,
@@ -86,16 +86,18 @@ class ScrapePages {
       },
       () => {
         // TODO add timer to show how long it took
-        this.logger.info('Done!')
         this.queue.closeQueue()
         this.emitter.emitDone()
+        this.logger.info('Done!')
       }
     )
 
     this.emitter.onStop(() => {
+      this.logger.info('Exiting manually.')
       this.queue.closeQueue()
       subscription.unsubscribe()
-      this.logger.info('Exited manually.')
+      this.logger.info('Done!')
+      this.emitter.emitDone()
     })
     return this.emitter.emitter
   }

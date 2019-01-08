@@ -3,7 +3,8 @@
   "plugins": ["typescript"],
   "rules": {
     "no-unused-expressions": "error",
+    "no-console": "warn",
     "typescript/no-unused-vars": "error",
-    "no-console": "warn"
+    "typescript/explicit-member-accessibility": "error"
   }
 }
