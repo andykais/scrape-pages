@@ -39,6 +39,7 @@
     "@babel/preset-typescript": "^7.1.0",
     "@babel/register": "^7.0.0",
     "@types/better-sqlite3": "^5.2.1",
+    "@types/bunyan": "^1.8.5",
     "@types/chai": "^4.1.7",
     "@types/cheerio": "^0.22.9",
     "@types/handlebars": "^4.0.39",
@@ -50,6 +51,7 @@
     "@types/source-map-support": "^0.4.1",
     "@types/verror": "^1.10.3",
     "babel-loader": "^8.0.4",
+    "bunyan": "^1.8.12",
     "chai": "^4.2.0",
     "chai-exclude": "^1.0.12",
     "copy-webpack-plugin": "^4.5.2",
@@ -80,7 +82,6 @@
     "sanitize-filename": "^1.6.1",
     "source-map-support": "^0.5.6",
     "ts-runtime": "^0.2.0",
-    "verror": "^1.10.0",
-    "winston": "^3.1.0"
+    "verror": "^1.10.0"
   }
 }

@@ -1,10 +1,17 @@
 import EventEmitter from 'events'
 import * as Rx from 'rxjs'
 import * as Fetch from 'node-fetch'
+import VError from 'verror'
 // type imports
 import { makeFlatConfig } from './configuration/site-traversal/make-flat-config'
 import { Config } from './configuration/site-traversal/types'
 import { Store } from './store'
+
+const scraperEvents = {
+  DOWNLOAD: 'download',
+  PROGRESS: 'progress',
+  COMPLETE: 'complete'
+}
 
 class ScraperEmitter {
   private emitter: EventEmitter
@@ -38,12 +45,21 @@ class ScraperEmitter {
   }
 }
 
+const events = {
+  // emittable
+  DONE: 'done',
+  ERROR: 'error',
+  // listenable
+  STOP: 'stop',
+  USE_RATE_LIMITER: 'useRateLimiter'
+}
+
 class Emitter {
   private store: Store
   public emitter: EventEmitter
   public scraper: { [scraper: string]: ScraperEmitter } = {}
 
-  constructor(config: Config, store: Store) {
+  public constructor(config: Config, store: Store) {
     // TODO replace w/ store.queryFor
     this.emitter = new EventEmitter()
     this.store = store
@@ -54,8 +70,20 @@ class Emitter {
     }
   }
 
-  hasListenerFor(eventName: string) {
-    return Boolean(this.emitter.listenerCount(eventName))
+  private hasListenerFor = (eventName: string): boolean =>
+    !!this.emitter.listenerCount(eventName)
+
+  emit = {
+    done: () => {
+      this.emitter.emit(events.DONE, this.store.queryFor)
+    },
+    error: (error: Error) => {
+      if (this.hasListenerFor(events.ERROR)) {
+        this.emitter.emit(events.ERROR, VError.fullStack(error))
+      } else {
+        throw error
+      }
+    }
   }
 
   emitDone() {

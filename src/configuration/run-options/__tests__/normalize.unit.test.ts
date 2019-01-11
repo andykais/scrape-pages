@@ -12,20 +12,28 @@ describe('normalize run options with', () => {
         folder: '/nonexistent'
       }
       const runOptions = normalizeOptions(fullConfig, runOptionsInit)
-      const runOptionsExpected: FlatRunOptions = {
-        level_0_index_0: {
-          cache: true,
-          downloadPriority: 0,
-          folder: '/nonexistent/level_0_index_0',
-          input: {}
-        },
-        level_1_index_0: {
-          cache: true,
-          downloadPriority: 0,
-          folder: '/nonexistent/level_1_index_0',
-          input: {}
-        }
-      }
+      const runOptionsExpected: FlatRunOptions = new Map([
+        [
+          'level_0_index_0',
+          {
+            cache: true,
+            logLevel: 'error' as 'error',
+            downloadPriority: 0,
+            folder: '/nonexistent/level_0_index_0',
+            input: {}
+          }
+        ],
+        [
+          'level_1_index_0',
+          {
+            cache: true,
+            logLevel: 'error' as 'error',
+            downloadPriority: 0,
+            folder: '/nonexistent/level_1_index_0',
+            input: {}
+          }
+        ]
+      ])
       expect(runOptionsExpected).to.be.deep.equal(runOptions)
     })
   })
@@ -48,7 +56,7 @@ describe('normalize run options with', () => {
         folder: '/nonexistent'
       }
       const runOptions = normalizeOptions(fullConfig, runOptionsInit)
-      const normalizedInput = runOptions['level_0_index_0'].input
+      const normalizedInput = runOptions.get('level_0_index_0')!.input
 
       expect(normalizedInput).to.be.deep.equal({
         username: runOptionsInit.input.username

@@ -1,3 +1,10 @@
+// scraper name
+export type ScraperName = string
+// scraper group
+type ScraperGroup = string
+// input key
+type InputKey = string
+
 // RegexCleanup {{{
 type RegexRemove = string
 interface RegexReplace {
@@ -8,27 +15,28 @@ type RegexCleanup = RegexRemove | RegexReplace
 // }}}
 
 // Input {{{
-type InputSimple = string
+type InputSimple = InputKey
 type InputCleaned = {
-  name: string
+  name: InputKey
   regexCleanup: RegexCleanup
 }
 type Input = InputSimple | InputCleaned
 // }}}
 
 // DownloadConfig {{{
-type UrlTemplate = string
+// handlebars template
+type Template = string
 type UrlMethods = 'GET' | 'POST' | 'PUT' | 'DELETE'
 interface DownloadConfigInterface {
   method?: UrlMethods
-  urlTemplate: UrlTemplate
-  headerTemplates?: { [HeaderName: string]: string }
+  urlTemplate: Template
+  headerTemplates?: { [headerName: string]: Template }
   regexCleanup?: RegexCleanup
 }
-export type DownloadConfigInit = UrlTemplate | DownloadConfigInterface
+export type DownloadConfigInit = Template | DownloadConfigInterface
 export interface DownloadConfig extends DownloadConfigInterface {
   method: UrlMethods
-  headerTemplates: { [HeaderName: string]: string }
+  headerTemplates: { [headerName: string]: Template }
 }
 // }}}
 
@@ -50,7 +58,7 @@ export interface ParseConfig extends ParseConfigInterface {
 type Incrementers = 'failed-download' | 'empty-parse' | number
 
 export interface ScrapeConfigInit {
-  name?: string
+  name?: ScraperName
   download?: DownloadConfigInit
   parse?: ParseConfigInit
   incrementUntil?: Incrementers
@@ -65,7 +73,7 @@ export interface ConfigInit {
 
 // returned by ./normalize.ts
 export interface ScrapeConfig {
-  name: string
+  name: ScraperName
   download?: DownloadConfig
   parse?: ParseConfig
   incrementUntil: Incrementers
@@ -82,9 +90,9 @@ export interface Config extends ConfigInit {
 export type ConfigPositionInfo = {
   depth: number
   horizontalIndex: number
-  name: string
-  parentName?: string
+  name: ScraperName
+  parentName?: ScraperName
 }
 export type FlatConfig = {
-  [name: string]: ConfigPositionInfo
+  [scraperName: string]: ConfigPositionInfo
 }

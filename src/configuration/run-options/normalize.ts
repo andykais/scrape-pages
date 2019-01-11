@@ -42,6 +42,7 @@ const normalizeOptions = (
   const defaults = {
     cache: true,
     downloadPriority: 0,
+    logLevel: 'error' as 'error',
     ...globalOptions // user preferences for all things override
   }
 
@@ -49,15 +50,15 @@ const normalizeOptions = (
     (acc: FlatRunOptions, scraperConfig) => {
       const { name } = scraperConfig
       const scraperOptions = optionsEach[name]
-      acc[name] = {
+      acc.set(name, {
         ...defaults,
         folder: resolve(defaults.folder, name),
         ...scraperOptions,
         input
-      }
+      })
       return acc
     },
-    {}
+    new Map()
   )
 
   return options

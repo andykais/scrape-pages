@@ -26,7 +26,7 @@ const scraperStep = (config: ScrapeConfig) => {
 
   // run setup
   return (flatRunParams: FlatRunOptions, dependencies: Dependencies) => {
-    const runParams = flatRunParams[config.name]
+    const runParams = flatRunParams.get(config.name)!
     const downloader = downloaderClassFactory(config, runParams, dependencies)
     const parser = parserClassFactory(config, runParams, dependencies)
 
@@ -50,7 +50,7 @@ const scraperStep = (config: ScrapeConfig) => {
       })
       if (downloadId) {
         const parsedValuesWithId = store.qs.selectParsedValues(downloadId)
-        scraperLogger.cachedValues(downloadId, parsedValuesWithId)
+        // scraperLogger.cachedValues(downloadId, parsedValuesWithId)
         return parsedValuesWithId
       } else {
         const { downloadValue, downloadId, filename } = await downloader.run({
@@ -72,7 +72,7 @@ const scraperStep = (config: ScrapeConfig) => {
         })()
         const parsedValuesWithId = store.qs.selectParsedValues(downloadId)
 
-        scraperLogger.newValues(downloadId, parsedValuesWithId)
+        // scraperLogger.newValues(downloadId, parsedValuesWithId)
         return parsedValuesWithId
       }
     }
