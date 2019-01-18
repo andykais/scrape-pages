@@ -5,7 +5,7 @@ import { Logger } from './logger'
 import { Queue } from './queue'
 // type imports
 import { Config } from '../settings/config/types'
-import { RunOptionsInit, FlatRunOptions } from '../settings/options/types'
+import { OptionsInit, FlatOptions } from '../settings/options/types'
 
 export type Tools = {
   store: Store
@@ -15,8 +15,8 @@ export type Tools = {
 }
 export const initTools = (
   config: Config,
-  optionsInit: RunOptionsInit,
-  flatOptions: FlatRunOptions
+  optionsInit: OptionsInit,
+  flatOptions: FlatOptions
 ): Tools => {
   const store = new Store(config, optionsInit)
   const emitter = new Emitter(config, store)

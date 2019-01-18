@@ -2,16 +2,16 @@ import { resolve } from 'path'
 import { makeFlatConfig } from '../config/make-flat-config'
 import { assertOptionsType } from './'
 // type imports
-import { Input, RunOptionsInit, FlatRunOptions } from './types'
+import { Input, OptionsInit, FlatOptions } from './types'
 import { Config } from '../config/types'
 
-const getConfigInputValues = (config: Config, runParams: RunOptionsInit) => {
+const getConfigInputValues = (config: Config, options: OptionsInit) => {
   const configInputKeys = config.input.map(input => {
     if (typeof input === 'string') return input
     else return input.name
   })
 
-  const initInputs = runParams.input || {}
+  const initInputs = options.input || {}
   const filteredInputs: Input = {}
   for (const inputKey of configInputKeys) {
     if (initInputs[inputKey] === undefined) {
@@ -29,15 +29,15 @@ const getConfigInputValues = (config: Config, runParams: RunOptionsInit) => {
 
 const normalizeOptions = (
   config: Config,
-  runParams: RunOptionsInit
-): FlatRunOptions => {
-  assertOptionsType(runParams)
+  optionsInit: OptionsInit
+): FlatOptions => {
+  assertOptionsType(optionsInit)
 
   const flatConfig = makeFlatConfig(config)
-  const { optionsEach = {}, ...globalOptions } = runParams
+  const { optionsEach = {}, ...globalOptions } = optionsInit
 
-  const input = getConfigInputValues(config, runParams)
-  // assertValidInput(config, runParams)
+  const input = getConfigInputValues(config, optionsInit)
+  // assertValidInput(config, options)
 
   const defaults = {
     cache: true,
@@ -46,8 +46,8 @@ const normalizeOptions = (
     ...globalOptions // user preferences for all things override
   }
 
-  const options: FlatRunOptions = Object.values(flatConfig).reduce(
-    (acc: FlatRunOptions, scraperConfig) => {
+  const options: FlatOptions = Object.values(flatConfig).reduce(
+    (acc: FlatOptions, scraperConfig) => {
       const { name } = scraperConfig
       const scraperOptions = optionsEach[name]
       acc.set(name, {

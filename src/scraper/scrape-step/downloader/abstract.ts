@@ -1,5 +1,5 @@
 import { ScrapeConfig } from '../../../settings/config/types'
-import { RunOptions } from '../../../settings/options/types'
+import { Options } from '../../../settings/options/types'
 import { Tools } from '../../../tools'
 
 export type DownloadParams = {
@@ -13,15 +13,15 @@ type RetrieveValue = { downloadValue?: string; filename?: string }
  */
 export abstract class AbstractDownloader<DownloadData> {
   protected config: ScrapeConfig
-  protected runParams: RunOptions
+  protected options: Options
   protected tools: Tools
 
   public constructor(
     config: ScrapeConfig,
-    runParams: RunOptions,
+    options: Options,
     tools: Tools
   ) {
-    Object.assign(this, { config, runParams, tools })
+    Object.assign(this, { config, options, tools })
   }
   public run = async (downloadParams: DownloadParams) => {
     const downloadData = this.constructDownload(downloadParams)

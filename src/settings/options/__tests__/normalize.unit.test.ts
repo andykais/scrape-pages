@@ -1,7 +1,7 @@
 import { normalizeConfig } from '../../config'
 import { normalizeOptions } from '../'
 import * as testingConfigs from '../../../../testing/resources/testing-configs'
-import { FlatRunOptions } from '../types'
+import { FlatOptions } from '../types'
 import { expect } from 'chai'
 
 describe('normalize run options with', () => {
@@ -12,7 +12,7 @@ describe('normalize run options with', () => {
         folder: '/nonexistent'
       }
       const runOptions = normalizeOptions(fullConfig, runOptionsInit)
-      const runOptionsExpected: FlatRunOptions = new Map([
+      const runOptionsExpected: FlatOptions = new Map([
         [
           'level_0_index_0',
           {

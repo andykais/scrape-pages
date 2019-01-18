@@ -3,7 +3,7 @@ import * as bunyan from 'bunyan'
 // import { createLogger, transports, format } from 'winston'
 import { tap } from 'rxjs/operators'
 // type imports
-import { RunOptionsInit, FlatRunOptions } from '../settings/options/types'
+import { OptionsInit, FlatOptions } from '../settings/options/types'
 import { ScraperName } from '../settings/config/types'
 // import * as winston from 'winston'
 import { ParsedValue } from '../scraper/scrape-step'
@@ -20,19 +20,19 @@ class Logger {
   public error: typeof bunyan.prototype.error
 
   public constructor(
-    runOptions: RunOptionsInit,
-    flatRunOptions: FlatRunOptions
+    options: OptionsInit,
+    flatOptions: FlatOptions
   ) {
     this.logger = bunyan.createLogger({
       name: 'root',
-      level: runOptions.logLevel || ('error' as 'error'),
+      level: options.logLevel || ('error' as 'error'),
       serializers,
-      streams: runOptions.logToFile
-        ? [{ path: path.resolve(runOptions.folder, runOptions.logToFile) }]
+      streams: options.logToFile
+        ? [{ path: path.resolve(options.folder, options.logToFile) }]
         : [{ stream: process.stdout }]
     })
     this.scrapers = new Map()
-    flatRunOptions.forEach((options, name) => {
+    flatOptions.forEach((options, name) => {
       const logger = this.logger.child({ scraper: name })
       this.scrapers.set(name, logger)
     })

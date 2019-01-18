@@ -1,5 +1,5 @@
 import { ScrapeConfig } from '../../../settings/config/types'
-import { RunOptions } from '../../../settings/options/types'
+import { Options } from '../../../settings/options/types'
 import { Tools } from '../../../tools'
 
 export type ParserValues = string[] | [undefined | string]
@@ -8,17 +8,17 @@ export type ParserValues = string[] | [undefined | string]
  */
 export abstract class AbstractParser {
   protected config: ScrapeConfig
-  protected runParams: RunOptions
+  protected options: Options
   protected tools: Tools
   protected selector: string
   protected attribute: string
 
   public constructor(
     config: ScrapeConfig,
-    runParams: RunOptions,
+    options: Options,
     tools: Tools
   ) {
-    Object.assign(this, { config, runParams, tools, ...config.parse })
+    Object.assign(this, { config, options, tools, ...config.parse })
   }
   public run = (value?: string) => {
     /** TODO

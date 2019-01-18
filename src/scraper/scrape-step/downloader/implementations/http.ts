@@ -8,7 +8,7 @@ import { compileTemplate } from '../../../../util/handlebars'
 // type imports
 import { URL } from 'url'
 import { ScrapeConfig } from '../../../../settings/config/types'
-import { RunOptions } from '../../../../settings/options/types'
+import { Options } from '../../../../settings/options/types'
 import { Tools } from '../../../../tools'
 import { DownloadConfig } from '../../../../settings/config/types'
 
@@ -40,10 +40,10 @@ export class Downloader extends AbstractDownloader<DownloadData> {
 
   public constructor(
     config: ScrapeConfig,
-    runParams: RunOptions,
+    options: Options,
     tools: Tools
   ) {
-    super(config, runParams, tools)
+    super(config, options, tools)
     // set templates
     this.urlTemplate = compileTemplate(config.download!.urlTemplate)
     this.headerTemplates = new Map()
@@ -55,7 +55,7 @@ export class Downloader extends AbstractDownloader<DownloadData> {
     // TODO change this to manual options option ONLY
     const shouldDownloadToMemory =
       this.config.scrapeEach.length || this.config.parse
-    const shouldDownloadToFile = this.runParams.cache
+    const shouldDownloadToFile = this.options.cache
     if (shouldDownloadToMemory && shouldDownloadToFile) {
       this.fetcher = this.downloadToFileAndMemory
     } else if (shouldDownloadToMemory) {
@@ -69,7 +69,7 @@ export class Downloader extends AbstractDownloader<DownloadData> {
     value,
     incrementIndex: index
   }: DownloadParams): DownloadData => {
-    const templateVals = { ...this.runParams.input, value, index }
+    const templateVals = { ...this.options.input, value, index }
     // construct url
     const url = new URL(this.urlTemplate(templateVals)).toString()
     // construct headers
@@ -89,14 +89,14 @@ export class Downloader extends AbstractDownloader<DownloadData> {
     [url, fetchOptions]
   ) => {
     const downloadFolder = path.resolve(
-      this.runParams.folder,
+      this.options.folder,
       downloadId.toString()
     )
     const filename = path.resolve(downloadFolder, sanitizeFilename(url))
 
     const response = await this.tools.queue.add(
       () => fetch(url, fetchOptions),
-      this.runParams.downloadPriority
+      this.options.downloadPriority
     )
     await mkdirp(downloadFolder)
     this.verifyResponseOk(response, url)
@@ -124,14 +124,14 @@ export class Downloader extends AbstractDownloader<DownloadData> {
     [url, fetchOptions]
   ) => {
     const downloadFolder = path.resolve(
-      this.runParams.folder,
+      this.options.folder,
       downloadId.toString()
     )
     const filename = path.resolve(downloadFolder, sanitizeFilename(url))
 
     const response = await this.tools.queue.add(
       () => fetch(url.toString(), fetchOptions),
-      this.runParams.downloadPriority
+      this.options.downloadPriority
     )
     await mkdirp(downloadFolder)
     await new Promise((resolve, reject) => {
@@ -156,7 +156,7 @@ export class Downloader extends AbstractDownloader<DownloadData> {
     [url, fetchOptions]
   ) =>
     this.tools.queue
-      .add(() => fetch(url, fetchOptions), this.runParams.downloadPriority)
+      .add(() => fetch(url, fetchOptions), this.options.downloadPriority)
       .then(response => {
         this.verifyResponseOk(response, url)
         this.tools.emitter.scraper[this.config.name].emitProgress(

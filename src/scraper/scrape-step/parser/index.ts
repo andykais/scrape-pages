@@ -3,7 +3,7 @@ import { Parser as JsonParser } from './implementations/json'
 import { Parser as IdentityParser } from './implementations/identity'
 // type imports
 import { ScrapeConfig } from '../../../settings/config/types'
-import { RunOptions } from '../../../settings/options/types'
+import { Options } from '../../../settings/options/types'
 import { Tools } from '../../../tools'
 
 const parsers = {
@@ -12,13 +12,13 @@ const parsers = {
 }
 export const parserClassFactory = (
   config: ScrapeConfig,
-  runParams: RunOptions,
+  options: Options,
   tools: Tools
 ) => {
   // TODO use type guards
   if (config.parse) {
-    return new parsers[config.parse.expect](config, runParams, tools)
+    return new parsers[config.parse.expect](config, options, tools)
   } else {
-    return new IdentityParser(config, runParams, tools)
+    return new IdentityParser(config, options, tools)
   }
 }

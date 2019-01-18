@@ -1,7 +1,7 @@
 import * as Rx from 'rxjs'
 import * as ops from 'rxjs/operators'
 import { rateLimitToggle } from '../../util/rxjs/operators'
-import { RunOptionsInit, FlatRunOptions } from '../../settings/options/types'
+import { OptionsInit, FlatOptions } from '../../settings/options/types'
 import { PriorityQueue } from './priority-queue'
 import { Task } from '../../util/rxjs/operators/conditional-rate-limiter'
 
@@ -14,12 +14,12 @@ class Queue {
   private queue: PriorityQueue<Task>
 
   public constructor(
-    { maxConcurrent = 1, rateLimit }: RunOptionsInit,
-    flatRunOptions: FlatRunOptions,
+    { maxConcurrent = 1, rateLimit }: OptionsInit,
+    flatOptions: FlatOptions,
     toggler: Rx.Observable<boolean>
   ) {
     const priorities = new Set()
-    flatRunOptions.forEach(options => priorities.add(options.downloadPriority))
+    flatOptions.forEach(options => priorities.add(options.downloadPriority))
     this.queue = new PriorityQueue(Array.from(priorities))
 
     // rx subject that adds tasks to the observable pipeline

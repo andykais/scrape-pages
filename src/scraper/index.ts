@@ -5,12 +5,12 @@ import { normalizeConfig } from '../settings/config'
 import { normalizeOptions } from '../settings/options'
 // type imports
 import { Config, ConfigInit } from '../settings/config/types'
-import { RunOptionsInit, FlatRunOptions } from '../settings/options/types'
+import { OptionsInit, FlatOptions } from '../settings/options/types'
 
 const initFolders = async (
   config: Config,
-  optionsInit: RunOptionsInit,
-  flatOptions: FlatRunOptions
+  optionsInit: OptionsInit,
+  flatOptions: FlatOptions
 ) => {
   if (optionsInit.cleanFolder) await rmrf(optionsInit.folder)
 
@@ -20,7 +20,7 @@ const initFolders = async (
 
 export const scrape = async (
   configInit: ConfigInit,
-  optionsInit: RunOptionsInit
+  optionsInit: OptionsInit
 ) => {
   const config = normalizeConfig(configInit)
   const flatOptions = normalizeOptions(config, optionsInit)

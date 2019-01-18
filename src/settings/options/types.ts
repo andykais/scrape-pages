@@ -26,7 +26,7 @@ export interface Parallelism {
   }
 }
 
-export interface RunOptionsInit extends OptionsAny, Parallelism {
+export interface OptionsInit extends OptionsAny, Parallelism {
   input?: Input
   folder: string
   cleanFolder?: boolean
@@ -37,9 +37,9 @@ export interface RunOptionsInit extends OptionsAny, Parallelism {
   }
 }
 
-export interface RunOptions extends ScraperOptions {
+export interface Options extends ScraperOptions {
   input: Input
   folder: string
 }
 
-export type FlatRunOptions = Map<ScraperName, RunOptions>
+export type FlatOptions = Map<ScraperName, Options>

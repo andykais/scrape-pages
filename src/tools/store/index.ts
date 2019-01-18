@@ -5,7 +5,7 @@ import { Config, FlatConfig } from '../../settings/config/types'
 import { createTables, createStatements } from './queries'
 // type imports
 import { Transaction } from 'better-sqlite3'
-import { RunOptionsInit } from '../../settings/options/types'
+import { OptionsInit } from '../../settings/options/types'
 
 class Store {
   private config: Config
@@ -13,7 +13,7 @@ class Store {
   private database: Database
   public qs: ReturnType<typeof createStatements>
 
-  public constructor(config: Config, { folder }: RunOptionsInit) {
+  public constructor(config: Config, { folder }: OptionsInit) {
     this.config = config
     this.flatConfig = makeFlatConfig(config)
     // initialize sqlite3 database
