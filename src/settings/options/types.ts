@@ -1,6 +1,6 @@
 // type imports
 import { ScraperName } from '../config/types'
-import { LogType } from '../../tools/logger'
+import { LogLevel } from '../../tools/logger'
 
 export type Input = { [inputName: string]: number | string | boolean }
 
@@ -10,12 +10,12 @@ interface OptionsAny {
 
 interface ScraperOptionsInit extends OptionsAny {
   downloadPriority?: number
-  logLevel?: LogType
+  logLevel?: LogLevel
 }
 interface ScraperOptions extends OptionsAny {
   cache: boolean
   downloadPriority: number
-  logLevel: LogType
+  logLevel: LogLevel
 }
 
 export interface Parallelism {
@@ -30,7 +30,7 @@ export interface RunOptionsInit extends OptionsAny, Parallelism {
   input?: Input
   folder: string
   cleanFolder?: boolean
-  logLevel?: LogType
+  logLevel?: LogLevel
   logToFile?: string
   optionsEach?: {
     [scraperName: string]: ScraperOptionsInit

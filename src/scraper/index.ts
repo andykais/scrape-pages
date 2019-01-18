@@ -31,21 +31,19 @@ export const scrape = async (
   const scrapingObservable = scrapingScheme([{ parsedValue: '' }])
   // start running the observable
   const { emitter, queue, logger, store } = tools
-  const subscription = scrapingObservable.subscribe(
-    undefined,
-    (error: Error) => {
-      console.log('here')
+  const subscription = scrapingObservable.subscribe({
+    error: (error: Error) => {
       emitter.emit.error(error)
       subscription.unsubscribe()
       queue.closeQueue()
     },
-    () => {
+    complete: () => {
       // TODO add timer to show how long it took
       queue.closeQueue()
       emitter.emit.done()
       logger.info('Done!')
     }
-  )
+  })
 
   emitter.on.stop(() => {
     logger.info('Exiting manually.')

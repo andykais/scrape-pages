@@ -20,7 +20,7 @@ npm install scrape-pages
 lets download the five most recent images from NASA's image of the day archive
 
 ```javascript
-const ScrapePages = require('scrape-pages')
+const { scraper } = require('scrape-pages')
 // create a config file
 const config = {
   scrape: {
@@ -42,24 +42,22 @@ const config = {
     }
   }
 }
+const options = {
+  folder: './downloads',
+  logLevel: 'info',
+  logFile: './nasa-download.log'
+}
 
 // load the config into a new 'scraper'
-const siteScraper = new ScrapePages(config)
-// begin scraping
-const runOptions = { folder: './downloads' }
-const logOptions = { logLevel: 'INFO', logFile: './nasa-download.log' }
-const emitter = siteScraper.run(runOptions, logOptions)
-
-// emits each time an image finishes downloading
-emitter.on('image:complete', (queryFor, { id }) =>
+const scraper = await scrape(config, options)
+const { on, emit, query } = scraper
+on('image:compete', id => {
   console.log('COMPLETED image', id)
-)
-
-emitter.on('done', async queryFor => {
+})
+on('done', () => {
   console.log('finished.')
-  const result = await queryFor({ scrapers: ['images'] })
-  console.log(result)
-  // [{
+  const result = query({ scrapers: ['images'] })
+  // result = [{
   //   images: [{ filename: 'img1.jpg' }, { filename: 'img2.jpg' }, ...]
   // }]
 })
@@ -73,50 +71,45 @@ The scraper instance created from a config object is meant to be reusable and ca
 config object. `scraper.run` can be called multiple times, and, as long as different folders are
 provided, each run will work independently. `scraper.run` returns **emitter**
 
-### Scraper class constructor
+### scrape
 
-| param  | type         | required | type file                                                | description                |
-| ------ | ------------ | -------- | -------------------------------------------------------- | ---                        |
-| config | `ConfigInit` | Yes      | [src/settings/types.ts](src/settings/types.ts)           | _what_ is being downloaded |
-
-### Scraper class run method
-
-| param      | type             | required | type file                                            | description                   |
-| ---------- | ---------------- | -------- | ---------------------------------------------------- | ---                           |
-| runOptions | `RunOptionsInit` | Yes      | [src/run-options/types.ts](src/run-options/types.ts) | _how_ something is downloaded |
-| logOptions | `LogOptions`     | No       | [src/run-options/types.ts](src/run-options/types.ts) | configure logging             |
+| param   | type             | required | type file                                                      | description                   |
+| ------- | ---------------- | -------- | -------------------------------------------------------------- | ----------------------------- |
+| config  | `ConfigInit`     | Yes      | [src/settings/config/types.ts](src/settings/config/types.ts)   | _what_ is being downloaded    |
+| options | `RunOptionsInit` | Yes      | [src/settings/options/types.ts](src/settings/options/types.ts) | _how_ something is downloaded |
 
 
-### emitter
+### scraper
+The `scrape` function returns a promise which yeilds these utilities (`on`, `emit`, and `query`)
 
-
-#### Listenable events
+#### on
+Listen for events from the scraper
 | event                  | callback arguments    | description                                |
-| ---                    | ---                   | ---                                        |
+| ---------------------- | --------------------- | ------------------------------------------ |
 | `'done'`               | queryFor              | when the scraper has completed             |
 | `'error'`              | error                 | if the scraper encounters an error         |
 | `'<scraper>:progress'` | queryFor, download id | emits progress of download until completed |
 | `'<scraper>:queued'`   | queryFor, download id | when a download is queued                  |
 | `'<scraper>:complete'` | queryFor, download id | when a download is completed               |
 
-#### Emittable events
+#### emit
+
 While the scraper is working, you can affect its behavior by emitting these events:
-| event              | arguments | description                                                           |
-| ---                | ---       | ---                                                                   |
-| `'useRateLimiter'` | boolean   | turn on or off the rate limit defined in the run options              |
-| `'stop'`           |           | stop the crawler (note that in progress requests will still complete) |
+| event | arguments | description |
+| --- | --- | --- |
+| `'useRateLimiter'` | boolean | turn on or off the rate limit defined in the run options |
+| `'stop'` | | stop the crawler (note that in progress requests will still complete) |
 
 each event will return the **queryFor** function as its first argument
 
-#### queryFor named arguments
+#### query
 
 This function is an argument in the emitter callback and is used to get data back out of the scraper whenever
 you need it. These are its arguments:
-| name       | type       | required | description                                                          |
-| ---        | ---        | ---      | ---                                                                  |
-| `scrapers` | `string[]` | Yes      | scrapers who will return their filenames and parsed values, in order |
-| `groupBy`  | `string`   | Yes      | name of a scraper which will delineate the values in `scrapers`      |
-
+| name | type | required | description |
+| --- | --- | --- | --- |
+| `scrapers` | `string[]` | Yes | scrapers who will return their filenames and parsed values, in order |
+| `groupBy` | `string` | Yes | name of a scraper which will delineate the values in `scrapers` |
 
 ## Motivation
 

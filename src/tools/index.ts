@@ -4,7 +4,7 @@ import { Store } from './store'
 import { Logger } from './logger'
 import { Queue } from './queue'
 // type imports
-import { Config, ConfigInit } from '../settings/config/types'
+import { Config } from '../settings/config/types'
 import { RunOptionsInit, FlatRunOptions } from '../settings/options/types'
 
 export type Tools = {

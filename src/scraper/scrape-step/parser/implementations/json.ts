@@ -1,5 +1,5 @@
 import { AbstractParser } from '../abstract'
 
 export class Parser extends AbstractParser {
-  parse = (value: string) => [value]
+  public parse = (value: string) => [value]
 }

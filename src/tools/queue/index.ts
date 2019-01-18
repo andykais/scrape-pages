@@ -13,7 +13,7 @@ class Queue {
   private queuePromise: Promise<any>
   private queue: PriorityQueue<Task>
 
-  constructor(
+  public constructor(
     { maxConcurrent = 1, rateLimit }: RunOptionsInit,
     flatRunOptions: FlatRunOptions,
     toggler: Rx.Observable<boolean>
@@ -60,7 +60,7 @@ class Queue {
       .catch(error => callback(error, undefined))
 
   // returns a promise that resolves or rejects according to the promise passed in
-  add = <T>(task: () => Promise<T>, priority: number): Promise<T> => {
+  public add = <T>(task: () => Promise<T>, priority: number): Promise<T> => {
     return new Promise((resolve, reject) => {
       const callback: ErrorCallback = (error, value) => {
         if (error) reject(error)
@@ -72,7 +72,7 @@ class Queue {
   }
 
   // called add(task) anywhere after this method is called will throw an error
-  closeQueue() {
+  public closeQueue() {
     this.isOpen = false
     this.enqueueSubject.complete()
   }
@@ -80,7 +80,7 @@ class Queue {
   // queuePromise will never resolve until closeQueue() is called
   // if you are waiting on a promise that will never close, your program may exit unexpectedly
   // see https://stackoverflow.com/q/46966890/3795137 for an explaination of the nodejs event cycle
-  toPromise() {
+  public toPromise() {
     return this.queuePromise
   }
 }

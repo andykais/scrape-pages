@@ -9,7 +9,7 @@ export class PriorityQueue<T = any> {
   public length = 0
 
   // all priorities used in the push function are defined in the constructor
-  constructor(availablePriorities: number[]) {
+  public constructor(availablePriorities: number[]) {
     for (const priority of availablePriorities) {
       this.priorities.push(priority)
       this.queue[priority] = []
@@ -17,7 +17,7 @@ export class PriorityQueue<T = any> {
     this.priorities.sort((a: number, b: number) => b - a)
   }
 
-  pop = () => {
+  public pop = () => {
     for (const priority of this.priorities) {
       const queueSlot = this.queue[priority]
       if (queueSlot.length) {
@@ -27,7 +27,7 @@ export class PriorityQueue<T = any> {
     }
   }
 
-  push = (val: T, priority: number) => {
+  public push = (val: T, priority: number) => {
     this.queue[priority].push(val)
     this.length++
   }

@@ -1,7 +1,6 @@
 import EventEmitter from 'events'
 import * as Rx from 'rxjs'
 import * as Fetch from 'node-fetch'
-import VError from 'verror'
 // type imports
 import { makeFlatConfig } from '../settings/config/make-flat-config'
 import { Config } from '../settings/config/types'
@@ -18,16 +17,20 @@ class ScraperEmitter {
   private store: Store
   private name: string
 
-  constructor(name: string, emitter: EventEmitter, store: Store) {
+  public constructor(name: string, emitter: EventEmitter, store: Store) {
     this.emitter = emitter
     this.store = store
     this.name = name
   }
   public emitQueuedDownload = (id: number) => {
-    this.emitter.emit(`${this.name}:queued`, this.store.queryFor, id)
+    this.emitter.emit(
+      `${this.name}:${scraperEvents.DOWNLOAD}`,
+      this.store.queryFor,
+      id
+    )
   }
   public emitProgress = (id: number, response: Fetch.Response) => {
-    const emitKey = `${this.name}:progress`
+    const emitKey = `${this.name}:${scraperEvents.PROGRESS}`
     if (this.emitter.listenerCount(emitKey)) {
       const contentLength = parseInt(
         response.headers.get('content-length') || '0'
@@ -41,7 +44,11 @@ class ScraperEmitter {
     }
   }
   public emitCompletedDownload = (id: number) => {
-    this.emitter.emit(`${this.name}:complete`, this.store.queryFor, id)
+    this.emitter.emit(
+      `${this.name}:${scraperEvents.COMPLETE}`,
+      this.store.queryFor,
+      id
+    )
   }
 }
 
@@ -67,6 +74,9 @@ class Emitter {
   public emitter: EventEmitter
   public scraper: { [scraper: string]: ScraperEmitter } = {}
 
+  private hasListenerFor = (eventName: string): boolean =>
+    this.emitter.listenerCount(eventName) !== 0
+
   public constructor(config: Config, store: Store) {
     // TODO replace w/ store.queryFor
     this.emitter = new EventEmitter()
@@ -78,46 +88,23 @@ class Emitter {
     }
   }
 
-  private hasListenerFor = (eventName: string): boolean => {
-    console.log(eventName, this.emitter.listenerCount(eventName))
-    console.log(this.emitter.listenerCount(eventName) !== 0)
-    return this.emitter.listenerCount(eventName) !== 0
-  }
+  public getBoundOn = (): EmitterOn => this.emitter.on.bind(this.emitter)
+  public getBoundEmit = (): EmitterEmit => this.emitter.emit.bind(this.emitter)
+  public getRxEventStream = (eventName: string) =>
+    Rx.fromEvent(this.emitter, eventName)
 
-  emit = {
+  public emit = {
     done: () => {
-      this.emitter.emit(events.DONE, this.store.queryFor)
+      this.emitter.emit(events.DONE)
     },
     error: (error: Error) => {
       this.emitter.emit(events.ERROR, error)
     }
   }
-  on = {
+  public on = {
     stop: (callback: () => void) => {
       this.emitter.on(events.STOP, callback)
     }
-  }
-
-  getBoundOn = (): EmitterOn => this.emitter.on.bind(this.emitter)
-  getBoundEmit = (): EmitterEmit => this.emitter.emit.bind(this.emitter)
-
-  emitDone() {
-    this.emitter.emit('done', this.store.queryFor)
-  }
-
-  emitError(error: string) {
-    if (this.emitter.listenerCount('error')) {
-      this.emitter.emit('error', error)
-    } else {
-      // throw error
-    }
-  }
-
-  getRxEventStream = (eventName: string) =>
-    Rx.fromEvent(this.emitter, eventName)
-
-  onStop(cb: () => any) {
-    this.emitter.on('stop', cb)
   }
 }
 export { Emitter }

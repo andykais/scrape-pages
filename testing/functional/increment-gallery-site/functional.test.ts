@@ -1,11 +1,11 @@
 import os from 'os'
 import path from 'path'
 
-import { expect, use } from 'chai'
+import { expect } from 'chai'
 import _ from 'lodash/fp'
 
 import '../../use-chai-plugins'
-import { NockFolderMock } from '../../nock-folder-mock'
+import { nockMockFolder } from '../../nock-folder-mock'
 import { config } from './config'
 import expectedQueryResult from './resources/expected-query-result.json'
 import { scrape } from '../../../src'
@@ -15,21 +15,18 @@ describe('increment gallery site', () => {
     let scraperQueryForFunction: any
     before(done => {
       ;(async () => {
-        const endpointMock = new NockFolderMock(
+        await nockMockFolder(
           `${__dirname}/resources/mock-endpoints`,
           'http://increment-gallery-site.com'
         )
-        await endpointMock.init()
 
         const options = {
           folder: path.resolve(os.tmpdir(), this.fullTitle()),
           cleanFolder: true
         }
-        const { on, emit, query } = await scrape(config, options)
-        on('done', () => {
-          scraperQueryForFunction = query
-          done()
-        })
+        const { on, query } = await scrape(config, options)
+        scraperQueryForFunction = query
+        on('done', done)
       })()
     })
 
@@ -57,22 +54,19 @@ describe('increment gallery site', () => {
     let scraperQueryForFunction: any
     before(done => {
       ;(async () => {
-        const endpointMock = new NockFolderMock(
+        await nockMockFolder(
           `${__dirname}/resources/mock-endpoints`,
           'http://increment-gallery-site.com',
           { randomSeed: 1 }
         )
-        await endpointMock.init()
 
         const options = {
           folder: path.resolve(os.tmpdir(), this.fullTitle()),
           cleanFolder: true
         }
-        const { on, emit, query } = await scrape(config, options)
-        on('done', () => {
-          scraperQueryForFunction = query
-          done()
-        })
+        const { on, query } = await scrape(config, options)
+        scraperQueryForFunction = query
+        on('done', done)
       })()
     })
 

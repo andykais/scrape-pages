@@ -31,10 +31,8 @@ const scraperStep = (config: ScrapeConfig) => {
     const parser = parserClassFactory(config, runParams, tools)
 
     const { store, emitter, logger } = tools
-    const scraperLogger = logger.scraper(config.name)
-    const children = childrenSetup.map(child =>
-      child(flatRunParams, tools)
-    )
+    const scraperLogger = logger.scraper(config.name)!
+    const children = childrenSetup.map(child => child(flatRunParams, tools))
     const scrapeNextChild = config.scrapeNext
       ? scraperStep(config.scrapeNext)(flatRunParams, tools)
       : () => Rx.empty()
@@ -50,7 +48,10 @@ const scraperStep = (config: ScrapeConfig) => {
       })
       if (downloadId) {
         const parsedValuesWithId = store.qs.selectParsedValues(downloadId)
-        // scraperLogger.cachedValues(downloadId, parsedValuesWithId)
+        scraperLogger.info(
+          { parsedValuesWithId, downloadId },
+          'loaded cached values'
+        )
         return parsedValuesWithId
       } else {
         const { downloadValue, downloadId, filename } = await downloader.run({
@@ -72,7 +73,10 @@ const scraperStep = (config: ScrapeConfig) => {
         })()
         const parsedValuesWithId = store.qs.selectParsedValues(downloadId)
 
-        // scraperLogger.newValues(downloadId, parsedValuesWithId)
+        scraperLogger.info(
+          { parsedValuesWithId, downloadId },
+          'inserted new values'
+        )
         return parsedValuesWithId
       }
     }

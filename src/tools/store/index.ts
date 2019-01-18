@@ -13,7 +13,7 @@ class Store {
   private database: Database
   public qs: ReturnType<typeof createStatements>
 
-  constructor(config: Config, { folder }: RunOptionsInit) {
+  public constructor(config: Config, { folder }: RunOptionsInit) {
     this.config = config
     this.flatConfig = makeFlatConfig(config)
     // initialize sqlite3 database
@@ -25,11 +25,11 @@ class Store {
     this.qs = createStatements(this.flatConfig, this.database)
   }
 
-  transaction = <T>(func: () => T): Transaction => {
+  public transaction = <T>(func: () => T): Transaction => {
     return this.database.transaction(func)
   }
 
-  queryFor = ({
+  public queryFor = ({
     scrapers,
     groupBy
   }: {

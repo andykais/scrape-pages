@@ -18,44 +18,34 @@ const findFilesRecursive = async (folder: string): Promise<string[]> => {
 }
 
 class PsuedoSeedRandom {
-  _seed: number
-  constructor(seed: number) {
+  private _seed: number
+  public constructor(seed: number) {
     this._seed = seed % 2147483647
     if (this._seed <= 0) this._seed += 2147483646
   }
-  next = () => (this._seed = (this._seed * 16807) % 2147483647)
-  nextFloat = () => (this.next() - 1) / 2147483646
+  public next = () => (this._seed = (this._seed * 16807) % 2147483647)
+  public nextFloat = () => (this.next() - 1) / 2147483646
 }
 
-export class NockFolderMock {
-  mockEndpointsFolder: string
-  baseUrl: string
-  scope: nock.Scope
-  random: PsuedoSeedRandom
+export const nockMockFolder = async (
+  mockEndpointsFolder: string,
+  baseUrl: string,
+  { randomSeed }: { randomSeed?: number } = {}
+) => {
+  const scope = nock(baseUrl)
+  const random = randomSeed && new PsuedoSeedRandom(randomSeed)
 
-  constructor(
-    mockEndpointsFolder: string,
-    baseUrl: string,
-    { randomSeed }: { randomSeed?: number } = {}
-  ) {
-    this.mockEndpointsFolder = mockEndpointsFolder
-    this.baseUrl = baseUrl
-    this.scope = nock(baseUrl)
-    if (randomSeed) this.random = new PsuedoSeedRandom(randomSeed)
-  }
-  init = async () => {
-    const files = await findFilesRecursive(this.mockEndpointsFolder)
-    for (const file of files) {
-      const relativePath = path.relative(this.mockEndpointsFolder, file)
-      const fullPath = path.resolve(this.mockEndpointsFolder, file)
-      if (this.random) {
-        this.scope
-          .get(`/${relativePath}`)
-          .delay(this.random.nextFloat() * 100)
-          .replyWithFile(200, fullPath)
-      } else {
-        this.scope.get(`/${relativePath}`).replyWithFile(200, fullPath)
-      }
+  const files = await findFilesRecursive(mockEndpointsFolder)
+  for (const file of files) {
+    const relativePath = path.relative(mockEndpointsFolder, file)
+    const fullPath = path.resolve(mockEndpointsFolder, file)
+    if (random) {
+      scope
+        .get(`/${relativePath}`)
+        .delay(random.nextFloat() * 100)
+        .replyWithFile(200, fullPath)
+    } else {
+      scope.get(`/${relativePath}`).replyWithFile(200, fullPath)
     }
   }
 }
