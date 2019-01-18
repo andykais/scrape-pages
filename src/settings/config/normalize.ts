@@ -7,8 +7,7 @@ import {
   ConfigInit,
   Config
 } from './types'
-import { assertConfigType } from './runtime/assert'
-const runtimeAssertConfig: any = assertConfigType
+import { assertConfigType } from './'
 
 const downloadDefaults: {
   headerTemplates: DownloadConfig['headerTemplates']
@@ -86,7 +85,7 @@ const standardizeInput = (input: ConfigInit['input']): Config['input'] => {
 }
 
 const normalizeConfig = (config: ConfigInit): Config => {
-  runtimeAssertConfig(config)
+  assertConfigType(config)
 
   const input = standardizeInput(config.input)
 

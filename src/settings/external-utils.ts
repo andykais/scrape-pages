@@ -1,8 +1,4 @@
-import {
-  normalizeConfig,
-  makeFlatConfig,
-  assertConfigType
-} from './config'
+import { normalizeConfig, makeFlatConfig, assertConfigType } from './config'
 import { normalizeOptions, assertOptionsType } from './options'
 
 export const config = {

@@ -19,10 +19,7 @@ class Logger {
   public warn: typeof bunyan.prototype.warn
   public error: typeof bunyan.prototype.error
 
-  public constructor(
-    options: OptionsInit,
-    flatOptions: FlatOptions
-  ) {
+  public constructor(options: OptionsInit, flatOptions: FlatOptions) {
     this.logger = bunyan.createLogger({
       name: 'root',
       level: options.logLevel || ('error' as 'error'),

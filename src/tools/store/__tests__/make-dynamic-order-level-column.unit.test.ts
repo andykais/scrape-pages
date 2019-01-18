@@ -1,8 +1,5 @@
 import { expect } from 'chai'
-import {
-  makeFlatConfig,
-  normalizeConfig
-} from '../../../settings/config'
+import { makeFlatConfig, normalizeConfig } from '../../../settings/config'
 import { makeDynamicOrderLevelColumn } from '../sql-generators'
 import * as testingConfigs from '../../../../testing/resources/testing-configs'
 

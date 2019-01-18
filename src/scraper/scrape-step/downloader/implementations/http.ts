@@ -38,11 +38,7 @@ export class Downloader extends AbstractDownloader<DownloadData> {
   }
   private fetcher: FetchFunction
 
-  public constructor(
-    config: ScrapeConfig,
-    options: Options,
-    tools: Tools
-  ) {
+  public constructor(config: ScrapeConfig, options: Options, tools: Tools) {
     super(config, options, tools)
     // set templates
     this.urlTemplate = compileTemplate(config.download!.urlTemplate)

@@ -1,6 +1,7 @@
-// type imports
-import { ScraperName } from '../config/types'
-import { LogLevel } from '../../tools/logger'
+// until webpack can load ts-runtime, this is far more convienent than importing other files
+type ScraperName = string
+// likewise, this should come from bunyan, but it does not work well with ts-runtime
+type LogLevel = 'debug' | 'info' | 'warn' | 'error'
 
 export type Input = { [inputName: string]: number | string | boolean }
 

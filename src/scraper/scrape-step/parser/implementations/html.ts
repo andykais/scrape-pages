@@ -28,11 +28,7 @@ export class Parser extends AbstractParser {
   }
   protected parse = (value: string) => this.parser(value)
 
-  public constructor(
-    config: ScrapeConfig,
-    options: Options,
-    tools: Tools
-  ) {
+  public constructor(config: ScrapeConfig, options: Options, tools: Tools) {
     super(config, options, tools)
     this.parser = this.attribute ? this.selectAttrVals : this.selectTextVals
   }

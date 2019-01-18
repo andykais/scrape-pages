@@ -1,9 +1,6 @@
 import { findLowestCommonParent } from './util/find-lowest-common-parent'
 // type imports
-import {
-  FlatConfig,
-  ConfigPositionInfo
-} from '../../../settings/config/types'
+import { FlatConfig, ConfigPositionInfo } from '../../../settings/config/types'
 
 /**
  * ensures that when multiple scrapes are selected at once, the proper order is attached at each level of the

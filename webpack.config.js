@@ -20,7 +20,7 @@ module.exports = (env, { mode = 'development' } = {}) => ({
   devtool: 'inline-source-map',
   entry: {
     index: './src/index.ts',
-    'normalize-config': './src/settings/config/normalize.ts'
+    util: './src/settings/external-utils.ts'
   },
   output: {
     path: resolve(__dirname, 'lib'),

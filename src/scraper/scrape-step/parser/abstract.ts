@@ -13,11 +13,7 @@ export abstract class AbstractParser {
   protected selector: string
   protected attribute: string
 
-  public constructor(
-    config: ScrapeConfig,
-    options: Options,
-    tools: Tools
-  ) {
+  public constructor(config: ScrapeConfig, options: Options, tools: Tools) {
     Object.assign(this, { config, options, tools, ...config.parse })
   }
   public run = (value?: string) => {

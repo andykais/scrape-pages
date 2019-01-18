@@ -11,7 +11,6 @@ export const downloaderClassFactory = (
   tools: Tools
 ) => {
   // TODO use type guards
-  if (config.download)
-    return new HttpDownloader(config, options, tools)
+  if (config.download) return new HttpDownloader(config, options, tools)
   else return new IdentityDownloader(config, options, tools)
 }

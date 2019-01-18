@@ -16,11 +16,7 @@ export abstract class AbstractDownloader<DownloadData> {
   protected options: Options
   protected tools: Tools
 
-  public constructor(
-    config: ScrapeConfig,
-    options: Options,
-    tools: Tools
-  ) {
+  public constructor(config: ScrapeConfig, options: Options, tools: Tools) {
     Object.assign(this, { config, options, tools })
   }
   public run = async (downloadParams: DownloadParams) => {
