@@ -55,6 +55,6 @@ export const scrape = async (
   return {
     on: emitter.getBoundOn(),
     emit: emitter.getBoundEmit(),
-    query: store.queryFor
+    query: store.query
   }
 }

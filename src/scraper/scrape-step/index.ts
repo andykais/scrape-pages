@@ -69,7 +69,7 @@ const scraperStep = (config: ScrapeConfig) => {
             downloadId,
             parsedValues
           })
-          emitter.scraper[config.name].emitCompletedDownload(downloadId)
+          emitter.scraper(config.name).emit.completed(downloadId)
         })()
         const parsedValuesWithId = store.qs.selectParsedValues(downloadId)
 

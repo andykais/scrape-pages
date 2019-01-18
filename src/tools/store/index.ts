@@ -29,7 +29,7 @@ class Store {
     return this.database.transaction(func)
   }
 
-  public queryFor = ({
+  public query = ({
     scrapers,
     groupBy
   }: {

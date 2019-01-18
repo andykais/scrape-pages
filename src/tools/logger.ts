@@ -13,7 +13,7 @@ const serializers = {
 }
 class Logger {
   private logger: bunyan
-  private scrapers: Map<ScraperName, bunyan>
+  private scrapers: { [scraperName: string]: bunyan }
   public debug: typeof bunyan.prototype.debug
   public info: typeof bunyan.prototype.info
   public warn: typeof bunyan.prototype.warn
@@ -28,10 +28,10 @@ class Logger {
         ? [{ path: path.resolve(options.folder, options.logToFile) }]
         : [{ stream: process.stdout }]
     })
-    this.scrapers = new Map()
+    this.scrapers = {}
     flatOptions.forEach((options, name) => {
       const logger = this.logger.child({ scraper: name })
-      this.scrapers.set(name, logger)
+      this.scrapers[name] = logger
     })
     this.debug = this.logger.debug.bind(this.logger)
     this.info = this.logger.info.bind(this.logger)
@@ -40,7 +40,7 @@ class Logger {
   }
   public tap = (name = 'TAP') =>
     tap((...args: any[]) => this.logger.debug({ tap: name, ...args }))
-  public scraper = (name: ScraperName) => this.scrapers.get(name)
+  public scraper = (name: ScraperName) => this.scrapers[name]
 }
 export type LogLevel = bunyan.LogLevel
 export { Logger }

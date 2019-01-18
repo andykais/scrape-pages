@@ -26,6 +26,7 @@ export abstract class AbstractDownloader<DownloadData> {
       downloadParams,
       downloadData
     )
+    this.tools.emitter.scraper(this.config.name).emit.queued(downloadId)
     const { downloadValue, filename } = await this.retrieve(
       downloadId,
       downloadData

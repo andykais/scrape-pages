@@ -19,7 +19,7 @@ export const initTools = (
   flatOptions: FlatOptions
 ): Tools => {
   const store = new Store(config, optionsInit)
-  const emitter = new Emitter(config, store)
+  const emitter = new Emitter(config)
   const logger = new Logger(optionsInit, flatOptions)
   const rateLimiterEventStream = emitter.getRxEventStream(
     'useRateLimiter'

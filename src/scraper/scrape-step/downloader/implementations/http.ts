@@ -103,10 +103,9 @@ export class Downloader extends AbstractDownloader<DownloadData> {
       response.body.pipe(dest)
       response.body.on('error', error => reject(error))
       response.body.on('data', chunk => buffers.push(chunk))
-      this.tools.emitter.scraper[this.config.name].emitProgress(
-        downloadId,
-        response
-      )
+      this.tools.emitter
+        .scraper(this.config.name)
+        .emit.progress(downloadId, response)
       dest.on('error', error => reject(error))
       dest.on('close', () => resolve(Buffer.concat(buffers)))
     })
@@ -134,10 +133,9 @@ export class Downloader extends AbstractDownloader<DownloadData> {
       this.verifyResponseOk(response, url)
       const dest = createWriteStream(filename)
       response.body.pipe(dest)
-      this.tools.emitter.scraper[this.config.name].emitProgress(
-        downloadId,
-        response
-      )
+      this.tools.emitter
+        .scraper(this.config.name)
+        .emit.progress(downloadId, response)
       response.body.on('error', error => reject(error))
       dest.on('error', error => reject(error))
       dest.on('close', resolve)
@@ -155,10 +153,9 @@ export class Downloader extends AbstractDownloader<DownloadData> {
       .add(() => fetch(url, fetchOptions), this.options.downloadPriority)
       .then(response => {
         this.verifyResponseOk(response, url)
-        this.tools.emitter.scraper[this.config.name].emitProgress(
-          downloadId,
-          response
-        )
+        this.tools.emitter
+          .scraper(this.config.name)
+          .emit.progress(downloadId, response)
         return response.text()
       })
       .then(downloadValue => ({
