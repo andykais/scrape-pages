@@ -5,10 +5,10 @@ import { tap } from 'rxjs/operators'
 import {
   RunOptionsInit,
   FlatRunOptions
-} from './configuration/run-options/types'
-import { ScraperName } from './configuration/site-traversal/types'
+} from '../settings/options/types'
+import { ScraperName } from '../settings/config/types'
 // import * as winston from 'winston'
-import { ParsedValue } from './scraper/scrape-step'
+import { ParsedValue } from '../scraper/scrape-step'
 
 // TODO add serializers for parsedValueWithId
 class Logger {

@@ -2,9 +2,9 @@ import { Parser as HtmlParser } from './implementations/html'
 import { Parser as JsonParser } from './implementations/json'
 import { Parser as IdentityParser } from './implementations/identity'
 // type imports
-import { ScrapeConfig } from '../../../configuration/site-traversal/types'
-import { RunOptions } from '../../../configuration/run-options/types'
-import { Dependencies } from '../../types'
+import { ScrapeConfig } from '../../../settings/config/types'
+import { RunOptions } from '../../../settings/options/types'
+import { Tools } from '../../../tools'
 
 const parsers = {
   html: HtmlParser,
@@ -13,12 +13,12 @@ const parsers = {
 export const parserClassFactory = (
   config: ScrapeConfig,
   runParams: RunOptions,
-  dependencies: Dependencies
+  tools: Tools
 ) => {
   // TODO use type guards
   if (config.parse) {
-    return new parsers[config.parse.expect](config, runParams, dependencies)
+    return new parsers[config.parse.expect](config, runParams, tools)
   } else {
-    return new IdentityParser(config, runParams, dependencies)
+    return new IdentityParser(config, runParams, tools)
   }
 }

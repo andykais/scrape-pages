@@ -1,10 +1,11 @@
 import { Database } from './database'
-import { makeFlatConfig } from '../configuration/site-traversal'
-import { groupBy as groupByKey } from '../util/array'
-import { Config, FlatConfig } from '../configuration/site-traversal/types'
+import { makeFlatConfig } from '../../settings/config'
+import { groupBy as groupByKey } from '../../util/array'
+import { Config, FlatConfig } from '../../settings/config/types'
 import { createTables, createStatements } from './queries'
 // type imports
 import { Transaction } from 'better-sqlite3'
+import { RunOptionsInit } from '../../settings/options/types'
 
 class Store {
   private config: Config
@@ -12,16 +13,15 @@ class Store {
   private database: Database
   public qs: ReturnType<typeof createStatements>
 
-  constructor(config: Config) {
+  constructor(config: Config, { folder }: RunOptionsInit) {
     this.config = config
     this.flatConfig = makeFlatConfig(config)
-  }
-
-  init = ({ folder }: { folder: string }) => {
+    // initialize sqlite3 database
     this.database = new Database(folder)
     this.database.pragma('journal_mode = WAL')
-
+    // initialize tables (if they do not exist already)
     createTables(this.flatConfig, this.database)()
+    // prepare statements
     this.qs = createStatements(this.flatConfig, this.database)
   }
 

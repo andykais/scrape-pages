@@ -3,8 +3,8 @@ import * as Rx from 'rxjs'
 import * as Fetch from 'node-fetch'
 import VError from 'verror'
 // type imports
-import { makeFlatConfig } from './configuration/site-traversal/make-flat-config'
-import { Config } from './configuration/site-traversal/types'
+import { makeFlatConfig } from '../settings/config/make-flat-config'
+import { Config } from '../settings/config/types'
 import { Store } from './store'
 
 const scraperEvents = {
@@ -46,13 +46,21 @@ class ScraperEmitter {
 }
 
 const events = {
-  // emittable
+  // listenable
   DONE: 'done',
   ERROR: 'error',
-  // listenable
+  // emittable
   STOP: 'stop',
   USE_RATE_LIMITER: 'useRateLimiter'
 }
+type EmitterOn = (
+  event: 'done' | 'error',
+  callback: (...args: any[]) => void
+) => void
+type EmitterEmit = (
+  event: 'stop' | 'useRateLimiter',
+  ...emittedValues: any[]
+) => void
 
 class Emitter {
   private store: Store
@@ -70,21 +78,28 @@ class Emitter {
     }
   }
 
-  private hasListenerFor = (eventName: string): boolean =>
-    !!this.emitter.listenerCount(eventName)
+  private hasListenerFor = (eventName: string): boolean => {
+    console.log(eventName, this.emitter.listenerCount(eventName))
+    console.log(this.emitter.listenerCount(eventName) !== 0)
+    return this.emitter.listenerCount(eventName) !== 0
+  }
 
   emit = {
     done: () => {
       this.emitter.emit(events.DONE, this.store.queryFor)
     },
     error: (error: Error) => {
-      if (this.hasListenerFor(events.ERROR)) {
-        this.emitter.emit(events.ERROR, VError.fullStack(error))
-      } else {
-        throw error
-      }
+      this.emitter.emit(events.ERROR, error)
     }
   }
+  on = {
+    stop: (callback: () => void) => {
+      this.emitter.on(events.STOP, callback)
+    }
+  }
+
+  getBoundOn = (): EmitterOn => this.emitter.on.bind(this.emitter)
+  getBoundEmit = (): EmitterEmit => this.emitter.emit.bind(this.emitter)
 
   emitDone() {
     this.emitter.emit('done', this.store.queryFor)
@@ -94,7 +109,7 @@ class Emitter {
     if (this.emitter.listenerCount('error')) {
       this.emitter.emit('error', error)
     } else {
-      throw error
+      // throw error
     }
   }
 

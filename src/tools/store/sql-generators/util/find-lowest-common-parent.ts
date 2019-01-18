@@ -1,7 +1,7 @@
 import {
   FlatConfig,
   ConfigPositionInfo
-} from '../../../configuration/site-traversal/types'
+} from '../../../../settings/config/types'
 /*
  *   G
  *   |

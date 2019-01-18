@@ -1,15 +1,14 @@
 import os from 'os'
 import path from 'path'
 
-import { expect, use } from 'chai'
-import chaiExclude from 'chai-exclude'
-use(chaiExclude)
+import { expect } from 'chai'
 import _ from 'lodash/fp'
 
+import '../../use-chai-plugins'
 import { NockFolderMock } from '../../nock-folder-mock'
-import PageScraper from '../../../src'
 import { config } from './config'
 import expectedQueryResult from './resources/expected-query-result.json'
+import { scrape } from '../../../src'
 
 describe('scrape next site', () => {
   describe('with instant scraper', function() {
@@ -22,17 +21,15 @@ describe('scrape next site', () => {
         )
         await endpointMock.init()
 
-        const downloadDir = path.resolve(os.tmpdir(), this.fullTitle())
-        const siteScraper = new PageScraper(config)
-        siteScraper
-          .run({
-            folder: downloadDir,
-            cleanFolder: true
-          })
-          .on('done', queryFor => {
-            scraperQueryForFunction = queryFor
-            done()
-          })
+        const options = {
+          folder: path.resolve(os.tmpdir(), this.fullTitle()),
+          cleanFolder: true
+        }
+        const { on, emit, query } = await scrape(config, options)
+        on('done', () => {
+          scraperQueryForFunction = query
+          done()
+        })
       })()
     })
 
@@ -67,18 +64,15 @@ describe('scrape next site', () => {
         )
         await endpointMock.init()
 
-        const downloadDir = path.resolve(os.tmpdir(), this.fullTitle())
-        const siteScraper = new PageScraper(config)
-        siteScraper
-          .run({
-            folder: downloadDir,
-            cleanFolder: true,
-            maxConcurrent: 10
-          })
-          .on('done', queryFor => {
-            scraperQueryForFunction = queryFor
-            done()
-          })
+        const options = {
+          folder: path.resolve(os.tmpdir(), this.fullTitle()),
+          cleanFolder: true
+        }
+        const { on, emit, query } = await scrape(config, options)
+        on('done', () => {
+          scraperQueryForFunction = query
+          done()
+        })
       })()
     })
 

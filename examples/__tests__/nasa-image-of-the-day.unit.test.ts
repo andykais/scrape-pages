@@ -1,5 +1,5 @@
 import nasaIotdConfig from '../nasa-image-of-the-day.config.json'
-import { assertConfigType } from '../../src/configuration/site-traversal'
+import { assertConfigType } from '../../src/settings/config'
 
 describe('nasa iotd config', () => {
   it('is properly typed', () => {

@@ -1,6 +1,6 @@
-import { ScrapeConfig } from '../../../configuration/site-traversal/types'
-import { RunOptions } from '../../../configuration/run-options/types'
-import { Dependencies } from '../../types'
+import { ScrapeConfig } from '../../../settings/config/types'
+import { RunOptions } from '../../../settings/options/types'
+import { Tools } from '../../../tools'
 
 export type ParserValues = string[] | [undefined | string]
 /**
@@ -9,16 +9,16 @@ export type ParserValues = string[] | [undefined | string]
 export abstract class AbstractParser {
   protected config: ScrapeConfig
   protected runParams: RunOptions
-  protected deps: Dependencies
+  protected tools: Tools
   protected selector: string
   protected attribute: string
 
   public constructor(
     config: ScrapeConfig,
     runParams: RunOptions,
-    deps: Dependencies
+    tools: Tools
   ) {
-    Object.assign(this, { config, runParams, deps, ...config.parse })
+    Object.assign(this, { config, runParams, tools, ...config.parse })
   }
   public run = (value?: string) => {
     /** TODO

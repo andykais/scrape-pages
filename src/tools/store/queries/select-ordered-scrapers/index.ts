@@ -1,4 +1,4 @@
-import { compileTemplate } from '../../../util/handlebars'
+import { compileTemplate } from '../../../../util/handlebars'
 import {
   makeDynamicOrderLevelColumn,
   makeWaitingConditionalJoins

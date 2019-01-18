@@ -7,10 +7,10 @@ import { AbstractDownloader, DownloadParams } from '../abstract'
 import { compileTemplate } from '../../../../util/handlebars'
 // type imports
 import { URL } from 'url'
-import { ScrapeConfig } from '../../../../configuration/site-traversal/types'
-import { RunOptions } from '../../../../configuration/run-options/types'
-import { Dependencies } from '../../../types'
-import { DownloadConfig } from '../../../../configuration/site-traversal/types'
+import { ScrapeConfig } from '../../../../settings/config/types'
+import { RunOptions } from '../../../../settings/options/types'
+import { Tools } from '../../../../tools'
+import { DownloadConfig } from '../../../../settings/config/types'
 
 type Headers = { [header: string]: string }
 type DownloadData = [
@@ -41,9 +41,9 @@ export class Downloader extends AbstractDownloader<DownloadData> {
   public constructor(
     config: ScrapeConfig,
     runParams: RunOptions,
-    deps: Dependencies
+    tools: Tools
   ) {
-    super(config, runParams, deps)
+    super(config, runParams, tools)
     // set templates
     this.urlTemplate = compileTemplate(config.download!.urlTemplate)
     this.headerTemplates = new Map()
@@ -52,7 +52,7 @@ export class Downloader extends AbstractDownloader<DownloadData> {
         this.headerTemplates.set(key, compileTemplate(templateStr))
     )
     // choose fetcher
-    // TODO change this to manual run-options option ONLY
+    // TODO change this to manual options option ONLY
     const shouldDownloadToMemory =
       this.config.scrapeEach.length || this.config.parse
     const shouldDownloadToFile = this.runParams.cache
@@ -94,7 +94,7 @@ export class Downloader extends AbstractDownloader<DownloadData> {
     )
     const filename = path.resolve(downloadFolder, sanitizeFilename(url))
 
-    const response = await this.deps.queue.add(
+    const response = await this.tools.queue.add(
       () => fetch(url, fetchOptions),
       this.runParams.downloadPriority
     )
@@ -107,7 +107,7 @@ export class Downloader extends AbstractDownloader<DownloadData> {
       response.body.pipe(dest)
       response.body.on('error', error => reject(error))
       response.body.on('data', chunk => buffers.push(chunk))
-      this.deps.emitter.scraper[this.config.name].emitProgress(
+      this.tools.emitter.scraper[this.config.name].emitProgress(
         downloadId,
         response
       )
@@ -129,7 +129,7 @@ export class Downloader extends AbstractDownloader<DownloadData> {
     )
     const filename = path.resolve(downloadFolder, sanitizeFilename(url))
 
-    const response = await this.deps.queue.add(
+    const response = await this.tools.queue.add(
       () => fetch(url.toString(), fetchOptions),
       this.runParams.downloadPriority
     )
@@ -138,7 +138,7 @@ export class Downloader extends AbstractDownloader<DownloadData> {
       this.verifyResponseOk(response, url)
       const dest = createWriteStream(filename)
       response.body.pipe(dest)
-      this.deps.emitter.scraper[this.config.name].emitProgress(
+      this.tools.emitter.scraper[this.config.name].emitProgress(
         downloadId,
         response
       )
@@ -155,11 +155,11 @@ export class Downloader extends AbstractDownloader<DownloadData> {
     downloadId,
     [url, fetchOptions]
   ) =>
-    this.deps.queue
+    this.tools.queue
       .add(() => fetch(url, fetchOptions), this.runParams.downloadPriority)
       .then(response => {
         this.verifyResponseOk(response, url)
-        this.deps.emitter.scraper[this.config.name].emitProgress(
+        this.tools.emitter.scraper[this.config.name].emitProgress(
           downloadId,
           response
         )

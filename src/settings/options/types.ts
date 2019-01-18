@@ -1,6 +1,6 @@
 // type imports
-import { ScraperName } from '../site-traversal/types'
-import { LogType } from '../../logger'
+import { ScraperName } from '../config/types'
+import { LogType } from '../../tools/logger'
 
 export type Input = { [inputName: string]: number | string | boolean }
 

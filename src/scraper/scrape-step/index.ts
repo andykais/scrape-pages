@@ -5,10 +5,10 @@ import { downloaderClassFactory } from './downloader'
 import { parserClassFactory } from './parser'
 import { incrementer } from './incrementer'
 // type imports
-import { ScrapeConfig } from '../../configuration/site-traversal/types'
-import { FlatRunOptions } from '../../configuration/run-options/types'
-import { Dependencies } from '../types'
-import { SelectedRow as ParsedValueWithId } from '../../store/queries/select-parsed-values'
+import { ScrapeConfig } from '../../settings/config/types'
+import { FlatRunOptions } from '../../settings/options/types'
+import { Tools } from '../../tools'
+import { SelectedRow as ParsedValueWithId } from '../../tools/store/queries/select-parsed-values'
 import { DownloadParseFunction } from './incrementer'
 
 type InputValue = {
@@ -25,18 +25,18 @@ const scraperStep = (config: ScrapeConfig) => {
   )
 
   // run setup
-  return (flatRunParams: FlatRunOptions, dependencies: Dependencies) => {
+  return (flatRunParams: FlatRunOptions, tools: Tools) => {
     const runParams = flatRunParams.get(config.name)!
-    const downloader = downloaderClassFactory(config, runParams, dependencies)
-    const parser = parserClassFactory(config, runParams, dependencies)
+    const downloader = downloaderClassFactory(config, runParams, tools)
+    const parser = parserClassFactory(config, runParams, tools)
 
-    const { store, emitter, logger } = dependencies
+    const { store, emitter, logger } = tools
     const scraperLogger = logger.scraper(config.name)
     const children = childrenSetup.map(child =>
-      child(flatRunParams, dependencies)
+      child(flatRunParams, tools)
     )
     const scrapeNextChild = config.scrapeNext
-      ? scraperStep(config.scrapeNext)(flatRunParams, dependencies)
+      ? scraperStep(config.scrapeNext)(flatRunParams, tools)
       : () => Rx.empty()
 
     const downloadParseFunction: DownloadParseFunction = async (

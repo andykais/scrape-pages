@@ -12,7 +12,7 @@
     "build": "run-s clean compile:runtime compile",
     "build:watch": "webpack --mode=development --watch",
     "compile": "webpack --mode=production",
-    "compile:runtime": "tsr --compilerOptions '{\"outDir\": \"src/configuration/site-traversal/runtime/\"}' src/configuration/site-traversal/assert.ts && tsr --compilerOptions '{\"outDir\": \"src/configuration/run-options/runtime\"}' src/configuration/run-options/assert.ts",
+    "compile:runtime": "tsr --compilerOptions '{\"outDir\": \"src/settings/config/runtime/\"}' src/settings/config/assert.ts && tsr --compilerOptions '{\"outDir\": \"src/settings/run-options/runtime\"}' src/settings/run-options/assert.ts",
     "clean": "rimraf lib",
     "lint": "eslint '**/*.ts'",
     "format": "git ls-files '*.ts' '*.json' | xargs prettier --write",

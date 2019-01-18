@@ -1,9 +1,9 @@
 import { resolve } from 'path'
-import { makeFlatConfig } from '../site-traversal/make-flat-config'
+import { makeFlatConfig } from '../config/make-flat-config'
 import { assertOptionsType } from './'
 // type imports
 import { Input, RunOptionsInit, FlatRunOptions } from './types'
-import { Config } from '../site-traversal/types'
+import { Config } from '../config/types'
 
 const getConfigInputValues = (config: Config, runParams: RunOptionsInit) => {
   const configInputKeys = config.input.map(input => {

@@ -1,10 +1,7 @@
 import { expect } from 'chai'
-import {
-  makeFlatConfig,
-  normalizeConfig
-} from '../../configuration/site-traversal'
+import { makeFlatConfig, normalizeConfig } from '../../../settings/config'
 import { findLowestCommonParent } from '../sql-generators/util/find-lowest-common-parent'
-import * as testingConfigs from '../../../testing/resources/testing-configs'
+import * as testingConfigs from '../../../../testing/resources/testing-configs'
 
 describe('find lowest common parent', () => {
   const galleryPostImgTag = testingConfigs.__GALLERY_POST_IMG_TAG__

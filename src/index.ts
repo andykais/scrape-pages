@@ -1,4 +1,4 @@
 import 'source-map-support/register'
-import { ScrapePages } from './scraper'
 
-export default ScrapePages
+export { scrape } from './scraper'
+export * from './settings/external-utils'

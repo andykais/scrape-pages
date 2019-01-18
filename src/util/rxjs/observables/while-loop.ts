@@ -17,7 +17,6 @@ export const whileLoopObservable = <In, Out>(
           observer.next(nextVal)
           index++
         } catch (e) {
-          // TODO in incrementUntil number, allow loop to keep going when there is a failed download
           observer.error(e)
           break
         }

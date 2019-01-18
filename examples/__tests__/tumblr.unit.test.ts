@@ -1,5 +1,5 @@
 import tumblrConfig from '../tumblr.config.json'
-import { assertConfigType } from '../../src/configuration/site-traversal'
+import { assertConfigType } from '../../src/settings/config'
 
 describe('tumblr config', () => {
   it('is properly typed', () => {

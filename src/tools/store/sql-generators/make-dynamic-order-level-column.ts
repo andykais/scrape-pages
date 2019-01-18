@@ -3,7 +3,7 @@ import { findLowestCommonParent } from './util/find-lowest-common-parent'
 import {
   FlatConfig,
   ConfigPositionInfo
-} from '../../configuration/site-traversal/types'
+} from '../../../settings/config/types'
 
 /**
  * ensures that when multiple scrapes are selected at once, the proper order is attached at each level of the

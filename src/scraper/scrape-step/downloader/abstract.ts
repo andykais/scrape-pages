@@ -1,6 +1,6 @@
-import { ScrapeConfig } from '../../../configuration/site-traversal/types'
-import { RunOptions } from '../../../configuration/run-options/types'
-import { Dependencies } from '../../types'
+import { ScrapeConfig } from '../../../settings/config/types'
+import { RunOptions } from '../../../settings/options/types'
+import { Tools } from '../../../tools'
 
 export type DownloadParams = {
   parentId?: number
@@ -14,18 +14,18 @@ type RetrieveValue = { downloadValue?: string; filename?: string }
 export abstract class AbstractDownloader<DownloadData> {
   protected config: ScrapeConfig
   protected runParams: RunOptions
-  protected deps: Dependencies
+  protected tools: Tools
 
   public constructor(
     config: ScrapeConfig,
     runParams: RunOptions,
-    deps: Dependencies
+    tools: Tools
   ) {
-    Object.assign(this, { config, runParams, deps })
+    Object.assign(this, { config, runParams, tools })
   }
   public run = async (downloadParams: DownloadParams) => {
     const downloadData = this.constructDownload(downloadParams)
-    const downloadId = this.deps.store.qs.insertQueuedDownload(
+    const downloadId = this.tools.store.qs.insertQueuedDownload(
       this.config.name,
       downloadParams,
       downloadData

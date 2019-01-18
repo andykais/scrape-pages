@@ -1,12 +1,9 @@
 import * as Rx from 'rxjs'
 import * as ops from 'rxjs/operators'
-import { rateLimitToggle } from '../util/rxjs/operators'
-import {
-  RunOptionsInit,
-  FlatRunOptions
-} from '../configuration/run-options/types'
+import { rateLimitToggle } from '../../util/rxjs/operators'
+import { RunOptionsInit, FlatRunOptions } from '../../settings/options/types'
 import { PriorityQueue } from './priority-queue'
-import { Task } from '../util/rxjs/operators/conditional-rate-limiter'
+import { Task } from '../../util/rxjs/operators/conditional-rate-limiter'
 
 type ErrorCallback = (error?: Error, value?: any) => void
 class Queue {
@@ -21,10 +18,9 @@ class Queue {
     flatRunOptions: FlatRunOptions,
     toggler: Rx.Observable<boolean>
   ) {
-    const priorities = Object.values(flatRunOptions).map(
-      options => options.downloadPriority
-    )
-    this.queue = new PriorityQueue(Array.from(new Set(priorities)))
+    const priorities = new Set()
+    flatRunOptions.forEach(options => priorities.add(options.downloadPriority))
+    this.queue = new PriorityQueue(Array.from(priorities))
 
     // rx subject that adds tasks to the observable pipeline
     const enqueueSubject = new Rx.Subject()

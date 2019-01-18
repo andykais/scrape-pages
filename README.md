@@ -77,7 +77,7 @@ provided, each run will work independently. `scraper.run` returns **emitter**
 
 | param  | type         | required | type file                                                | description                |
 | ------ | ------------ | -------- | -------------------------------------------------------- | ---                        |
-| config | `ConfigInit` | Yes      | [src/configuration/types.ts](src/configuration/types.ts) | _what_ is being downloaded |
+| config | `ConfigInit` | Yes      | [src/settings/types.ts](src/settings/types.ts)           | _what_ is being downloaded |
 
 ### Scraper class run method
 

@@ -1,4 +1,4 @@
-import { ConfigInit } from '../../../src/configuration/site-traversal/types'
+import { ConfigInit } from '../../../src/settings/config/types'
 
 export const config: ConfigInit = {
   scrape: {

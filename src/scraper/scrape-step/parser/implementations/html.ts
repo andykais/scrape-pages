@@ -1,9 +1,9 @@
 import cheerio from 'cheerio'
 import { AbstractParser } from '../abstract'
 // type imports
-import { ScrapeConfig } from '../../../../configuration/site-traversal/types'
-import { RunOptions } from '../../../../configuration/run-options/types'
-import { Dependencies } from '../../../types'
+import { ScrapeConfig } from '../../../../settings/config/types'
+import { RunOptions } from '../../../../settings/options/types'
+import { Tools } from '../../../../tools'
 
 export class Parser extends AbstractParser {
   private parser: (value: string) => string[]
@@ -31,9 +31,9 @@ export class Parser extends AbstractParser {
   public constructor(
     config: ScrapeConfig,
     runParams: RunOptions,
-    deps: Dependencies
+    tools: Tools
   ) {
-    super(config, runParams, deps)
+    super(config, runParams, tools)
     this.parser = this.attribute ? this.selectAttrVals : this.selectTextVals
   }
 }

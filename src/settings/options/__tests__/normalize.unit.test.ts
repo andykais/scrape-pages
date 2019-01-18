@@ -1,4 +1,4 @@
-import { normalizeConfig } from '../../site-traversal'
+import { normalizeConfig } from '../../config'
 import { normalizeOptions } from '../'
 import * as testingConfigs from '../../../../testing/resources/testing-configs'
 import { FlatRunOptions } from '../types'

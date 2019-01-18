@@ -1,6 +1,6 @@
 import * as Rx from 'rxjs'
 import * as ops from 'rxjs/operators'
-import { ScrapeConfig } from '../../../configuration/site-traversal/types'
+import { ScrapeConfig } from '../../../settings/config/types'
 import { ParsedValue } from '../'
 import { whileLoopObservable } from '../../../util/rxjs/observables/while-loop'
 
