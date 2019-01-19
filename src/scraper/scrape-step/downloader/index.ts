@@ -14,3 +14,5 @@ export const downloaderClassFactory = (
   if (config.download) return new HttpDownloader(config, options, tools)
   else return new IdentityDownloader(config, options, tools)
 }
+
+export type DownloaderClass = IdentityDownloader | HttpDownloader

@@ -1,5 +1,5 @@
 import { initTools } from '../tools'
-import { scraperStep } from './scrape-step'
+import { ScrapeStep } from './scrape-step'
 import { mkdirp, rmrf } from '../util/fs'
 import { normalizeConfig } from '../settings/config'
 import { normalizeOptions } from '../settings/options'
@@ -27,8 +27,8 @@ export const scrape = async (
   await initFolders(config, optionsInit, flatOptions)
   const tools = initTools(config, optionsInit, flatOptions)
   // create the observable
-  const scrapingScheme = scraperStep(config.scrape)(flatOptions, tools)
-  const scrapingObservable = scrapingScheme([{ parsedValue: '' }])
+  const scrapingScheme = new ScrapeStep(config.scrape, flatOptions, tools)
+  const scrapingObservable = scrapingScheme.run([{ parsedValue: '' }])
   // start running the observable
   const { emitter, queue, logger, store } = tools
   const subscription = scrapingObservable.subscribe({

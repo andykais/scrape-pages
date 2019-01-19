@@ -22,3 +22,4 @@ export const parserClassFactory = (
     return new IdentityParser(config, options, tools)
   }
 }
+export type ParserClass = HtmlParser | JsonParser | IdentityParser
