@@ -12,12 +12,12 @@ const serializers = {
   parsedValuesWithId: (values: ParsedValue[]) => values.map(v => v.parsedValue)
 }
 class Logger {
-  private logger: bunyan
-  private scrapers: { [scraperName: string]: bunyan }
   public debug: typeof bunyan.prototype.debug
   public info: typeof bunyan.prototype.info
   public warn: typeof bunyan.prototype.warn
   public error: typeof bunyan.prototype.error
+  private logger: bunyan
+  private scrapers: { [scraperName: string]: bunyan }
 
   public constructor(options: OptionsInit, flatOptions: FlatOptions) {
     this.logger = bunyan.createLogger({

@@ -4,9 +4,9 @@
  * e.g. priority one is popped before priority zero
  */
 export class PriorityQueue<T = any> {
+  public length = 0
   private priorities: number[] = []
   private queue: { [priority: number]: T[] } = {}
-  public length = 0
 
   // all priorities used in the push function are defined in the constructor
   public constructor(availablePriorities: number[]) {

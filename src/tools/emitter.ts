@@ -12,13 +12,6 @@ const scraperEvents = {
 }
 
 class ScraperEmitter {
-  private emitter: EventEmitter
-  private name: string
-
-  public constructor(name: string, emitter: EventEmitter) {
-    this.emitter = emitter
-    this.name = name
-  }
   public emit = {
     queued: (id: number) => {
       this.emitter.emit(`${this.name}:${scraperEvents.QUEUED}`, id)
@@ -41,6 +34,13 @@ class ScraperEmitter {
       this.emitter.emit(`${this.name}:${scraperEvents.COMPLETE}`, id)
     }
   }
+  private emitter: EventEmitter
+  private name: string
+
+  public constructor(name: string, emitter: EventEmitter) {
+    this.emitter = emitter
+    this.name = name
+  }
 }
 
 const events = {
@@ -59,25 +59,6 @@ type EmitterEmit = (
 
 class Emitter {
   public emitter: EventEmitter
-  private scrapers: { [scraper: string]: ScraperEmitter } = {}
-
-  private hasListenerFor = (eventName: string): boolean =>
-    this.emitter.listenerCount(eventName) !== 0
-
-  public constructor(config: Config) {
-    this.emitter = new EventEmitter()
-
-    const flatConfig = makeFlatConfig(config)
-    for (const name of Object.keys(flatConfig)) {
-      this.scrapers[name] = new ScraperEmitter(name, this.emitter)
-    }
-  }
-
-  public scraper = (name: string) => this.scrapers[name]
-  public getBoundOn = (): EmitterOn => this.emitter.on.bind(this.emitter)
-  public getBoundEmit = (): EmitterEmit => this.emitter.emit.bind(this.emitter)
-  public getRxEventStream = (eventName: string) =>
-    Rx.fromEvent(this.emitter, eventName)
 
   public emit = {
     done: () => {
@@ -92,5 +73,23 @@ class Emitter {
       this.emitter.on(events.STOP, callback)
     }
   }
+  private scrapers: { [scraper: string]: ScraperEmitter } = {}
+
+  public constructor(config: Config) {
+    this.emitter = new EventEmitter()
+
+    const flatConfig = makeFlatConfig(config)
+    for (const name of Object.keys(flatConfig)) {
+      this.scrapers[name] = new ScraperEmitter(name, this.emitter)
+    }
+  }
+  public scraper = (name: string) => this.scrapers[name]
+  public getBoundOn = (): EmitterOn => this.emitter.on.bind(this.emitter)
+  public getBoundEmit = (): EmitterEmit => this.emitter.emit.bind(this.emitter)
+  public getRxEventStream = (eventName: string) =>
+    Rx.fromEvent(this.emitter, eventName)
+
+  private hasListenerFor = (eventName: string): boolean =>
+    this.emitter.listenerCount(eventName) !== 0
 }
 export { Emitter }

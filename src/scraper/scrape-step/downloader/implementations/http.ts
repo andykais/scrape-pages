@@ -31,11 +31,6 @@ type FetchFunction = (
 export class Downloader extends AbstractDownloader<DownloadData> {
   private urlTemplate: ReturnType<typeof compileTemplate>
   private headerTemplates: Map<string, ReturnType<typeof compileTemplate>>
-  private verifyResponseOk = (response: Fetch.Response, url: string) => {
-    if (!response.ok) {
-      throw new Error(`status ${response.status} for ${url}`)
-    }
-  }
   private fetcher: FetchFunction
 
   public constructor(config: ScrapeConfig, options: Options, tools: Tools) {
@@ -80,6 +75,11 @@ export class Downloader extends AbstractDownloader<DownloadData> {
     return this.fetcher(downloadId, downloadData)
   }
 
+  private verifyResponseOk = (response: Fetch.Response, url: string) => {
+    if (!response.ok) {
+      throw new Error(`status ${response.status} for ${url}`)
+    }
+  }
   private downloadToFileAndMemory: FetchFunction = async (
     downloadId,
     [url, fetchOptions]

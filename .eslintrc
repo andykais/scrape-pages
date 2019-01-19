@@ -6,6 +6,7 @@
     "no-console": "warn",
     "typescript/no-unused-vars": "error",
     "typescript/explicit-member-accessibility": "error",
+    "typescript/member-ordering": "error",
     "no-only-tests/no-only-tests": "error"
   }
 }

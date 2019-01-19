@@ -8,10 +8,10 @@ import { Transaction } from 'better-sqlite3'
 import { OptionsInit } from '../../settings/options/types'
 
 class Store {
+  public qs: ReturnType<typeof createStatements>
   private config: Config
   private flatConfig: FlatConfig
   private database: Database
-  public qs: ReturnType<typeof createStatements>
 
   public constructor(config: Config, { folder }: OptionsInit) {
     this.config = config

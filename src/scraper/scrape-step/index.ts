@@ -1,6 +1,5 @@
 import * as Rx from 'rxjs'
 import * as ops from 'rxjs/operators'
-import VError from 'verror'
 import { downloaderClassFactory } from './downloader'
 import { parserClassFactory } from './parser'
 import { incrementer } from './incrementer'
@@ -69,6 +68,22 @@ class ScrapeStep extends AbstractScrapeStep {
       scrapeNextChild
     )
   }
+
+  public run: typeof AbstractScrapeStep.prototype.run = (
+    parentValues: ParsedValue[]
+  ): Rx.Observable<ParsedValue[]> =>
+    Rx.from(parentValues).pipe(
+      ops.flatMap(this.incrementObservableFunction),
+      ops.catchError(wrapError(`scraper '${this.scraperName}'`)),
+      ops.flatMap(
+        parsedValues =>
+          this.children.length
+            ? this.children.map(child => child.run(parsedValues))
+            : [Rx.of(parsedValues)]
+      ),
+      ops.mergeAll()
+    )
+
   private downloadParseFunction: DownloadParseFunction = async (
     { parsedValue: value, id: parentId },
     incrementIndex
@@ -115,20 +130,6 @@ class ScrapeStep extends AbstractScrapeStep {
       return parsedValuesWithId
     }
   }
-  public run: typeof AbstractScrapeStep.prototype.run = (
-    parentValues: ParsedValue[]
-  ): Rx.Observable<ParsedValue[]> =>
-    Rx.from(parentValues).pipe(
-      ops.flatMap(this.incrementObservableFunction),
-      ops.catchError(wrapError(`scraper '${this.scraperName}'`)),
-      ops.flatMap(
-        parsedValues =>
-          this.children.length
-            ? this.children.map(child => child.run(parsedValues))
-            : [Rx.of(parsedValues)]
-      ),
-      ops.mergeAll()
-    )
 }
 
 export { ScrapeStep, IdentityScrapeStep }
