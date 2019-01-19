@@ -1,19 +1,25 @@
-import { parser as htmlParser } from './variations/html-parser'
-import { parser as jsonParser } from './variations/json-parser'
-import { parser as identityParser } from './variations/identity-parser'
-import { ScrapeConfig } from '../../../configuration/site-traversal/types'
+import { Parser as HtmlParser } from './implementations/html'
+import { Parser as JsonParser } from './implementations/json'
+import { Parser as IdentityParser } from './implementations/identity'
+// type imports
+import { ScrapeConfig } from '../../../settings/config/types'
+import { Options } from '../../../settings/options/types'
+import { Tools } from '../../../tools'
 
-export type ParserType = (
-  config: ScrapeConfig
-) => () => (value: string) => string[]
-
-export default (config: ScrapeConfig) => {
-  const parsers = {
-    html: htmlParser,
-    json: jsonParser
-  }
-
-  return config.parse
-    ? parsers[config.parse.expect](config)
-    : identityParser(config)
+const parsers = {
+  html: HtmlParser,
+  json: JsonParser
 }
+export const parserClassFactory = (
+  config: ScrapeConfig,
+  options: Options,
+  tools: Tools
+) => {
+  // TODO use type guards
+  if (config.parse) {
+    return new parsers[config.parse.expect](config, options, tools)
+  } else {
+    return new IdentityParser(config, options, tools)
+  }
+}
+export type ParserClass = HtmlParser | JsonParser | IdentityParser

@@ -1,105 +1,60 @@
-import * as Rx from 'rxjs'
-import Emitter from '../emitter'
-import Store from '../store'
-import Logger from '../logger'
-import Queue from '../queue'
-import scraper from './scrape-step'
-import { mkdirp, mkdir, rmrf } from '../util/fs'
-import { normalizeConfig } from '../configuration/site-traversal'
-import { normalizeOptions } from '../configuration/run-options'
+import { initTools } from '../tools'
+import { ScrapeStep } from './scrape-step'
+import { mkdirp, rmrf } from '../util/fs'
+import { normalizeConfig } from '../settings/config'
+import { normalizeOptions } from '../settings/options'
 // type imports
-import { LogType } from '../logger'
-import { Config, ConfigInit } from '../configuration/site-traversal/types'
-import {
-  RunOptionsInit,
-  FlatRunOptions
-} from '../configuration/run-options/types'
-import { Dependencies } from './types'
+import { Config, ConfigInit } from '../settings/config/types'
+import { OptionsInit, FlatOptions } from '../settings/options/types'
 
-class ScrapePages {
-  config: Config
-  configuredScraper: ReturnType<typeof scraper>
-  scrapingScheme: ReturnType<ReturnType<typeof scraper>>
-  // dependencies
-  store: Store
-  emitter: Emitter
-  logger: Logger
-  queue: Queue
+const initFolders = async (
+  config: Config,
+  optionsInit: OptionsInit,
+  flatOptions: FlatOptions
+) => {
+  if (optionsInit.cleanFolder) await rmrf(optionsInit.folder)
 
-  constructor(config: ConfigInit) {
-    this.config = normalizeConfig(config)
-    this.configuredScraper = scraper(this.config.scrape)
-  }
-
-  initResources = async (
-    runParams: RunOptionsInit,
-    flatRunParams: FlatRunOptions
-  ) => {
-    if (runParams.cleanFolder) {
-      this.logger.info(`Cleaning ${runParams.folder}`)
-      await rmrf(runParams.folder)
-    }
-
-    this.logger.info('Making folders.')
-    await mkdirp(runParams.folder)
-    for (const { folder } of Object.values(flatRunParams)) await mkdirp(folder)
-
-    this.logger.info('Setting up SQLite database.')
-    // syncronous db creation
-    this.store.init(runParams)
-
-    this.logger.info('Begin downloading with inputs', runParams.input)
-  }
-
-  // TODO add parsable input for this first parse step
-  initDependencies = (runParams: RunOptionsInit, logLevel: LogType) => {
-    const flatRunParams = normalizeOptions(this.config, runParams)
-
-    this.store = new Store(this.config)
-    this.emitter = new Emitter(this.config, this.store)
-    this.logger = new Logger({ logLevel })
-    const rateLimiterEventStream = this.emitter.getRxEventStream(
-      'useRateLimiter'
-    ) as Rx.Observable<boolean> // deal with incoming values on this event as truthy or falsey
-    this.queue = new Queue(runParams, flatRunParams, rateLimiterEventStream)
-
-    this.scrapingScheme = this.configuredScraper(flatRunParams, {
-      queue: this.queue,
-      emitter: this.emitter,
-      logger: this.logger,
-      store: this.store
-    })
-
-    return Rx.concat(
-      this.initResources(runParams, flatRunParams),
-      this.scrapingScheme([{ parsedValue: '' }])
-    )
-  }
-
-  run = (runParams: RunOptionsInit, logLevel: LogType = 'ERROR') => {
-    const scrapingObservable = this.initDependencies(runParams, logLevel)
-    const subscription = scrapingObservable.subscribe(
-      undefined,
-      error => {
-        this.emitter.emitError(error)
-        subscription.unsubscribe()
-        this.queue.closeQueue()
-      },
-      () => {
-        // TODO add timer to show how long it took
-        this.logger.info('Done!')
-        this.queue.closeQueue()
-        this.emitter.emitDone()
-      }
-    )
-
-    this.emitter.onStop(() => {
-      this.queue.closeQueue()
-      subscription.unsubscribe()
-      this.logger.info('Exited manually.')
-    })
-    return this.emitter.emitter
-  }
+  await mkdirp(optionsInit.folder)
+  for (const { folder } of flatOptions.values()) await mkdirp(folder)
 }
 
-export default ScrapePages
+export const scrape = async (
+  configInit: ConfigInit,
+  optionsInit: OptionsInit
+) => {
+  const config = normalizeConfig(configInit)
+  const flatOptions = normalizeOptions(config, optionsInit)
+  await initFolders(config, optionsInit, flatOptions)
+  const tools = initTools(config, optionsInit, flatOptions)
+  // create the observable
+  const scrapingScheme = new ScrapeStep(config.scrape, flatOptions, tools)
+  const scrapingObservable = scrapingScheme.run([{ parsedValue: '' }])
+  // start running the observable
+  const { emitter, queue, logger, store } = tools
+  const subscription = scrapingObservable.subscribe({
+    error: (error: Error) => {
+      emitter.emit.error(error)
+      subscription.unsubscribe()
+      queue.closeQueue()
+    },
+    complete: () => {
+      // TODO add timer to show how long it took
+      queue.closeQueue()
+      emitter.emit.done()
+      logger.info('Done!')
+    }
+  })
+
+  emitter.on.stop(() => {
+    logger.info('Exiting manually.')
+    queue.closeQueue()
+    subscription.unsubscribe()
+    logger.info('Done!')
+    emitter.emit.done()
+  })
+  return {
+    on: emitter.getBoundOn(),
+    emit: emitter.getBoundEmit(),
+    query: store.query
+  }
+}

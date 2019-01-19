@@ -1,102 +1,135 @@
 import * as Rx from 'rxjs'
 import * as ops from 'rxjs/operators'
-import setDownloaderConfig from './downloader'
-import setParserConfig from './parser'
-import incrementer from './incrementer'
-import { mkdirpSync } from '../../util/fs'
+import { downloaderClassFactory } from './downloader'
+import { parserClassFactory } from './parser'
+import { incrementer } from './incrementer'
+import { wrapError } from '../../util/error'
 // type imports
-import { ScrapeConfig } from '../../configuration/site-traversal/types'
-import { FlatRunOptions } from '../../configuration/run-options/types'
-import { Dependencies } from '../types'
-import { SelectedRow as ParsedValueWithId } from '../../store/queries/select-parsed-values'
+import { ScraperName, ScrapeConfig } from '../../settings/config/types'
+import { FlatOptions } from '../../settings/options/types'
+import { Tools } from '../../tools'
+import { SelectedRow as ParsedValueWithId } from '../../tools/store/queries/select-parsed-values'
 import { DownloadParseFunction } from './incrementer'
+import { DownloaderClass } from './downloader'
+import { ParserClass } from './parser'
 
-type ScrapeValue = (parentValues: any[]) => Rx.Observable<any>
-type ScrapeStep = (
-  config: ScrapeConfig
-) => (flatRunParams: FlatRunOptions, dependencies: Dependencies) => ScrapeValue
 type InputValue = {
   parsedValue: string
   id?: number // nonexistent
 }
 export type ParsedValue = InputValue | ParsedValueWithId
 
-// init setup
-const scraper = (config: ScrapeConfig) => {
-  const setDownloaderOptions = setDownloaderConfig(config)
-  const setParserOptions = setParserConfig(config)
-  const getIncrementObservable = incrementer(config)
-  const childrenSetup = config.scrapeEach.map(scrapeConfig =>
-    scraper(scrapeConfig)
-  )
+abstract class AbstractScrapeStep {
+  public abstract run: (
+    parsedValues: ParsedValue[]
+  ) => Rx.Observable<ParsedValue[]>
+}
+class IdentityScrapeStep extends AbstractScrapeStep {
+  public run: typeof AbstractScrapeStep.prototype.run = () => Rx.empty()
+}
+class ScrapeStep extends AbstractScrapeStep {
+  private scraperName: ScraperName
+  private config: ScrapeConfig
+  private flatOptions: FlatOptions
+  private tools: Tools
+  private scraperLogger: ReturnType<Tools['logger']['scraper']>
 
-  // run setup
-  return (flatRunParams: FlatRunOptions, dependencies: Dependencies) => {
-    const runParams = flatRunParams[config.name]
-    const downloader = setDownloaderOptions(runParams, dependencies)
-    const parser = setParserOptions()
+  private downloader: DownloaderClass
+  private parser: ParserClass
+  private incrementObservableFunction: ReturnType<typeof incrementer>
+  private children: ScrapeStep[]
 
-    const { queue, store, emitter } = dependencies
-    // simpler to keep this synchronous
-    mkdirpSync(runParams.folder)
-    const children = childrenSetup.map(child =>
-      child(flatRunParams, dependencies)
+  public constructor(
+    config: ScrapeConfig,
+    flatOptions: FlatOptions,
+    tools: Tools
+  ) {
+    super()
+    this.scraperName = config.name
+    this.config = config
+    this.flatOptions = flatOptions
+    this.tools = tools
+
+    // const getIncrementObservable = incrementer(config)
+    this.children = config.scrapeEach.map(
+      scrapeConfig => new ScrapeStep(scrapeConfig, flatOptions, tools)
     )
-    const scrapeNextChild = config.scrapeNext
-      ? scraper(config.scrapeNext)(flatRunParams, dependencies)
-      : (parentValues: ParsedValue[]) => Rx.empty()
+    const scraperOptions = flatOptions.get(this.scraperName)!
+    this.downloader = downloaderClassFactory(config, scraperOptions, tools)
+    this.parser = parserClassFactory(config, scraperOptions, tools)
 
-    const downloadParseFunction: DownloadParseFunction = async (
-      { parsedValue: value, id: parentId },
+    this.scraperLogger = tools.logger.scraper(this.scraperName)!
+    const scrapeNextChild = config.scrapeNext
+      ? new ScrapeStep(config.scrapeNext, flatOptions, tools)
+      : new IdentityScrapeStep()
+    this.incrementObservableFunction = incrementer(
+      config,
+      this.downloadParseFunction,
+      scrapeNextChild
+    )
+  }
+
+  public run: typeof AbstractScrapeStep.prototype.run = (
+    parentValues: ParsedValue[]
+  ): Rx.Observable<ParsedValue[]> =>
+    Rx.from(parentValues).pipe(
+      ops.flatMap(this.incrementObservableFunction),
+      ops.catchError(wrapError(`scraper '${this.scraperName}'`)),
+      ops.flatMap(
+        parsedValues =>
+          this.children.length
+            ? this.children.map(child => child.run(parsedValues))
+            : [Rx.of(parsedValues)]
+      ),
+      ops.mergeAll()
+    )
+
+  private downloadParseFunction: DownloadParseFunction = async (
+    { parsedValue: value, id: parentId },
+    incrementIndex
+  ) => {
+    const { store, emitter } = this.tools
+    const { id: downloadId } = store.qs.selectCompletedDownload({
       incrementIndex,
-      scrapeNextIndex = 0
-    ) => {
-      const { id: downloadId } = store.qs.selectCompletedDownload({
-        incrementIndex,
-        parentId,
-        scraper: config.name
-      })
-      if (downloadId) {
-        const parsedValuesWithId = store.qs.selectParsedValues(downloadId)
-        return parsedValuesWithId
-      } else {
-        const { downloadValue, downloadId, filename } = await downloader({
+      parentId,
+      scraper: this.scraperName
+    })
+    if (downloadId) {
+      const parsedValuesWithId = store.qs.selectParsedValues(downloadId)
+      this.scraperLogger.info(
+        { parsedValuesWithId, downloadId },
+        'loaded cached values'
+      )
+      return parsedValuesWithId
+    } else {
+      const { downloadValue, downloadId, filename } = await this.downloader.run(
+        {
           incrementIndex,
-          scrapeNextIndex: 0,
           parentId,
           value
-        })
-        const parsedValues = parser(downloadValue)
-
-        const parsedValuesWithId = store.asTransaction(() => {
-          store.qs.updateDownloadToComplete({ downloadId, filename })
-          store.qs.insertBatchParsedValues({
-            name: config.name,
-            parentId,
-            downloadId,
-            parsedValues
-          })
-          emitter.forScraper[config.name].emitCompletedDownload(downloadId)
-          return store.qs.selectParsedValues(downloadId)
-        })()
-        return parsedValuesWithId
-      }
-    }
-
-    // called per each value
-    return (parentValues: ParsedValue[]): Rx.Observable<ParsedValue[]> =>
-      Rx.from(parentValues).pipe(
-        ops.flatMap(
-          getIncrementObservable(downloadParseFunction, scrapeNextChild)
-        ),
-        ops.flatMap(
-          parsedValues =>
-            children.length
-              ? children.map(child => child(parsedValues))
-              : [Rx.of(parsedValues)]
-        ),
-        ops.mergeAll()
+        }
       )
+      const parsedValues = this.parser.run(downloadValue)
+
+      store.transaction(() => {
+        store.qs.updateDownloadToComplete({ downloadId, filename })
+        store.qs.insertBatchParsedValues({
+          name: this.scraperName,
+          parentId,
+          downloadId,
+          parsedValues
+        })
+        emitter.scraper(this.scraperName).emit.completed(downloadId)
+      })()
+      const parsedValuesWithId = store.qs.selectParsedValues(downloadId)
+
+      this.scraperLogger.info(
+        { parsedValuesWithId, downloadId },
+        'inserted new values'
+      )
+      return parsedValuesWithId
+    }
   }
 }
-export default scraper
+
+export { ScrapeStep, IdentityScrapeStep }

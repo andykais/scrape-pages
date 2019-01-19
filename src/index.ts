@@ -1,4 +1,4 @@
 import 'source-map-support/register'
-import PageScraper from './scraper'
 
-export default PageScraper
+export { scrape } from './scraper'
+export * from './settings/external-utils'

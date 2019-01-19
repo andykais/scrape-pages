@@ -1,4 +1,4 @@
-import { assertConfigType } from '../../src/configuration/site-traversal'
+import { assertConfigType } from '../../src/settings/config'
 import * as testingConfigs from '../../testing/resources/testing-configs'
 
 describe('example simple config', () => {

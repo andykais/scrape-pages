@@ -1,36 +1,18 @@
-import { downloader as urlDownloader } from './variations/url-downloader'
-import { downloader as identityDownloader } from './variations/identity-downloader'
+import { Downloader as IdentityDownloader } from './implementations/identity'
+import { Downloader as HttpDownloader } from './implementations/http'
 // type imports
-import { ScrapeConfig } from '../../../configuration/site-traversal/types'
-import { RunOptions } from '../../../configuration/run-options/types'
-import { Dependencies } from '../../types'
+import { ScrapeConfig } from '../../../settings/config/types'
+import { Options } from '../../../settings/options/types'
+import { Tools } from '../../../tools'
 
-export type DownloadParams = {
-  parentId?: number
-  scrapeNextIndex: number
-  incrementIndex: number
-  value?: string
+export const downloaderClassFactory = (
+  config: ScrapeConfig,
+  options: Options,
+  tools: Tools
+) => {
+  // TODO use type guards
+  if (config.download) return new HttpDownloader(config, options, tools)
+  else return new IdentityDownloader(config, options, tools)
 }
-type ReturnType =
-  | Promise<{
-      downloadValue: string
-      downloadId: number
-      filename?: string
-    }>
-  | {
-      downloadValue: string
-      downloadId: number
-      filename: null
-    }
 
-export type DownloaderType = (
-  config: ScrapeConfig
-) => (
-  runParams: RunOptions,
-  dependencies: Dependencies
-) => (downloadParams: DownloadParams) => ReturnType
-
-export default (config: ScrapeConfig) => {
-  if (config.download) return urlDownloader(config)
-  else return identityDownloader(config)
-}
+export type DownloaderClass = IdentityDownloader | HttpDownloader

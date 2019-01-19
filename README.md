@@ -17,10 +17,10 @@ npm install scrape-pages
 
 ## Usage
 
-lets download the five most recent images from nasa's image of the day archive
+lets download the five most recent images from NASA's image of the day archive
 
 ```javascript
-const ScrapePages = require('scrape-pages')
+const { scraper } = require('scrape-pages')
 // create a config file
 const config = {
   scrape: {
@@ -42,21 +42,22 @@ const config = {
     }
   }
 }
+const options = {
+  folder: './downloads',
+  logLevel: 'info',
+  logFile: './nasa-download.log'
+}
 
 // load the config into a new 'scraper'
-const siteScraper = new ScrapePages(config)
-// begin scraping
-const emitter = siteScraper.run({ folder: './downloads' })
-
-emitter.on('image:complete', (queryFor, { id }) =>
+const scraper = await scrape(config, options)
+const { on, emit, query } = scraper
+on('image:compete', id => {
   console.log('COMPLETED image', id)
-)
-
-emitter.on('done', async queryFor => {
+})
+on('done', () => {
   console.log('finished.')
-  const result = await queryFor({ scrapers: { images: ['filename'] } })
-  console.log(result)
-  // [{
+  const result = query({ scrapers: ['images'] })
+  // result = [{
   //   images: [{ filename: 'img1.jpg' }, { filename: 'img2.jpg' }, ...]
   // }]
 })
@@ -66,41 +67,49 @@ For more real world examples, visit the [examples](examples) directory
 
 ## Documentation
 
-Detailed usage documentation is coming, but for now, [typescript](https://www.typescriptlang.org/) typings
-exist for the surface API.
-
-- for scraper config object documentation see [src/configuration/types.ts](src/configuration/types.ts)
-- for runtime options documentation see [src/run-options/types.ts](src/run-options/types.ts)
-
 The scraper instance created from a config object is meant to be reusable and cached. It only knows about the
 config object. `scraper.run` can be called multiple times, and, as long as different folders are
 provided, each run will work independently. `scraper.run` returns **emitter**
 
-### emitter
+### scrape
 
-#### Listenable events
+| param   | type             | required | type file                                                      | description                   |
+| ------- | ---------------- | -------- | -------------------------------------------------------------- | ----------------------------- |
+| config  | `ConfigInit`     | Yes      | [src/settings/config/types.ts](src/settings/config/types.ts)   | _what_ is being downloaded    |
+| options | `RunOptionsInit` | Yes      | [src/settings/options/types.ts](src/settings/options/types.ts) | _how_ something is downloaded |
+
+
+### scraper
+The `scrape` function returns a promise which yeilds these utilities (`on`, `emit`, and `query`)
+
+#### on
+Listen for events from the scraper
+| event                  | callback arguments    | description                                |
+| ---------------------- | --------------------- | ------------------------------------------ |
+| `'done'`               | queryFor              | when the scraper has completed             |
+| `'error'`              | error                 | if the scraper encounters an error         |
+| `'<scraper>:progress'` | queryFor, download id | emits progress of download until completed |
+| `'<scraper>:queued'`   | queryFor, download id | when a download is queued                  |
+| `'<scraper>:complete'` | queryFor, download id | when a download is completed               |
+
+#### emit
+
+While the scraper is working, you can affect its behavior by emitting these events:
+| event | arguments | description |
+| --- | --- | --- |
+| `'useRateLimiter'` | boolean | turn on or off the rate limit defined in the run options |
+| `'stop'` | | stop the crawler (note that in progress requests will still complete) |
 
 each event will return the **queryFor** function as its first argument
 
-- `'done'`: when the scraper has completed
-- `'error'`: when the scraper encounters an error (this also stops the scraper)
-- `'<scraper>:progress'`: emits progress of download until completed
-- `'<scraper>:queued'`: when a download is queued
-- `'<scraper>:complete'`: when a download is completed
+#### query
 
-#### Emittable events
-
-- '`useRateLimiter'`: pass a boolean to turn on or off the rate limit defined in the run options
-- `'stop'`: emit this event to stop the crawler (note that any in progress promises will still complete)
-
-### queryFor
-
-This function is used to get data back out of the scraper whenever you need it. The function takes an object
-with three keys:
-
-- `scrapers`: `{ [name]: Array<'filename'|'parsedValue'> }`
-- `groupBy?`: name of a scraper which will delineate the values in `scrapers`
-- `stmtCacheKey?`: `Symbol` which helps the internal database cache queries.
+This function is an argument in the emitter callback and is used to get data back out of the scraper whenever
+you need it. These are its arguments:
+| name | type | required | description |
+| --- | --- | --- | --- |
+| `scrapers` | `string[]` | Yes | scrapers who will return their filenames and parsed values, in order |
+| `groupBy` | `string` | Yes | name of a scraper which will delineate the values in `scrapers` |
 
 ## Motivation
 

@@ -1,4 +1,4 @@
-import Handlebars from 'handlebars'
+import * as Handlebars from 'handlebars'
 
 Handlebars.registerHelper('+', (x: number, y: number) => x + y)
 Handlebars.registerHelper('-', (x: number, y: number) => x - y)

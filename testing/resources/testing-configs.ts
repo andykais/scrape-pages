@@ -1,4 +1,4 @@
-import { ConfigInit } from '../../src/configuration/site-traversal/types'
+import { ConfigInit } from '../../src/settings/config/types'
 
 // setup reusable variables
 export const __SIMPLE_CONFIG__: ConfigInit = {
@@ -52,4 +52,13 @@ export const __GALLERY_POST_IMG_TAG__: ConfigInit = {
       ]
     }
   }
+}
+
+export const __EMPTY_CONFIG__: ConfigInit = {
+  scrape: {}
+}
+
+export const __INPUT_CONFIG__: ConfigInit = {
+  input: ['username'],
+  scrape: {}
 }

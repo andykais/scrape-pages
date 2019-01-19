@@ -1,38 +1,32 @@
 import os from 'os'
 import path from 'path'
 
-import { expect, use } from 'chai'
-import chaiExclude from 'chai-exclude'
-use(chaiExclude)
+import { expect } from 'chai'
 import _ from 'lodash/fp'
 
-import { NockFolderMock } from '../../nock-folder-mock'
-import PageScraper from '../../../src'
+import '../../use-chai-plugins'
+import { nockMockFolder } from '../../nock-folder-mock'
 import { config } from './config'
 import expectedQueryResult from './resources/expected-query-result.json'
+import { scrape } from '../../../src'
 
 describe('increment gallery site', () => {
   describe('with instant scraper', function() {
     let scraperQueryForFunction: any
     before(done => {
       ;(async () => {
-        const endpointMock = new NockFolderMock(
+        await nockMockFolder(
           `${__dirname}/resources/mock-endpoints`,
           'http://increment-gallery-site.com'
         )
-        await endpointMock.init()
 
-        const downloadDir = path.resolve(os.tmpdir(), this.fullTitle())
-        const siteScraper = new PageScraper(config)
-        siteScraper
-          .run({
-            folder: downloadDir,
-            cleanFolder: true
-          })
-          .on('done', queryFor => {
-            scraperQueryForFunction = queryFor
-            done()
-          })
+        const options = {
+          folder: path.resolve(os.tmpdir(), this.fullTitle()),
+          cleanFolder: true
+        }
+        const { on, query } = await scrape(config, options)
+        scraperQueryForFunction = query
+        on('done', done)
       })()
     })
 
@@ -60,24 +54,19 @@ describe('increment gallery site', () => {
     let scraperQueryForFunction: any
     before(done => {
       ;(async () => {
-        const endpointMock = new NockFolderMock(
+        await nockMockFolder(
           `${__dirname}/resources/mock-endpoints`,
           'http://increment-gallery-site.com',
           { randomSeed: 1 }
         )
-        await endpointMock.init()
 
-        const downloadDir = path.resolve(os.tmpdir(), this.fullTitle())
-        const siteScraper = new PageScraper(config)
-        siteScraper
-          .run({
-            folder: downloadDir,
-            cleanFolder: true
-          })
-          .on('done', queryFor => {
-            scraperQueryForFunction = queryFor
-            done()
-          })
+        const options = {
+          folder: path.resolve(os.tmpdir(), this.fullTitle()),
+          cleanFolder: true
+        }
+        const { on, query } = await scrape(config, options)
+        scraperQueryForFunction = query
+        on('done', done)
       })()
     })
 

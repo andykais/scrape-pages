@@ -1,7 +1,4 @@
 import * as Rx from 'rxjs'
-import * as ops from 'rxjs/operators'
-// types
-import { DownloadParseFunction } from '../../../scraper/scrape-step/incrementer'
 
 export const whileLoopObservable = <In, Out>(
   inLoopFunction: (initialVal: In, index: number) => Promise<Out>,
@@ -20,7 +17,6 @@ export const whileLoopObservable = <In, Out>(
           observer.next(nextVal)
           index++
         } catch (e) {
-          // TODO in incrementUntil number, allow loop to keep going when there is a failed download
           observer.error(e)
           break
         }
