@@ -33,7 +33,6 @@ class ScrapeStep extends AbstractScrapeStep {
   private flatOptions: FlatOptions
   private tools: Tools
   private scraperLogger: ReturnType<Tools['logger']['scraper']>
-
   private downloader: DownloaderClass
   private parser: ParserClass
   private incrementObservableFunction: ReturnType<typeof incrementer>
@@ -69,6 +68,9 @@ class ScrapeStep extends AbstractScrapeStep {
     )
   }
 
+  // todo start using Rx.merge(parentValues.map(this.incrementObservableFunction))
+  // right now, observables per set of parsed values are 1 + #values * ( increments + scrapeNext || 0 )
+  // this can remove the first one
   public run: typeof AbstractScrapeStep.prototype.run = (
     parentValues: ParsedValue[]
   ): Rx.Observable<ParsedValue[]> =>

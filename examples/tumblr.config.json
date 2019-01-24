@@ -2,9 +2,9 @@
   "input": "username",
   "scrape": {
     "download": {
-      "increment": 50,
-      "urlTemplate": "https://{username}.tumblr.com/api/read/json?start={_index}&num=50"
+      "urlTemplate": "https://{{ username }}.tumblr.com/api/read/json?start={{'*' index 50 }}&num=50"
     },
+    "incrementUntil": "failed-download",
     "scrapeEach": {
       "name": "parse-json",
       "parse": {

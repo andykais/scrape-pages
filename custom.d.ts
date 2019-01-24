@@ -4,7 +4,7 @@ declare module '*.sql' {
 }
 
 declare module 'flow-runtime' {
-  const content: any
+  const content: {}
   export default content
 }
 

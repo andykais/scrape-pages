@@ -2,13 +2,13 @@
   "input": "artist",
   "scrape": {
     "download": {
-      "increment": 24,
-      "urlTemplate": "https://{artist}.deviantart.com/gallery/?catpath=/&offset={_index}"
+      "urlTemplate": "https://{{ artist }}.deviantart.com/gallery/?catpath=/&offset={{'*' index 24}}"
     },
     "parse": {
       "selector": ".torpedo-thumb-link",
       "attribute": "href"
     },
+    "incrementUntil": "failed-download",
     "scrapeEach": {
       "download": "{value}",
       "parse": {

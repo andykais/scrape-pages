@@ -12,6 +12,7 @@ class Store {
   private config: Config
   private flatConfig: FlatConfig
   private database: Database
+  public transaction: Transaction
 
   public constructor(config: Config, { folder }: OptionsInit) {
     this.config = config
@@ -19,14 +20,11 @@ class Store {
     // initialize sqlite3 database
     this.database = new Database(folder)
     this.database.pragma('journal_mode = WAL')
+    this.transaction = this.database.transaction.bind(this.database)
     // initialize tables (if they do not exist already)
     createTables(this.flatConfig, this.database)()
     // prepare statements
     this.qs = createStatements(this.flatConfig, this.database)
-  }
-
-  public transaction = <T>(func: () => T): Transaction => {
-    return this.database.transaction(func)
   }
 
   public query = ({
