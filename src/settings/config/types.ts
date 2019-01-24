@@ -96,3 +96,36 @@ export type ConfigPositionInfo = {
 export type FlatConfig = {
   [scraperName: string]: ConfigPositionInfo
 }
+
+type Import = string
+export interface ScrapeConfigInit2 {
+  download?: DownloadConfigInit
+  parse?: ParseConfigInit
+  incrementUntil?: Incrementers
+}
+export interface ScrapeConfig2 {
+  download?: DownloadConfig
+  parse?: ParseConfig
+  incrementUntil: Incrementers
+}
+interface StructureInit {
+  scraper: ScraperName
+  scrapeEach?: StructureInit | StructureInit[]
+  scrapeNext?: StructureInit | StructureInit[]
+}
+interface Structure extends StructureInit {
+  scrapeEach: Structure[]
+  scrapeNext: Structure[]
+}
+export interface ConfigInit2 {
+  input?: Input | Input[]
+  import?: Import | Import[]
+  defs: { [scraperName: string]: ScrapeConfigInit }
+  structure: StructureInit
+}
+export interface Config2 extends ConfigInit2 {
+  input: Input[]
+  import: Import[]
+  structure: Structure
+}
+

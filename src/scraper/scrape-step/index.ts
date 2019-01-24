@@ -35,7 +35,7 @@ class ScrapeStep extends AbstractScrapeStep {
   private scraperLogger: ReturnType<Tools['logger']['scraper']>
   private downloader: DownloaderClass
   private parser: ParserClass
-  private incrementObservableFunction: ReturnType<typeof incrementer>
+  public incrementObservableFunction: ReturnType<typeof incrementer>
   private children: ScrapeStep[]
 
   public constructor(

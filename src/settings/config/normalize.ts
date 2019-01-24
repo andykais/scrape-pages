@@ -5,16 +5,18 @@ import {
   ParseConfig,
   ScrapeConfigInit,
   ConfigInit,
-  Config
+  Config,
+  // replacement
+  ScrapeConfigInit2,
+  ScrapeConfig2,
+  ConfigInit2,
+  Config2
 } from './types'
 import { assertConfigType } from './'
 
-const downloadDefaults: {
-  headerTemplates: DownloadConfig['headerTemplates']
-  method: DownloadConfig['method']
-} = {
-  method: 'GET',
-  headerTemplates: {}
+const downloadDefaults = {
+  method: 'GET' as DownloadConfig['method'],
+  headerTemplates: {} as DownloadConfig['headerTemplates']
 }
 // TODO use type guards
 const assignDownloadDefaults = (download: DownloadConfigInit): DownloadConfig =>
@@ -97,3 +99,90 @@ const normalizeConfig = (config: ConfigInit): Config => {
   }
 }
 export { normalizeConfig }
+
+const defaults = {
+  definitions: {
+    incrementUntil: 0
+  }
+}
+const normalizeDefinition = (
+  scrapeConfig: ScrapeConfigInit2
+): ScrapeConfig2 => ({
+  ...defaults.definitions,
+  ...scrapeConfig,
+  download:
+    scrapeConfig.download === undefined
+      ? undefined
+      : assignDownloadDefaults(scrapeConfig.download),
+  parse:
+    scrapeConfig.parse === undefined
+      ? undefined
+      : assignParseDefaults(scrapeConfig.parse)
+})
+
+const normalizeUndefinedSingleArray = <T>(val?: T | T[]): T[] =>
+  val === undefined ? [] : Array.isArray(val) ? val : [val]
+
+const normalizeStructure = ({
+  scraper,
+  scrapeNext,
+  scrapeEach
+}: ConfigInit2['structure']): Config2['structure'] => ({
+  scraper,
+  scrapeNext: normalizeUndefinedSingleArray(scrapeNext).map(normalizeStructure),
+  scrapeEach: normalizeUndefinedSingleArray(scrapeEach).map(normalizeStructure)
+})
+
+const normalizeConfig2 = (config: ConfigInit2): Config2 => {
+  // assertConfigType(config)
+
+  const defs = Object.keys(config.defs).reduce(
+    (acc, scraperName) => ({
+      ...acc,
+      [scraperName]: normalizeDefinition(config.defs[scraperName])
+    }),
+    {}
+  )
+
+  return {
+    input: normalizeUndefinedSingleArray(config.input),
+    import: normalizeUndefinedSingleArray(config.import),
+    defs,
+    structure: normalizeStructure(config.structure)
+  }
+}
+
+export { normalizeConfig2 }
+import * as Rx from 'rxjs'
+import * as ops from 'rxjs/operators'
+import { ParsedValue, ScrapeStep } from '../../scraper/scrape-step'
+import { wrapError } from '../../util/error'
+
+const buildStructure = (
+  config: Config2,
+  scrapers: { [scraperName: string]: ScrapeStep }
+) => {
+  const recurse = (structure: Config2['structure']) => {
+    // const scraper = scrapers[structure.scraper]
+    const each = structure.scrapeEach.map(({ scraper }) => scrapers[scraper])
+    const next = structure.scrapeNext.map(({ scraper }) => scrapers[scraper])
+
+    return (parentValues: ParsedValue[]): Rx.Observable<ParsedValue[]> =>
+      Rx.from(parentValues).pipe(
+        ops.catchError(wrapError(`scraper '${this.scraperName}'`)),
+        ops.flatMap(value =>
+          Rx.merge(
+            ...each.map(child => child.incrementObservableFunction(value))
+          )
+        )
+      )
+  }
+  const scraper = scrapers[config.structure.scraper]
+  return (inputValues: ParsedValue[]) =>
+    Rx.from(inputValues).pipe(
+      ops.flatMap(scraper.incrementObservableFunction),
+      ops.flatMap(recurse(config.structure))
+    )
+
+  return (parseValues: ParsedValue[]) => recurse(config.structure)
+}
