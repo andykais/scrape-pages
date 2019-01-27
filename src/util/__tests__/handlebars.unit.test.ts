@@ -1,7 +1,6 @@
 import { compileTemplate } from '../handlebars'
 import { expect } from 'chai'
 
-
 describe('handlebars helpers', () => {
   it('should work with multiplication operator', () => {
     const template = `{{'*' 2 4}}`

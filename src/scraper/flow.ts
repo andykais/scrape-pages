@@ -65,30 +65,30 @@ const structureScrapers = (
           okToIncrement,
           parsedValueWithId
         ).pipe(
-          // ops.takeWhile(), // move okToIncrement logic here?
           ops.catchError(ignoreFetchError),
-          ops.flatMap((parsedValues, incrementIndex) =>
-            Rx.of(parsedValues).pipe(
-              ops.expand(parsedValues =>
-                Rx.merge(
-                  ...next.map(nextScraper =>
-                    nextScraper(parsedValues).pipe(
-                      ops.flatMap(parsedValues =>
-                        parsedValues.map(parsedValueWithId =>
-                          scraper.downloadParseFunction(
-                            parsedValueWithId,
-                            incrementIndex
-                          )
-                        )
-                      ),
-                      ops.mergeAll(),
-                      ops.filter(incrementUntilEmptyParse)
+          ops.expand(([parsedValues, incrementIndex]) =>
+            Rx.merge(
+              ...next.map(nextScraper =>
+                nextScraper(parsedValues).pipe(
+                  ops.flatMap(parsedValues =>
+                    parsedValues.map(parsedValueWithId =>
+                      scraper.downloadParseFunction(
+                        parsedValueWithId,
+                        incrementIndex
+                      )
                     )
+                  ),
+                  ops.mergeAll(),
+                  ops.filter(incrementUntilEmptyParse),
+                  ops.map(
+                    parsedValues =>
+                      [parsedValues, incrementIndex] as [ParsedValue[], number]
                   )
                 )
               )
             )
-          )
+          ),
+          ops.map(([parsedValues]) => parsedValues)
         )
       ),
       each.length
