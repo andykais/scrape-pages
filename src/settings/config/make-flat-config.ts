@@ -18,8 +18,9 @@ const makeFlatConfig = (config: Config): FlatConfig => {
     const nextConfigs = structure.scrapeNext.reduce(
       (acc, child, horizontalIndex) => ({
         ...acc,
-        // ...recurse(child, scraper, depth + 1, horizontalIndex), // possible improvement, test ordering
-        ...recurse(child)
+        ...recurse(child, scraper, depth + 1, horizontalIndex)
+        // previously depth & horizontalIndex were disregarded, add functional test to prove it is not problem
+        // ...recurse(child)
       }),
       {}
     )

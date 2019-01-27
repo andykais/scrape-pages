@@ -1,6 +1,6 @@
 import { normalizeConfig } from '../'
 import * as testingConfigs from '../../../../testing/resources/testing-configs'
-import { Config, ConfigInit } from '../types'
+import { Config } from '../types'
 import { expect } from 'chai'
 
 describe('normalize config with', () => {
@@ -45,36 +45,6 @@ describe('normalize config with', () => {
           }
         ]
       }
-      // scrape: {
-      //   name: 'level_0_index_0',
-      //   download: {
-      //     method: 'GET',
-      //     urlTemplate: (simpleConfig.scrape as any).download,
-      //     headerTemplates: {}
-      //     // regexCleanup: undefined
-      //   },
-      //   parse: {
-      //     selector: (simpleConfig.scrape.parse as any).selector,
-      //     attribute: (simpleConfig.scrape.parse as any).attribute,
-      //     expect: 'html'
-      //   },
-      //   incrementUntil: 0,
-      //   scrapeEach: [
-      //     {
-      //       name: 'level_1_index_0',
-      //       download: {
-      //         method: 'GET',
-      //         urlTemplate: (simpleConfig.scrape as any).scrapeEach.download,
-      //         headerTemplates: {}
-      //       },
-      //       parse: undefined,
-      //       incrementUntil: 0,
-      //       scrapeEach: [],
-      //       scrapeNext: undefined
-      //     }
-      //   ],
-      //   scrapeNext: undefined
-      // }
     }
 
     it('should match itself for a full filled in config', () => {

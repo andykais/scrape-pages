@@ -4,7 +4,7 @@ import * as RxCustom from '../util/rxjs/observables'
 import { ScrapeStep } from './scrape-step'
 import { wrapError } from '../util/error'
 // type imports
-import { ParsedValue, DownloadParseFunction } from './scrape-step'
+import { ParsedValue } from './scrape-step'
 import { Config, ScrapeConfig } from '../settings/config/types'
 
 type DownloadParseBoolean = (

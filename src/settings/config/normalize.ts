@@ -50,56 +50,6 @@ const normalizeParse = (parse: ParseConfigInit): ParseConfig =>
         expect: parse.expect || defaults.parse.expect
       }
 
-// const fillInDefaultsRecurse = (level = 0, parentName = '') => (
-//   scrapeConfig: ScrapeConfigInit,
-//   index = 0
-// ): Config['scrape'] => {
-//   const {
-//     name,
-//     download,
-//     parse,
-//     incrementUntil,
-//     scrapeNext,
-//     scrapeEach = []
-//   } = scrapeConfig
-
-//   const internalName = `${parentName}${
-//     parentName ? '-' : ''
-//   }level_${level}_index_${index}${scrapeNext ? '_next' : ''}`
-
-//   return {
-//     name: name || internalName,
-//     download:
-//       download === undefined ? undefined : assignDownloadDefaults(download),
-//     parse: parse === undefined ? undefined : assignParseDefaults(parse),
-//     incrementUntil: incrementUntil || 0,
-//     scrapeNext:
-//       scrapeNext && fillInDefaultsRecurse(level + 1, parentName)(scrapeNext),
-//     scrapeEach: Array.isArray(scrapeEach)
-//       ? scrapeEach.map(fillInDefaultsRecurse(level + 1, parentName))
-//       : [fillInDefaultsRecurse(level + 1)(scrapeEach)]
-//   }
-// }
-
-// const standardizeInput = (input: ConfigInit['input']): Config['input'] => {
-//   if (!input) return []
-//   else return Array.isArray(input) ? input : [input]
-// }
-
-// const normalizeConfig = (config: ConfigInit): Config => {
-//   assertConfigType(config)
-
-//   const input = standardizeInput(config.input)
-
-//   const fullConfig = fillInDefaultsRecurse()(config.scrape)
-
-//   return {
-//     input,
-//     scrape: fullConfig
-//   }
-// }
-// export { normalizeConfig }
-
 const normalizeDefinition = (scrapeConfig: ScrapeConfigInit): ScrapeConfig => ({
   ...defaults.definitions,
   ...scrapeConfig,
@@ -127,7 +77,7 @@ const normalizeStructure = ({
 })
 
 const normalizeConfig = (config: ConfigInit): Config => {
-  // assertConfigType(config)
+  assertConfigType(config)
 
   const defs = Object.keys(config.defs).reduce(
     (acc, scraperName) => ({

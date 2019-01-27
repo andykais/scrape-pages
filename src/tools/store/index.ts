@@ -9,10 +9,10 @@ import { OptionsInit } from '../../settings/options/types'
 
 class Store {
   public qs: ReturnType<typeof createStatements>
+  public transaction: Transaction
   private config: Config
   private flatConfig: FlatConfig
   private database: Database
-  public transaction: Transaction
 
   public constructor(config: Config, { folder }: OptionsInit) {
     this.config = config

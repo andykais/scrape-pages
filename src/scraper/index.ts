@@ -28,7 +28,6 @@ export const scrape = async (
   const flatOptions = normalizeOptions(config, optionsInit)
   await initFolders(config, optionsInit, flatOptions)
   const tools = initTools(config, optionsInit, flatOptions)
-  const s = config.defs['s']
   // create the observable
   const scrapers = mapObject(
     config.defs,
