@@ -9,6 +9,7 @@ import { nockMockFolder } from '../../nock-folder-mock'
 import { config } from './config'
 import expectedQueryResult from './resources/expected-query-result.json'
 import { scrape } from '../../../src'
+import { OptionsInit } from '../../../src/settings/options/types'
 
 describe('increment gallery site', () => {
   describe('with instant scraper', function() {
@@ -20,9 +21,15 @@ describe('increment gallery site', () => {
           'http://increment-gallery-site.com'
         )
 
-        const options = {
+        const options: OptionsInit = {
           folder: path.resolve(os.tmpdir(), this.fullTitle()),
-          cleanFolder: true
+          cleanFolder: true,
+          optionsEach: {
+            image: {
+              read: false,
+              write: true
+            }
+          }
         }
         const { on, query } = await scrape(config, options)
         scraperQueryForFunction = query
@@ -62,8 +69,15 @@ describe('increment gallery site', () => {
 
         const options = {
           folder: path.resolve(os.tmpdir(), this.fullTitle()),
-          cleanFolder: true
+          cleanFolder: true,
+          optionsEach: {
+            image: {
+              read: false,
+              write: true
+            }
+          }
         }
+
         const { on, query } = await scrape(config, options)
         scraperQueryForFunction = query
         on('done', done)

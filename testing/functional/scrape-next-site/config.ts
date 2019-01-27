@@ -1,40 +1,58 @@
 import { ConfigInit } from '../../../src/settings/config/types'
 
 export const config: ConfigInit = {
-  scrape: {
-    name: 'index-page',
-    download: 'http://scrape-next-site.com/index.html',
-    parse: '#batch-id',
+  defs: {
+    'index-page': {
+      download: 'http://scrape-next-site.com/index.html',
+      parse: '#batch-id'
+    },
+    gallery: {
+      download: 'http://scrape-next-site.com/batch-id-page/id-{{ value }}.html'
+    },
+    'next-batch-id': {
+      parse: '#batch-id'
+    },
+    'batch-page': {
+      parse: {
+        selector: 'li > a',
+        attribute: 'href'
+      }
+    },
+    'image-page': {
+      download: 'http://scrape-next-site.com{{ value }}'
+    },
+    tag: {
+      parse: '#tags > li'
+    },
+    'image-parse': {
+      parse: {
+        selector: 'img',
+        attribute: 'src'
+      }
+    },
+    image: {
+      download: 'http://scrape-next-site.com{{ value }}'
+    }
+  },
+  structure: {
+    scraper: 'index-page',
     scrapeEach: {
-      name: 'gallery',
-      download: 'http://scrape-next-site.com/batch-id-page/id-{{ value }}.html',
+      scraper: 'gallery',
       scrapeNext: {
-        name: 'next-batch-id',
-        parse: '#batch-id'
+        scraper: 'next-batch-id'
       },
       scrapeEach: {
-        name: 'batch-page',
-        parse: {
-          selector: 'li > a',
-          attribute: 'href'
-        },
+        scraper: 'batch-page',
         scrapeEach: {
-          name: 'image-page',
-          download: 'http://scrape-next-site.com{{ value }}',
+          scraper: 'image-page',
           scrapeEach: [
             {
-              name: 'tag',
-              parse: '#tags > li'
+              scraper: 'tag'
             },
             {
-              name: 'image-parse',
-              parse: {
-                selector: 'img',
-                attribute: 'src'
-              },
+              scraper: 'image-parse',
               scrapeEach: {
-                name: 'image',
-                download: 'http://scrape-next-site.com{{ value }}'
+                scraper: 'image'
               }
             }
           ]

@@ -3,6 +3,8 @@ import { ScrapeStep } from './scrape-step'
 import { mkdirp, rmrf } from '../util/fs'
 import { normalizeConfig } from '../settings/config'
 import { normalizeOptions } from '../settings/options'
+import { structureScrapers } from './flow'
+import { mapObject } from '../util/object'
 // type imports
 import { Config, ConfigInit } from '../settings/config/types'
 import { OptionsInit, FlatOptions } from '../settings/options/types'
@@ -26,32 +28,41 @@ export const scrape = async (
   const flatOptions = normalizeOptions(config, optionsInit)
   await initFolders(config, optionsInit, flatOptions)
   const tools = initTools(config, optionsInit, flatOptions)
+  const s = config.defs['s']
   // create the observable
-  const scrapingScheme = new ScrapeStep(config.scrape, flatOptions, tools)
-  const scrapingObservable = scrapingScheme.run([{ parsedValue: '' }])
+  const scrapers = mapObject(
+    config.defs,
+    (name, scrapeConfig) =>
+      new ScrapeStep(name, scrapeConfig, flatOptions.get(name)!, tools)
+  )
+  const scrapingScheme = structureScrapers(config, scrapers)(config.structure)
+  const scrapingObservable = scrapingScheme([{ parsedValue: '' }])
   // start running the observable
   const { emitter, queue, logger, store } = tools
-  const subscription = scrapingObservable.subscribe({
-    error: (error: Error) => {
-      emitter.emit.error(error)
+  // necessary so that any listeners setup after function is called are setup before downloads begin
+  setTimeout(() => {
+    const subscription = scrapingObservable.subscribe({
+      error: (error: Error) => {
+        emitter.emit.error(error)
+        subscription.unsubscribe()
+        queue.closeQueue()
+      },
+      complete: () => {
+        // TODO add timer to show how long it took
+        queue.closeQueue()
+        emitter.emit.done()
+        logger.info('Done!')
+      }
+    })
+    emitter.on.stop(() => {
+      logger.info('Exiting manually.')
+      queue.closeQueue()
       subscription.unsubscribe()
-      queue.closeQueue()
-    },
-    complete: () => {
-      // TODO add timer to show how long it took
-      queue.closeQueue()
-      emitter.emit.done()
       logger.info('Done!')
-    }
-  })
+      emitter.emit.done()
+    })
+  }, 0)
 
-  emitter.on.stop(() => {
-    logger.info('Exiting manually.')
-    queue.closeQueue()
-    subscription.unsubscribe()
-    logger.info('Done!')
-    emitter.emit.done()
-  })
   return {
     on: emitter.getBoundOn(),
     emit: emitter.getBoundEmit(),

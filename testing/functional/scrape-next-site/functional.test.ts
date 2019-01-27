@@ -22,7 +22,13 @@ describe('scrape next site', () => {
 
         const options = {
           folder: path.resolve(os.tmpdir(), this.fullTitle()),
-          cleanFolder: true
+          cleanFolder: true,
+          optionsEach: {
+            image: {
+              read: false,
+              write: true
+            }
+          }
         }
         const { on, query } = await scrape(config, options)
         scraperQueryForFunction = query
@@ -62,7 +68,13 @@ describe('scrape next site', () => {
 
         const options = {
           folder: path.resolve(os.tmpdir(), this.fullTitle()),
-          cleanFolder: true
+          cleanFolder: true,
+          optionsEach: {
+            image: {
+              read: false,
+              write: true
+            }
+          }
         }
         const { on, query } = await scrape(config, options)
         scraperQueryForFunction = query

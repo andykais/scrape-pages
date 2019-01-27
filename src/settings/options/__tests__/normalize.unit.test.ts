@@ -7,29 +7,33 @@ import { expect } from 'chai'
 describe('normalize run options with', () => {
   describe('simple config', () => {
     const fullConfig = normalizeConfig(testingConfigs.__SIMPLE_CONFIG__)
-    it('should match returned run options', () => {
+    it('should match returned options', () => {
       const runOptionsInit = {
         folder: '/nonexistent'
       }
       const runOptions = normalizeOptions(fullConfig, runOptionsInit)
       const runOptionsExpected: FlatOptions = new Map([
         [
-          'level_0_index_0',
+          'index',
           {
             cache: true,
+            read: true,
+            write: false,
             logLevel: 'error' as 'error',
             downloadPriority: 0,
-            folder: '/nonexistent/level_0_index_0',
+            folder: '/nonexistent/index',
             input: {}
           }
         ],
         [
-          'level_1_index_0',
+          'image',
           {
             cache: true,
+            read: true,
+            write: false,
             logLevel: 'error' as 'error',
             downloadPriority: 0,
-            folder: '/nonexistent/level_1_index_0',
+            folder: '/nonexistent/image',
             input: {}
           }
         ]
@@ -56,7 +60,7 @@ describe('normalize run options with', () => {
         folder: '/nonexistent'
       }
       const runOptions = normalizeOptions(fullConfig, runOptionsInit)
-      const normalizedInput = runOptions.get('level_0_index_0')!.input
+      const normalizedInput = runOptions.get('identity')!.input
 
       expect(normalizedInput).to.be.deep.equal({
         username: runOptionsInit.input.username

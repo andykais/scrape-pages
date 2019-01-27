@@ -5,6 +5,7 @@ var lib_1 = require("ts-runtime/lib");
 exports.ScraperName = lib_1.default.type("ScraperName", lib_1.default.nullable(lib_1.default.string()));
 var ScraperGroup = lib_1.default.type("ScraperGroup", lib_1.default.nullable(lib_1.default.string()));
 var InputKey = lib_1.default.type("InputKey", lib_1.default.nullable(lib_1.default.string()));
+var Import = lib_1.default.type("Import", lib_1.default.nullable(lib_1.default.string()));
 var RegexRemove = lib_1.default.type("RegexRemove", lib_1.default.nullable(lib_1.default.string()));
 var RegexReplace = lib_1.default.type("RegexReplace", lib_1.default.object(lib_1.default.property("selector", lib_1.default.nullable(lib_1.default.string())), lib_1.default.property("replacer", lib_1.default.nullable(lib_1.default.string()))));
 var RegexCleanup = lib_1.default.type("RegexCleanup", lib_1.default.nullable(lib_1.default.union(lib_1.default.nullable(lib_1.default.ref(RegexRemove)), lib_1.default.nullable(lib_1.default.ref(RegexReplace)))));
@@ -22,11 +23,37 @@ var ParseConfigInterface = lib_1.default.type("ParseConfigInterface", lib_1.defa
 exports.ParseConfigInit = lib_1.default.type("ParseConfigInit", lib_1.default.nullable(lib_1.default.union(lib_1.default.nullable(lib_1.default.ref(Selector)), lib_1.default.nullable(lib_1.default.ref(ParseConfigInterface)))));
 exports.ParseConfig = lib_1.default.type("ParseConfig", lib_1.default.intersect(lib_1.default.ref(ParseConfigInterface), lib_1.default.object(lib_1.default.property("expect", lib_1.default.nullable(lib_1.default.ref(ExpectedFormats))))));
 var Incrementers = lib_1.default.type("Incrementers", lib_1.default.nullable(lib_1.default.union(lib_1.default.nullable(lib_1.default.string("failed-download")), lib_1.default.nullable(lib_1.default.string("empty-parse")), lib_1.default.nullable(lib_1.default.number()))));
-exports.ScrapeConfigInit = lib_1.default.type("ScrapeConfigInit", function (ScrapeConfigInit) { return lib_1.default.object(lib_1.default.property("name", lib_1.default.nullable(lib_1.default.ref(exports.ScraperName)), true), lib_1.default.property("download", lib_1.default.nullable(lib_1.default.ref(exports.DownloadConfigInit)), true), lib_1.default.property("parse", lib_1.default.nullable(lib_1.default.ref(exports.ParseConfigInit)), true), lib_1.default.property("incrementUntil", lib_1.default.nullable(lib_1.default.ref(Incrementers)), true), lib_1.default.property("scrapeNext", lib_1.default.nullable(lib_1.default.ref(ScrapeConfigInit)), true), lib_1.default.property("scrapeEach", lib_1.default.nullable(lib_1.default.union(lib_1.default.nullable(lib_1.default.ref(ScrapeConfigInit)), lib_1.default.nullable(lib_1.default.array(lib_1.default.nullable(lib_1.default.ref(ScrapeConfigInit)))))), true)); });
-exports.ConfigInit = lib_1.default.type("ConfigInit", lib_1.default.object(lib_1.default.property("input", lib_1.default.nullable(lib_1.default.union(lib_1.default.nullable(lib_1.default.ref(Input)), lib_1.default.nullable(lib_1.default.array(lib_1.default.nullable(lib_1.default.ref(Input)))))), true), lib_1.default.property("scrape", lib_1.default.nullable(lib_1.default.ref(exports.ScrapeConfigInit)))));
-// returned by ./normalize.ts
-exports.ScrapeConfig = lib_1.default.type("ScrapeConfig", function (ScrapeConfig) { return lib_1.default.object(lib_1.default.property("name", lib_1.default.nullable(lib_1.default.ref(exports.ScraperName))), lib_1.default.property("download", lib_1.default.nullable(lib_1.default.ref(exports.DownloadConfig)), true), lib_1.default.property("parse", lib_1.default.nullable(lib_1.default.ref(exports.ParseConfig)), true), lib_1.default.property("incrementUntil", lib_1.default.nullable(lib_1.default.ref(Incrementers))), lib_1.default.property("scrapeNext", lib_1.default.nullable(lib_1.default.ref(ScrapeConfig)), true), lib_1.default.property("scrapeEach", lib_1.default.nullable(lib_1.default.array(lib_1.default.nullable(lib_1.default.ref(ScrapeConfig)))))); });
-exports.Config = lib_1.default.type("Config", lib_1.default.intersect(lib_1.default.ref(exports.ConfigInit), lib_1.default.object(lib_1.default.property("input", lib_1.default.nullable(lib_1.default.array(lib_1.default.nullable(lib_1.default.ref(Input))))), lib_1.default.property("scrape", lib_1.default.nullable(lib_1.default.ref(exports.ScrapeConfig))))));
+// export interface ScrapeConfigInit {
+//   name?: ScraperName
+//   download?: DownloadConfigInit
+//   parse?: ParseConfigInit
+//   incrementUntil?: Incrementers
+//   scrapeNext?: ScrapeConfigInit
+//   scrapeEach?: ScrapeConfigInit | ScrapeConfigInit[]
+// }
+// export interface ConfigInit {
+//   input?: Input | Input[]
+//   scrape: ScrapeConfigInit
+// }
+// // returned by ./normalize.ts
+// export interface ScrapeConfig {
+//   name: ScraperName
+//   download?: DownloadConfig
+//   parse?: ParseConfig
+//   incrementUntil: Incrementers
+//   scrapeNext?: ScrapeConfig // scrape next only increments until 'empty-parse'
+//   scrapeEach: ScrapeConfig[]
+// }
+// export interface Config extends ConfigInit {
+//   input: Input[]
+//   scrape: ScrapeConfig
+// }
 // returned by ./make-flat-config.ts
 exports.ConfigPositionInfo = lib_1.default.type("ConfigPositionInfo", lib_1.default.object(lib_1.default.property("depth", lib_1.default.nullable(lib_1.default.number())), lib_1.default.property("horizontalIndex", lib_1.default.nullable(lib_1.default.number())), lib_1.default.property("name", lib_1.default.nullable(lib_1.default.ref(exports.ScraperName))), lib_1.default.property("parentName", lib_1.default.nullable(lib_1.default.ref(exports.ScraperName)), true)));
 exports.FlatConfig = lib_1.default.type("FlatConfig", lib_1.default.object(lib_1.default.indexer("scraperName", lib_1.default.nullable(lib_1.default.string()), lib_1.default.nullable(lib_1.default.ref(exports.ConfigPositionInfo)))));
+exports.ScrapeConfigInit = lib_1.default.type("ScrapeConfigInit", lib_1.default.object(lib_1.default.property("download", lib_1.default.nullable(lib_1.default.ref(exports.DownloadConfigInit)), true), lib_1.default.property("parse", lib_1.default.nullable(lib_1.default.ref(exports.ParseConfigInit)), true), lib_1.default.property("incrementUntil", lib_1.default.nullable(lib_1.default.ref(Incrementers)), true)));
+exports.ScrapeConfig = lib_1.default.type("ScrapeConfig", lib_1.default.object(lib_1.default.property("download", lib_1.default.nullable(lib_1.default.ref(exports.DownloadConfig)), true), lib_1.default.property("parse", lib_1.default.nullable(lib_1.default.ref(exports.ParseConfig)), true), lib_1.default.property("incrementUntil", lib_1.default.nullable(lib_1.default.ref(Incrementers)))));
+var StructureInit = lib_1.default.type("StructureInit", function (StructureInit) { return lib_1.default.object(lib_1.default.property("scraper", lib_1.default.nullable(lib_1.default.ref(exports.ScraperName))), lib_1.default.property("scrapeEach", lib_1.default.nullable(lib_1.default.union(lib_1.default.nullable(lib_1.default.ref(StructureInit)), lib_1.default.nullable(lib_1.default.array(lib_1.default.nullable(lib_1.default.ref(StructureInit)))))), true), lib_1.default.property("scrapeNext", lib_1.default.nullable(lib_1.default.union(lib_1.default.nullable(lib_1.default.ref(StructureInit)), lib_1.default.nullable(lib_1.default.array(lib_1.default.nullable(lib_1.default.ref(StructureInit)))))), true)); });
+var Structure = lib_1.default.type("Structure", function (Structure) { return lib_1.default.intersect(lib_1.default.ref(StructureInit), lib_1.default.object(lib_1.default.property("scrapeEach", lib_1.default.nullable(lib_1.default.array(lib_1.default.nullable(lib_1.default.ref(Structure))))), lib_1.default.property("scrapeNext", lib_1.default.nullable(lib_1.default.array(lib_1.default.nullable(lib_1.default.ref(Structure))))))); });
+exports.ConfigInit = lib_1.default.type("ConfigInit", lib_1.default.object(lib_1.default.property("input", lib_1.default.nullable(lib_1.default.union(lib_1.default.nullable(lib_1.default.ref(Input)), lib_1.default.nullable(lib_1.default.array(lib_1.default.nullable(lib_1.default.ref(Input)))))), true), lib_1.default.property("import", lib_1.default.nullable(lib_1.default.union(lib_1.default.nullable(lib_1.default.ref(Import)), lib_1.default.nullable(lib_1.default.array(lib_1.default.nullable(lib_1.default.ref(Import)))))), true), lib_1.default.property("defs", lib_1.default.object(lib_1.default.indexer("scraperName", lib_1.default.nullable(lib_1.default.string()), lib_1.default.nullable(lib_1.default.ref(exports.ScrapeConfigInit))))), lib_1.default.property("structure", lib_1.default.nullable(lib_1.default.ref(StructureInit)))));
+exports.Config = lib_1.default.type("Config", lib_1.default.intersect(lib_1.default.ref(exports.ConfigInit), lib_1.default.object(lib_1.default.property("input", lib_1.default.nullable(lib_1.default.array(lib_1.default.nullable(lib_1.default.ref(Input))))), lib_1.default.property("import", lib_1.default.nullable(lib_1.default.array(lib_1.default.nullable(lib_1.default.ref(Import))))), lib_1.default.property("defs", lib_1.default.object(lib_1.default.indexer("scraperName", lib_1.default.nullable(lib_1.default.string()), lib_1.default.nullable(lib_1.default.ref(exports.ScrapeConfig))))), lib_1.default.property("structure", lib_1.default.nullable(lib_1.default.ref(Structure))))));

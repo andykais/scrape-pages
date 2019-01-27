@@ -43,6 +43,8 @@ const normalizeOptions = (
     cache: true,
     downloadPriority: 0,
     logLevel: 'error' as 'error',
+    read: true,
+    write: false,
     ...globalOptions // user preferences for all things override
   }
 

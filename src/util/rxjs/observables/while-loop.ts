@@ -1,6 +1,6 @@
 import * as Rx from 'rxjs'
 
-export const whileLoopObservable = <In, Out>(
+export const whileLoop = <In, Out>(
   inLoopFunction: (initialVal: In, index: number) => Promise<Out>,
   conditional: (loopValue: Out, index: number) => boolean,
   initialVal: In

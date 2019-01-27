@@ -1,33 +1,40 @@
 import { Config, FlatConfig } from './types'
 
-const makeFlatConfig = (fullConfig: Config): FlatConfig => {
+const makeFlatConfig = (config: Config): FlatConfig => {
   const recurse = (
-    config: Config['scrape'],
+    structure: Config['structure'],
     parentName?: string,
     depth = 0,
     horizontalIndex = 0
   ): FlatConfig => {
-    const { name } = config
-    const childConfigs = config.scrapeEach.reduce(
-      (acc, scraper, horizontalIndex) => ({
+    const { scraper } = structure
+    const eachConfigs = structure.scrapeEach.reduce(
+      (acc, child, horizontalIndex) => ({
         ...acc,
-        ...recurse(scraper, name, depth + 1, horizontalIndex)
+        ...recurse(child, scraper, depth + 1, horizontalIndex)
       }),
       {}
     )
-    const scrapeNextConfig = config.scrapeNext ? recurse(config.scrapeNext) : {}
+    const nextConfigs = structure.scrapeNext.reduce(
+      (acc, child, horizontalIndex) => ({
+        ...acc,
+        // ...recurse(child, scraper, depth + 1, horizontalIndex), // possible improvement, test ordering
+        ...recurse(child)
+      }),
+      {}
+    )
 
     return {
-      [name]: {
-        name,
+      [scraper]: {
+        name: scraper,
         parentName,
         depth,
         horizontalIndex
       },
-      ...scrapeNextConfig,
-      ...childConfigs
+      ...eachConfigs,
+      ...nextConfigs
     }
   }
-  return recurse(fullConfig.scrape)
+  return recurse(config.structure)
 }
 export { makeFlatConfig }

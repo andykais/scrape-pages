@@ -4,6 +4,8 @@ export type ScraperName = string
 type ScraperGroup = string
 // input key
 type InputKey = string
+// npm import
+type Import = string
 
 // RegexCleanup {{{
 type RegexRemove = string
@@ -57,35 +59,6 @@ export interface ParseConfig extends ParseConfigInterface {
 
 type Incrementers = 'failed-download' | 'empty-parse' | number
 
-export interface ScrapeConfigInit {
-  name?: ScraperName
-  download?: DownloadConfigInit
-  parse?: ParseConfigInit
-  incrementUntil?: Incrementers
-  scrapeNext?: ScrapeConfigInit
-  scrapeEach?: ScrapeConfigInit | ScrapeConfigInit[]
-}
-
-export interface ConfigInit {
-  input?: Input | Input[]
-  scrape: ScrapeConfigInit
-}
-
-// returned by ./normalize.ts
-export interface ScrapeConfig {
-  name: ScraperName
-  download?: DownloadConfig
-  parse?: ParseConfig
-  incrementUntil: Incrementers
-  scrapeNext?: ScrapeConfig // scrape next only increments until 'empty-parse'
-  scrapeEach: ScrapeConfig[]
-}
-
-export interface Config extends ConfigInit {
-  input: Input[]
-  scrape: ScrapeConfig
-}
-
 // returned by ./make-flat-config.ts
 export type ConfigPositionInfo = {
   depth: number
@@ -97,13 +70,12 @@ export type FlatConfig = {
   [scraperName: string]: ConfigPositionInfo
 }
 
-type Import = string
-export interface ScrapeConfigInit2 {
+export interface ScrapeConfigInit {
   download?: DownloadConfigInit
   parse?: ParseConfigInit
   incrementUntil?: Incrementers
 }
-export interface ScrapeConfig2 {
+export interface ScrapeConfig {
   download?: DownloadConfig
   parse?: ParseConfig
   incrementUntil: Incrementers
@@ -117,15 +89,16 @@ interface Structure extends StructureInit {
   scrapeEach: Structure[]
   scrapeNext: Structure[]
 }
-export interface ConfigInit2 {
+export interface ConfigInit {
   input?: Input | Input[]
   import?: Import | Import[]
   defs: { [scraperName: string]: ScrapeConfigInit }
   structure: StructureInit
 }
-export interface Config2 extends ConfigInit2 {
+// returned by ./normalize.ts
+export interface Config extends ConfigInit {
   input: Input[]
   import: Import[]
+  defs: { [scraperName: string]: ScrapeConfig }
   structure: Structure
 }
-

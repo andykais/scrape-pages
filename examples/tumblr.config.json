@@ -1,36 +1,50 @@
 {
   "input": "username",
-  "scrape": {
-    "download": {
-      "urlTemplate": "https://{{ username }}.tumblr.com/api/read/json?start={{'*' index 50 }}&num=50"
+  "defs": {
+    "user": {
+      "download": {
+        "urlTemplate": "https://{{ username }}.tumblr.com/api/read/json?start={{'*' index 50 }}&num=50"
+      },
+      "incrementUntil": "failed-download"
     },
-    "incrementUntil": "failed-download",
-    "scrapeEach": {
-      "name": "parse-json",
+    "parse-json": {
       "parse": {
         "expect": "json",
         "selector": "posts[type:photo]"
       },
-      "regexCleanup": "var tumblr_api_read = ",
+      "regexCleanup": "var tumblr_api_read = "
+    },
+    "image-page": {
+      "parse": {
+        "selector": "photo-url-1280"
+      },
+      "regexCleanup": {
+        "select": "https://d+?.",
+        "replace": "https://"
+      }
+    },
+    "image": {
+      "download": "{value}"
+    },
+    "tags": {
+      "parse": {
+        "selector": "tags"
+      }
+    }
+  },
+  "structure": {
+    "scraper": "user",
+    "scrapeEach": {
+      "scraper": "parse-json",
       "scrapeEach": [
         {
-          "name": "image",
-          "parse": {
-            "selector": "photo-url-1280"
-          },
-          "regexCleanup": {
-            "select": "https://d+?.",
-            "replace": "https://"
-          },
+          "scraper": "image-page",
           "scrapeEach": {
-            "download": "{value}"
+            "scraper": "image"
           }
         },
         {
-          "name": "tags",
-          "parse": {
-            "selector": "tags"
-          }
+          "scraper": "tags"
         }
       ]
     }

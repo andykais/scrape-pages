@@ -2,14 +2,12 @@ import * as Rx from 'rxjs'
 import * as ops from 'rxjs/operators'
 import { downloaderClassFactory } from './downloader'
 import { parserClassFactory } from './parser'
-import { incrementer } from './incrementer'
 import { wrapError } from '../../util/error'
 // type imports
 import { ScraperName, ScrapeConfig } from '../../settings/config/types'
-import { FlatOptions } from '../../settings/options/types'
+import { Options } from '../../settings/options/types'
 import { Tools } from '../../tools'
 import { SelectedRow as ParsedValueWithId } from '../../tools/store/queries/select-parsed-values'
-import { DownloadParseFunction } from './incrementer'
 import { DownloaderClass } from './downloader'
 import { ParserClass } from './parser'
 
@@ -18,75 +16,82 @@ type InputValue = {
   id?: number // nonexistent
 }
 export type ParsedValue = InputValue | ParsedValueWithId
+export type DownloadParseFunction = (
+  parsedValueWithId: ParsedValue,
+  incrementIndex: number
+) => Promise<ParsedValue[]>
 
-abstract class AbstractScrapeStep {
-  public abstract run: (
-    parsedValues: ParsedValue[]
-  ) => Rx.Observable<ParsedValue[]>
-}
-class IdentityScrapeStep extends AbstractScrapeStep {
-  public run: typeof AbstractScrapeStep.prototype.run = () => Rx.empty()
-}
-class ScrapeStep extends AbstractScrapeStep {
-  private scraperName: ScraperName
-  private config: ScrapeConfig
-  private flatOptions: FlatOptions
+class ScrapeStep {
+  public scraperName: ScraperName
+  public config: ScrapeConfig
+  private options: Options
+  // private flatOptions: FlatOptions
   private tools: Tools
   private scraperLogger: ReturnType<Tools['logger']['scraper']>
   private downloader: DownloaderClass
   private parser: ParserClass
-  public incrementObservableFunction: ReturnType<typeof incrementer>
-  private children: ScrapeStep[]
+  // public incrementObservableFunction: ReturnType<typeof incrementer>
+  // private children: ScrapeStep[]
 
   public constructor(
-    config: ScrapeConfig,
-    flatOptions: FlatOptions,
+    scraperName: ScraperName,
+    scraperConfig: ScrapeConfig,
+    scraperOptions: Options,
     tools: Tools
   ) {
-    super()
-    this.scraperName = config.name
-    this.config = config
-    this.flatOptions = flatOptions
+    this.scraperName = scraperName
+    this.config = scraperConfig
+    this.options = scraperOptions
     this.tools = tools
 
     // const getIncrementObservable = incrementer(config)
-    this.children = config.scrapeEach.map(
-      scrapeConfig => new ScrapeStep(scrapeConfig, flatOptions, tools)
+    // this.children = config.scrapeEach.map(
+    //   scrapeConfig => new ScrapeStep(scrapeConfig, flatOptions, tools)
+    // )
+    // const scraperOptions = flatOptions.get(this.scraperName)!
+    this.downloader = downloaderClassFactory(
+      scraperName,
+      scraperConfig,
+      scraperOptions,
+      tools
     )
-    const scraperOptions = flatOptions.get(this.scraperName)!
-    this.downloader = downloaderClassFactory(config, scraperOptions, tools)
-    this.parser = parserClassFactory(config, scraperOptions, tools)
+    this.parser = parserClassFactory(
+      scraperName,
+      scraperConfig,
+      scraperOptions,
+      tools
+    )
 
-    this.scraperLogger = tools.logger.scraper(this.scraperName)!
-    const scrapeNextChild = config.scrapeNext
-      ? new ScrapeStep(config.scrapeNext, flatOptions, tools)
-      : new IdentityScrapeStep()
-    this.incrementObservableFunction = incrementer(
-      config,
-      this.downloadParseFunction,
-      scrapeNextChild
-    )
+    this.scraperLogger = tools.logger.scraper(scraperName)!
+    // const scrapeNextChild = config.scrapeNext
+    //   ? new ScrapeStep(config.scrapeNext, flatOptions, tools)
+    //   : new IdentityScrapeStep()
+    // this.incrementObservableFunction = incrementer(
+    //   config,
+    //   this.downloadParseFunction,
+    //   scrapeNextChild
+    // )
   }
 
   // todo start using Rx.merge(parentValues.map(this.incrementObservableFunction))
   // right now, observables per set of parsed values are 1 + #values * ( increments + scrapeNext || 0 )
   // this can remove the first one
-  public run: typeof AbstractScrapeStep.prototype.run = (
-    parentValues: ParsedValue[]
-  ): Rx.Observable<ParsedValue[]> =>
-    Rx.from(parentValues).pipe(
-      ops.flatMap(this.incrementObservableFunction),
-      ops.catchError(wrapError(`scraper '${this.scraperName}'`)),
-      ops.flatMap(
-        parsedValues =>
-          this.children.length
-            ? this.children.map(child => child.run(parsedValues))
-            : [Rx.of(parsedValues)]
-      ),
-      ops.mergeAll()
-    )
+  // public run: typeof AbstractScrapeStep.prototype.run = (
+  //   parentValues: ParsedValue[]
+  // ): Rx.Observable<ParsedValue[]> =>
+  //   Rx.from(parentValues).pipe(
+  //     ops.flatMap(this.incrementObservableFunction),
+  //     ops.catchError(wrapError(`scraper '${this.scraperName}'`)),
+  //     ops.flatMap(
+  //       parsedValues =>
+  //         this.children.length
+  //           ? this.children.map(child => child.run(parsedValues))
+  //           : [Rx.of(parsedValues)]
+  //     ),
+  //     ops.mergeAll()
+  //   )
 
-  private downloadParseFunction: DownloadParseFunction = async (
+  public downloadParseFunction: DownloadParseFunction = async (
     { parsedValue: value, id: parentId },
     incrementIndex
   ) => {
@@ -134,4 +139,4 @@ class ScrapeStep extends AbstractScrapeStep {
   }
 }
 
-export { ScrapeStep, IdentityScrapeStep }
+export { ScrapeStep }

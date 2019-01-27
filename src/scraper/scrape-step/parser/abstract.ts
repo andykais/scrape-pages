@@ -1,4 +1,4 @@
-import { ScrapeConfig } from '../../../settings/config/types'
+import { ScraperName, ScrapeConfig } from '../../../settings/config/types'
 import { Options } from '../../../settings/options/types'
 import { Tools } from '../../../tools'
 
@@ -7,13 +7,19 @@ export type ParserValues = string[] | [undefined | string]
  * base abstract class which other downloaders derive from
  */
 export abstract class AbstractParser {
+  protected scraperName: ScraperName
   protected config: ScrapeConfig
   protected options: Options
   protected tools: Tools
   protected selector: string
   protected attribute: string
 
-  public constructor(config: ScrapeConfig, options: Options, tools: Tools) {
+  public constructor(
+    scraperName: ScraperName,
+    config: ScrapeConfig,
+    options: Options,
+    tools: Tools
+  ) {
     Object.assign(this, { config, options, tools, ...config.parse })
   }
   public run = (value?: string) => {
