@@ -3,6 +3,7 @@ import { Emitter } from './emitter'
 import { Store } from './store'
 import { Logger } from './logger'
 import { Queue } from './queue'
+
 // type imports
 import { Config } from '../settings/config/types'
 import { OptionsInit, FlatOptions } from '../settings/options/types'

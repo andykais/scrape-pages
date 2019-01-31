@@ -1,6 +1,7 @@
 import { resolve } from 'path'
 import { makeFlatConfig } from '../config/make-flat-config'
 import { assertOptionsType } from './'
+import { FMap } from '../../util/map'
 // type imports
 import { Input, OptionsInit, FlatOptions } from './types'
 import { Config } from '../config/types'
@@ -60,9 +61,10 @@ const normalizeOptions = (
       })
       return acc
     },
-    new Map()
+    new FMap()
   )
 
   return options
 }
+
 export { normalizeOptions }

@@ -1,3 +1,4 @@
+import { FMap } from '../../../util/map'
 import { normalizeConfig } from '../../config'
 import { normalizeOptions } from '../'
 import * as testingConfigs from '../../../../testing/resources/testing-configs'
@@ -12,7 +13,7 @@ describe('normalize run options with', () => {
         folder: '/nonexistent'
       }
       const runOptions = normalizeOptions(fullConfig, runOptionsInit)
-      const runOptionsExpected: FlatOptions = new Map([
+      const runOptionsExpected: FlatOptions = new FMap([
         [
           'index',
           {

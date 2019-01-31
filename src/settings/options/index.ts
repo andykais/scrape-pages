@@ -1,3 +1,3 @@
 export { normalizeOptions } from './normalize'
 
-export { assertOptionsType } from './runtime/assert'
+export { assertOptionsType } from './runtime/settings/options/assert'

@@ -31,8 +31,8 @@ export const scrape = async (
   // create the observable
   const scrapers = mapObject(
     config.defs,
-    (name, scrapeConfig) =>
-      new ScrapeStep(name, scrapeConfig, flatOptions.get(name)!, tools)
+    (scrapeConfig, name) =>
+      new ScrapeStep(name, scrapeConfig, flatOptions.getOrThrow(name), tools)
   )
   const scrapingScheme = structureScrapers(config, scrapers)(config.structure)
   const scrapingObservable = scrapingScheme([{ parsedValue: '' }])

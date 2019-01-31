@@ -1,3 +1,4 @@
+import { FMap } from '../../util/map'
 // until webpack can load ts-runtime, this is far more convienent than importing the type from '../config/types'
 type ScraperName = string
 
@@ -40,4 +41,4 @@ export interface Options extends ScraperOptions {
   input: Input
   folder: string
 }
-export type FlatOptions = Map<ScraperName, Options>
+export type FlatOptions = FMap<ScraperName, Options>
