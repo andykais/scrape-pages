@@ -7,10 +7,9 @@ import { AbstractDownloader, DownloadParams } from '../abstract'
 import { compileTemplate } from '../../../../util/handlebars'
 // type imports
 import { URL } from 'url'
-import { ScraperName, ScrapeConfig } from '../../../../settings/config/types'
+import { ScraperName, DownloadConfig } from '../../../../settings/config/types'
 import { Options } from '../../../../settings/options/types'
 import { Tools } from '../../../../tools'
-import { DownloadConfig } from '../../../../settings/config/types'
 
 type Headers = { [header: string]: string }
 type DownloadData = [
@@ -29,23 +28,24 @@ type FetchFunction = (
  * downloader pertaining to all http/https requests
  */
 export class Downloader extends AbstractDownloader<DownloadData> {
+  protected config: DownloadConfig
   private urlTemplate: ReturnType<typeof compileTemplate>
   private headerTemplates: Map<string, ReturnType<typeof compileTemplate>>
   private fetcher: FetchFunction
 
   public constructor(
     scraperName: ScraperName,
-    config: ScrapeConfig,
+    config: DownloadConfig,
     options: Options,
     tools: Tools
   ) {
     super(scraperName, config, options, tools)
+    this.config = config // must be set on again on child classes https://github.com/babel/babel/issues/9439
     // set templates
-    this.urlTemplate = compileTemplate(config.download!.urlTemplate)
+    this.urlTemplate = compileTemplate(this.config.urlTemplate)
     this.headerTemplates = new Map()
-    Object.entries(config.download!.headerTemplates).forEach(
-      ([key, templateStr]) =>
-        this.headerTemplates.set(key, compileTemplate(templateStr))
+    Object.entries(this.config.headerTemplates).forEach(([key, templateStr]) =>
+      this.headerTemplates.set(key, compileTemplate(templateStr))
     )
     // choose fetcher
     if (this.options.read && this.options.write) {
@@ -71,7 +71,7 @@ export class Downloader extends AbstractDownloader<DownloadData> {
     for (const [key, template] of this.headerTemplates) {
       headers[key] = template(templateVals)
     }
-    return [url, { headers, method: this.config.download!.method }]
+    return [url, { headers, method: this.config.method }]
   }
 
   protected retrieve = (downloadId: number, downloadData: DownloadData) => {

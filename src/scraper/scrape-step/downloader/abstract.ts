@@ -1,4 +1,8 @@
-import { ScraperName, ScrapeConfig } from '../../../settings/config/types'
+import {
+  ScraperName,
+  DownloadConfig,
+  ScrapeConfig
+} from '../../../settings/config/types'
 import { Options } from '../../../settings/options/types'
 import { Tools } from '../../../tools'
 
@@ -13,13 +17,13 @@ type RetrieveValue = { downloadValue?: string; filename?: string }
  */
 export abstract class AbstractDownloader<DownloadData> {
   protected scraperName: ScraperName
-  protected config: ScrapeConfig
+  protected config: DownloadConfig | undefined
   protected options: Options
   protected tools: Tools
 
   public constructor(
     scraperName: ScraperName,
-    config: ScrapeConfig,
+    config: DownloadConfig | undefined,
     options: Options,
     tools: Tools
   ) {

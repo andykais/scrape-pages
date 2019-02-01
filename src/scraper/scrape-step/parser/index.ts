@@ -12,15 +12,15 @@ const parsers = {
 }
 export const parserClassFactory = (
   scraperName: ScraperName,
-  config: ScrapeConfig,
+  { parse }: ScrapeConfig,
   options: Options,
   tools: Tools
 ) => {
   // TODO use type guards
-  if (config.parse) {
-    return new parsers[config.parse.expect](scraperName, config, options, tools)
+  if (parse) {
+    return new parsers[parse.expect](scraperName, parse, options, tools)
   } else {
-    return new IdentityParser(scraperName, config, options, tools)
+    return new IdentityParser(scraperName, parse, options, tools)
   }
 }
 export type ParserClass = HtmlParser | JsonParser | IdentityParser
