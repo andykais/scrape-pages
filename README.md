@@ -84,6 +84,7 @@ The `scrape` function returns a promise which yeilds these utilities (`on`, `emi
 
 #### on
 Listen for events from the scraper
+
 | event                  | callback arguments    | description                                |
 | ---------------------- | --------------------- | ------------------------------------------ |
 | `'done'`               | queryFor              | when the scraper has completed             |
@@ -106,6 +107,7 @@ each event will return the **queryFor** function as its first argument
 
 This function is an argument in the emitter callback and is used to get data back out of the scraper whenever
 you need it. These are its arguments:
+
 | name | type | required | description |
 | --- | --- | --- | --- |
 | `scrapers` | `string[]` | Yes | scrapers who will return their filenames and parsed values, in order |
