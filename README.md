@@ -96,6 +96,7 @@ Listen for events from the scraper
 #### emit
 
 While the scraper is working, you can affect its behavior by emitting these events:
+
 | event | arguments | description |
 | --- | --- | --- |
 | `'useRateLimiter'` | boolean | turn on or off the rate limit defined in the run options |
