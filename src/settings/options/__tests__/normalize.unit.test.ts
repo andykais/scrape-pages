@@ -7,7 +7,7 @@ import { expect } from 'chai'
 
 describe('normalize run options with', () => {
   describe('simple config', () => {
-    const fullConfig = normalizeConfig(testingConfigs.__SIMPLE_CONFIG__)
+    const fullConfig = normalizeConfig(testingConfigs.SIMPLE_CONFIG)
     it('should match returned options', () => {
       const optionsInit = {
         folder: '/nonexistent'
@@ -38,7 +38,7 @@ describe('normalize run options with', () => {
   })
 
   describe('config with input', () => {
-    const fullConfig = normalizeConfig(testingConfigs.__INPUT_CONFIG__)
+    const fullConfig = normalizeConfig(testingConfigs.INPUT_CONFIG)
 
     it('should error out when there is no input', () => {
       const optionsInit = { folder: '/nonexistent' }

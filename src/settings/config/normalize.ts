@@ -39,7 +39,7 @@ const normalizeInputs = (inputsInit: ConfigInit['input']) => {
   try {
     for (const input of inputs) validateSlug(input)
   } catch (e) {
-    throw new VError({ name: e.name, cause: e }, 'For an input key, ')
+    throw new VError({ name: e.name, cause: e }, 'For an input key')
   }
   return inputs
 }
@@ -84,7 +84,7 @@ const normalizeDefs = (defs: ConfigInit['defs']) => {
       acc[scraperName] = normalizeDefinition(defs[scraperName])
       return acc
     } catch (e) {
-      throw new VError({ name: e.name, cause: e }, 'For a scraper name, ')
+      throw new VError({ name: e.name, cause: e }, 'For a scraper name')
     }
   }, {})
 }

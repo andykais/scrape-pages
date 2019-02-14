@@ -5,7 +5,7 @@ import * as testingConfigs from '../../../../testing/resources/testing-configs'
 
 // should only give the higher one when their depths are unequal
 describe('make dynamic order level column', () => {
-  const galleryPostImgTag = testingConfigs.__GALLERY_POST_IMG_TAG__
+  const galleryPostImgTag = testingConfigs.GALLERY_POST_IMG_TAG
   const fullConfig = normalizeConfig(galleryPostImgTag)
   const flatConfig = flattenConfig(fullConfig)
 
