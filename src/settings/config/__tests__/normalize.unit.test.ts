@@ -5,7 +5,7 @@ import { expect } from 'chai'
 
 describe('normalize config with', () => {
   describe('simple config', () => {
-    const simpleConfig = testingConfigs.__SIMPLE_CONFIG__
+    const simpleConfig = testingConfigs.SIMPLE_CONFIG
     const fullConfig = normalizeConfig(simpleConfig)
     const fullConfigGuess: Config = {
       input: [],
@@ -58,7 +58,7 @@ describe('normalize config with', () => {
   })
 
   describe('gallery post img tag config', () => {
-    const galleryPostImgTag = testingConfigs.__GALLERY_POST_IMG_TAG__
+    const galleryPostImgTag = testingConfigs.GALLERY_POST_IMG_TAG
     const fullConfig = normalizeConfig(galleryPostImgTag)
 
     it('should match itself for a full filled in config', () => {

@@ -48,5 +48,4 @@ export const rmrf = async (folder: string) => {
   }
 }
 
-export const sanitizeFilename = (filename: string) =>
-  sanitize(filename, { replacement: '_' })
+export const sanitizeFilename = (filename: string) => sanitize(filename, { replacement: '_' })

@@ -38,18 +38,8 @@ class ScrapeStep {
     this.options = scraperOptions
     this.tools = tools
 
-    this.downloader = downloaderClassFactory(
-      scraperName,
-      scraperConfig,
-      scraperOptions,
-      tools
-    )
-    this.parser = parserClassFactory(
-      scraperName,
-      scraperConfig,
-      scraperOptions,
-      tools
-    )
+    this.downloader = downloaderClassFactory(scraperName, scraperConfig, scraperOptions, tools)
+    this.parser = parserClassFactory(scraperName, scraperConfig, scraperOptions, tools)
 
     this.scraperLogger = tools.logger.scraper(scraperName)!
   }
@@ -66,19 +56,15 @@ class ScrapeStep {
     })
     if (downloadId) {
       const parsedValuesWithId = store.qs.selectParsedValues(downloadId)
-      this.scraperLogger.info(
-        { parsedValuesWithId, downloadId },
-        'loaded cached values'
-      )
+      this.scraperLogger.info({ parsedValuesWithId, downloadId }, 'loaded cached values')
+      emitter.scraper(this.scraperName).emit.completed(downloadId)
       return parsedValuesWithId
     } else {
-      const { downloadValue, downloadId, filename } = await this.downloader.run(
-        {
-          incrementIndex,
-          parentId,
-          value
-        }
-      )
+      const { downloadValue, downloadId, filename } = await this.downloader.run({
+        incrementIndex,
+        parentId,
+        value
+      })
       const parsedValues = this.parser.run(downloadValue)
 
       store.transaction(() => {
@@ -89,14 +75,11 @@ class ScrapeStep {
           downloadId,
           parsedValues
         })
-        emitter.scraper(this.scraperName).emit.completed(downloadId)
       })()
       const parsedValuesWithId = store.qs.selectParsedValues(downloadId)
 
-      this.scraperLogger.info(
-        { parsedValuesWithId, downloadId },
-        'inserted new values'
-      )
+      this.scraperLogger.info({ parsedValuesWithId, downloadId }, 'inserted new values')
+      emitter.scraper(this.scraperName).emit.completed(downloadId)
       return parsedValuesWithId
     }
   }

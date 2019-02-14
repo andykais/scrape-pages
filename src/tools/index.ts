@@ -1,4 +1,4 @@
-import * as Rx from 'rxjs'
+import * as ops from 'rxjs/operators'
 import { Emitter } from './emitter'
 import { Store } from './store'
 import { Logger } from './logger'
@@ -22,9 +22,9 @@ export const initTools = (
   const store = new Store(config, optionsInit)
   const emitter = new Emitter(config)
   const logger = new Logger(optionsInit, flatOptions)
-  const rateLimiterEventStream = emitter.getRxEventStream(
-    'useRateLimiter'
-  ) as Rx.Observable<boolean> // deal with incoming values on this event as truthy or falsey
+  const rateLimiterEventStream = emitter
+    .getRxEventStream('useRateLimiter')
+    .pipe(ops.map(toggle => !!toggle))
   const queue = new Queue(optionsInit, flatOptions, rateLimiterEventStream)
 
   return {

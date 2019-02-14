@@ -15,10 +15,7 @@ describe('scrape next site', () => {
     let scraperQueryForFunction: any
     before(done => {
       ;(async () => {
-        await nockMockFolder(
-          `${__dirname}/resources/mock-endpoints`,
-          'http://scrape-next-site.com'
-        )
+        await nockMockFolder(`${__dirname}/resources/mock-endpoints`, 'http://scrape-next-site.com')
 
         const options = {
           folder: path.resolve(os.tmpdir(), this.fullTitle()),

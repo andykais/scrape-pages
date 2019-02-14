@@ -7,14 +7,13 @@ import { Tools } from '../../../tools'
 
 export const downloaderClassFactory = (
   scraperName: ScraperName,
-  config: ScrapeConfig,
+  { download }: ScrapeConfig,
   options: Options,
   tools: Tools
 ) => {
   // TODO use type guards
-  if (config.download)
-    return new HttpDownloader(scraperName, config, options, tools)
-  else return new IdentityDownloader(scraperName, config, options, tools)
+  if (download) return new HttpDownloader(scraperName, download, options, tools)
+  else return new IdentityDownloader(scraperName, download, options, tools)
 }
 
 export type DownloaderClass = IdentityDownloader | HttpDownloader

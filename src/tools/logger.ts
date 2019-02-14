@@ -38,8 +38,7 @@ class Logger {
     this.warn = this.logger.warn.bind(this.logger)
     this.error = this.logger.error.bind(this.logger)
   }
-  public tap = (name = 'TAP') =>
-    tap((...args: any[]) => this.logger.debug({ tap: name, ...args }))
+  public tap = (name = 'TAP') => tap((...args: any[]) => this.logger.debug({ tap: name, ...args }))
   public scraper = (name: ScraperName) => this.scrapers[name]
 }
 export type LogLevel = bunyan.LogLevel

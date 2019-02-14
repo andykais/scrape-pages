@@ -10,10 +10,7 @@ import { query as updateDownloadToComplete } from './update-download-to-complete
 import { query as insertBatchParsedValues } from './insert-batch-parsed-values'
 import { query as selectParsedValues } from './select-parsed-values'
 
-export const createStatements = (
-  flatConfig: FlatConfig,
-  database: Database
-) => ({
+export const createStatements = (flatConfig: FlatConfig, database: Database) => ({
   selectOrderedScrapers: selectOrderedScrapers(flatConfig, database),
   selectCompletedDownload: selectCompletedDownload(flatConfig, database),
   insertQueuedDownload: insertQueuedDownload(flatConfig, database),

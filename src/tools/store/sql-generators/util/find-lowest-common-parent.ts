@@ -1,7 +1,4 @@
-import {
-  FlatConfig,
-  ConfigPositionInfo
-} from '../../../../settings/config/types'
+import { FlatConfig, ConfigPositionInfo } from '../../../../settings/config/types'
 /*
  *   G
  *   |
@@ -15,7 +12,7 @@ export const findLowestCommonParent = (
   flatConfig: FlatConfig,
   scraperA: ConfigPositionInfo,
   scraperB: ConfigPositionInfo
-): FlatConfig['name'] => {
+): ConfigPositionInfo => {
   if (scraperA.parentName === null) return scraperA
   if (scraperB.parentName === null) return scraperB
   const recurse = (
@@ -31,8 +28,8 @@ export const findLowestCommonParent = (
     )
       return
 
-    const scraperAParent = flatConfig[scraperA.parentName]
-    const scraperBParent = flatConfig[scraperB.parentName]
+    const scraperAParent = flatConfig.getOrThrow(scraperA.parentName)
+    const scraperBParent = flatConfig.getOrThrow(scraperB.parentName)
     if (!scraperAParent || !scraperBParent) return
 
     const commonParent1 = recurse(scraperAParent, scraperB)
@@ -42,8 +39,5 @@ export const findLowestCommonParent = (
     if (commonParent2) return commonParent2
   }
   // make sure the level lower on the tree is second
-  return (
-    recurse(...[scraperA, scraperB].sort((a, b) => b.depth - a.depth)) ||
-    scraperA
-  )
+  return recurse(...[scraperA, scraperB].sort((a, b) => b.depth - a.depth)) || scraperA
 }

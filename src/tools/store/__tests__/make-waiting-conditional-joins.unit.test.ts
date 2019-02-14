@@ -1,13 +1,13 @@
 import { expect } from 'chai'
-import { makeFlatConfig, normalizeConfig } from '../../../settings/config'
+import { flattenConfig, normalizeConfig } from '../../../settings/config'
 import { makeWaitingConditionalJoins } from '../sql-generators'
 import * as testingConfigs from '../../../../testing/resources/testing-configs'
 
 // should only give the higher one when their depths are unequal
 describe('make waiting conditional joins', () => {
-  const galleryPostImgTag = testingConfigs.__GALLERY_POST_IMG_TAG__
+  const galleryPostImgTag = testingConfigs.GALLERY_POST_IMG_TAG
   const fullConfig = normalizeConfig(galleryPostImgTag)
-  const flatConfig = makeFlatConfig(fullConfig)
+  const flatConfig = flattenConfig(fullConfig)
 
   it('should wait for the lowest level respective to its own depth', () => {
     const scrapersToGetOut = ['tag', 'img']

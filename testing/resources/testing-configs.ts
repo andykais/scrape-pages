@@ -1,7 +1,7 @@
 import { ConfigInit } from '../../src/settings/config/types'
 
 // setup reusable variables
-export const __SIMPLE_CONFIG__: ConfigInit = {
+export const SIMPLE_CONFIG: ConfigInit = {
   defs: {
     index: {
       download: 'example-site.com/images',
@@ -22,7 +22,7 @@ export const __SIMPLE_CONFIG__: ConfigInit = {
   }
 }
 
-export const __GALLERY_POST_IMG_TAG__: ConfigInit = {
+export const GALLERY_POST_IMG_TAG: ConfigInit = {
   defs: {
     gallery: {
       download: 'https://gallery.com/cool', // save url before and after under name === gallery
@@ -74,12 +74,12 @@ export const __GALLERY_POST_IMG_TAG__: ConfigInit = {
   }
 }
 
-export const __EMPTY_CONFIG__: ConfigInit = {
+export const EMPTY_CONFIG: ConfigInit = {
   defs: { identity: {} },
   structure: { scraper: 'identity' }
 }
 
-export const __INPUT_CONFIG__: ConfigInit = {
+export const INPUT_CONFIG: ConfigInit = {
   input: ['username'],
   defs: { identity: {} },
   structure: { scraper: 'identity' }

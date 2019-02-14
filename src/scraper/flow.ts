@@ -7,17 +7,13 @@ import { wrapError } from '../util/error'
 import { ParsedValue } from './scrape-step'
 import { Config, ScrapeConfig } from '../settings/config/types'
 
-type DownloadParseBoolean = (
-  parsedValues: ParsedValue[],
-  incrementIndex: number
-) => boolean
+type DownloadParseBoolean = (parsedValues: ParsedValue[], incrementIndex: number) => boolean
 
-const incrementUntilEmptyParse: DownloadParseBoolean = parsedValues =>
-  !!parsedValues.length
-const incrementUntilNumericIndex = (
-  incrementUntil: number
-): DownloadParseBoolean => (parsedValues, incrementIndex) =>
-  incrementUntil >= incrementIndex
+const incrementUntilEmptyParse: DownloadParseBoolean = parsedValues => !!parsedValues.length
+const incrementUntilNumericIndex = (incrementUntil: number): DownloadParseBoolean => (
+  parsedValues,
+  incrementIndex
+) => incrementUntil >= incrementIndex
 const incrementAlways = () => true
 
 const catchFetchError = (e: Error) => {
@@ -45,10 +41,9 @@ const chooseIgnoreError = ({ incrementUntil }: ScrapeConfig) => {
   }
 }
 
-const structureScrapers = (
-  config: Config,
-  scrapers: { [scraperName: string]: ScrapeStep }
-) => (structure: Config['structure']) => {
+const structureScrapers = (config: Config, scrapers: { [scraperName: string]: ScrapeStep }) => (
+  structure: Config['structure']
+) => {
   const scraper = scrapers[structure.scraper]
   const each = structure.scrapeEach.map(structureScrapers(config, scrapers))
   const next = structure.scrapeNext.map(structureScrapers(config, scrapers))
@@ -60,11 +55,7 @@ const structureScrapers = (
     Rx.from(parentValues).pipe(
       ops.catchError(wrapError(`scraper '${scraper.scraperName}'`)),
       ops.flatMap(parsedValueWithId =>
-        RxCustom.whileLoop(
-          scraper.downloadParseFunction,
-          okToIncrement,
-          parsedValueWithId
-        ).pipe(
+        RxCustom.whileLoop(scraper.downloadParseFunction, okToIncrement, parsedValueWithId).pipe(
           ops.catchError(ignoreFetchError),
           ops.expand(([parsedValues, incrementIndex]) =>
             Rx.merge(
@@ -72,18 +63,12 @@ const structureScrapers = (
                 nextScraper(parsedValues).pipe(
                   ops.flatMap(parsedValues =>
                     parsedValues.map(parsedValueWithId =>
-                      scraper.downloadParseFunction(
-                        parsedValueWithId,
-                        incrementIndex
-                      )
+                      scraper.downloadParseFunction(parsedValueWithId, incrementIndex)
                     )
                   ),
                   ops.mergeAll(),
                   ops.filter(incrementUntilEmptyParse),
-                  ops.map(
-                    parsedValues =>
-                      [parsedValues, incrementIndex] as [ParsedValue[], number]
-                  )
+                  ops.map(parsedValues => [parsedValues, incrementIndex] as [ParsedValue[], number])
                 )
               )
             )

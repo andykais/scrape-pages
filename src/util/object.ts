@@ -1,10 +1,7 @@
 /**
  * behaves like Array.prototype.map for objects
  */
-const mapObject = <T, V>(
-  object: { [key: string]: T },
-  fn: (value: T, key: string) => V
-) => {
+const mapObject = <T, V>(object: { [key: string]: T }, fn: (value: T, key: string) => V) => {
   const mappedObject: { [key: string]: V } = {}
   for (const key in object) {
     mappedObject[key] = fn(object[key], key)
@@ -18,9 +15,7 @@ type ReplaceInObject<I extends {}, Find, ReplaceWith> = I extends Find
   : {
       [K in keyof I]: I[K] extends Find
         ? ReplaceWith
-        : I[K] extends any[]
-          ? ReplaceInObject<I[K][number], Find, ReplaceWith>[]
-          : I[K]
+        : I[K] extends any[] ? ReplaceInObject<I[K][number], Find, ReplaceWith>[] : I[K]
     }
 /**
  * immutable find-and-replace function for objects. Searches recursively in object for values
@@ -35,8 +30,7 @@ const replaceInObject = <T extends {}, Find, ReplaceWith>(
     for (const [key, val] of Object.entries(object)) {
       if (shouldReplace(val, key)) (replacedIn as any)[key] = fn(val, key)
       else if (Array.isArray(val)) (replacedIn as any)[key] = val.map(recurse)
-      else if (typeof val === 'object')
-        (replacedIn as any)[key] = recurse(val as T)
+      else if (typeof val === 'object') (replacedIn as any)[key] = recurse(val as T)
     }
     return replacedIn as ReplaceInObject<T, Find, ReplaceWith>
   }
@@ -69,11 +63,7 @@ const marshaller = <T extends {}, F extends (...args: any[]) => T>(fn: F) => (
   ...args: ArgumentTypes<F>
 ) => marshalObject(fn(...args) as ReturnType<F>)
 
-const safeCurry = <
-  T,
-  F extends (...args: any[]) => T,
-  G extends (fResult: T) => any
->(
+const safeCurry = <T, F extends (...args: any[]) => T, G extends (fResult: T) => any>(
   gFn: G,
   fFn: F
 ) => (...args: ArgumentTypes<F>): T => gFn(fFn(...args))

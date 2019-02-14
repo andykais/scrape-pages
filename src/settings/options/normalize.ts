@@ -1,40 +1,38 @@
 import { resolve } from 'path'
-import { makeFlatConfig } from '../config/make-flat-config'
+import { flattenConfig } from '../config/flatten'
 import { assertOptionsType } from './'
-import { FMap } from '../../util/map'
 // type imports
 import { Input, OptionsInit, FlatOptions } from './types'
 import { Config } from '../config/types'
 
 const getConfigInputValues = (config: Config, options: OptionsInit) => {
-  const configInputKeys = config.input.map(input => {
-    if (typeof input === 'string') return input
-    else return input.name
-  })
-
   const initInputs = options.input || {}
+
+  const optionsMissingInputKeys = config.input.filter(key => initInputs[key] === undefined)
+  if (optionsMissingInputKeys.length) {
+    throw new Error(`Invalid input! Options is missing keys(s) [${optionsMissingInputKeys.join()}]`)
+  }
+
+  return config.input.reduce((acc: Input, inputKey) => {
+    acc[inputKey] = initInputs[inputKey]
+    return acc
+  }, {})
+
   const filteredInputs: Input = {}
-  for (const inputKey of configInputKeys) {
+  for (const inputKey of config.input) {
     if (initInputs[inputKey] === undefined) {
-      const missingKeys = configInputKeys
-        .filter(key => initInputs[key] === undefined)
-        .join()
-      throw new Error(
-        `Invalid input! Options is missing keys(s) [${missingKeys}]`
-      )
+      const missingKeys = config.input.filter(key => initInputs[key] === undefined).join()
+      throw new Error(`Invalid input! Options is missing keys(s) [${missingKeys}]`)
     }
     filteredInputs[inputKey] = initInputs[inputKey]
   }
   return filteredInputs
 }
 
-const normalizeOptions = (
-  config: Config,
-  optionsInit: OptionsInit
-): FlatOptions => {
+const normalizeOptions = (config: Config, optionsInit: OptionsInit): FlatOptions => {
   assertOptionsType(optionsInit)
 
-  const flatConfig = makeFlatConfig(config)
+  const flatConfig = flattenConfig(config)
   const { optionsEach = {}, ...globalOptions } = optionsInit
 
   const input = getConfigInputValues(config, optionsInit)
@@ -49,20 +47,14 @@ const normalizeOptions = (
     ...globalOptions // user preferences for all things override
   }
 
-  const options: FlatOptions = Object.values(flatConfig).reduce(
-    (acc: FlatOptions, scraperConfig) => {
-      const { name } = scraperConfig
-      const scraperOptions = optionsEach[name]
-      acc.set(name, {
-        ...defaults,
-        folder: resolve(defaults.folder, name),
-        ...scraperOptions,
-        input
-      })
-      return acc
-    },
-    new FMap()
-  )
+  const options: FlatOptions = flatConfig.map((scraperConfig, name) => {
+    return {
+      ...defaults,
+      folder: resolve(defaults.folder, name),
+      ...optionsEach[name],
+      input
+    }
+  })
 
   return options
 }

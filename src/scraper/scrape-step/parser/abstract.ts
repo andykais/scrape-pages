@@ -1,4 +1,4 @@
-import { ScraperName, ScrapeConfig } from '../../../settings/config/types'
+import { ScraperName, ParseConfig } from '../../../settings/config/types'
 import { Options } from '../../../settings/options/types'
 import { Tools } from '../../../tools'
 
@@ -8,7 +8,7 @@ export type ParserValues = string[] | [undefined | string]
  */
 export abstract class AbstractParser {
   protected scraperName: ScraperName
-  protected config: ScrapeConfig
+  protected config: ParseConfig | undefined
   protected options: Options
   protected tools: Tools
   protected selector: string
@@ -16,11 +16,11 @@ export abstract class AbstractParser {
 
   public constructor(
     scraperName: ScraperName,
-    config: ScrapeConfig,
+    config: ParseConfig | undefined,
     options: Options,
     tools: Tools
   ) {
-    Object.assign(this, { config, options, tools, ...config.parse })
+    Object.assign(this, { scraperName, config, options, tools })
   }
   public run = (value?: string) => {
     /** TODO
