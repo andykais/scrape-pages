@@ -9,11 +9,11 @@ describe('normalize run options with', () => {
   describe('simple config', () => {
     const fullConfig = normalizeConfig(testingConfigs.__SIMPLE_CONFIG__)
     it('should match returned options', () => {
-      const runOptionsInit = {
+      const optionsInit = {
         folder: '/nonexistent'
       }
-      const runOptions = normalizeOptions(fullConfig, runOptionsInit)
-      const runOptionsExpected: FlatOptions = FMap.fromObject({
+      const options = normalizeOptions(fullConfig, optionsInit)
+      const optionsExpected: FlatOptions = FMap.fromObject({
         index: {
           cache: true,
           read: true,
@@ -33,7 +33,7 @@ describe('normalize run options with', () => {
           input: {}
         }
       })
-      expect([...runOptions]).to.have.deep.members([...runOptionsExpected])
+      expect([...options]).to.have.deep.members([...optionsExpected])
     })
   })
 
@@ -41,24 +41,24 @@ describe('normalize run options with', () => {
     const fullConfig = normalizeConfig(testingConfigs.__INPUT_CONFIG__)
 
     it('should error out when there is no input', () => {
-      const runOptionsInit = { folder: '/nonexistent' }
+      const optionsInit = { folder: '/nonexistent' }
       const missingInputs = fullConfig.input.join()
 
-      expect(() => normalizeOptions(fullConfig, runOptionsInit)).to.throw(
+      expect(() => normalizeOptions(fullConfig, optionsInit)).to.throw(
         `Invalid input! Options is missing keys(s) [${missingInputs}]`
       )
     })
 
     it('should not error out when there are extra run option inputs', () => {
-      const runOptionsInit = {
+      const optionsInit = {
         input: { username: 'johnnybravo', password: 'sunglasses' },
         folder: '/nonexistent'
       }
-      const runOptions = normalizeOptions(fullConfig, runOptionsInit)
-      const normalizedInput = runOptions.get('identity')!.input
+      const options = normalizeOptions(fullConfig, optionsInit)
+      const normalizedInput = options.get('identity')!.input
 
       expect(normalizedInput).to.be.deep.equal({
-        username: runOptionsInit.input.username
+        username: optionsInit.input.username
       })
     })
   })

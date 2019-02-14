@@ -76,7 +76,7 @@ provided, each run will work independently. `scraper.run` returns **emitter**
 | param   | type             | required | type file                                                      | description                   |
 | ------- | ---------------- | -------- | -------------------------------------------------------------- | ----------------------------- |
 | config  | `ConfigInit`     | Yes      | [src/settings/config/types.ts](src/settings/config/types.ts)   | _what_ is being downloaded    |
-| options | `RunOptionsInit` | Yes      | [src/settings/options/types.ts](src/settings/options/types.ts) | _how_ something is downloaded |
+| options | `OptionsInit`    | Yes      | [src/settings/options/types.ts](src/settings/options/types.ts) | _how_ something is downloaded |
 
 
 ### scraper
