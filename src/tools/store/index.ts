@@ -5,6 +5,7 @@ import { Config, FlatConfig } from '../../settings/config/types'
 import { createTables, createStatements } from './queries'
 // type imports
 import { Transaction } from 'better-sqlite3'
+import { ScraperName } from '../../settings/config/types'
 import { OptionsInit } from '../../settings/options/types'
 
 class Store {
@@ -27,21 +28,13 @@ class Store {
     this.qs = createStatements(this.flatConfig, this.database)
   }
 
-  public query = ({
-    scrapers,
-    groupBy
-  }: {
-    scrapers: string[]
-    groupBy?: string
-  }) => {
-    // const scraperNames = Object.keys(scrapers)
-
+  public query = ({ scrapers, groupBy }: { scrapers: ScraperName[]; groupBy?: ScraperName }) => {
     const matchingScrapers = scrapers.filter(s => this.flatConfig.getOrThrow(s))
     if (!matchingScrapers.length) return [{}]
 
-    const matchingAll = Array.from(
-      new Set(scrapers.concat(groupBy === undefined ? [] : groupBy))
-    ).filter(s => this.flatConfig.getOrThrow(s))
+    const matchingAll = Array.from(new Set(scrapers.concat(groupBy || []))).filter(s =>
+      this.flatConfig.getOrThrow(s)
+    )
     // const matchingAll = Array.from(
     // new Set(scraperNames.concat(groupBy))
     // ).filter(s => this.flatConfig[s])

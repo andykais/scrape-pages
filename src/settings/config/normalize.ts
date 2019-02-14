@@ -54,13 +54,8 @@ const normalizeDefinition = (scrapeConfig: ScrapeConfigInit): ScrapeConfig => ({
   ...defaults.definitions,
   ...scrapeConfig,
   download:
-    scrapeConfig.download === undefined
-      ? undefined
-      : normalizeDownload(scrapeConfig.download),
-  parse:
-    scrapeConfig.parse === undefined
-      ? undefined
-      : normalizeParse(scrapeConfig.parse)
+    scrapeConfig.download === undefined ? undefined : normalizeDownload(scrapeConfig.download),
+  parse: scrapeConfig.parse === undefined ? undefined : normalizeParse(scrapeConfig.parse)
 })
 
 const normalizeUndefinedSingleArray = <T>(val?: T | T[]): T[] =>

@@ -59,9 +59,7 @@ const rateLimitToggle = <V>(
       // async flow
       Rx.merge(Rx.of(useLimiterFirst), toggler)
         .pipe(
-          ops.switchMap(
-            useRateLimiter => (useRateLimiter ? rateTimer : concurrentLimiter)
-          ),
+          ops.switchMap(useRateLimiter => (useRateLimiter ? rateTimer : concurrentLimiter)),
           ops.takeWhile(() => !closed || !!plannedExecutions),
           ops.mergeMap(dequeue),
           ops.mergeMap(executor) // must manage the max concurrent number manually

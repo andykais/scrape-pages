@@ -16,22 +16,15 @@ const getConfigInputValues = (config: Config, options: OptionsInit) => {
   const filteredInputs: Input = {}
   for (const inputKey of configInputKeys) {
     if (initInputs[inputKey] === undefined) {
-      const missingKeys = configInputKeys
-        .filter(key => initInputs[key] === undefined)
-        .join()
-      throw new Error(
-        `Invalid input! Options is missing keys(s) [${missingKeys}]`
-      )
+      const missingKeys = configInputKeys.filter(key => initInputs[key] === undefined).join()
+      throw new Error(`Invalid input! Options is missing keys(s) [${missingKeys}]`)
     }
     filteredInputs[inputKey] = initInputs[inputKey]
   }
   return filteredInputs
 }
 
-const normalizeOptions = (
-  config: Config,
-  optionsInit: OptionsInit
-): FlatOptions => {
+const normalizeOptions = (config: Config, optionsInit: OptionsInit): FlatOptions => {
   assertOptionsType(optionsInit)
 
   const flatConfig = flattenConfig(config)

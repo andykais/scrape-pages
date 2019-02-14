@@ -1,8 +1,4 @@
-import {
-  ScraperName,
-  DownloadConfig,
-  ScrapeConfig
-} from '../../../settings/config/types'
+import { ScraperName, DownloadConfig, ScrapeConfig } from '../../../settings/config/types'
 import { Options } from '../../../settings/options/types'
 import { Tools } from '../../../tools'
 
@@ -37,10 +33,7 @@ export abstract class AbstractDownloader<DownloadData> {
       downloadData
     )
     this.tools.emitter.scraper(this.scraperName).emit.queued(downloadId)
-    const { downloadValue, filename } = await this.retrieve(
-      downloadId,
-      downloadData
-    )
+    const { downloadValue, filename } = await this.retrieve(downloadId, downloadData)
 
     return {
       downloadId,
@@ -51,9 +44,7 @@ export abstract class AbstractDownloader<DownloadData> {
     }
   }
   // implement these methods
-  protected abstract constructDownload(
-    downloadParams: DownloadParams
-  ): DownloadData
+  protected abstract constructDownload(downloadParams: DownloadParams): DownloadData
   protected abstract retrieve(
     downloadId: number,
     downloadParams: DownloadData

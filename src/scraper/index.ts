@@ -9,21 +9,14 @@ import { mapObject } from '../util/object'
 import { Config, ConfigInit } from '../settings/config/types'
 import { OptionsInit, FlatOptions } from '../settings/options/types'
 
-const initFolders = async (
-  config: Config,
-  optionsInit: OptionsInit,
-  flatOptions: FlatOptions
-) => {
+const initFolders = async (config: Config, optionsInit: OptionsInit, flatOptions: FlatOptions) => {
   if (optionsInit.cleanFolder) await rmrf(optionsInit.folder)
 
   await mkdirp(optionsInit.folder)
   for (const { folder } of flatOptions.values()) await mkdirp(folder)
 }
 
-export const scrape = async (
-  configInit: ConfigInit,
-  optionsInit: OptionsInit
-) => {
+export const scrape = async (configInit: ConfigInit, optionsInit: OptionsInit) => {
   const config = normalizeConfig(configInit)
   const flatOptions = normalizeOptions(config, optionsInit)
   await initFolders(config, optionsInit, flatOptions)
@@ -31,8 +24,7 @@ export const scrape = async (
   // create the observable
   const scrapers = mapObject(
     config.defs,
-    (scrapeConfig, name) =>
-      new ScrapeStep(name, scrapeConfig, flatOptions.getOrThrow(name), tools)
+    (scrapeConfig, name) => new ScrapeStep(name, scrapeConfig, flatOptions.getOrThrow(name), tools)
   )
   const scrapingScheme = structureScrapers(config, scrapers)(config.structure)
   const scrapingObservable = scrapingScheme([{ parsedValue: '' }])

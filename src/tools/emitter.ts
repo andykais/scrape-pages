@@ -20,9 +20,7 @@ class ScraperEmitter {
     progress: (id: number, response: Fetch.Response) => {
       const emitKey = `${this.name}:${scraperEvents.PROGRESS}`
       if (this.emitter.listenerCount(emitKey)) {
-        const contentLength = parseInt(
-          response.headers.get('content-length') || '0'
-        )
+        const contentLength = parseInt(response.headers.get('content-length') || '0')
         let bytesLength = 0
         response.body.on('data', chunk => {
           bytesLength += chunk.length
@@ -53,10 +51,7 @@ const events = {
   USE_RATE_LIMITER: 'useRateLimiter'
 }
 type EmitterOn = (event: string, callback: (...args: any[]) => void) => void
-type EmitterEmit = (
-  event: 'stop' | 'useRateLimiter',
-  ...emittedValues: any[]
-) => void
+type EmitterEmit = (event: 'stop' | 'useRateLimiter', ...emittedValues: any[]) => void
 
 class Emitter {
   public emitter: EventEmitter
@@ -80,15 +75,12 @@ class Emitter {
     this.emitter = new EventEmitter()
 
     const flatConfig = flattenConfig(config)
-    this.scrapers = flatConfig.map(
-      (_, name) => new ScraperEmitter(name, this.emitter)
-    )
+    this.scrapers = flatConfig.map((_, name) => new ScraperEmitter(name, this.emitter))
   }
   public scraper = (name: ScraperName) => this.scrapers.getOrThrow(name)
   public getBoundOn = (): EmitterOn => this.emitter.on.bind(this.emitter)
   public getBoundEmit = (): EmitterEmit => this.emitter.emit.bind(this.emitter)
-  public getRxEventStream = (eventName: string) =>
-    Rx.fromEvent(this.emitter, eventName)
+  public getRxEventStream = (eventName: string) => Rx.fromEvent(this.emitter, eventName)
 
   private hasListenerFor = (eventName: string): boolean =>
     this.emitter.listenerCount(eventName) !== 0
