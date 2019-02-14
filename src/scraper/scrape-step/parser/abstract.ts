@@ -1,4 +1,4 @@
-import { ScraperName, ParseConfig, ScrapeConfig } from '../../../settings/config/types'
+import { ScraperName, ParseConfig } from '../../../settings/config/types'
 import { Options } from '../../../settings/options/types'
 import { Tools } from '../../../tools'
 

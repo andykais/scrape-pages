@@ -1,7 +1,6 @@
 import { resolve } from 'path'
 import { flattenConfig } from '../config/flatten'
 import { assertOptionsType } from './'
-import { FMap } from '../../util/map'
 // type imports
 import { Input, OptionsInit, FlatOptions } from './types'
 import { Config } from '../config/types'

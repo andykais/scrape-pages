@@ -1,4 +1,4 @@
-import { ScraperName, DownloadConfig, ScrapeConfig } from '../../../settings/config/types'
+import { ScraperName, DownloadConfig } from '../../../settings/config/types'
 import { Options } from '../../../settings/options/types'
 import { Tools } from '../../../tools'
 

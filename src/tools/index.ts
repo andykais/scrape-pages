@@ -1,4 +1,3 @@
-import * as Rx from 'rxjs'
 import * as ops from 'rxjs/operators'
 import { Emitter } from './emitter'
 import { Store } from './store'
