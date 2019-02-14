@@ -70,6 +70,7 @@ class ScrapeStep {
         { parsedValuesWithId, downloadId },
         'loaded cached values'
       )
+      emitter.scraper(this.scraperName).emit.completed(downloadId)
       return parsedValuesWithId
     } else {
       const { downloadValue, downloadId, filename } = await this.downloader.run(
@@ -89,7 +90,6 @@ class ScrapeStep {
           downloadId,
           parsedValues
         })
-        emitter.scraper(this.scraperName).emit.completed(downloadId)
       })()
       const parsedValuesWithId = store.qs.selectParsedValues(downloadId)
 
@@ -97,6 +97,7 @@ class ScrapeStep {
         { parsedValuesWithId, downloadId },
         'inserted new values'
       )
+      emitter.scraper(this.scraperName).emit.completed(downloadId)
       return parsedValuesWithId
     }
   }

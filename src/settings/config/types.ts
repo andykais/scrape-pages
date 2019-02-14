@@ -1,3 +1,4 @@
+import { FMap } from '../../util/map'
 // scraper name
 export type ScraperName = string
 // scraper group
@@ -59,16 +60,14 @@ export interface ParseConfig extends ParseConfigInterface {
 
 type Incrementers = 'failed-download' | 'empty-parse' | number
 
-// returned by ./make-flat-config.ts
+// returned by ./flatten.ts
 export type ConfigPositionInfo = {
   depth: number
   horizontalIndex: number
   name: ScraperName
   parentName?: ScraperName
 }
-export type FlatConfig = {
-  [scraperName: string]: ConfigPositionInfo
-}
+export type FlatConfig = FMap<ScraperName, ConfigPositionInfo>
 
 export interface ScrapeConfigInit {
   download?: DownloadConfigInit

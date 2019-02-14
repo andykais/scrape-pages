@@ -1,12 +1,13 @@
 import { expect } from 'chai'
+import { FMap } from '../../../util/map'
 import { FlatConfig } from '../types'
-import { normalizeConfig, makeFlatConfig } from '../'
+import { normalizeConfig, flattenConfig } from '../'
 import * as testingConfigs from '../../../../testing/resources/testing-configs'
 
 describe('make flat config', () => {
   const galleryPostImgTag = testingConfigs.__GALLERY_POST_IMG_TAG__
 
-  const flatConfigGuess: FlatConfig = {
+  const flatConfigGuess: FlatConfig = FMap.fromObject({
     gallery: {
       depth: 0,
       horizontalIndex: 0,
@@ -37,11 +38,11 @@ describe('make flat config', () => {
       name: 'tag',
       parentName: 'post'
     }
-  }
+  })
 
   it('matches expected flat config', () => {
     const fullConfig = normalizeConfig(galleryPostImgTag)
-    const flatConfig = makeFlatConfig(fullConfig)
-    expect(flatConfig).to.be.deep.equal(flatConfigGuess)
+    const flatConfig = flattenConfig(fullConfig)
+    expect([...flatConfig]).to.have.deep.members([...flatConfigGuess])
   })
 })

@@ -15,7 +15,7 @@ export const findLowestCommonParent = (
   flatConfig: FlatConfig,
   scraperA: ConfigPositionInfo,
   scraperB: ConfigPositionInfo
-): FlatConfig['name'] => {
+): ConfigPositionInfo => {
   if (scraperA.parentName === null) return scraperA
   if (scraperB.parentName === null) return scraperB
   const recurse = (
@@ -31,8 +31,8 @@ export const findLowestCommonParent = (
     )
       return
 
-    const scraperAParent = flatConfig[scraperA.parentName]
-    const scraperBParent = flatConfig[scraperB.parentName]
+    const scraperAParent = flatConfig.getOrThrow(scraperA.parentName)
+    const scraperBParent = flatConfig.getOrThrow(scraperB.parentName)
     if (!scraperAParent || !scraperBParent) return
 
     const commonParent1 = recurse(scraperAParent, scraperB)

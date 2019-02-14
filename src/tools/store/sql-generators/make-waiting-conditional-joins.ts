@@ -6,7 +6,7 @@ const makeWaitingConditionalJoins = (
   scraperNames: string[]
 ) => {
   const levels = scraperNames
-    .map(name => flatConfig[name])
+    .map(name => flatConfig.getOrThrow(name))
     .sort((a, b) => b.depth - a.depth)
   const lowestDepth = levels[0].depth
   const levelsThatWillWait = levels.filter(l => l.depth !== lowestDepth)

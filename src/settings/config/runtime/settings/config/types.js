@@ -4,6 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const lib_1 = __importDefault(require("ts-runtime/lib"));
+const map_1 = require("../../util/map");
 // scraper name
 exports.ScraperName = lib_1.default.type("ScraperName", lib_1.default.string());
 const ScraperGroup = lib_1.default.type("ScraperGroup", lib_1.default.string());
@@ -26,9 +27,9 @@ const ParseConfigInterface = lib_1.default.type("ParseConfigInterface", lib_1.de
 exports.ParseConfigInit = lib_1.default.type("ParseConfigInit", lib_1.default.union(lib_1.default.ref(Selector), lib_1.default.ref(ParseConfigInterface)));
 exports.ParseConfig = lib_1.default.type("ParseConfig", lib_1.default.intersect(lib_1.default.ref(ParseConfigInterface), lib_1.default.object(lib_1.default.property("expect", lib_1.default.ref(ExpectedFormats)))));
 const Incrementers = lib_1.default.type("Incrementers", lib_1.default.union(lib_1.default.string("failed-download"), lib_1.default.string("empty-parse"), lib_1.default.number()));
-// returned by ./make-flat-config.ts
+// returned by ./flatten.ts
 exports.ConfigPositionInfo = lib_1.default.type("ConfigPositionInfo", lib_1.default.object(lib_1.default.property("depth", lib_1.default.number()), lib_1.default.property("horizontalIndex", lib_1.default.number()), lib_1.default.property("name", lib_1.default.ref(exports.ScraperName)), lib_1.default.property("parentName", lib_1.default.ref(exports.ScraperName), true)));
-exports.FlatConfig = lib_1.default.type("FlatConfig", lib_1.default.object(lib_1.default.indexer("scraperName", lib_1.default.string(), lib_1.default.ref(exports.ConfigPositionInfo))));
+exports.FlatConfig = lib_1.default.type("FlatConfig", lib_1.default.ref(map_1.FMap, lib_1.default.ref(exports.ScraperName), lib_1.default.ref(exports.ConfigPositionInfo)));
 exports.ScrapeConfigInit = lib_1.default.type("ScrapeConfigInit", lib_1.default.object(lib_1.default.property("download", lib_1.default.ref(exports.DownloadConfigInit), true), lib_1.default.property("parse", lib_1.default.ref(exports.ParseConfigInit), true), lib_1.default.property("incrementUntil", lib_1.default.ref(Incrementers), true)));
 exports.ScrapeConfig = lib_1.default.type("ScrapeConfig", lib_1.default.object(lib_1.default.property("download", lib_1.default.ref(exports.DownloadConfig), true), lib_1.default.property("parse", lib_1.default.ref(exports.ParseConfig), true), lib_1.default.property("incrementUntil", lib_1.default.ref(Incrementers))));
 const StructureInit = lib_1.default.type("StructureInit", StructureInit => lib_1.default.object(lib_1.default.property("scraper", lib_1.default.ref(exports.ScraperName)), lib_1.default.property("scrapeEach", lib_1.default.union(lib_1.default.ref(StructureInit), lib_1.default.array(lib_1.default.ref(StructureInit))), true), lib_1.default.property("scrapeNext", lib_1.default.union(lib_1.default.ref(StructureInit), lib_1.default.array(lib_1.default.ref(StructureInit))), true)));

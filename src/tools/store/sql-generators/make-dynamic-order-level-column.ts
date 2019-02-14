@@ -17,11 +17,11 @@ const makeDynamicOrderLevelColumn = (
     let lowestDepth = 0
 
     for (const currentName of scraperNames) {
-      const current = flatConfig[currentName]
+      const current = flatConfig.getOrThrow(currentName)
       let min: ConfigPositionInfo | null = null
       if (lowestDepth < current.depth) lowestDepth = current.depth
       for (const comparisonName of scraperNames) {
-        const comparison = flatConfig[comparisonName]
+        const comparison = flatConfig.getOrThrow(comparisonName)
         if (current.name !== comparison.name) {
           const commonAncestor = findLowestCommonParent(
             flatConfig,
@@ -40,7 +40,7 @@ const makeDynamicOrderLevelColumn = (
     const diagonalOrderColumn = Object.keys(ancestors)
       .map(commonParentName => {
         const orderAtRecurseDepth =
-          lowestDepth - flatConfig[commonParentName].depth - 1
+          lowestDepth - flatConfig.getOrThrow(commonParentName).depth - 1
         const scrapersToOrder = ancestors[commonParentName]
         return scrapersToOrder
           .map(({ name, depth, horizontalIndex }) => {

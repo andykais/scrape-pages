@@ -19,7 +19,9 @@ export const query: CreateQuery<Statement> = (
   flatConfig,
   database
 ) => scrapers => {
-  const scraperConfigs = scrapers.map(s => flatConfig[s]).filter(c => c)
+  const scraperConfigs = scrapers
+    .map(s => flatConfig.getOrThrow(s))
+    .filter(c => c)
 
   const lowestDepth = Math.max(...scraperConfigs.map(s => s.depth))
   const orderLevelColumnSql = makeDynamicOrderLevelColumn(flatConfig, scrapers)

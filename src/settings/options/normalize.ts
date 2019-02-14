@@ -1,5 +1,5 @@
 import { resolve } from 'path'
-import { makeFlatConfig } from '../config/make-flat-config'
+import { flattenConfig } from '../config/flatten'
 import { assertOptionsType } from './'
 import { FMap } from '../../util/map'
 // type imports
@@ -34,7 +34,7 @@ const normalizeOptions = (
 ): FlatOptions => {
   assertOptionsType(optionsInit)
 
-  const flatConfig = makeFlatConfig(config)
+  const flatConfig = flattenConfig(config)
   const { optionsEach = {}, ...globalOptions } = optionsInit
 
   const input = getConfigInputValues(config, optionsInit)
@@ -49,20 +49,14 @@ const normalizeOptions = (
     ...globalOptions // user preferences for all things override
   }
 
-  const options: FlatOptions = Object.values(flatConfig).reduce(
-    (acc: FlatOptions, scraperConfig) => {
-      const { name } = scraperConfig
-      const scraperOptions = optionsEach[name]
-      acc.set(name, {
-        ...defaults,
-        folder: resolve(defaults.folder, name),
-        ...scraperOptions,
-        input
-      })
-      return acc
-    },
-    new FMap()
-  )
+  const options: FlatOptions = flatConfig.map((scraperConfig, name) => {
+    return {
+      ...defaults,
+      folder: resolve(defaults.folder, name),
+      ...optionsEach[name],
+      input
+    }
+  })
 
   return options
 }

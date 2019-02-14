@@ -2,8 +2,9 @@ import EventEmitter from 'events'
 import * as Rx from 'rxjs'
 import * as Fetch from 'node-fetch'
 // type imports
-import { makeFlatConfig } from '../settings/config/make-flat-config'
-import { Config } from '../settings/config/types'
+import { FMap } from '../util/map'
+import { flattenConfig } from '../settings/config/flatten'
+import { ScraperName, Config } from '../settings/config/types'
 
 const scraperEvents = {
   QUEUED: 'queued',
@@ -73,17 +74,17 @@ class Emitter {
       this.emitter.on(events.STOP, callback)
     }
   }
-  private scrapers: { [scraper: string]: ScraperEmitter } = {}
+  private scrapers: FMap<ScraperName, ScraperEmitter>
 
   public constructor(config: Config) {
     this.emitter = new EventEmitter()
 
-    const flatConfig = makeFlatConfig(config)
-    for (const name of Object.keys(flatConfig)) {
-      this.scrapers[name] = new ScraperEmitter(name, this.emitter)
-    }
+    const flatConfig = flattenConfig(config)
+    this.scrapers = flatConfig.map(
+      (_, name) => new ScraperEmitter(name, this.emitter)
+    )
   }
-  public scraper = (name: string) => this.scrapers[name]
+  public scraper = (name: ScraperName) => this.scrapers.getOrThrow(name)
   public getBoundOn = (): EmitterOn => this.emitter.on.bind(this.emitter)
   public getBoundEmit = (): EmitterEmit => this.emitter.emit.bind(this.emitter)
   public getRxEventStream = (eventName: string) =>

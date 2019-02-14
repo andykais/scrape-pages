@@ -1,5 +1,5 @@
 import { Database } from './database'
-import { makeFlatConfig } from '../../settings/config'
+import { flattenConfig } from '../../settings/config'
 import { groupBy as groupByKey } from '../../util/array'
 import { Config, FlatConfig } from '../../settings/config/types'
 import { createTables, createStatements } from './queries'
@@ -16,7 +16,7 @@ class Store {
 
   public constructor(config: Config, { folder }: OptionsInit) {
     this.config = config
-    this.flatConfig = makeFlatConfig(config)
+    this.flatConfig = flattenConfig(config)
     // initialize sqlite3 database
     this.database = new Database(folder)
     this.database.pragma('journal_mode = WAL')
@@ -36,12 +36,12 @@ class Store {
   }) => {
     // const scraperNames = Object.keys(scrapers)
 
-    const matchingScrapers = scrapers.filter(s => this.flatConfig[s])
+    const matchingScrapers = scrapers.filter(s => this.flatConfig.getOrThrow(s))
     if (!matchingScrapers.length) return [{}]
 
     const matchingAll = Array.from(
       new Set(scrapers.concat(groupBy === undefined ? [] : groupBy))
-    ).filter(s => this.flatConfig[s])
+    ).filter(s => this.flatConfig.getOrThrow(s))
     // const matchingAll = Array.from(
     // new Set(scraperNames.concat(groupBy))
     // ).filter(s => this.flatConfig[s])

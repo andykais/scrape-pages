@@ -13,33 +13,27 @@ describe('normalize run options with', () => {
         folder: '/nonexistent'
       }
       const runOptions = normalizeOptions(fullConfig, runOptionsInit)
-      const runOptionsExpected: FlatOptions = new FMap([
-        [
-          'index',
-          {
-            cache: true,
-            read: true,
-            write: false,
-            logLevel: 'error' as 'error',
-            downloadPriority: 0,
-            folder: '/nonexistent/index',
-            input: {}
-          }
-        ],
-        [
-          'image',
-          {
-            cache: true,
-            read: true,
-            write: false,
-            logLevel: 'error' as 'error',
-            downloadPriority: 0,
-            folder: '/nonexistent/image',
-            input: {}
-          }
-        ]
-      ])
-      expect(runOptionsExpected).to.be.deep.equal(runOptions)
+      const runOptionsExpected: FlatOptions = FMap.fromObject({
+        index: {
+          cache: true,
+          read: true,
+          write: false,
+          logLevel: 'error' as 'error',
+          downloadPriority: 0,
+          folder: '/nonexistent/index',
+          input: {}
+        },
+        image: {
+          cache: true,
+          read: true,
+          write: false,
+          logLevel: 'error' as 'error',
+          downloadPriority: 0,
+          folder: '/nonexistent/image',
+          input: {}
+        }
+      })
+      expect([...runOptions]).to.have.deep.members([...runOptionsExpected])
     })
   })
 

@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import { makeFlatConfig, normalizeConfig } from '../../../settings/config'
+import { flattenConfig, normalizeConfig } from '../../../settings/config'
 import { makeDynamicOrderLevelColumn } from '../sql-generators'
 import * as testingConfigs from '../../../../testing/resources/testing-configs'
 
@@ -7,7 +7,7 @@ import * as testingConfigs from '../../../../testing/resources/testing-configs'
 describe('make dynamic order level column', () => {
   const galleryPostImgTag = testingConfigs.__GALLERY_POST_IMG_TAG__
   const fullConfig = normalizeConfig(galleryPostImgTag)
-  const flatConfig = makeFlatConfig(fullConfig)
+  const flatConfig = flattenConfig(fullConfig)
 
   it(`should always be '0' when there arent any cases`, () => {
     const scrapersToGetOut = ['tag']
