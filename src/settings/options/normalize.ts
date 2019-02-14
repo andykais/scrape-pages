@@ -6,16 +6,22 @@ import { Input, OptionsInit, FlatOptions } from './types'
 import { Config } from '../config/types'
 
 const getConfigInputValues = (config: Config, options: OptionsInit) => {
-  const configInputKeys = config.input.map(input => {
-    if (typeof input === 'string') return input
-    else return input.name
-  })
-
   const initInputs = options.input || {}
+
+  const optionsMissingInputKeys = config.input.filter(key => initInputs[key] === undefined)
+  if (optionsMissingInputKeys.length) {
+    throw new Error(`Invalid input! Options is missing keys(s) [${optionsMissingInputKeys.join()}]`)
+  }
+
+  return config.input.reduce((acc: Input, inputKey) => {
+    acc[inputKey] = initInputs[inputKey]
+    return acc
+  }, {})
+
   const filteredInputs: Input = {}
-  for (const inputKey of configInputKeys) {
+  for (const inputKey of config.input) {
     if (initInputs[inputKey] === undefined) {
-      const missingKeys = configInputKeys.filter(key => initInputs[key] === undefined).join()
+      const missingKeys = config.input.filter(key => initInputs[key] === undefined).join()
       throw new Error(`Invalid input! Options is missing keys(s) [${missingKeys}]`)
     }
     filteredInputs[inputKey] = initInputs[inputKey]

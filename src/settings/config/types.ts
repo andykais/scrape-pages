@@ -18,12 +18,7 @@ type RegexCleanup = RegexRemove | RegexReplace
 // }}}
 
 // Input {{{
-type InputSimple = InputKey
-type InputCleaned = {
-  name: InputKey
-  regexCleanup: RegexCleanup
-}
-type Input = InputSimple | InputCleaned
+type Input = InputKey
 // }}}
 
 // DownloadConfig {{{

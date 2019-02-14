@@ -1,3 +1,5 @@
+import { validateSlug } from '../../util/slug'
+import VError from 'verror'
 import {
   DownloadConfigInit,
   DownloadConfig,
@@ -11,6 +13,8 @@ import {
 } from './types'
 import { assertConfigType } from './'
 
+const reservedWords = ['value', 'index']
+
 const defaults = {
   definitions: {
     incrementUntil: 0
@@ -23,6 +27,21 @@ const defaults = {
     expect: 'html' as ParseConfig['expect'],
     attribute: undefined as ParseConfig['attribute']
   }
+}
+
+const normalizeInputs = (inputsInit: ConfigInit['input']) => {
+  const inputs = normalizeUndefinedSingleArray(inputsInit)
+  // make sure no reserved words are used as input keys
+  const matchingReserves = reservedWords.filter(reserved => inputs.includes(reserved))
+  if (matchingReserves.length) {
+    throw new Error(`[${matchingReserves.join()}] are reserved word(s). The cannot be input names.`)
+  }
+  try {
+    for (const input of inputs) validateSlug(input)
+  } catch (e) {
+    throw new VError({ name: e.name, cause: e }, 'For an input key, ')
+  }
+  return inputs
 }
 
 // TODO use type guards
@@ -58,6 +77,18 @@ const normalizeDefinition = (scrapeConfig: ScrapeConfigInit): ScrapeConfig => ({
   parse: scrapeConfig.parse === undefined ? undefined : normalizeParse(scrapeConfig.parse)
 })
 
+const normalizeDefs = (defs: ConfigInit['defs']) => {
+  return Object.keys(defs).reduce((acc: Config['defs'], scraperName) => {
+    try {
+      validateSlug(scraperName)
+      acc[scraperName] = normalizeDefinition(defs[scraperName])
+      return acc
+    } catch (e) {
+      throw new VError({ name: e.name, cause: e }, 'For a scraper name, ')
+    }
+  }, {})
+}
+
 const normalizeUndefinedSingleArray = <T>(val?: T | T[]): T[] =>
   val === undefined ? [] : Array.isArray(val) ? val : [val]
 
@@ -74,18 +105,10 @@ const normalizeStructure = ({
 const normalizeConfig = (config: ConfigInit): Config => {
   assertConfigType(config)
 
-  const defs = Object.keys(config.defs).reduce(
-    (acc, scraperName) => ({
-      ...acc,
-      [scraperName]: normalizeDefinition(config.defs[scraperName])
-    }),
-    {}
-  )
-
   return {
-    input: normalizeUndefinedSingleArray(config.input),
+    input: normalizeInputs(config.input),
     import: normalizeUndefinedSingleArray(config.import),
-    defs,
+    defs: normalizeDefs(config.defs),
     structure: normalizeStructure(config.structure)
   }
 }
