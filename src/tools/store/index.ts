@@ -1,6 +1,6 @@
 import { Database } from './database'
 import { flattenConfig } from '../../settings/config'
-import { groupBy as groupByKey } from '../../util/array'
+import { groupUntilSeparator } from '../../util/array'
 import { Config, FlatConfig } from '../../settings/config/types'
 import { createTables, createStatements } from './queries'
 // type imports
@@ -29,77 +29,19 @@ class Store {
   }
 
   public query = ({ scrapers, groupBy }: { scrapers: ScraperName[]; groupBy?: ScraperName }) => {
-    const matchingScrapers = scrapers.filter(s => this.flatConfig.getOrThrow(s))
-    if (!matchingScrapers.length) return [{}]
+    if (!scrapers.filter(s => this.flatConfig.get(s)).length) return []
 
-    const matchingAll = Array.from(new Set(scrapers.concat(groupBy || []))).filter(s =>
-      this.flatConfig.getOrThrow(s)
+    const allExistingScrapers = [...new Set(scrapers.concat(groupBy || []))].filter(s =>
+      this.flatConfig.get(s)
     )
-    // const matchingAll = Array.from(
-    // new Set(scraperNames.concat(groupBy))
-    // ).filter(s => this.flatConfig[s])
 
-    const result = this.qs.selectOrderedScrapers(matchingAll)
-    // console.log(
-    // result.map(r => r.scraper).reduce((acc, name) => {
-    // acc[name] = acc[name] || 0
-    // acc[name]++
-    // return acc
-    // }, {})
-    // )
+    const result = this.qs.selectOrderedScrapers(allExistingScrapers)
 
-    /** logging helper
-    // const headers = [
-    //   'id',
-    //   'parentId',
-    //   'incrementIndex',
-    //   'levelOrder',
-    //   'recurseDepth',
-    //   'currentScraper',
-    //   'filename',
-    //   'parsedValue',
-    //   'scraper'
-    // ]
-    // console.log([
-    // headers.join(' | '),
-    // ...result.map(r => {
-    // return headers
-    // .map(key =>
-    // (r[key] === null ? 'NULL' : r[key])
-    // .toString()
-    // .replace(/\n/g, '')
-    // .padStart(key === 'scraper' ? 0 : key.length)
-    // .slice(key === 'scraper' ? null : -key.length)
-    // )
-    // .join(' | ')
-    // })
-    // ])
-    */
-
-    // TODO move this into sql
-    // const objectPicker = (
-    // object: { [name: string]: any },
-    // selections: string[]
-    // ): any => {
-    // const accepted: any = {}
-    // for (const selection of selections) {
-    // const value = object[selection]
-    // if (value) {
-    // accepted[selection] = value
-    // }
-    // }
-    // return accepted
-    // }
-    // console.log({ result })
-    const groupedRows = groupByKey(
+    return groupUntilSeparator(
       result,
-      'scraper',
-      groupBy,
-      groupBy !== undefined && scrapers.includes(groupBy),
-      selector => selector
-      // selector => objectPicker(selector, scrapers[selector.scraper])
+      ({ scraper }) => scraper === groupBy,
+      groupBy !== undefined && scrapers.includes(groupBy)
     )
-    return groupedRows
   }
 }
 

@@ -2,17 +2,18 @@ import os from 'os'
 import path from 'path'
 
 import { expect } from 'chai'
-import _ from 'lodash/fp'
 
 import '../../use-chai-plugins'
 import { nockMockFolder } from '../../nock-folder-mock'
 import { config } from './config'
 import expectedQueryResult from './resources/expected-query-result.json'
 import { scrape } from '../../../src'
+// type imports
+import { Store } from '../../../src/tools/store'
 
 describe('scrape next site', () => {
   describe('with instant scraper', function() {
-    let scraperQueryForFunction: any
+    let scraperQueryFn: Store['query']
     before(done => {
       ;(async () => {
         await nockMockFolder(`${__dirname}/resources/mock-endpoints`, 'http://scrape-next-site.com')
@@ -28,27 +29,27 @@ describe('scrape next site', () => {
           }
         }
         const { on, query } = await scrape(config, options)
-        scraperQueryForFunction = query
+        scraperQueryFn = query
         on('done', done)
       })()
     })
 
     it('should group each image into a separate slot, in order', () => {
-      const result = scraperQueryForFunction({
+      const result = scraperQueryFn({
         scrapers: ['image'],
         groupBy: 'image'
       })
       expect(result)
-        .excludingEvery('filename')
-        .to.be.deep.equal(expectedQueryResult.map(_.omit('tag')))
+        .excludingEvery(['filename', 'id'])
+        .to.be.deep.equal(expectedQueryResult.map(g => g.filter(r => r.scraper === 'image')))
     })
     it('should group tags and images together that were found on the same page', () => {
-      const result = scraperQueryForFunction({
+      const result = scraperQueryFn({
         scrapers: ['image', 'tag'],
         groupBy: 'image-page'
       })
       expect(result)
-        .excludingEvery('filename')
+        .excludingEvery(['filename', 'id'])
         .to.be.deep.equal(expectedQueryResult)
     })
   })
@@ -85,7 +86,7 @@ describe('scrape next site', () => {
         groupBy: 'image-page'
       })
       expect(result)
-        .excludingEvery('filename')
+        .excludingEvery(['filename', 'id'])
         .to.be.deep.equal(expectedQueryResult)
     })
   })

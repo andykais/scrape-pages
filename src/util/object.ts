@@ -63,35 +63,4 @@ const marshaller = <T extends {}, F extends (...args: any[]) => T>(fn: F) => (
   ...args: ArgumentTypes<F>
 ) => marshalObject(fn(...args) as ReturnType<F>)
 
-const safeCurry = <T, F extends (...args: any[]) => T, G extends (fResult: T) => any>(
-  gFn: G,
-  fFn: F
-) => (...args: ArgumentTypes<F>): T => gFn(fFn(...args))
-
-// ======================== SAMPLE ============================ //
-
-const sample: Input = {
-  m: new Map([['a', 1]])
-}
-type Input = { m: Map<string, number>; children?: Input[] }
-// type Input = { m: Map<string, number>; children?: undefined }
-const outputActual = marshalObject(sample)
-type Output = {
-  m: {
-    [key: string]: number
-  }
-  // children?: undefined
-  children?: { m: { [key: string]: number } }[]
-}
-const outputExpected: Output = outputActual
-
-// const curried = safeCurry((obj: Output) => obj, (obj: Input) => marshalObject(obj))
-// const curried = safeCurry(marshalObject, (obj: Input) => obj) // XXX
-const curried = marshaller((obj: Input) => obj)
-// const curried = safeCurry(<T>(obj: T) => obj, (obj: Input) => obj) // XXX
-// const curried = safeCurry((x: boolean) => x, (x: number) => x)
-const curriedOutput: Output = curried(sample)
-
-// ======================== SAMPLE ============================ //
-
 export { mapObject, replaceInObject, marshalObject, marshaller }

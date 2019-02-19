@@ -42,8 +42,8 @@ WITH cte AS (
 )
 SELECT
 --  *
+  id,
   scraper,
-  --  id,
   parsedValue,
   --  downloadId,
   url, filename

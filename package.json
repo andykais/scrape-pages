@@ -16,7 +16,7 @@
     "compile:runtime:config": "tsr --libDeclarations --tsConfig src/settings/config/runtime/tsconfig.runtime.json src/settings/config/assert.ts && replace-in-file './tsr-declarations' '../../tsr-declarations' src/settings/config/runtime/settings/config/*",
     "compile:runtime": "run-s compile:runtime:config compile:runtime:options",
     "clean": "rimraf lib",
-    "lint": "eslint '**/*.ts'",
+    "lint": "eslint --ignore-path .gitignore '**/*.ts'",
     "format": "git ls-files '*.ts' '*.json' | xargs prettier --write",
     "format:check": "git ls-files '*.ts' '*.json' | xargs prettier --list-different",
     "typecheck": "tsc --noEmit --project tsconfig.json",

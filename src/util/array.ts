@@ -1,28 +1,26 @@
-export const groupBy = <T>(
-  array: { [key: string]: any }[],
-  key: string,
-  value: T,
-  includeGroupByKey = false,
-  resultSelector: (v: any) => any = v => v
-) => {
+/**
+ * groups array values until `isSeparator` decides the rows should be separated
+ */
+export const groupUntilSeparator = <T>(
+  array: T[],
+  isSeparator: (item: T) => boolean,
+  includeSeparator: boolean
+): T[][] => {
   const { length } = array
-  let collector: { [key: string]: any } = {}
-  const groupedArray = []
+  const groupedArray: T[][] = []
+  let grouping = []
 
   for (let i = 0; i < length; i++) {
     const item = array[i]
-    const itemValue = item[key]
-
-    if (itemValue === value && i !== 0) {
-      groupedArray.push(collector)
-      collector = {}
+    const itemIsSeparator = isSeparator(item)
+    if (itemIsSeparator && i !== 0) {
+      groupedArray.push(grouping)
+      grouping = []
     }
-    if (includeGroupByKey || itemValue !== value) {
-      const collectorArray = collector[itemValue] || []
-      collector[itemValue] = collectorArray
-      collectorArray.push(resultSelector(item))
+    if (!itemIsSeparator || includeSeparator) {
+      grouping.push(item)
     }
   }
-  groupedArray.push(collector)
+  groupedArray.push(grouping)
   return groupedArray
 }
