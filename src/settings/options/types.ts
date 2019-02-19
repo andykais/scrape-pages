@@ -9,14 +9,13 @@ export type Input = { [inputName: string]: any }
 
 interface OptionsAnyInit {
   logLevel?: LogLevel
-  cache?: boolean
+  cache?: boolean // should re-download or use db entry
+  read?: boolean // should download be read into memory
+  write?: boolean // should download be saved to a file (separate from a database entry)
 }
 
 interface ScraperOptionsInit extends OptionsAnyInit {
   downloadPriority?: number
-  cache?: boolean // should re-download or use db entry
-  read?: boolean // should download be read into memory
-  write?: boolean // should download be saved to a file (separate from a database entry)
 }
 interface ScraperOptions extends Required<ScraperOptionsInit> {}
 
@@ -31,7 +30,6 @@ export interface OptionsInit extends OptionsAnyInit, Parallelism {
   input?: Input
   folder: string
   cleanFolder?: boolean
-  logToFile?: string
   optionsEach?: {
     [scraperName: string]: ScraperOptionsInit
   }

@@ -3,6 +3,7 @@ import { ScrapeStep } from './scrape-step'
 import { mkdirp, rmrf } from '../util/fs'
 import { normalizeConfig } from '../settings/config'
 import { normalizeOptions } from '../settings/options'
+import { Logger } from '../tools/logger'
 import { structureScrapers } from './flow'
 import { mapObject } from '../util/object'
 // type imports
@@ -14,6 +15,8 @@ const initFolders = async (config: Config, optionsInit: OptionsInit, flatOptions
 
   await mkdirp(optionsInit.folder)
   for (const { folder } of flatOptions.values()) await mkdirp(folder)
+
+  await Logger.rotateLogFiles(optionsInit.folder)
 }
 
 export const scrape = async (configInit: ConfigInit, optionsInit: OptionsInit) => {

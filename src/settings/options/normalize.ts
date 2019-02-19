@@ -39,9 +39,9 @@ const normalizeOptions = (config: Config, optionsInit: OptionsInit): FlatOptions
   // assertValidInput(config, options)
 
   const defaults = {
-    cache: true,
     downloadPriority: 0,
     logLevel: 'error' as 'error',
+    cache: true,
     read: true,
     write: false,
     ...globalOptions // user preferences for all things override
