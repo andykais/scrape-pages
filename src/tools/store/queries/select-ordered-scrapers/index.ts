@@ -3,7 +3,7 @@ import { makeDynamicOrderLevelColumn, makeWaitingConditionalJoins } from '../../
 import SQL_TEMPLATE from './template.sql'
 import { CreateQuery } from '../../types'
 
-type SelectedRow = {
+export type SelectedRow = {
   scraper: string
   id: number
   downloadId: number
@@ -11,7 +11,7 @@ type SelectedRow = {
   url?: string
   filename?: string
 }
-type Statement = (scrapers: string[]) => SelectedRow[]
+type Statement = (scrapers: string[]) => () => SelectedRow[]
 export const query: CreateQuery<Statement> = (flatConfig, database) => scrapers => {
   const scraperConfigs = scrapers.map(s => flatConfig.getOrThrow(s)).filter(c => c)
 
@@ -28,5 +28,5 @@ export const query: CreateQuery<Statement> = (flatConfig, database) => scrapers 
     lowestDepth
   })
   const statement = database.prepare(selectOrderedSql)
-  return statement.all()
+  return () => statement.all()
 }

@@ -53,7 +53,7 @@ class ScrapeStep {
       incrementIndex,
       parentId,
       scraper: this.scraperName
-    })
+    }) || { id: undefined }
     if (downloadId) {
       const parsedValuesWithId = store.qs.selectParsedValues(downloadId)
       this.scraperLogger.info({ parsedValuesWithId, downloadId }, 'loaded cached values')

@@ -3,6 +3,7 @@ import { Database } from '../database'
 import { FlatConfig } from '../../../settings/config/types'
 
 export { query as createTables } from './create-tables'
+export { query as selectOrderedScrapers } from './select-ordered-scrapers'
 import { query as selectOrderedScrapers } from './select-ordered-scrapers'
 import { query as selectCompletedDownload } from './select-completed-download'
 import { query as insertQueuedDownload } from './insert-queued-download'
@@ -17,8 +18,4 @@ export const createStatements = (flatConfig: FlatConfig, database: Database) => 
   updateDownloadToComplete: updateDownloadToComplete(flatConfig, database),
   insertBatchParsedValues: insertBatchParsedValues(flatConfig, database),
   selectParsedValues: selectParsedValues(flatConfig, database),
-  // util statements
-  beginTransaction: database.prepare('BEGIN TRANSACTION'),
-  commitTransaction: database.prepare('COMMIT'),
-  rollbackTransaction: database.prepare('ROLLBACK')
 })

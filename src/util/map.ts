@@ -1,6 +1,12 @@
 type MapLike<K, V> = FMap<K, V> | Map<K, V>
 
 class FMap<K = any, V = any> extends Map<K, V> {
+  public constructor(pairs?: [K, V][]) {
+    super(pairs)
+    this.has = this.has.bind(this)
+    this.get = this.get.bind(this)
+  }
+
   public static fromObject = <T>(object: { [key: string]: T }): FMap<string, T> => {
     const fmap = new FMap<string, T>()
     for (const [key, val] of Object.entries(object)) {

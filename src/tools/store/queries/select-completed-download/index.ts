@@ -1,7 +1,7 @@
 import SQL_TEMPLATE from './template.sql'
 import { CreateQuery } from '../../types'
 
-type SelectedRow = { id?: number }
+type SelectedRow = { id: number } | undefined
 type Statement = (
   params: {
     incrementIndex: number
@@ -12,6 +12,6 @@ type Statement = (
 export const query: CreateQuery<Statement> = (flatConfig, database) => {
   const statement = database.prepare(SQL_TEMPLATE)
   return ({ incrementIndex, parentId = -1, scraper }) => {
-    return statement.get([incrementIndex, parentId, scraper]) || {}
+    return statement.get([incrementIndex, parentId, scraper])
   }
 }

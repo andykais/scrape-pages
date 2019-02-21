@@ -47,7 +47,7 @@
     "@babel/preset-env": "^7.2.3",
     "@babel/preset-typescript": "^7.1.0",
     "@babel/register": "^7.0.0",
-    "@types/better-sqlite3": "^5.2.1",
+    "@types/better-sqlite3": "^5.2.2",
     "@types/bunyan": "^1.8.5",
     "@types/chai": "^4.1.7",
     "@types/cheerio": "^0.22.9",
