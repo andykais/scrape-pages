@@ -1,7 +1,9 @@
-import fetch, * as Fetch from 'node-fetch'
+import fetch from 'node-fetch'
 import { createWriteStream } from 'fs'
 import path from 'path'
 import { mkdirp, sanitizeFilename } from '../../../../util/fs'
+import { FMap } from '../../../../util/map'
+import { ResponseError } from '../../../../util/error'
 
 import { AbstractDownloader, DownloadParams } from '../abstract'
 import { compileTemplate } from '../../../../util/handlebars'
@@ -27,7 +29,7 @@ type FetchFunction = (
 export class Downloader extends AbstractDownloader<DownloadData> {
   protected config: DownloadConfig
   private urlTemplate: ReturnType<typeof compileTemplate>
-  private headerTemplates: Map<string, ReturnType<typeof compileTemplate>>
+  private headerTemplates: FMap<string, ReturnType<typeof compileTemplate>>
   private fetcher: FetchFunction
 
   public constructor(
@@ -40,7 +42,7 @@ export class Downloader extends AbstractDownloader<DownloadData> {
     this.config = config // must be set on again on child classes https://github.com/babel/babel/issues/9439
     // set templates
     this.urlTemplate = compileTemplate(this.config.urlTemplate)
-    this.headerTemplates = new Map()
+    this.headerTemplates = new FMap()
     Object.entries(this.config.headerTemplates).forEach(([key, templateStr]) =>
       this.headerTemplates.set(key, compileTemplate(templateStr))
     )
@@ -64,10 +66,7 @@ export class Downloader extends AbstractDownloader<DownloadData> {
     // construct url
     const url = new URL(this.urlTemplate(templateVals)).toString()
     // construct headers
-    const headers: Headers = {}
-    for (const [key, template] of this.headerTemplates) {
-      headers[key] = template(templateVals)
-    }
+    const headers = this.headerTemplates.toObject(template => template(templateVals))
     return [url, { headers, method: this.config.method }]
   }
 
@@ -75,11 +74,6 @@ export class Downloader extends AbstractDownloader<DownloadData> {
     return this.fetcher(downloadId, downloadData)
   }
 
-  private verifyResponseOk = (response: Fetch.Response, url: string) => {
-    if (!response.ok) {
-      throw new Error(`status ${response.status} for ${url}`)
-    }
-  }
   private downloadToFileAndMemory: FetchFunction = async (downloadId, [url, fetchOptions]) => {
     const downloadFolder = path.resolve(this.options.folder, downloadId.toString())
     const filename = path.resolve(downloadFolder, sanitizeFilename(url))
@@ -89,7 +83,7 @@ export class Downloader extends AbstractDownloader<DownloadData> {
       this.options.downloadPriority
     )
     await mkdirp(downloadFolder)
-    this.verifyResponseOk(response, url)
+    if (!response.ok) throw new ResponseError(response, url)
     const dest = createWriteStream(filename)
     const buffers: Buffer[] = []
 
@@ -116,7 +110,7 @@ export class Downloader extends AbstractDownloader<DownloadData> {
     )
     await mkdirp(downloadFolder)
     await new Promise((resolve, reject) => {
-      this.verifyResponseOk(response, url)
+      if (!response.ok) reject(new ResponseError(response, url))
       const dest = createWriteStream(filename)
       response.body.pipe(dest)
       this.tools.emitter.scraper(this.scraperName).emit.progress(downloadId, response)
@@ -133,7 +127,7 @@ export class Downloader extends AbstractDownloader<DownloadData> {
     this.tools.queue
       .add(() => fetch(url, fetchOptions), this.options.downloadPriority)
       .then(response => {
-        this.verifyResponseOk(response, url)
+        if (!response.ok) throw new ResponseError(response, url)
         this.tools.emitter.scraper(this.scraperName).emit.progress(downloadId, response)
         return response.text()
       })

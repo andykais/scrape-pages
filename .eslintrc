@@ -8,6 +8,7 @@
   "rules": {
     "no-unused-expressions": "error",
     "no-console": "warn",
+    "no-unreachable": "error",
     "@typescript-eslint/no-unused-vars": "error",
     "@typescript-eslint/explicit-member-accessibility": "error",
     "@typescript-eslint/member-ordering": "error",

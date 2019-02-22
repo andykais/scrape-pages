@@ -5,6 +5,7 @@ class FMap<K = any, V = any> extends Map<K, V> {
     super(pairs)
     this.has = this.has.bind(this)
     this.get = this.get.bind(this)
+    this.toObject = this.toObject.bind(this)
   }
 
   public static fromObject = <T>(object: { [key: string]: T }): FMap<string, T> => {
@@ -15,10 +16,12 @@ class FMap<K = any, V = any> extends Map<K, V> {
     return fmap
   }
 
-  public toObject = <T>(): { [key: string]: V } => {
-    const object: { [key: string]: V } = {}
+  public toObject(): { [key: string]: V }
+  public toObject<T>(fn: (val: V, key: K) => T): { [key: string]: T }
+  public toObject<T>(fn: (val: V, key: K) => T | V = (v: V) => v) {
+    const object: { [key: string]: T | V } = {}
     for (const [key, val] of this) {
-      object[key.toString()] = val
+      object[key.toString()] = fn(val, key)
     }
     return object
   }
@@ -41,6 +44,14 @@ class FMap<K = any, V = any> extends Map<K, V> {
       mapped.set(key, fn(val, key))
     }
     return mapped
+  }
+
+  public reduce = <T>(fn: (acc: T, val: V, key: K, map: FMap<K, V>) => T, initializer: T): T => {
+    let acc = initializer
+    for (const [key, val] of this) {
+      acc = fn(acc, val, key, this)
+    }
+    return acc
   }
 
   public merge = (fmap: MapLike<K, V>): FMap<K, V> => {

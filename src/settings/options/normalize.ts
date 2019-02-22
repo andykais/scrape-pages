@@ -5,7 +5,7 @@ import { assertOptionsType } from './'
 import { Input, OptionsInit, FlatOptions } from './types'
 import { Config } from '../config/types'
 
-const getConfigInputValues = (config: Config, options: OptionsInit) => {
+const getConfigInputValues = (config: Config, options: OptionsInit): Input => {
   const initInputs = options.input || {}
 
   const optionsMissingInputKeys = config.input.filter(key => initInputs[key] === undefined)
@@ -17,16 +17,6 @@ const getConfigInputValues = (config: Config, options: OptionsInit) => {
     acc[inputKey] = initInputs[inputKey]
     return acc
   }, {})
-
-  const filteredInputs: Input = {}
-  for (const inputKey of config.input) {
-    if (initInputs[inputKey] === undefined) {
-      const missingKeys = config.input.filter(key => initInputs[key] === undefined).join()
-      throw new Error(`Invalid input! Options is missing keys(s) [${missingKeys}]`)
-    }
-    filteredInputs[inputKey] = initInputs[inputKey]
-  }
-  return filteredInputs
 }
 
 const normalizeOptions = (config: Config, optionsInit: OptionsInit): FlatOptions => {
@@ -36,7 +26,6 @@ const normalizeOptions = (config: Config, optionsInit: OptionsInit): FlatOptions
   const { optionsEach = {}, ...globalOptions } = optionsInit
 
   const input = getConfigInputValues(config, optionsInit)
-  // assertValidInput(config, options)
 
   const defaults = {
     downloadPriority: 0,
@@ -47,14 +36,12 @@ const normalizeOptions = (config: Config, optionsInit: OptionsInit): FlatOptions
     ...globalOptions // user preferences for all things override
   }
 
-  const options: FlatOptions = flatConfig.map((scraperConfig, name) => {
-    return {
-      ...defaults,
-      folder: resolve(defaults.folder, name),
-      ...optionsEach[name],
-      input
-    }
-  })
+  const options: FlatOptions = flatConfig.map((scraperConfig, name) => ({
+    ...defaults,
+    folder: resolve(defaults.folder, name),
+    ...optionsEach[name],
+    input
+  }))
 
   return options
 }

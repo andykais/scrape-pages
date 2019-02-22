@@ -1,8 +1,9 @@
+import * as Fetch from 'node-fetch'
 import * as Rx from 'rxjs'
 import * as ops from 'rxjs/operators'
 import * as RxCustom from '../util/rxjs/observables'
 import { ScrapeStep } from './scrape-step'
-import { wrapError } from '../util/error'
+import { wrapError, ResponseError } from '../util/error'
 // type imports
 import { ParsedValue } from './scrape-step'
 import { Config, ScrapeConfig } from '../settings/config/types'
@@ -16,8 +17,8 @@ const incrementUntilNumericIndex = (incrementUntil: number): DownloadParseBoolea
 ) => incrementUntil >= incrementIndex
 const incrementAlways = () => true
 
-const catchFetchError = (e: Error) => {
-  if (e.name === 'FetchError') return Rx.empty()
+const catchDownloadError = (e: Error) => {
+  if (e instanceof Fetch.FetchError || e instanceof ResponseError) return Rx.empty()
   else return Rx.throwError(e)
 }
 const throwAnyError = (e: Error) => Rx.throwError(e)
@@ -35,7 +36,7 @@ const chooseIncrementEvaluator = ({ incrementUntil }: ScrapeConfig) => {
 const chooseIgnoreError = ({ incrementUntil }: ScrapeConfig) => {
   switch (incrementUntil) {
     case 'failed-download':
-      return catchFetchError
+      return catchDownloadError
     default:
       return throwAnyError
   }

@@ -17,5 +17,5 @@ export const createStatements = (flatConfig: FlatConfig, database: Database) => 
   insertQueuedDownload: insertQueuedDownload(flatConfig, database),
   updateDownloadToComplete: updateDownloadToComplete(flatConfig, database),
   insertBatchParsedValues: insertBatchParsedValues(flatConfig, database),
-  selectParsedValues: selectParsedValues(flatConfig, database),
+  selectParsedValues: selectParsedValues(flatConfig, database)
 })
