@@ -10,5 +10,7 @@ declare module 'flow-runtime' {
 
 type ArgumentTypes<F extends Function> = F extends (...args: infer A) => any ? A : never
 
+type Omit<T, K> = Pick<T, Exclude<keyof T, K>>
+
 type Nullable<T> = T | null
 type Voidable<T> = T | void

@@ -2,7 +2,7 @@ import { resolve } from 'path'
 import { flattenConfig } from '../config/flatten'
 import { assertOptionsType } from './'
 // type imports
-import { Input, OptionsInit, FlatOptions } from './types'
+import { Input, OptionsInit, Options, FlatOptions } from './types'
 import { Config } from '../config/types'
 
 const getConfigInputValues = (config: Config, options: OptionsInit): Input => {
@@ -27,9 +27,9 @@ const normalizeOptions = (config: Config, optionsInit: OptionsInit): FlatOptions
 
   const input = getConfigInputValues(config, optionsInit)
 
-  const defaults = {
+  const defaults: Omit<Options, 'input' | 'folder'> = {
     downloadPriority: 0,
-    logLevel: 'error' as 'error',
+    logLevel: 'error',
     cache: true,
     read: true,
     write: false,
@@ -38,7 +38,7 @@ const normalizeOptions = (config: Config, optionsInit: OptionsInit): FlatOptions
 
   const options: FlatOptions = flatConfig.map((scraperConfig, name) => ({
     ...defaults,
-    folder: resolve(defaults.folder, name),
+    folder: resolve(globalOptions.folder, name),
     ...optionsEach[name],
     input
   }))

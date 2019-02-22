@@ -5,7 +5,7 @@ type ScraperName = string
 // likewise, this should come from bunyan, but it does not work well with ts-runtime
 type LogLevel = 'debug' | 'info' | 'warn' | 'error'
 
-export type Input = { [inputName: string]: any }
+export type Input = { [inputName: string]: string }
 
 interface OptionsAnyInit {
   logLevel?: LogLevel
@@ -22,7 +22,7 @@ interface ScraperOptions extends Required<ScraperOptionsInit> {}
 interface Parallelism {
   maxConcurrent?: number
   rateLimit?: {
-    rate: number
+    rate: number // in milliseconds
     limit: number
   }
 }
@@ -34,6 +34,8 @@ export interface OptionsInit extends OptionsAnyInit, Parallelism {
     [scraperName: string]: ScraperOptionsInit
   }
 }
+
+export type OptionsReusable = Omit<OptionsInit, 'input' | 'folder' | 'cleanFolder'>
 
 export interface Options extends ScraperOptions {
   input: Input

@@ -15,17 +15,20 @@ import { assertConfigType } from './'
 
 const reservedWords = ['value', 'index']
 
-const defaults = {
-  definitions: {
+const defaults: {
+  definition: Pick<ScrapeConfig, 'incrementUntil'>
+  download: Pick<DownloadConfig, 'method' | 'headerTemplates'>
+  parse: Pick<ParseConfig, 'expect'>
+} = {
+  definition: {
     incrementUntil: 0
   },
   download: {
-    method: 'GET' as DownloadConfig['method'],
-    headerTemplates: {} as DownloadConfig['headerTemplates']
+    method: 'GET',
+    headerTemplates: {}
   },
   parse: {
-    expect: 'html' as ParseConfig['expect'],
-    attribute: undefined as ParseConfig['attribute']
+    expect: 'html'
   }
 }
 
@@ -70,7 +73,7 @@ const normalizeParse = (parse: ParseConfigInit): ParseConfig =>
       }
 
 const normalizeDefinition = (scrapeConfig: ScrapeConfigInit): ScrapeConfig => ({
-  ...defaults.definitions,
+  ...defaults.definition,
   ...scrapeConfig,
   download:
     scrapeConfig.download === undefined ? undefined : normalizeDownload(scrapeConfig.download),
