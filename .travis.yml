@@ -1,59 +1,66 @@
 language: node_js
 
-stages:
-  - name: typecheck-test-lint
-    if: branch = master OR type IN (pull_request)
-  - name: deploy-npm
-    if: tag IS present
-  - name: deploy-website
-    if: branch = master AND NOT type IN (pull_request)
+node_js:
+  - '11'
+  - '10'
+  - '9'
+  - '8'
 
-cache:
-  directories:
-    - $HOME/.npm
+os:
+  - linux
+  - osx
+  # - windows
+
+cache: npm
+
+stages:
+  - name: typecheck
+    if: branch = master OR type IN (pull_request)
+  - name: test
+    if: branch = master OR type IN (pull_request)
+  - name: lint
+    if: branch = master OR type IN (pull_request)
+  - name: deploy npm
+    if: tag IS present
+  - name: deploy website
+    if: branch = master AND NOT type IN (pull_request)
 
 jobs:
   include:
-    - stage: typecheck-test-lint
-      name: typecheck
-      node_js: '8'
+    - stage: typecheck
       script: npm run typecheck
+      skip_cleanup: true
 
-    - stage: typecheck-test-lint
-      name: test node:10
-      node_js: '10'
-      script: npm run test:unit && npm run test:functional
-    - stage: typecheck-test-lint
-      name: test node:9
-      node_js: '9'
-      script: npm run test:unit && npm run test:functional
-    - stage: typecheck-test-lint
-      name: test node:8
-      node_js: '8'
-      script: npm run test:unit && npm run test:functional
+    - stage: lint
+      script: npm run lint && npm run format:check
+      skip_cleanup: true
 
-    - stage: typecheck-test-lint
-      name: lint
-      node_js: '8'
-      script: npm run lint
-
-    - stage: typecheck-test-lint
-      name: check formatting
-      node_js: '8'
-      script: npm run format:check
-
-    - stage: deploy-npm
-      node_js: '8'
+    - stage: deploy npm
       script: skip
       deploy:
         provider: script
-        script: bash publish.sh
-        skip_cleanup: true
-        on:
-          tags: true
+        script:
+          - |
+            (
+              set -Eeuo pipefail
+              set -x
+              # bump version based on github release tag
+              npm version --no-git-tag-version "$TRAVIS_TAG"
+              # publish package to npmjs.org
+              echo '//registry.npmjs.org/:_authToken=${NPM_AUTH_TOKEN}' >> ~/.npmrc
+              npm run build
+              cd lib
+              npm publish
+              cd ..
+              # push updated package.json to github
+              git checkout -b master
+              git add package.json package-lock.json
+              git commit --message "release $TRAVIS_TAG"
+              git remote add deploy https://${GITHUB_TOKEN}@github.com/${TRAVIS_REPO_SLUG}.git
+              git push deploy master
+            )
 
-    - stage: deploy-website
-      node_js: '8'
+    - stage: deploy website
       before_install: cd website
       script: npm run build
       deploy:
