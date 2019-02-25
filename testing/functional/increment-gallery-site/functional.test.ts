@@ -57,6 +57,50 @@ describe('increment gallery site', () => {
     })
   })
 
+  describe('with value limit', function() {
+    let scraperQueryFn: Store['query']
+    const configWithLimit = {
+      ...config,
+      defs: { ...config.defs, gallery: { ...config.defs.gallery, limitValuesTo: 1 } }
+    }
+    before(done => {
+      ;(async () => {
+        await nockMockFolder(
+          `${__dirname}/resources/mock-endpoints`,
+          'http://increment-gallery-site.com'
+        )
+
+        const options = {
+          folder: path.resolve(os.tmpdir(), this.fullTitle()),
+          cleanFolder: true,
+          optionsEach: {
+            image: {
+              read: false,
+              write: true
+            }
+          }
+        }
+        const { on, query } = await scrape(configWithLimit, options)
+        scraperQueryFn = query
+        on('done', done)
+      })()
+    })
+
+    it('should group each image into a separate slot, in order', () => {
+      const result = scraperQueryFn({
+        scrapers: ['image'],
+        groupBy: 'image'
+      })
+      expect(result)
+        .excludingEvery(['filename', 'id'])
+        .to.be.deep.equal(
+          expectedQueryResult
+            .map(g => g.filter(r => r.scraper === 'image'))
+            .filter((_, i) => i <= 1)
+        )
+    })
+  })
+
   describe('with psuedo-random delayed scraper', function() {
     let scraperQueryForFunction: any
     before(done => {

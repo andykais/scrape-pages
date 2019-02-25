@@ -23,7 +23,7 @@ const catchDownloadError = (e: Error) => {
 }
 const throwAnyError = (e: Error) => Rx.throwError(e)
 
-const chooseIncrementEvaluator = ({ incrementUntil }: ScrapeConfig) => {
+const chooseIncrementEvaluator = ({ incrementUntil }: ScrapeConfig): DownloadParseBoolean => {
   switch (incrementUntil) {
     case 'empty-parse':
       return incrementUntilEmptyParse
@@ -32,6 +32,10 @@ const chooseIncrementEvaluator = ({ incrementUntil }: ScrapeConfig) => {
     default:
       return incrementUntilNumericIndex(incrementUntil)
   }
+}
+const chooseValueLimit = <T>({ limitValuesTo }: ScrapeConfig): Rx.MonoTypeOperatorFunction<T> => {
+  if (limitValuesTo === undefined) return ops.tap()
+  else return ops.take(limitValuesTo)
 }
 const chooseIgnoreError = ({ incrementUntil }: ScrapeConfig) => {
   switch (incrementUntil) {
@@ -50,6 +54,7 @@ const structureScrapers = (config: Config, scrapers: { [scraperName: string]: Sc
   const next = structure.scrapeNext.map(structureScrapers(config, scrapers))
 
   const okToIncrement = chooseIncrementEvaluator(scraper.config)
+  const valueLimitOperator = chooseValueLimit<ParsedValue[]>(scraper.config)
   const ignoreFetchError = chooseIgnoreError(scraper.config)
 
   return (parentValues: ParsedValue[]): Rx.Observable<ParsedValue[]> =>
@@ -69,7 +74,7 @@ const structureScrapers = (config: Config, scrapers: { [scraperName: string]: Sc
                   ),
                   ops.mergeAll(),
                   ops.filter(incrementUntilEmptyParse),
-                  ops.map(parsedValues => [parsedValues, incrementIndex] as [ParsedValue[], number])
+                  ops.map((parsedValues): [ParsedValue[], number] => [parsedValues, incrementIndex])
                 )
               )
             )
@@ -77,6 +82,7 @@ const structureScrapers = (config: Config, scrapers: { [scraperName: string]: Sc
           ops.map(([parsedValues]) => parsedValues)
         )
       ),
+      valueLimitOperator,
       each.length
         ? ops.flatMap(scraperValues => each.map(child => child(scraperValues)))
         : ops.map(scraperValues => [scraperValues]),

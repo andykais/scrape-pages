@@ -22,7 +22,8 @@ describe('normalize config with', () => {
             attribute: (simpleConfig.defs.index.parse as any).attribute,
             expect: 'html'
           },
-          incrementUntil: 0
+          incrementUntil: 0,
+          limitValuesTo: undefined
         },
         image: {
           download: {
@@ -31,7 +32,8 @@ describe('normalize config with', () => {
             headerTemplates: {}
           },
           parse: undefined,
-          incrementUntil: 0
+          incrementUntil: 0,
+          limitValuesTo: undefined
         }
       },
       structure: {
@@ -64,6 +66,24 @@ describe('normalize config with', () => {
     it('should match itself for a full filled in config', () => {
       const fullConfigFromGuess = normalizeConfig(fullConfig)
       expect(fullConfigFromGuess).to.be.deep.equal(fullConfig)
+    })
+  })
+
+  describe('poorly formed slugs', () => {
+    it('for input names should error out', () => {
+      const config = {
+        input: ['test+'],
+        defs: { identity: {} },
+        structure: { scraper: 'identitiy' }
+      }
+      expect(() => normalizeConfig(config)).to.throw()
+    })
+    it('for scraper names should error out', () => {
+      const config = {
+        defs: { 'scraper+': {} },
+        structure: { scraper: 'identitiy' }
+      }
+      expect(() => normalizeConfig(config)).to.throw()
     })
   })
 })

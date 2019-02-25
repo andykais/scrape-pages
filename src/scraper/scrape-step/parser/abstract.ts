@@ -22,17 +22,10 @@ export abstract class AbstractParser {
   ) {
     Object.assign(this, { scraperName, config, options, tools })
   }
-  public run = (value?: string) => {
-    /** TODO
-     * ok I need to re-evaluate what an undefined passed value means
-     * images should be undefined IF I MANUALLY SAY SO
-     * but that will stop the flow from happening
-     *
-     * any time we say dont store the value, it will stop the flow
-     * AND stop the scraper (unless we pass down a null value)
-     * but storing images as text is a waste of energy
-     */
-    return this.parse(value)
-  }
+  /**
+   * @param value only ever `undefined` if a download step has `read: false`.
+   */
+  public run = (value?: string) => this.parse(value)
+
   protected abstract parse: (value?: string) => ParserValues
 }

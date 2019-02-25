@@ -7,7 +7,7 @@ type Statement = (
     parentId?: number
     incrementIndex: number
   },
-  downloadData: {}
+  downloadData: any
 ) => number
 export const query: CreateQuery<Statement> = (flatConfig, database) => {
   const statement = database.prepare(SQL_TEMPLATE)

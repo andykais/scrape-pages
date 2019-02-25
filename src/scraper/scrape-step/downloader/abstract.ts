@@ -1,6 +1,7 @@
 import { ScraperName, DownloadConfig } from '../../../settings/config/types'
 import { Options } from '../../../settings/options/types'
 import { Tools } from '../../../tools'
+import { Downloader as IdentityDownloader } from './implementations/identity'
 
 export type DownloadParams = {
   parentId?: number
@@ -30,16 +31,15 @@ export abstract class AbstractDownloader<DownloadData> {
     const downloadId = this.tools.store.qs.insertQueuedDownload(
       this.scraperName,
       downloadParams,
-      downloadData
+      // identity downloader is a special case. It does nothing, and the value being passed through is already stored somewhere else.
+      this instanceof IdentityDownloader ? undefined : downloadData
     )
     this.tools.emitter.scraper(this.scraperName).emit.queued(downloadId)
     const { downloadValue, filename } = await this.retrieve(downloadId, downloadData)
 
     return {
       downloadId,
-      // downloadValue conditional is for identity parser,
-      // essentially, if there was no data that went into a download, then nothing important was recieved
-      downloadValue: downloadData ? downloadValue : downloadParams.value,
+      downloadValue,
       filename
     }
   }
