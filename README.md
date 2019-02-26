@@ -21,35 +21,56 @@ lets download the five most recent images from NASA's image of the day archive
 
 ```javascript
 const { scraper } = require('scrape-pages')
-// create a config file
+
 const config = {
-  scrape: {
-    download: 'https://apod.nasa.gov/apod/archivepix.html',
-    parse: {
-      selector: 'body > b > a:nth-child(-n+10)',
-      attribute: 'href'
+  // define some scrapers
+  scrapers: {
+    index: {
+      download: 'https://apod.nasa.gov/apod/archivepix.html',
+      parse: {
+        selector: 'body > b > a:nth-child(-n+10)',
+        attribute: 'href'
+      },
     },
-    scrapeEach: {
+    post: {
       download: 'https://apod.nasa.gov/apod/{value}',
       parse: {
         selector: 'a[href^="image"]',
         attribute: 'href'
       },
+    },
+    image: {
+      download: 'https://apod.nasa.gov/apod/{value}'
+    }
+  },
+  // describe how they work together
+  run: {
+    scraper: 'index',
+    scrapeEach: {
+      scraper: 'post',
       scrapeEach: {
-        name: 'image',
-        download: 'https://apod.nasa.gov/apod/{value}'
+        scraper: 'image'
       }
     }
   }
 }
+
 const options = {
-  folder: './downloads',
   logLevel: 'info',
-  logFile: './nasa-download.log'
+  optionsEach: {
+    image: {
+      read: false,
+      write: true
+    }
+  }
+}
+// params are separated from config & options so params can change while reusing configs & options.
+const params = {
+  folder: './downloads',
 }
 
 // load the config into a new 'scraper'
-const scraper = await scrape(config, options)
+const scraper = await scrape(config, options, params)
 const { on, emit, query } = scraper
 on('image:compete', id => {
   console.log('COMPLETED image', id)
@@ -77,6 +98,7 @@ provided, each run will work independently. `scraper.run` returns **emitter**
 | ------- | ---------------- | -------- | -------------------------------------------------------------- | ----------------------------- |
 | config  | `ConfigInit`     | Yes      | [src/settings/config/types.ts](src/settings/config/types.ts)   | _what_ is being downloaded    |
 | options | `OptionsInit`    | Yes      | [src/settings/options/types.ts](src/settings/options/types.ts) | _how_ something is downloaded |
+| params  | `ParamsInit`     | Yes      | [src/settings/params/types.ts](src/settings/params/types.ts)   | _who_ is being downloaded     |
 
 
 ### scraper
