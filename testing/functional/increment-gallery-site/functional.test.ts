@@ -22,8 +22,6 @@ describe('increment gallery site', () => {
         )
 
         const options = {
-          folder: path.resolve(os.tmpdir(), this.fullTitle()),
-          cleanFolder: true,
           optionsEach: {
             image: {
               read: false,
@@ -31,7 +29,11 @@ describe('increment gallery site', () => {
             }
           }
         }
-        const { on, query } = await scrape(config, options)
+        const params = {
+          folder: path.resolve(os.tmpdir(), this.fullTitle()),
+          cleanFolder: true
+        }
+        const { on, query } = await scrape(config, options, params)
         scraperQueryFn = query
         on('done', done)
       })()
@@ -71,8 +73,6 @@ describe('increment gallery site', () => {
         )
 
         const options = {
-          folder: path.resolve(os.tmpdir(), this.fullTitle()),
-          cleanFolder: true,
           optionsEach: {
             image: {
               read: false,
@@ -80,7 +80,11 @@ describe('increment gallery site', () => {
             }
           }
         }
-        const { on, query } = await scrape(configWithLimit, options)
+        const params = {
+          folder: path.resolve(os.tmpdir(), this.fullTitle()),
+          cleanFolder: true
+        }
+        const { on, query } = await scrape(configWithLimit, options, params)
         scraperQueryFn = query
         on('done', done)
       })()
@@ -112,8 +116,6 @@ describe('increment gallery site', () => {
         )
 
         const options = {
-          folder: path.resolve(os.tmpdir(), this.fullTitle()),
-          cleanFolder: true,
           optionsEach: {
             image: {
               read: false,
@@ -122,7 +124,12 @@ describe('increment gallery site', () => {
           }
         }
 
-        const { on, query } = await scrape(config, options)
+        const params = {
+          folder: path.resolve(os.tmpdir(), this.fullTitle()),
+          cleanFolder: true
+        }
+
+        const { on, query } = await scrape(config, options, params)
         scraperQueryForFunction = query
         on('done', done)
       })()

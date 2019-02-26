@@ -5,8 +5,10 @@ import { Logger } from './logger'
 import { Queue } from './queue'
 
 // type imports
+import { Settings } from '../settings'
 import { Config } from '../settings/config/types'
 import { OptionsInit, FlatOptions } from '../settings/options/types'
+import { ParamsInit } from '../settings/params/types'
 
 export type Tools = {
   store: Store
@@ -14,18 +16,14 @@ export type Tools = {
   logger: Logger
   queue: Queue
 }
-export const initTools = (
-  config: Config,
-  optionsInit: OptionsInit,
-  flatOptions: FlatOptions
-): Tools => {
-  const store = new Store(config, optionsInit)
-  const emitter = new Emitter(config)
-  const logger = new Logger(optionsInit, flatOptions)
+export const initTools = (settings: Settings): Tools => {
+  const store = new Store(settings)
+  const emitter = new Emitter(settings)
+  const logger = new Logger(settings)
   const rateLimiterEventStream = emitter
     .getRxEventStream('useRateLimiter')
     .pipe(ops.map(toggle => !!toggle))
-  const queue = new Queue(optionsInit, flatOptions, rateLimiterEventStream)
+  const queue = new Queue(settings, rateLimiterEventStream)
 
   return {
     store,

@@ -6,6 +6,7 @@ import { ScrapeStep } from './scrape-step'
 import { wrapError, ResponseError } from '../util/error'
 // type imports
 import { ParsedValue } from './scrape-step'
+import { Settings } from '../settings'
 import { Config, ScrapeConfig } from '../settings/config/types'
 
 type DownloadParseBoolean = (parsedValues: ParsedValue[], incrementIndex: number) => boolean
@@ -46,12 +47,13 @@ const chooseIgnoreError = ({ incrementUntil }: ScrapeConfig) => {
   }
 }
 
-const structureScrapers = (config: Config, scrapers: { [scraperName: string]: ScrapeStep }) => (
+const structureScrapers = (settings: Settings, scrapers: { [scraperName: string]: ScrapeStep }) => (
   structure: Config['structure']
 ) => {
+  const { config } = settings
   const scraper = scrapers[structure.scraper]
-  const each = structure.scrapeEach.map(structureScrapers(config, scrapers))
-  const next = structure.scrapeNext.map(structureScrapers(config, scrapers))
+  const each = structure.scrapeEach.map(structureScrapers(settings, scrapers))
+  const next = structure.scrapeNext.map(structureScrapers(settings, scrapers))
 
   const okToIncrement = chooseIncrementEvaluator(scraper.config)
   const valueLimitOperator = chooseValueLimit<ParsedValue[]>(scraper.config)

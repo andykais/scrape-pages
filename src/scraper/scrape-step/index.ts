@@ -1,8 +1,9 @@
 import { downloaderClassFactory } from './downloader'
 import { parserClassFactory } from './parser'
 // type imports
+import { ScrapeSettings } from '../../settings'
 import { ScraperName, ScrapeConfig } from '../../settings/config/types'
-import { Options } from '../../settings/options/types'
+import { ScrapeOptions } from '../../settings/options/types'
 import { Tools } from '../../tools'
 import { SelectedRow as ParsedValueWithId } from '../../tools/store/queries/select-parsed-values'
 import { DownloaderClass } from './downloader'
@@ -20,8 +21,9 @@ export type DownloadParseFunction = (
 
 class ScrapeStep {
   public scraperName: ScraperName
-  public config: ScrapeConfig
-  private options: Options
+  public config: ScrapeSettings['config']
+  private options: ScrapeSettings['options']
+  private params: ScrapeSettings['params']
   private tools: Tools
   private scraperLogger: ReturnType<Tools['logger']['scraper']>
   private downloader: DownloaderClass
@@ -29,19 +31,22 @@ class ScrapeStep {
 
   public constructor(
     scraperName: ScraperName,
-    scraperConfig: ScrapeConfig,
-    scraperOptions: Options,
+    settings: ScrapeSettings,
     tools: Tools
   ) {
-    this.scraperName = scraperName
-    this.config = scraperConfig
-    this.options = scraperOptions
-    this.tools = tools
+    const downloader = downloaderClassFactory(scraperName, settings, tools)
+    const parser = parserClassFactory(scraperName, settings, tools)
 
-    this.downloader = downloaderClassFactory(scraperName, scraperConfig, scraperOptions, tools)
-    this.parser = parserClassFactory(scraperName, scraperConfig, scraperOptions, tools)
+    const scraperLogger = tools.logger.scraper(scraperName)!
 
-    this.scraperLogger = tools.logger.scraper(scraperName)!
+    Object.assign(this, {
+      scraperName,
+      ...settings,
+      tools,
+      downloader,
+      parser,
+      scraperLogger
+    })
   }
 
   public downloadParseFunction: DownloadParseFunction = async (

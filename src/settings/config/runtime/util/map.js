@@ -14,24 +14,11 @@ const lib_1 = __importDefault(require("ts-runtime/lib"));
 const MapLike = lib_1.default.type("MapLike", MapLike => {
     const K = MapLike.typeParameter("K");
     const V = MapLike.typeParameter("V");
-    return lib_1.default.union(lib_1.default.ref(lib_1.default.tdz(() => FMap, "FMap"), K, V), lib_1.default.ref("Map.357196048", K, V));
+    return lib_1.default.union(lib_1.default.ref(lib_1.default.tdz(() => FMap, "FMap"), K, V), lib_1.default.ref("Map.2685527372", K, V));
 });
 const _FMapTypeParametersSymbol = Symbol("FMapTypeParameters");
 let FMap = FMap_1 = class FMap extends Map {
-    constructor(...args) {
-        super(...args);
-        this.toObject = lib_1.default.annotate(() => {
-            const T = lib_1.default.typeParameter("T");
-            const _returnType = lib_1.default.return(lib_1.default.object(lib_1.default.indexer("key", lib_1.default.string(), this[_FMapTypeParametersSymbol].V)));
-            const object = lib_1.default.object(lib_1.default.indexer("key", lib_1.default.string(), this[_FMapTypeParametersSymbol].V)).assert({});
-            for (const [key, val] of this) {
-                object[key.toString()] = val;
-            }
-            return _returnType.assert(object);
-        }, lib_1.default.function(fn => {
-            const T = fn.typeParameter("T");
-            return [lib_1.default.return(lib_1.default.object(lib_1.default.indexer("key", lib_1.default.string(), this[_FMapTypeParametersSymbol].V)))];
-        }));
+    constructor(pairs) {
         this.getOrElse = lib_1.default.annotate((key, fn) => {
             const T = lib_1.default.typeParameter("T");
             let _keyType = this[_FMapTypeParametersSymbol].K;
@@ -70,6 +57,22 @@ let FMap = FMap_1 = class FMap extends Map {
             const T = fn.typeParameter("T");
             return [lib_1.default.param("fn", lib_1.default.function(lib_1.default.param("val", this[_FMapTypeParametersSymbol].V), lib_1.default.param("key", this[_FMapTypeParametersSymbol].K), lib_1.default.return(T))), lib_1.default.return(lib_1.default.ref(FMap_1, this[_FMapTypeParametersSymbol].K, T))];
         }));
+        this.reduce = lib_1.default.annotate((fn, initializer) => {
+            const T = lib_1.default.typeParameter("T");
+            let _fnType = lib_1.default.function(lib_1.default.param("acc", lib_1.default.flowInto(T)), lib_1.default.param("val", this[_FMapTypeParametersSymbol].V), lib_1.default.param("key", this[_FMapTypeParametersSymbol].K), lib_1.default.param("map", lib_1.default.ref(FMap_1, this[_FMapTypeParametersSymbol].K, this[_FMapTypeParametersSymbol].V)), lib_1.default.return(T));
+            let _initializerType = lib_1.default.flowInto(T);
+            const _returnType = lib_1.default.return(T);
+            lib_1.default.param("fn", _fnType).assert(fn);
+            lib_1.default.param("initializer", _initializerType).assert(initializer);
+            let acc = initializer;
+            for (const [key, val] of this) {
+                acc = fn(acc, val, key, this);
+            }
+            return _returnType.assert(acc);
+        }, lib_1.default.function(fn => {
+            const T = fn.typeParameter("T");
+            return [lib_1.default.param("fn", lib_1.default.function(lib_1.default.param("acc", lib_1.default.flowInto(T)), lib_1.default.param("val", this[_FMapTypeParametersSymbol].V), lib_1.default.param("key", this[_FMapTypeParametersSymbol].K), lib_1.default.param("map", lib_1.default.ref(FMap_1, this[_FMapTypeParametersSymbol].K, this[_FMapTypeParametersSymbol].V)), lib_1.default.return(T))), lib_1.default.param("initializer", lib_1.default.flowInto(T)), lib_1.default.return(T)];
+        }));
         this.merge = lib_1.default.annotate((fmap) => {
             let _fmapType = lib_1.default.ref(MapLike, this[_FMapTypeParametersSymbol].K, this[_FMapTypeParametersSymbol].V);
             const _returnType = lib_1.default.return(lib_1.default.ref(FMap_1, this[_FMapTypeParametersSymbol].K, this[_FMapTypeParametersSymbol].V));
@@ -80,12 +83,32 @@ let FMap = FMap_1 = class FMap extends Map {
             }
             return _returnType.assert(merged);
         }, lib_1.default.function(lib_1.default.param("fmap", lib_1.default.ref(MapLike, this[_FMapTypeParametersSymbol].K, this[_FMapTypeParametersSymbol].V)), lib_1.default.return(lib_1.default.ref(FMap_1, this[_FMapTypeParametersSymbol].K, this[_FMapTypeParametersSymbol].V))));
+        let _pairsType = lib_1.default.array(lib_1.default.tuple(this[_FMapTypeParametersSymbol].K, this[_FMapTypeParametersSymbol].V));
+        lib_1.default.param("pairs", _pairsType, true).assert(pairs);
+        super(pairs);
         const _typeParameters = {
             K: lib_1.default.typeParameter("K", void 0, lib_1.default.any()),
             V: lib_1.default.typeParameter("V", void 0, lib_1.default.any())
         };
         this[_FMapTypeParametersSymbol] = _typeParameters;
         lib_1.default.bindTypeParameters(this, this[_FMapTypeParametersSymbol].K, this[_FMapTypeParametersSymbol].V);
+        this.has = this.has.bind(this);
+        this.get = this.get.bind(this);
+        this.toObject = this.toObject.bind(this);
+    }
+    toObject(fn = lib_1.default.annotate((v) => {
+        let _vType = this[_FMapTypeParametersSymbol].V;
+        lib_1.default.param("v", _vType).assert(v);
+        return v;
+    }, lib_1.default.function(lib_1.default.param("v", this[_FMapTypeParametersSymbol].V), lib_1.default.return(lib_1.default.any())))) {
+        const T = lib_1.default.typeParameter("T");
+        let _fnType = lib_1.default.function(lib_1.default.param("val", this[_FMapTypeParametersSymbol].V), lib_1.default.param("key", this[_FMapTypeParametersSymbol].K), lib_1.default.return(lib_1.default.union(T, this[_FMapTypeParametersSymbol].V)));
+        lib_1.default.param("fn", _fnType).assert(fn);
+        const object = lib_1.default.object(lib_1.default.indexer("key", lib_1.default.string(), lib_1.default.union(lib_1.default.flowInto(T), this[_FMapTypeParametersSymbol].V))).assert({});
+        for (const [key, val] of this) {
+            object[key.toString()] = fn(val, key);
+        }
+        return object;
     }
 };
 _a = lib_1.default.TypeParametersSymbol;
@@ -108,7 +131,10 @@ FMap = FMap_1 = __decorate([
     lib_1.default.annotate(lib_1.default.class("FMap", FMap => {
         const K = FMap.typeParameter("K", void 0, lib_1.default.any());
         const V = FMap.typeParameter("V", void 0, lib_1.default.any());
-        return [lib_1.default.extends(lib_1.default.ref("Map.357196048", K, V)), lib_1.default.property("toObject", lib_1.default.any()), lib_1.default.property("getOrElse", lib_1.default.any()), lib_1.default.property("getOrThrow", lib_1.default.any()), lib_1.default.property("map", lib_1.default.any()), lib_1.default.property("merge", lib_1.default.any()), lib_1.default.staticProperty("fromObject", lib_1.default.any())];
+        return [lib_1.default.extends(lib_1.default.ref("Map.2685527372", K, V)), lib_1.default.property("constructor", lib_1.default.function(lib_1.default.param("pairs", lib_1.default.array(lib_1.default.tuple(K, V)), true), lib_1.default.return(lib_1.default.any()))), lib_1.default.property("getOrElse", lib_1.default.any()), lib_1.default.property("getOrThrow", lib_1.default.any()), lib_1.default.property("map", lib_1.default.any()), lib_1.default.property("reduce", lib_1.default.any()), lib_1.default.property("merge", lib_1.default.any()), lib_1.default.staticProperty("fromObject", lib_1.default.any()), lib_1.default.property("toObject", lib_1.default.function(fn => {
+                const T = fn.typeParameter("T");
+                return [lib_1.default.param("fn", lib_1.default.function(lib_1.default.param("val", V), lib_1.default.param("key", K), lib_1.default.return(T)), true), lib_1.default.return(lib_1.default.union(lib_1.default.object(lib_1.default.indexer("key", lib_1.default.string(), V)), lib_1.default.object(lib_1.default.indexer("key", lib_1.default.string(), T))))];
+            }))];
     }))
 ], FMap);
 exports.FMap = FMap;

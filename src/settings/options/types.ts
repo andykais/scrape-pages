@@ -14,31 +14,20 @@ interface OptionsAnyInit {
   write?: boolean // should download be saved to a file (separate from a database entry)
 }
 
-interface ScraperOptionsInit extends OptionsAnyInit {
+interface ScrapeOptionsInit extends OptionsAnyInit {
   downloadPriority?: number
 }
-interface ScraperOptions extends Required<ScraperOptionsInit> {}
+export type ScrapeOptions = Readonly<Required<ScrapeOptionsInit>>
 
-interface Parallelism {
+export interface OptionsInit extends OptionsAnyInit {
   maxConcurrent?: number
   rateLimit?: {
     rate: number // in milliseconds
     limit: number
   }
-}
-export interface OptionsInit extends OptionsAnyInit, Parallelism {
-  input?: Input
-  folder: string
-  cleanFolder?: boolean
   optionsEach?: {
-    [scraperName: string]: ScraperOptionsInit
+    [scraperName: string]: ScrapeOptionsInit
   }
 }
 
-export type OptionsReusable = Omit<OptionsInit, 'input' | 'folder' | 'cleanFolder'>
-
-export interface Options extends ScraperOptions {
-  input: Input
-  folder: string
-}
-export type FlatOptions = FMap<ScraperName, Options>
+export type FlatOptions = FMap<ScraperName, ScrapeOptions>

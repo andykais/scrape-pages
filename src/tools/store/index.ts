@@ -5,8 +5,9 @@ import { Config, FlatConfig } from '../../settings/config/types'
 import { createTables, createStatements } from './queries'
 // type imports
 import { Transaction } from 'better-sqlite3'
+import { Settings } from '../../settings'
 import { ScraperName } from '../../settings/config/types'
-import { OptionsInit } from '../../settings/options/types'
+import { ParamsInit } from '../../settings/params/types'
 import { SelectedRow as OrderedScrapersRow } from './queries/select-ordered-scrapers'
 
 class Store {
@@ -17,7 +18,7 @@ class Store {
   private flatConfig: FlatConfig
   private database: Database
 
-  public constructor(config: Config, { folder }: OptionsInit) {
+  public constructor({ config, paramsInit: { folder } }: Settings) {
     this.config = config
     this.flatConfig = flattenConfig(config)
     // initialize sqlite3 database
@@ -37,9 +38,10 @@ class Store {
   }
 
   private prepareQuery: Query['prepare'] = ({ scrapers, groupBy }) => {
-    if (!scrapers.some(this.flatConfig.has)) return () => []
+    const hasScrapeConfig = this.flatConfig.has.bind(this.flatConfig)
+    if (!scrapers.some(hasScrapeConfig)) return () => []
 
-    const scrapersInConfig = scrapers.concat(groupBy || []).filter(this.flatConfig.has)
+    const scrapersInConfig = scrapers.concat(groupBy || []).filter(hasScrapeConfig)
 
     const preparedStatment = this.qs.selectOrderedScrapers([...new Set(scrapersInConfig)])
     return () => {

@@ -4,6 +4,7 @@ import { tap } from 'rxjs/operators'
 import * as fs from '../util/fs'
 // type imports
 import { FMap } from '../util/map'
+import { Settings } from '../settings'
 import { OptionsInit, FlatOptions } from '../settings/options/types'
 import { ScraperName } from '../settings/config/types'
 import { ParsedValue } from '../scraper/scrape-step'
@@ -20,12 +21,12 @@ class Logger {
   private logger: Bunyan
   private scraperLoggers: FMap<ScraperName, Bunyan>
 
-  public constructor(options: OptionsInit, flatOptions: FlatOptions) {
+  public constructor({ optionsInit, flatOptions, paramsInit }: Settings) {
     this.logger = Bunyan.createLogger({
       name: 'root',
-      level: options.logLevel || ('error' as 'error'),
+      level: optionsInit.logLevel || ('error' as 'error'),
       serializers,
-      streams: [{ path: path.resolve(options.folder, Logger.logFilename) }]
+      streams: [{ path: path.resolve(paramsInit.folder, Logger.logFilename) }]
     })
     this.scraperLoggers = flatOptions.map((options, name) => this.logger.child({ scraper: name }))
 

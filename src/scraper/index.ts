@@ -1,35 +1,44 @@
 import { initTools } from '../tools'
 import { ScrapeStep } from './scrape-step'
 import { mkdirp, rmrf } from '../util/fs'
+import { getSettings, getScrapeStepSettings } from '../settings'
 import { normalizeConfig } from '../settings/config'
 import { normalizeOptions } from '../settings/options'
+import { normalizeParams } from '../settings/params'
 import { Logger } from '../tools/logger'
 import { structureScrapers } from './flow'
 import { mapObject } from '../util/object'
 // type imports
+import { Settings } from '../settings'
 import { Config, ConfigInit } from '../settings/config/types'
 import { OptionsInit, FlatOptions } from '../settings/options/types'
+import { ParamsInit, FlatParams } from '../settings/params/types'
 
-const initFolders = async (config: Config, optionsInit: OptionsInit, flatOptions: FlatOptions) => {
-  if (optionsInit.cleanFolder) await rmrf(optionsInit.folder)
+const initFolders = async ({ paramsInit, flatParams }: Settings) => {
+  if (paramsInit.cleanFolder) await rmrf(paramsInit.folder)
 
-  await mkdirp(optionsInit.folder)
-  for (const { folder } of flatOptions.values()) await mkdirp(folder)
+  await mkdirp(paramsInit.folder)
+  for (const { folder } of flatParams.values()) await mkdirp(folder)
 
-  await Logger.rotateLogFiles(optionsInit.folder)
+  await Logger.rotateLogFiles(paramsInit.folder)
 }
 
-export const scrape = async (configInit: ConfigInit, optionsInit: OptionsInit) => {
-  const config = normalizeConfig(configInit)
-  const flatOptions = normalizeOptions(config, optionsInit)
-  await initFolders(config, optionsInit, flatOptions)
-  const tools = initTools(config, optionsInit, flatOptions)
-  // create the observable
-  const scrapers = mapObject(
-    config.defs,
-    (scrapeConfig, name) => new ScrapeStep(name, scrapeConfig, flatOptions.getOrThrow(name), tools)
+export const scrape = async (
+  configInit: ConfigInit,
+  optionsInit: OptionsInit,
+  paramsInit: ParamsInit
+) => {
+  const settings = getSettings(configInit, optionsInit, paramsInit)
+
+  await initFolders(settings)
+  const tools = initTools(settings)
+
+  const scrapers = getScrapeStepSettings(settings).map(
+    (scrapeSettings, name) => new ScrapeStep(name, scrapeSettings, tools)
   )
-  const scrapingScheme = structureScrapers(config, scrapers)(config.structure)
+
+  // create the observable
+  const scrapingScheme = structureScrapers(settings, scrapers.toObject())(settings.config.structure)
   const scrapingObservable = scrapingScheme([{ parsedValue: '' }])
   // start running the observable
   const { emitter, queue, logger, store } = tools

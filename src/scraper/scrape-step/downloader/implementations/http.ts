@@ -9,8 +9,9 @@ import { AbstractDownloader, DownloadParams } from '../abstract'
 import { compileTemplate } from '../../../../util/handlebars'
 // type imports
 import { URL } from 'url'
+import { ScrapeSettings } from '../../../../settings'
 import { ScraperName, DownloadConfig } from '../../../../settings/config/types'
-import { Options } from '../../../../settings/options/types'
+import { ScrapeOptions } from '../../../../settings/options/types'
 import { Tools } from '../../../../tools'
 
 type Headers = { [header: string]: string }
@@ -27,23 +28,23 @@ type FetchFunction = (
  * downloader pertaining to all http/https requests
  */
 export class Downloader extends AbstractDownloader<DownloadData> {
-  protected config: DownloadConfig
+  protected downloadConfig: DownloadConfig
   private urlTemplate: ReturnType<typeof compileTemplate>
   private headerTemplates: FMap<string, ReturnType<typeof compileTemplate>>
   private fetcher: FetchFunction
 
   public constructor(
     scraperName: ScraperName,
-    config: DownloadConfig,
-    options: Options,
+    downloadConfig: DownloadConfig,
+    settings: ScrapeSettings,
     tools: Tools
   ) {
-    super(scraperName, config, options, tools)
-    this.config = config // must be set on again on child classes https://github.com/babel/babel/issues/9439
+    super(scraperName, downloadConfig, settings, tools)
+    this.downloadConfig = downloadConfig // must be set on again on child classes https://github.com/babel/babel/issues/9439
     // set templates
-    this.urlTemplate = compileTemplate(this.config.urlTemplate)
+    this.urlTemplate = compileTemplate(this.downloadConfig.urlTemplate)
     this.headerTemplates = new FMap()
-    Object.entries(this.config.headerTemplates).forEach(([key, templateStr]) =>
+    Object.entries(this.downloadConfig.headerTemplates).forEach(([key, templateStr]) =>
       this.headerTemplates.set(key, compileTemplate(templateStr))
     )
     // choose fetcher
@@ -62,12 +63,12 @@ export class Downloader extends AbstractDownloader<DownloadData> {
     value,
     incrementIndex: index
   }: DownloadParams): DownloadData => {
-    const templateVals = { ...this.options.input, value, index }
+    const templateVals = { ...this.params.input, value, index }
     // construct url
     const url = new URL(this.urlTemplate(templateVals)).toString()
     // construct headers
     const headers = this.headerTemplates.toObject(template => template(templateVals))
-    return [url, { headers, method: this.config.method }]
+    return [url, { headers, method: this.downloadConfig.method }]
   }
 
   protected retrieve = (downloadId: number, downloadData: DownloadData) => {
@@ -75,7 +76,7 @@ export class Downloader extends AbstractDownloader<DownloadData> {
   }
 
   private downloadToFileAndMemory: FetchFunction = async (downloadId, [url, fetchOptions]) => {
-    const downloadFolder = path.resolve(this.options.folder, downloadId.toString())
+    const downloadFolder = path.resolve(this.params.folder, downloadId.toString())
     const filename = path.resolve(downloadFolder, sanitizeFilename(url))
 
     const response = await this.tools.queue.add(
@@ -101,7 +102,7 @@ export class Downloader extends AbstractDownloader<DownloadData> {
     }
   }
   private downloadToFileOnly: FetchFunction = async (downloadId, [url, fetchOptions]) => {
-    const downloadFolder = path.resolve(this.options.folder, downloadId.toString())
+    const downloadFolder = path.resolve(this.params.folder, downloadId.toString())
     const filename = path.resolve(downloadFolder, sanitizeFilename(url))
 
     const response = await this.tools.queue.add(

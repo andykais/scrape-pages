@@ -19,8 +19,6 @@ describe('scrape next site', () => {
         await nockMockFolder(`${__dirname}/resources/mock-endpoints`, 'http://scrape-next-site.com')
 
         const options = {
-          folder: path.resolve(os.tmpdir(), this.fullTitle()),
-          cleanFolder: true,
           optionsEach: {
             image: {
               read: false,
@@ -28,7 +26,11 @@ describe('scrape next site', () => {
             }
           }
         }
-        const { on, query } = await scrape(config, options)
+        const params = {
+          folder: path.resolve(os.tmpdir(), this.fullTitle()),
+          cleanFolder: true
+        }
+        const { on, query } = await scrape(config, options, params)
         scraperQueryFn = query
         on('done', done)
       })()
@@ -65,8 +67,6 @@ describe('scrape next site', () => {
         )
 
         const options = {
-          folder: path.resolve(os.tmpdir(), this.fullTitle()),
-          cleanFolder: true,
           optionsEach: {
             image: {
               read: false,
@@ -74,7 +74,11 @@ describe('scrape next site', () => {
             }
           }
         }
-        const { on, query } = await scrape(config, options)
+        const params = {
+          folder: path.resolve(os.tmpdir(), this.fullTitle()),
+          cleanFolder: true
+        }
+        const { on, query } = await scrape(config, options, params)
         scraperQueryForFunction = query
         on('done', done)
       })()

@@ -1,65 +1,58 @@
-// import { FMap } from '../../../util/map'
-// import { normalizeConfig } from '../../config'
-// import { normalizeOptions } from '../'
-// import * as testingConfigs from '../../../../testing/resources/testing-configs'
-// import { FlatOptions } from '../types'
-// import { expect } from 'chai'
+import { FMap } from '../../../util/map'
+import { normalizeConfig } from '../../config'
+import { normalizeOptions } from '../../options'
+import { normalizeParams } from '../'
+import * as testingConfigs from '../../../../testing/resources/testing-configs'
+import { FlatParams, ScrapeParams } from '../types'
+import { expect } from 'chai'
 
-// describe('normalize run options with', () => {
-//   describe('simple config', () => {
-//     const fullConfig = normalizeConfig(testingConfigs.SIMPLE_CONFIG)
-//     it('should match returned options', () => {
-//       const optionsInit = {
-//         folder: '/nonexistent'
-//       }
-//       const options = normalizeOptions(fullConfig, optionsInit)
-//       const optionsExpected: FlatOptions = FMap.fromObject({
-//         index: {
-//           cache: true,
-//           read: true,
-//           write: false,
-//           logLevel: 'error' as 'error',
-//           downloadPriority: 0,
-//           folder: '/nonexistent/index',
-//           input: {}
-//         },
-//         image: {
-//           cache: true,
-//           read: true,
-//           write: false,
-//           logLevel: 'error' as 'error',
-//           downloadPriority: 0,
-//           folder: '/nonexistent/image',
-//           input: {}
-//         }
-//       })
-//       expect([...options]).to.have.deep.members([...optionsExpected])
-//     })
-//   })
+describe('normalize params with', () => {
+  describe('simple config', () => {
+    const config = normalizeConfig(testingConfigs.SIMPLE_CONFIG)
+    const options = normalizeOptions(config, {})
+    it('should match returned params', () => {
+      const paramsInit = {
+        folder: '/nonexistent'
+      }
+      const params = normalizeParams(config, options, paramsInit)
+      const paramsExpected: FlatParams = FMap.fromObject<ScrapeParams>({
+        index: {
+          folder: '/nonexistent/index',
+          input: {}
+        },
+        image: {
+          folder: '/nonexistent/image',
+          input: {}
+        }
+      })
+      expect([...params]).to.have.deep.members([...paramsExpected])
+    })
+  })
 
-//   describe('config with input', () => {
-//     const fullConfig = normalizeConfig(testingConfigs.INPUT_CONFIG)
+  describe('config with input', () => {
+    const config = normalizeConfig(testingConfigs.INPUT_CONFIG)
+    const options = normalizeOptions(config, {})
 
-//     it('should error out when there is no input', () => {
-//       const optionsInit = { folder: '/nonexistent' }
-//       const missingInputs = fullConfig.input.join()
+    it('should error out when there is no input', () => {
+      const missingInputs = config.input.join()
+      const paramsInit = { folder: '/nonexistent' }
 
-//       expect(() => normalizeOptions(fullConfig, optionsInit)).to.throw(
-//         `Invalid input! Options is missing keys(s) [${missingInputs}]`
-//       )
-//     })
+      expect(() => normalizeParams(config, options, paramsInit)).to.throw(
+        `Invalid input! Params is missing keys(s) [${missingInputs}]`
+      )
+    })
 
-//     it('should not error out when there are extra run option inputs', () => {
-//       const optionsInit = {
-//         input: { username: 'johnnybravo', password: 'sunglasses' },
-//         folder: '/nonexistent'
-//       }
-//       const options = normalizeOptions(fullConfig, optionsInit)
-//       const normalizedInput = options.get('identity')!.input
+    it('should not error out when there are extra param inputs', () => {
+      const paramsInit = {
+        input: { username: 'johnnybravo', password: 'sunglasses' },
+        folder: '/nonexistent'
+      }
+      const flatParams = normalizeParams(config, options, paramsInit)
+      const normalizedInput = flatParams.getOrThrow('identity').input
 
-//       expect(normalizedInput).to.be.deep.equal({
-//         username: optionsInit.input.username
-//       })
-//     })
-//   })
-// })
+      expect(normalizedInput).to.be.deep.equal({
+        username: paramsInit.input.username
+      })
+    })
+  })
+})

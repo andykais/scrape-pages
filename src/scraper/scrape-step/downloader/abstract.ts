@@ -1,5 +1,7 @@
+// type imports
+import { ScrapeSettings } from '../../../settings'
 import { ScraperName, DownloadConfig } from '../../../settings/config/types'
-import { Options } from '../../../settings/options/types'
+import { ScrapeOptions } from '../../../settings/options/types'
 import { Tools } from '../../../tools'
 import { Downloader as IdentityDownloader } from './implementations/identity'
 
@@ -14,17 +16,19 @@ type RetrieveValue = { downloadValue?: string; filename?: string }
  */
 export abstract class AbstractDownloader<DownloadData> {
   protected scraperName: ScraperName
-  protected config: DownloadConfig | undefined
-  protected options: Options
+  protected downloadConfig: DownloadConfig | undefined
+  protected config: ScrapeSettings['config']
+  protected options: ScrapeSettings['options']
+  protected params: ScrapeSettings['params']
   protected tools: Tools
 
   public constructor(
     scraperName: ScraperName,
-    config: DownloadConfig | undefined,
-    options: Options,
+    downloadConfig: DownloadConfig | undefined,
+    settings: ScrapeSettings,
     tools: Tools
   ) {
-    Object.assign(this, { scraperName, config, options, tools })
+    Object.assign(this, { scraperName, downloadConfig, ...settings, tools })
   }
   public run = async (downloadParams: DownloadParams) => {
     const downloadData = this.constructDownload(downloadParams)

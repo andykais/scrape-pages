@@ -1,5 +1,7 @@
+// type imports
+import { ScrapeSettings } from '../../../settings'
 import { ScraperName, ParseConfig } from '../../../settings/config/types'
-import { Options } from '../../../settings/options/types'
+import { ScrapeOptions } from '../../../settings/options/types'
 import { Tools } from '../../../tools'
 
 export type ParserValues = string[] | [undefined | string]
@@ -8,19 +10,21 @@ export type ParserValues = string[] | [undefined | string]
  */
 export abstract class AbstractParser {
   protected scraperName: ScraperName
-  protected config: ParseConfig | undefined
-  protected options: Options
+  protected parseConfig: ParseConfig | undefined
+  protected config: ScrapeSettings['config']
+  protected options: ScrapeSettings['options']
+  protected params: ScrapeSettings['params']
   protected tools: Tools
   protected selector: string
   protected attribute: string
 
   public constructor(
     scraperName: ScraperName,
-    config: ParseConfig | undefined,
-    options: Options,
+    parseConfig: ParseConfig | undefined,
+    settings: ScrapeSettings,
     tools: Tools
   ) {
-    Object.assign(this, { scraperName, config, options, tools })
+    Object.assign(this, { scraperName, parseConfig, ...settings, tools })
   }
   /**
    * @param value only ever `undefined` if a download step has `read: false`.

@@ -3,7 +3,7 @@ import * as Rx from 'rxjs'
 import * as Fetch from 'node-fetch'
 // type imports
 import { FMap } from '../util/map'
-import { flattenConfig } from '../settings/config/flatten'
+import { Settings } from '../settings'
 import { ScraperName, Config } from '../settings/config/types'
 
 const scraperEvents = {
@@ -71,10 +71,9 @@ class Emitter {
   }
   private scrapers: FMap<ScraperName, ScraperEmitter>
 
-  public constructor(config: Config) {
+  public constructor({ config, flatConfig }: Settings) {
     this.emitter = new EventEmitter()
 
-    const flatConfig = flattenConfig(config)
     this.scrapers = flatConfig.map((_, name) => new ScraperEmitter(name, this.emitter))
   }
   public scraper = (name: ScraperName) => this.scrapers.getOrThrow(name)

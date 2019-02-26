@@ -2,8 +2,9 @@ import { Parser as HtmlParser } from './implementations/html'
 import { Parser as JsonParser } from './implementations/json'
 import { Parser as IdentityParser } from './implementations/identity'
 // type imports
+import { ScrapeSettings } from '../../../settings'
 import { ScraperName, ScrapeConfig } from '../../../settings/config/types'
-import { Options } from '../../../settings/options/types'
+import { ScrapeOptions } from '../../../settings/options/types'
 import { Tools } from '../../../tools'
 
 const parsers = {
@@ -12,15 +13,15 @@ const parsers = {
 }
 export const parserClassFactory = (
   scraperName: ScraperName,
-  { parse }: ScrapeConfig,
-  options: Options,
+  settings: ScrapeSettings,
   tools: Tools
 ) => {
+  const { parse } = settings.config
   // TODO use type guards
   if (parse) {
-    return new parsers[parse.expect](scraperName, parse, options, tools)
+    return new parsers[parse.expect](scraperName, parse, settings, tools)
   } else {
-    return new IdentityParser(scraperName, parse, options, tools)
+    return new IdentityParser(scraperName, parse, settings, tools)
   }
 }
 export type ParserClass = HtmlParser | JsonParser | IdentityParser
