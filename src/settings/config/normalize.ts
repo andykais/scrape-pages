@@ -81,11 +81,11 @@ const normalizeDefinition = (scrapeConfig: ScrapeConfigInit): ScrapeConfig => ({
   parse: scrapeConfig.parse === undefined ? undefined : normalizeParse(scrapeConfig.parse)
 })
 
-const normalizeDefs = (defs: ConfigInit['defs']) => {
-  return Object.keys(defs).reduce((acc: Config['defs'], scraperName) => {
+const normalizeScraperDefs = (scraperDefs: ConfigInit['scrapers']) => {
+  return Object.keys(scraperDefs).reduce((acc: Config['scrapers'], scraperName) => {
     try {
       validateSlug(scraperName)
-      acc[scraperName] = normalizeDefinition(defs[scraperName])
+      acc[scraperName] = normalizeDefinition(scraperDefs[scraperName])
       return acc
     } catch (e) {
       throw new VError({ name: e.name, cause: e }, 'For a scraper name')
@@ -96,14 +96,10 @@ const normalizeDefs = (defs: ConfigInit['defs']) => {
 const normalizeUndefinedSingleArray = <T>(val?: T | T[]): T[] =>
   val === undefined ? [] : Array.isArray(val) ? val : [val]
 
-const normalizeStructure = ({
+const normalizeStructure = ({ scraper, forNext, forEach }: ConfigInit['run']): Config['run'] => ({
   scraper,
-  scrapeNext,
-  scrapeEach
-}: ConfigInit['structure']): Config['structure'] => ({
-  scraper,
-  scrapeNext: normalizeUndefinedSingleArray(scrapeNext).map(normalizeStructure),
-  scrapeEach: normalizeUndefinedSingleArray(scrapeEach).map(normalizeStructure)
+  forNext: normalizeUndefinedSingleArray(forNext).map(normalizeStructure),
+  forEach: normalizeUndefinedSingleArray(forEach).map(normalizeStructure)
 })
 
 const normalizeConfig = (config: ConfigInit): Config => {
@@ -112,8 +108,8 @@ const normalizeConfig = (config: ConfigInit): Config => {
   return {
     input: normalizeInputs(config.input),
     import: normalizeUndefinedSingleArray(config.import),
-    defs: normalizeDefs(config.defs),
-    structure: normalizeStructure(config.structure)
+    scrapers: normalizeScraperDefs(config.scrapers),
+    run: normalizeStructure(config.run)
   }
 }
 

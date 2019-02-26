@@ -49,11 +49,11 @@ const chooseIgnoreError = ({ incrementUntil }: ScrapeConfig) => {
 }
 
 const structureScrapers = (settings: Settings, scrapers: FMap<ScraperName, ScrapeStep>) => (
-  structure: Config['structure']
+  structure: Config['run']
 ) => {
   const scraper = scrapers.getOrThrow(structure.scraper)
-  const each = structure.scrapeEach.map(structureScrapers(settings, scrapers))
-  const next = structure.scrapeNext.map(structureScrapers(settings, scrapers))
+  const each = structure.forEach.map(structureScrapers(settings, scrapers))
+  const next = structure.forNext.map(structureScrapers(settings, scrapers))
 
   const okToIncrement = chooseIncrementEvaluator(scraper.config)
   const valueLimitOperator = chooseValueLimit<ParsedValue[]>(scraper.config)

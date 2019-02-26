@@ -1,7 +1,7 @@
 import { ConfigInit } from '../../../src/settings/config/types'
 
 export const config: ConfigInit = {
-  defs: {
+  scrapers: {
     'index-page': {
       download: 'http://scrape-next-site.com/index.html',
       parse: '#batch-id'
@@ -34,24 +34,24 @@ export const config: ConfigInit = {
       download: 'http://scrape-next-site.com{{ value }}'
     }
   },
-  structure: {
+  run: {
     scraper: 'index-page',
-    scrapeEach: {
+    forEach: {
       scraper: 'gallery',
-      scrapeNext: {
+      forNext: {
         scraper: 'next-batch-id'
       },
-      scrapeEach: {
+      forEach: {
         scraper: 'batch-page',
-        scrapeEach: {
+        forEach: {
           scraper: 'image-page',
-          scrapeEach: [
+          forEach: [
             {
               scraper: 'tag'
             },
             {
               scraper: 'image-parse',
-              scrapeEach: {
+              forEach: {
                 scraper: 'image'
               }
             }

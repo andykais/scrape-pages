@@ -1,7 +1,7 @@
 import { ConfigInit } from '../../../src/settings/config/types'
 
 export const config: ConfigInit = {
-  defs: {
+  scrapers: {
     gallery: {
       download: `http://increment-gallery-site.com/gallery-page/{{'+' 1 index }}.html`,
       parse: {
@@ -26,17 +26,17 @@ export const config: ConfigInit = {
       download: 'http://increment-gallery-site.com{{ value }}'
     }
   },
-  structure: {
+  run: {
     scraper: 'gallery',
-    scrapeEach: {
+    forEach: {
       scraper: 'image-page',
-      scrapeEach: [
+      forEach: [
         {
           scraper: 'tag'
         },
         {
           scraper: 'image-page-parse',
-          scrapeEach: {
+          forEach: {
             scraper: 'image'
           }
         }

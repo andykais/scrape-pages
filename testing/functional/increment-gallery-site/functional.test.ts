@@ -63,7 +63,7 @@ describe('increment gallery site', () => {
     let scraperQueryFn: Store['query']
     const configWithLimit = {
       ...config,
-      defs: { ...config.defs, gallery: { ...config.defs.gallery, limitValuesTo: 1 } }
+      scrapers: { ...config.scrapers, gallery: { ...config.scrapers.gallery, limitValuesTo: 1 } }
     }
     before(done => {
       ;(async () => {

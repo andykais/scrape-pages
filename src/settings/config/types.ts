@@ -78,23 +78,23 @@ export interface ScrapeConfig {
 }
 interface StructureInit {
   scraper: ScraperName
-  scrapeEach?: StructureInit | StructureInit[]
-  scrapeNext?: StructureInit | StructureInit[]
+  forEach?: StructureInit | StructureInit[]
+  forNext?: StructureInit | StructureInit[]
 }
 interface Structure extends StructureInit {
-  scrapeEach: Structure[]
-  scrapeNext: Structure[]
+  forEach: Structure[]
+  forNext: Structure[]
 }
 export interface ConfigInit {
   input?: Input | Input[]
   import?: Import | Import[]
-  defs: { [scraperName: string]: ScrapeConfigInit }
-  structure: StructureInit
+  scrapers: { [scraperName: string]: ScrapeConfigInit }
+  run: StructureInit
 }
 // returned by ./normalize.ts
 export interface Config extends ConfigInit {
   input: Input[]
   import: Import[]
-  defs: { [scraperName: string]: ScrapeConfig }
-  structure: Structure
+  scrapers: { [scraperName: string]: ScrapeConfig }
+  run: Structure
 }

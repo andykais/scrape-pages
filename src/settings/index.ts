@@ -50,7 +50,7 @@ export const getSettings = (
 
 export const getScrapeStepSettings = (settings: Settings): FMap<string, ScrapeSettings> =>
   settings.flatConfig.map((_, name) => ({
-    config: settings.config.defs[name],
+    config: settings.config.scrapers[name],
     options: settings.flatOptions.getOrThrow(name),
     params: settings.flatParams.getOrThrow(name)
   }))

@@ -10,16 +10,16 @@ describe('normalize config with', () => {
     const fullConfigGuess: Config = {
       input: [],
       import: [],
-      defs: {
+      scrapers: {
         index: {
           download: {
             method: 'GET',
-            urlTemplate: simpleConfig.defs.index.download as any,
+            urlTemplate: simpleConfig.scrapers.index.download as any,
             headerTemplates: {}
           },
           parse: {
-            selector: (simpleConfig.defs.index.parse as any).selector,
-            attribute: (simpleConfig.defs.index.parse as any).attribute,
+            selector: (simpleConfig.scrapers.index.parse as any).selector,
+            attribute: (simpleConfig.scrapers.index.parse as any).attribute,
             expect: 'html'
           },
           incrementUntil: 0,
@@ -28,7 +28,7 @@ describe('normalize config with', () => {
         image: {
           download: {
             method: 'GET',
-            urlTemplate: simpleConfig.defs.image.download as any,
+            urlTemplate: simpleConfig.scrapers.image.download as any,
             headerTemplates: {}
           },
           parse: undefined,
@@ -36,14 +36,14 @@ describe('normalize config with', () => {
           limitValuesTo: undefined
         }
       },
-      structure: {
+      run: {
         scraper: 'index',
-        scrapeNext: [],
-        scrapeEach: [
+        forNext: [],
+        forEach: [
           {
             scraper: 'image',
-            scrapeNext: [],
-            scrapeEach: []
+            forNext: [],
+            forEach: []
           }
         ]
       }
@@ -73,15 +73,15 @@ describe('normalize config with', () => {
     it('for input names should error out', () => {
       const config = {
         input: ['test+'],
-        defs: { identity: {} },
-        structure: { scraper: 'identitiy' }
+        scrapers: { identity: {} },
+        run: { scraper: 'identitiy' }
       }
       expect(() => normalizeConfig(config)).to.throw()
     })
     it('for scraper names should error out', () => {
       const config = {
-        defs: { 'scraper+': {} },
-        structure: { scraper: 'identitiy' }
+        scrapers: { 'scraper+': {} },
+        run: { scraper: 'identitiy' }
       }
       expect(() => normalizeConfig(config)).to.throw()
     })

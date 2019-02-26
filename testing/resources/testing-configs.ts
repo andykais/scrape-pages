@@ -2,7 +2,7 @@ import { ConfigInit } from '../../src/settings/config/types'
 
 // setup reusable variables
 export const SIMPLE_CONFIG: ConfigInit = {
-  defs: {
+  scrapers: {
     index: {
       download: 'example-site.com/images',
       parse: {
@@ -14,16 +14,16 @@ export const SIMPLE_CONFIG: ConfigInit = {
       download: '{value}'
     }
   },
-  structure: {
+  run: {
     scraper: 'index',
-    scrapeEach: {
+    forEach: {
       scraper: 'image'
     }
   }
 }
 
 export const GALLERY_POST_IMG_TAG: ConfigInit = {
-  defs: {
+  scrapers: {
     gallery: {
       download: 'https://gallery.com/cool', // save url before and after under name === gallery
       parse: {
@@ -55,17 +55,17 @@ export const GALLERY_POST_IMG_TAG: ConfigInit = {
       download: '{value}' // save url under name === img
     }
   },
-  structure: {
+  run: {
     scraper: 'gallery',
-    scrapeEach: {
+    forEach: {
       scraper: 'post',
-      scrapeEach: [
+      forEach: [
         {
           scraper: 'tag'
         },
         {
           scraper: 'img-parse',
-          scrapeEach: {
+          forEach: {
             scraper: 'img'
           }
         }
@@ -75,12 +75,12 @@ export const GALLERY_POST_IMG_TAG: ConfigInit = {
 }
 
 export const EMPTY_CONFIG: ConfigInit = {
-  defs: { identity: {} },
-  structure: { scraper: 'identity' }
+  scrapers: { identity: {} },
+  run: { scraper: 'identity' }
 }
 
 export const INPUT_CONFIG: ConfigInit = {
   input: ['username'],
-  defs: { identity: {} },
-  structure: { scraper: 'identity' }
+  scrapers: { identity: {} },
+  run: { scraper: 'identity' }
 }
