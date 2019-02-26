@@ -1,11 +1,12 @@
 import { FMap } from '../../../util/map'
 import { normalizeConfig } from '../../config'
 import { normalizeOptions } from '../'
+import { RuntimeTypeError } from '../../../util/error'
 import * as testingConfigs from '../../../../testing/resources/testing-configs'
 import { OptionsInit, FlatOptions } from '../types'
 import { expect } from 'chai'
 
-describe('normalize run options with', () => {
+describe('normalize options with', () => {
   describe('simple config', () => {
     const fullConfig = normalizeConfig(testingConfigs.SIMPLE_CONFIG)
     it('should match returned options', () => {
@@ -28,6 +29,17 @@ describe('normalize run options with', () => {
         }
       })
       expect([...options]).to.have.deep.members([...optionsExpected])
+    })
+  })
+  describe('poorly formed options', () => {
+    const optionsInit: any = { maxConcurrent: '1' }
+    const fullConfig = normalizeConfig(testingConfigs.EMPTY_CONFIG)
+    it('should throw a type assertion error', () => {
+      expect(() => normalizeOptions(fullConfig, optionsInit))
+        .to.throw(
+          `$; cause: at $; all causes: (at $: found 'maxConcurrent' in object; at $.maxConcurrent: expected number)`
+        )
+        .with.property('name', 'RuntimeTypeError')
     })
   })
 })

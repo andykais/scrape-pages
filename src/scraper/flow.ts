@@ -5,9 +5,10 @@ import * as RxCustom from '../util/rxjs/observables'
 import { ScrapeStep } from './scrape-step'
 import { wrapError, ResponseError } from '../util/error'
 // type imports
+import { FMap } from '../util/map'
 import { ParsedValue } from './scrape-step'
 import { Settings } from '../settings'
-import { Config, ScrapeConfig } from '../settings/config/types'
+import { Config, ScrapeConfig, ScraperName } from '../settings/config/types'
 
 type DownloadParseBoolean = (parsedValues: ParsedValue[], incrementIndex: number) => boolean
 
@@ -47,11 +48,11 @@ const chooseIgnoreError = ({ incrementUntil }: ScrapeConfig) => {
   }
 }
 
-const structureScrapers = (settings: Settings, scrapers: { [scraperName: string]: ScrapeStep }) => (
+const structureScrapers = (settings: Settings, scrapers: FMap<ScraperName, ScrapeStep>) => (
   structure: Config['structure']
 ) => {
   const { config } = settings
-  const scraper = scrapers[structure.scraper]
+  const scraper = scrapers.getOrThrow(structure.scraper)
   const each = structure.scrapeEach.map(structureScrapers(settings, scrapers))
   const next = structure.scrapeNext.map(structureScrapers(settings, scrapers))
 

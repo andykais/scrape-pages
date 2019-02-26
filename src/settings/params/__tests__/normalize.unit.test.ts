@@ -55,4 +55,15 @@ describe('normalize params with', () => {
       })
     })
   })
+  describe('poorly formed params', () => {
+    const config = normalizeConfig(testingConfigs.EMPTY_CONFIG)
+    const options = normalizeOptions(config, {})
+    const paramsInit: any = {}
+
+    it('should throw a type assertion error', () => {
+      expect(() => normalizeParams(config, options, paramsInit))
+        .to.throw(`$; cause: at $; cause: at $: expected 'folder' in object`)
+        .with.property('name', 'RuntimeTypeError')
+    })
+  })
 })

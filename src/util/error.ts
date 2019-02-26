@@ -12,4 +12,11 @@ class ResponseError extends Error {
   }
 }
 
-export { ResponseError }
+class RuntimeTypeError extends TypeError {
+  public name = 'RuntimeTypeError'
+  public constructor(typescriptIsMsg: string) {
+    super(typescriptIsMsg)
+  }
+}
+
+export { ResponseError, RuntimeTypeError }

@@ -3,6 +3,7 @@ import * as testingConfigs from '../../../../testing/resources/testing-configs'
 import { Config } from '../types'
 import { expect } from 'chai'
 
+import * as t from 'typescript-is'
 describe('normalize config with', () => {
   describe('simple config', () => {
     const simpleConfig = testingConfigs.SIMPLE_CONFIG
@@ -84,6 +85,15 @@ describe('normalize config with', () => {
         structure: { scraper: 'identitiy' }
       }
       expect(() => normalizeConfig(config)).to.throw()
+    })
+  })
+
+  describe('poorly formed config', () => {
+    const configInit: any = {}
+    it('should throw a type assertion error', () => {
+      expect(() => normalizeConfig(configInit))
+        .to.throw(TypeError)
+        .with.property('name', 'RuntimeTypeError')
     })
   })
 })

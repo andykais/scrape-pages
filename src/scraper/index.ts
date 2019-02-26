@@ -38,7 +38,7 @@ export const scrape = async (
   )
 
   // create the observable
-  const scrapingScheme = structureScrapers(settings, scrapers.toObject())(settings.config.structure)
+  const scrapingScheme = structureScrapers(settings, scrapers)(settings.config.structure)
   const scrapingObservable = scrapingScheme([{ parsedValue: '' }])
   // start running the observable
   const { emitter, queue, logger, store } = tools
