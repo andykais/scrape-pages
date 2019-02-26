@@ -6,9 +6,6 @@ import { Queue } from './queue'
 
 // type imports
 import { Settings } from '../settings'
-import { Config } from '../settings/config/types'
-import { OptionsInit, FlatOptions } from '../settings/options/types'
-import { ParamsInit } from '../settings/params/types'
 
 export type Tools = {
   store: Store

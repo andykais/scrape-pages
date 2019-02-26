@@ -2,8 +2,7 @@ import { Downloader as IdentityDownloader } from './implementations/identity'
 import { Downloader as HttpDownloader } from './implementations/http'
 // type imports
 import { ScrapeSettings } from '../../../settings'
-import { ScraperName, ScrapeConfig } from '../../../settings/config/types'
-import { ScrapeOptions } from '../../../settings/options/types'
+import { ScraperName } from '../../../settings/config/types'
 import { Tools } from '../../../tools'
 
 export const downloaderClassFactory = (

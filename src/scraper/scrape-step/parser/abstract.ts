@@ -1,7 +1,6 @@
 // type imports
 import { ScrapeSettings } from '../../../settings'
 import { ScraperName, ParseConfig } from '../../../settings/config/types'
-import { ScrapeOptions } from '../../../settings/options/types'
 import { Tools } from '../../../tools'
 
 export type ParserValues = string[] | [undefined | string]

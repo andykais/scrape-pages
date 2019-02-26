@@ -1,14 +1,3 @@
-/**
- * behaves like Array.prototype.map for objects
- */
-const mapObject = <T, V>(object: { [key: string]: T }, fn: (value: T, key: string) => V) => {
-  const mappedObject: { [key: string]: V } = {}
-  for (const key in object) {
-    mappedObject[key] = fn(object[key], key)
-  }
-  return mappedObject
-}
-
 // type cannot represent replacing a toplevel array, so we wont support it in `replaceInObject`
 type ReplaceInObject<I extends {}, Find, ReplaceWith> = I extends Find
   ? ReplaceWith
@@ -63,4 +52,4 @@ const marshaller = <T extends {}, F extends (...args: any[]) => T>(fn: F) => (
   ...args: ArgumentTypes<F>
 ) => marshalObject(fn(...args) as ReturnType<F>)
 
-export { mapObject, replaceInObject, marshalObject, marshaller }
+export { replaceInObject, marshalObject, marshaller }

@@ -1,7 +1,6 @@
 import { FMap } from '../../../util/map'
 import { normalizeConfig } from '../../config'
 import { normalizeOptions } from '../'
-import { RuntimeTypeError } from '../../../util/error'
 import * as testingConfigs from '../../../../testing/resources/testing-configs'
 import { OptionsInit, FlatOptions } from '../types'
 import { expect } from 'chai'

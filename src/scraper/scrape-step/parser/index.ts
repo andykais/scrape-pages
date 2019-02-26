@@ -3,8 +3,7 @@ import { Parser as JsonParser } from './implementations/json'
 import { Parser as IdentityParser } from './implementations/identity'
 // type imports
 import { ScrapeSettings } from '../../../settings'
-import { ScraperName, ScrapeConfig } from '../../../settings/config/types'
-import { ScrapeOptions } from '../../../settings/options/types'
+import { ScraperName } from '../../../settings/config/types'
 import { Tools } from '../../../tools'
 
 const parsers = {

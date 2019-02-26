@@ -5,7 +5,6 @@ import * as fs from '../util/fs'
 // type imports
 import { FMap } from '../util/map'
 import { Settings } from '../settings'
-import { OptionsInit, FlatOptions } from '../settings/options/types'
 import { ScraperName } from '../settings/config/types'
 import { ParsedValue } from '../scraper/scrape-step'
 

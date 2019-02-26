@@ -1,15 +1,14 @@
-import { resolve } from 'path'
 import { flattenConfig } from '../config/flatten'
 import { assertOptionsType } from './'
 // type imports
-import { Input, OptionsInit, ScrapeOptions, FlatOptions } from './types'
+import { OptionsInit, ScrapeOptions, FlatOptions } from './types'
 import { Config } from '../config/types'
 
 const normalizeOptions = (config: Config, optionsInit: OptionsInit): FlatOptions => {
   assertOptionsType(optionsInit)
 
   const flatConfig = flattenConfig(config)
-  const { optionsEach = {}, maxConcurrent, rateLimit, ...globalOptions } = optionsInit
+  const { optionsEach = {}, ...globalOptions } = optionsInit
 
   const defaults: ScrapeOptions = {
     downloadPriority: 0,

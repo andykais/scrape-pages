@@ -3,7 +3,6 @@ import * as testingConfigs from '../../../../testing/resources/testing-configs'
 import { Config } from '../types'
 import { expect } from 'chai'
 
-import * as t from 'typescript-is'
 describe('normalize config with', () => {
   describe('simple config', () => {
     const simpleConfig = testingConfigs.SIMPLE_CONFIG

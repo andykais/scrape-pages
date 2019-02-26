@@ -51,7 +51,6 @@ const chooseIgnoreError = ({ incrementUntil }: ScrapeConfig) => {
 const structureScrapers = (settings: Settings, scrapers: FMap<ScraperName, ScrapeStep>) => (
   structure: Config['structure']
 ) => {
-  const { config } = settings
   const scraper = scrapers.getOrThrow(structure.scraper)
   const each = structure.scrapeEach.map(structureScrapers(settings, scrapers))
   const next = structure.scrapeNext.map(structureScrapers(settings, scrapers))

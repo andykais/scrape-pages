@@ -2,8 +2,7 @@ import { downloaderClassFactory } from './downloader'
 import { parserClassFactory } from './parser'
 // type imports
 import { ScrapeSettings } from '../../settings'
-import { ScraperName, ScrapeConfig } from '../../settings/config/types'
-import { ScrapeOptions } from '../../settings/options/types'
+import { ScraperName } from '../../settings/config/types'
 import { Tools } from '../../tools'
 import { SelectedRow as ParsedValueWithId } from '../../tools/store/queries/select-parsed-values'
 import { DownloaderClass } from './downloader'
@@ -29,11 +28,7 @@ class ScrapeStep {
   private downloader: DownloaderClass
   private parser: ParserClass
 
-  public constructor(
-    scraperName: ScraperName,
-    settings: ScrapeSettings,
-    tools: Tools
-  ) {
+  public constructor(scraperName: ScraperName, settings: ScrapeSettings, tools: Tools) {
     const downloader = downloaderClassFactory(scraperName, settings, tools)
     const parser = parserClassFactory(scraperName, settings, tools)
 

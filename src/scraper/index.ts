@@ -2,27 +2,31 @@ import { initTools } from '../tools'
 import { ScrapeStep } from './scrape-step'
 import { mkdirp, rmrf } from '../util/fs'
 import { getSettings, getScrapeStepSettings } from '../settings'
-import { normalizeConfig } from '../settings/config'
-import { normalizeOptions } from '../settings/options'
-import { normalizeParams } from '../settings/params'
 import { Logger } from '../tools/logger'
 import { structureScrapers } from './flow'
-import { mapObject } from '../util/object'
 // type imports
 import { Settings } from '../settings'
-import { Config, ConfigInit } from '../settings/config/types'
-import { OptionsInit, FlatOptions } from '../settings/options/types'
-import { ParamsInit, FlatParams } from '../settings/params/types'
+import { ConfigInit } from '../settings/config/types'
+import { OptionsInit } from '../settings/options/types'
+import { ParamsInit } from '../settings/params/types'
 
 const initFolders = async ({ paramsInit, flatParams }: Settings) => {
+  // remove folders if specified
   if (paramsInit.cleanFolder) await rmrf(paramsInit.folder)
-
+  // create folders
   await mkdirp(paramsInit.folder)
   for (const { folder } of flatParams.values()) await mkdirp(folder)
-
+  // safely rename existing log files
   await Logger.rotateLogFiles(paramsInit.folder)
 }
 
+/**
+ * scrape is the entrypoint for this library
+ *
+ * @param configInit 'what' is going to be scraped (the actual urls and parse strings)
+ * @param optionsInit 'how' is the site going to be scraped (mostly how downloads should behave)
+ * @param paramsInit 'who' is going to be scraped (settings specific to each run)
+ */
 export const scrape = async (
   configInit: ConfigInit,
   optionsInit: OptionsInit,

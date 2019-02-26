@@ -11,7 +11,6 @@ import { compileTemplate } from '../../../../util/handlebars'
 import { URL } from 'url'
 import { ScrapeSettings } from '../../../../settings'
 import { ScraperName, DownloadConfig } from '../../../../settings/config/types'
-import { ScrapeOptions } from '../../../../settings/options/types'
 import { Tools } from '../../../../tools'
 
 type Headers = { [header: string]: string }

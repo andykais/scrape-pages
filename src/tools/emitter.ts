@@ -4,7 +4,7 @@ import * as Fetch from 'node-fetch'
 // type imports
 import { FMap } from '../util/map'
 import { Settings } from '../settings'
-import { ScraperName, Config } from '../settings/config/types'
+import { ScraperName } from '../settings/config/types'
 
 const scraperEvents = {
   QUEUED: 'queued',
@@ -71,7 +71,7 @@ class Emitter {
   }
   private scrapers: FMap<ScraperName, ScraperEmitter>
 
-  public constructor({ config, flatConfig }: Settings) {
+  public constructor({ flatConfig }: Settings) {
     this.emitter = new EventEmitter()
 
     this.scrapers = flatConfig.map((_, name) => new ScraperEmitter(name, this.emitter))

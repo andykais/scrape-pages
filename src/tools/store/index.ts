@@ -7,7 +7,6 @@ import { createTables, createStatements } from './queries'
 import { Transaction } from 'better-sqlite3'
 import { Settings } from '../../settings'
 import { ScraperName } from '../../settings/config/types'
-import { ParamsInit } from '../../settings/params/types'
 import { SelectedRow as OrderedScrapersRow } from './queries/select-ordered-scrapers'
 
 class Store {
