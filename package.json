@@ -5,7 +5,8 @@
   "keywords": [
     "crawler",
     "scraper",
-    "http"
+    "http",
+    "emitter"
   ],
   "main": "index.js",
   "scripts": {
