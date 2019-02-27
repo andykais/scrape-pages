@@ -7,8 +7,6 @@ import { nockMockFolder } from '../../setup'
 import { config } from './config'
 import expectedQueryResult from './resources/expected-query-result.json'
 import { scrape } from '../../../src'
-// type imports
-import { Store } from '../../../src/tools/store'
 
 const options = {
   optionsEach: {
@@ -18,23 +16,24 @@ const options = {
     }
   }
 }
+// in this case, it is ok to reuse params since mocha runs async tests sequentially
+const params = {
+  folder: path.resolve(os.tmpdir(), 'scrape-pages--scrape-next-site'),
+  cleanFolder: true
+}
 describe('scrape next site', () => {
   describe('with instant scraper', function() {
-    let scraperQueryFn: Store['query']
+    const { start, query } = scrape(config, options, params)
+
     before(async () => {
       await nockMockFolder(`${__dirname}/resources/mock-endpoints`, 'http://scrape-next-site.com')
 
-      const params = {
-        folder: path.resolve(os.tmpdir(), this.fullTitle()),
-        cleanFolder: true
-      }
-      const { on, query } = await scrape(config, options, params)
-      scraperQueryFn = query
+      const { on } = await start()
       await new Promise(resolve => on('done', resolve))
     })
 
     it('should group each image into a separate slot, in order', () => {
-      const result = scraperQueryFn({
+      const result = query({
         scrapers: ['image'],
         groupBy: 'image'
       })
@@ -43,7 +42,7 @@ describe('scrape next site', () => {
         .to.be.deep.equal(expectedQueryResult.map(g => g.filter(r => r.scraper === 'image')))
     })
     it('should group tags and images together that were found on the same page', () => {
-      const result = scraperQueryFn({
+      const result = query({
         scrapers: ['image', 'tag'],
         groupBy: 'image-page'
       })
@@ -54,23 +53,19 @@ describe('scrape next site', () => {
   })
 
   describe('with psuedo-random delayed scraper', function() {
-    let scraperQueryForFunction: any
+    const { start, query } = scrape(config, options, params)
+
     before(async () => {
       await nockMockFolder(`${__dirname}/resources/mock-endpoints`, 'http://scrape-next-site.com', {
         randomSeed: 2
       })
 
-      const params = {
-        folder: path.resolve(os.tmpdir(), this.fullTitle()),
-        cleanFolder: true
-      }
-      const { on, query } = await scrape(config, options, params)
-      scraperQueryForFunction = query
+      const { on } = await start()
       await new Promise(resolve => on('done', resolve))
     })
 
     it('should keep images and tags together, in order', () => {
-      const result = scraperQueryForFunction({
+      const result = query({
         scrapers: ['image', 'tag'],
         groupBy: 'image-page'
       })

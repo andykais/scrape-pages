@@ -7,8 +7,6 @@ import { nockMockFolder } from '../../setup'
 import { config } from './config'
 import expectedQueryResult from './resources/expected-query-result.json'
 import { scrape } from '../../../src'
-// type imports
-import { Store } from '../../../src/tools/store'
 
 const options = {
   optionsEach: {
@@ -18,26 +16,26 @@ const options = {
     }
   }
 }
+const params = {
+  folder: path.resolve(os.tmpdir(), 'scrape-pages--increment-gallery-site'),
+  cleanFolder: true
+}
 describe('increment gallery site', () => {
   describe('with instant scraper', function() {
-    let scraperQueryFn: Store['query']
+    const { start, query } = scrape(config, options, params)
+
     before(async () => {
       await nockMockFolder(
         `${__dirname}/resources/mock-endpoints`,
         'http://increment-gallery-site.com'
       )
 
-      const params = {
-        folder: path.resolve(os.tmpdir(), this.fullTitle()),
-        cleanFolder: true
-      }
-      const { on, query } = await scrape(config, options, params)
-      scraperQueryFn = query
+      const { on } = await start()
       await new Promise(resolve => on('done', resolve))
     })
 
     it('should group each image into a separate slot, in order', () => {
-      const result = scraperQueryFn({
+      const result = query({
         scrapers: ['image'],
         groupBy: 'image'
       })
@@ -46,7 +44,7 @@ describe('increment gallery site', () => {
         .to.be.deep.equal(expectedQueryResult.map(g => g.filter(r => r.scraper === 'image')))
     })
     it('should group tags and images together that were found on the same page', () => {
-      const result = scraperQueryFn({
+      const result = query({
         scrapers: ['image', 'tag'],
         groupBy: 'image-page'
       })
@@ -57,28 +55,24 @@ describe('increment gallery site', () => {
   })
 
   describe('with value limit', function() {
-    let scraperQueryFn: Store['query']
     const configWithLimit = {
       ...config,
       scrapers: { ...config.scrapers, gallery: { ...config.scrapers.gallery, limitValuesTo: 1 } }
     }
+    const { start, query } = scrape(configWithLimit, options, params)
+
     before(async () => {
       await nockMockFolder(
         `${__dirname}/resources/mock-endpoints`,
         'http://increment-gallery-site.com'
       )
 
-      const params = {
-        folder: path.resolve(os.tmpdir(), this.fullTitle()),
-        cleanFolder: true
-      }
-      const { on, query } = await scrape(configWithLimit, options, params)
-      scraperQueryFn = query
+      const { on } = await start()
       await new Promise(resolve => on('done', resolve))
     })
 
     it('should group each image into a separate slot, in order', () => {
-      const result = scraperQueryFn({
+      const result = query({
         scrapers: ['image'],
         groupBy: 'image'
       })
@@ -93,7 +87,8 @@ describe('increment gallery site', () => {
   })
 
   describe('with psuedo-random delayed scraper', function() {
-    let scraperQueryForFunction: any
+    const { start, query } = scrape(config, options, params)
+
     before(async () => {
       await nockMockFolder(
         `${__dirname}/resources/mock-endpoints`,
@@ -101,18 +96,12 @@ describe('increment gallery site', () => {
         { randomSeed: 1 }
       )
 
-      const params = {
-        folder: path.resolve(os.tmpdir(), this.fullTitle()),
-        cleanFolder: true
-      }
-
-      const { on, query } = await scrape(config, options, params)
-      scraperQueryForFunction = query
+      const { on } = await start()
       await new Promise(resolve => on('done', resolve))
     })
 
     it('should keep images and tags together, in order', () => {
-      const result = scraperQueryForFunction({
+      const result = query({
         scrapers: ['image', 'tag'],
         groupBy: 'image-page'
       })
