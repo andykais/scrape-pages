@@ -2,7 +2,7 @@ WITH cte AS (
   SELECT
     parsedTree.id,
     downloads.id as downloadId,
-    url,
+    downloadData,
     filename,
     parsedValue,
     parentId,
@@ -18,7 +18,7 @@ WITH cte AS (
   SELECT
     pTree.id,
     cte.downloadId,
-    cte.url,
+    cte.downloadData,
     cte.filename,
     cte.parsedValue,
     pTree.parentId,
@@ -46,7 +46,7 @@ SELECT
   scraper,
   parsedValue,
   --  downloadId,
-  url, filename
+  downloadData, filename
 FROM cte
 WHERE recurseDepth = {{lowestDepth}}
 ORDER BY

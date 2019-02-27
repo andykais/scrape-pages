@@ -1,4 +1,4 @@
-import { initTools } from '../tools'
+import { initTools, initStore } from '../tools'
 import { ScrapeStep } from './scrape-step'
 import { mkdirp, rmrf } from '../util/fs'
 import { getSettings, getScrapeStepSettings } from '../settings'

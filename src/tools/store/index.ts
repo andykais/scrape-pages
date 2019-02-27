@@ -17,9 +17,9 @@ class Store {
   private flatConfig: FlatConfig
   private database: Database
 
-  public constructor({ config, paramsInit: { folder } }: Settings) {
+  public constructor({ config, flatConfig, paramsInit: { folder } }: Settings) {
     this.config = config
-    this.flatConfig = flattenConfig(config)
+    this.flatConfig = flatConfig
     // initialize sqlite3 database
     this.database = new Database(folder)
     this.database.pragma('journal_mode = WAL')

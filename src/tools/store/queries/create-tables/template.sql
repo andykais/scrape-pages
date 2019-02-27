@@ -3,9 +3,9 @@ BEGIN TRANSACTION;
 CREATE TABLE IF NOT EXISTS downloads (
   id INTEGER PRIMARY KEY NOT NULL,
   scraper TEXT NOT NULL,
-  incrementIndex INT NOT NULL, -- index of a url incrementer (priority low)
+  incrementIndex INT NOT NULL, -- scrape config increment number (priority low)
   parseParentId INT, -- necessary to distinguish identity steps
-  url TEXT,
+  downloadData TEXT,
   filename TEXT,
   complete BIT,
   failed BIT,

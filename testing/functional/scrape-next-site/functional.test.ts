@@ -3,37 +3,34 @@ import path from 'path'
 
 import { expect } from 'chai'
 
-import '../../use-chai-plugins'
-import { nockMockFolder } from '../../nock-folder-mock'
+import { nockMockFolder } from '../../setup'
 import { config } from './config'
 import expectedQueryResult from './resources/expected-query-result.json'
 import { scrape } from '../../../src'
 // type imports
 import { Store } from '../../../src/tools/store'
 
+const options = {
+  optionsEach: {
+    image: {
+      read: false,
+      write: true
+    }
+  }
+}
 describe('scrape next site', () => {
   describe('with instant scraper', function() {
     let scraperQueryFn: Store['query']
-    before(done => {
-      ;(async () => {
-        await nockMockFolder(`${__dirname}/resources/mock-endpoints`, 'http://scrape-next-site.com')
+    before(async () => {
+      await nockMockFolder(`${__dirname}/resources/mock-endpoints`, 'http://scrape-next-site.com')
 
-        const options = {
-          optionsEach: {
-            image: {
-              read: false,
-              write: true
-            }
-          }
-        }
-        const params = {
-          folder: path.resolve(os.tmpdir(), this.fullTitle()),
-          cleanFolder: true
-        }
-        const { on, query } = await scrape(config, options, params)
-        scraperQueryFn = query
-        on('done', done)
-      })()
+      const params = {
+        folder: path.resolve(os.tmpdir(), this.fullTitle()),
+        cleanFolder: true
+      }
+      const { on, query } = await scrape(config, options, params)
+      scraperQueryFn = query
+      await new Promise(resolve => on('done', resolve))
     })
 
     it('should group each image into a separate slot, in order', () => {
@@ -58,30 +55,18 @@ describe('scrape next site', () => {
 
   describe('with psuedo-random delayed scraper', function() {
     let scraperQueryForFunction: any
-    before(done => {
-      ;(async () => {
-        await nockMockFolder(
-          `${__dirname}/resources/mock-endpoints`,
-          'http://scrape-next-site.com',
-          { randomSeed: 2 }
-        )
+    before(async () => {
+      await nockMockFolder(`${__dirname}/resources/mock-endpoints`, 'http://scrape-next-site.com', {
+        randomSeed: 2
+      })
 
-        const options = {
-          optionsEach: {
-            image: {
-              read: false,
-              write: true
-            }
-          }
-        }
-        const params = {
-          folder: path.resolve(os.tmpdir(), this.fullTitle()),
-          cleanFolder: true
-        }
-        const { on, query } = await scrape(config, options, params)
-        scraperQueryForFunction = query
-        on('done', done)
-      })()
+      const params = {
+        folder: path.resolve(os.tmpdir(), this.fullTitle()),
+        cleanFolder: true
+      }
+      const { on, query } = await scrape(config, options, params)
+      scraperQueryForFunction = query
+      await new Promise(resolve => on('done', resolve))
     })
 
     it('should keep images and tags together, in order', () => {
