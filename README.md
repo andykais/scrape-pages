@@ -17,27 +17,27 @@ npm install scrape-pages
 
 ## Usage
 
-lets download the five most recent images from NASA's image of the day archive
+Lets download the ten most recent images from NASA's image of the day archive. First, define a `config`,
+`options`, and `params` to be passed into the scraper.
 
 ```javascript
-const { scraper } = require('scrape-pages')
-
 const config = {
   // define some scrapers
   scrapers: {
     index: {
       download: 'https://apod.nasa.gov/apod/archivepix.html',
       parse: {
-        selector: 'body > b > a:nth-child(-n+10)',
+        selector: 'body > b > a',
         attribute: 'href'
       },
+      limitValuesTo: 10
     },
     post: {
       download: 'https://apod.nasa.gov/apod/{value}',
       parse: {
         selector: 'a[href^="image"]',
         attribute: 'href'
-      },
+      }
     },
     image: {
       download: 'https://apod.nasa.gov/apod/{value}'
@@ -66,21 +66,25 @@ const options = {
 }
 // params are separated from config & options so params can change while reusing configs & options.
 const params = {
-  folder: './downloads',
+  folder: './downloads'
 }
+```
 
-// load the config into a new 'scraper'
-const scraper = await scrape(config, options, params)
-const { on, emit, query } = scraper
-on('image:compete', id => {
-  console.log('COMPLETED image', id)
-})
+After declaring your settings, the usage of the library is very simple. There is a way to start the scraper,
+listen to events, emit events back to the scraper, and query the scraped data.
+
+```javascript
+const { scraper } = require('scrape-pages')
+
+// create an executable scraper and a querier
+const { start, query } = scrape(config, options, params)
+// begin scraping here
+const { on, emit } = await start()
+// listen to events
+on('image:compete', id => console.log('COMPLETED image', id))
 on('done', () => {
-  console.log('finished.')
   const result = query({ scrapers: ['images'] })
-  // result = [{
-  //   images: [{ filename: 'img1.jpg' }, { filename: 'img2.jpg' }, ...]
-  // }]
+  // result = [[{ filename: 'img1.jpg' }, { filename: 'img2.jpg' }, ...]]
 })
 ```
 
@@ -94,47 +98,47 @@ provided, each run will work independently. `scraper.run` returns **emitter**
 
 ### scrape
 
-| param   | type             | required | type file                                                      | description                   |
-| ------- | ---------------- | -------- | -------------------------------------------------------------- | ----------------------------- |
-| config  | `ConfigInit`     | Yes      | [src/settings/config/types.ts](src/settings/config/types.ts)   | _what_ is being downloaded    |
-| options | `OptionsInit`    | Yes      | [src/settings/options/types.ts](src/settings/options/types.ts) | _how_ something is downloaded |
-| params  | `ParamsInit`     | Yes      | [src/settings/params/types.ts](src/settings/params/types.ts)   | _who_ is being downloaded     |
-
+| argument | type          | required | type file                                                      | description                   |
+| -------- | ------------- | -------- | -------------------------------------------------------------- | ----------------------------- |
+| config   | `ConfigInit`  | Yes      | [src/settings/config/types.ts](src/settings/config/types.ts)   | _what_ is being downloaded    |
+| options  | `OptionsInit` | Yes      | [src/settings/options/types.ts](src/settings/options/types.ts) | _how_ something is downloaded |
+| params   | `ParamsInit`  | Yes      | [src/settings/params/types.ts](src/settings/params/types.ts)   | _who_ is being downloaded     |
 
 ### scraper
-The `scrape` function returns a promise which yeilds these utilities (`on`, `emit`, and `query`)
+
+The `scrape` function returns a promise which yields these utilities (`on`, `emit`, and `query`)
 
 #### on
+
 Listen for events from the scraper
 
-| event                  | callback arguments    | description                                |
-| ---------------------- | --------------------- | ------------------------------------------ |
-| `'done'`               | queryFor              | when the scraper has completed             |
-| `'error'`              | error                 | if the scraper encounters an error         |
-| `'<scraper>:progress'` | queryFor, download id | emits progress of download until completed |
-| `'<scraper>:queued'`   | queryFor, download id | when a download is queued                  |
-| `'<scraper>:complete'` | queryFor, download id | when a download is completed               |
+| event                  | callback arguments | description                                |
+| ---------------------- | ------------------ | ------------------------------------------ |
+| `'done'`               |                    | when the scraper has completed             |
+| `'error'`              | Error              | if the scraper encounters an error         |
+| `'<scraper>:progress'` | download id        | emits progress of download until completed |
+| `'<scraper>:queued'`   | download id        | when a download is queued                  |
+| `'<scraper>:complete'` | download id        | when a download is completed               |
 
 #### emit
 
 While the scraper is working, you can affect its behavior by emitting these events:
 
-| event | arguments | description |
-| --- | --- | --- |
-| `'useRateLimiter'` | boolean | turn on or off the rate limit defined in the run options |
-| `'stop'` | | stop the crawler (note that in progress requests will still complete) |
+| event              | arguments | description                                                           |
+| ------------------ | --------- | --------------------------------------------------------------------- |
+| `'useRateLimiter'` | boolean   | turn on or off the rate limit defined in the run options              |
+| `'stop'`           |           | stop the crawler (note that in progress requests will still complete) |
 
-each event will return the **queryFor** function as its first argument
 
 #### query
 
 This function is an argument in the emitter callback and is used to get data back out of the scraper whenever
 you need it. These are its arguments:
 
-| name | type | required | description |
-| --- | --- | --- | --- |
-| `scrapers` | `string[]` | Yes | scrapers who will return their filenames and parsed values, in order |
-| `groupBy` | `string` | Yes | name of a scraper which will delineate the values in `scrapers` |
+| name       | type       | required | description                                                          |
+| ---------- | ---------- | -------- | -------------------------------------------------------------------- |
+| `scrapers` | `string[]` | Yes      | scrapers who will return their filenames and parsed values, in order |
+| `groupBy`  | `string`   | Yes      | name of a scraper which will delineate the values in `scrapers`      |
 
 ## Motivation
 
