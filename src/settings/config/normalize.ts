@@ -107,7 +107,6 @@ const normalizeConfig = (config: ConfigInit): Config => {
 
   return {
     input: normalizeInputs(config.input),
-    import: normalizeUndefinedSingleArray(config.import),
     scrapers: normalizeScraperDefs(config.scrapers),
     run: normalizeStructure(config.run)
   }

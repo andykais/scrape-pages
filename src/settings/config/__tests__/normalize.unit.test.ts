@@ -9,12 +9,11 @@ describe('normalize config with', () => {
     const fullConfig = normalizeConfig(simpleConfig)
     const fullConfigGuess: Config = {
       input: [],
-      import: [],
       scrapers: {
         index: {
           download: {
             method: 'GET',
-            urlTemplate: simpleConfig.scrapers.index.download as any,
+            urlTemplate: simpleConfig.scrapers.index.download as string,
             headerTemplates: {}
           },
           parse: {

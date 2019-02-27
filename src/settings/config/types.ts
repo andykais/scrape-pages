@@ -5,8 +5,6 @@ export type ScraperName = string
 type ScraperGroup = string
 // input key
 type InputKey = string
-// npm import
-type Import = string
 
 // RegexCleanup {{{
 type RegexRemove = string
@@ -87,14 +85,12 @@ interface Structure extends StructureInit {
 }
 export interface ConfigInit {
   input?: Input | Input[]
-  import?: Import | Import[]
   scrapers: { [scraperName: string]: ScrapeConfigInit }
   run: StructureInit
 }
 // returned by ./normalize.ts
 export interface Config extends ConfigInit {
   input: Input[]
-  import: Import[]
   scrapers: { [scraperName: string]: ScrapeConfig }
   run: Structure
 }
