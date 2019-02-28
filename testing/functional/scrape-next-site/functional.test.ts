@@ -8,6 +8,9 @@ import { config } from './config'
 import expectedQueryResult from './resources/expected-query-result.json'
 import { scrape } from '../../../src'
 
+const resourceFolder = `${__dirname}/resources/mock-endpoints`
+const resourceUrl = 'http://scrape-next-site.com'
+
 const options = {
   optionsEach: {
     image: {
@@ -22,11 +25,11 @@ const params = {
   cleanFolder: true
 }
 describe('scrape next site', () => {
-  describe('with instant scraper', function() {
+  describe('with instant scraper', () => {
     const { start, query } = scrape(config, options, params)
 
     before(async () => {
-      await nockMockFolder(`${__dirname}/resources/mock-endpoints`, 'http://scrape-next-site.com')
+      await nockMockFolder(resourceFolder, resourceUrl)
 
       const { on } = await start()
       await new Promise(resolve => on('done', resolve))
@@ -52,11 +55,11 @@ describe('scrape next site', () => {
     })
   })
 
-  describe('with psuedo-random delayed scraper', function() {
+  describe('with psuedo-random delayed scraper', () => {
     const { start, query } = scrape(config, options, params)
 
     before(async () => {
-      await nockMockFolder(`${__dirname}/resources/mock-endpoints`, 'http://scrape-next-site.com', {
+      await nockMockFolder(resourceFolder, resourceUrl, {
         randomSeed: 2
       })
 

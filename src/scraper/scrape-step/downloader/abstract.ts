@@ -4,12 +4,19 @@ import { ScraperName, DownloadConfig } from '../../../settings/config/types'
 import { Tools } from '../../../tools'
 import { Downloader as IdentityDownloader } from './implementations/identity'
 
+type DownloadId = number
 export type DownloadParams = {
-  parentId?: number
+  parentId?: DownloadId
   incrementIndex: number
   value?: string
 }
-type RetrieveValue = { downloadValue?: string; filename?: string }
+interface RetrieveValue {
+  downloadValue?: string
+  filename?: string
+}
+interface RunValue extends RetrieveValue {
+  downloadId: DownloadId
+}
 /**
  * base abstract class which other downloaders derive from
  */
@@ -20,6 +27,7 @@ export abstract class AbstractDownloader<DownloadData> {
   protected options: ScrapeSettings['options']
   protected params: ScrapeSettings['params']
   protected tools: Tools
+  public type: string
 
   public constructor(
     scraperName: ScraperName,
@@ -29,7 +37,7 @@ export abstract class AbstractDownloader<DownloadData> {
   ) {
     Object.assign(this, { scraperName, downloadConfig, ...settings, tools })
   }
-  public run = async (downloadParams: DownloadParams) => {
+  public run = async (downloadParams: DownloadParams): Promise<RunValue> => {
     const downloadData = this.constructDownload(downloadParams)
     const downloadId = this.tools.store.qs.insertQueuedDownload(
       this.scraperName,
@@ -47,8 +55,8 @@ export abstract class AbstractDownloader<DownloadData> {
     }
   }
   // implement these methods
-  protected abstract constructDownload(downloadParams: DownloadParams): DownloadData
-  protected abstract retrieve(
+  public abstract constructDownload(downloadParams: DownloadParams): DownloadData
+  public abstract retrieve(
     downloadId: number,
     downloadParams: DownloadData
   ): RetrieveValue | Promise<RetrieveValue>

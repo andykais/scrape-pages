@@ -5,8 +5,14 @@ import { expect } from 'chai'
 
 import { nockMockFolder } from '../../setup'
 import { config } from './config'
+import { copy } from '../../../src/util/object'
 import expectedQueryResult from './resources/expected-query-result.json'
 import { scrape } from '../../../src'
+
+import * as _ from 'lodash'
+
+const resourceFolder = `${__dirname}/resources/mock-endpoints`
+const resourceUrl = 'http://increment-gallery-site.com'
 
 const options = {
   optionsEach: {
@@ -21,14 +27,11 @@ const params = {
   cleanFolder: true
 }
 describe('increment gallery site', () => {
-  describe('with instant scraper', function() {
+  describe('with instant scraper', () => {
     const { start, query } = scrape(config, options, params)
 
     before(async () => {
-      await nockMockFolder(
-        `${__dirname}/resources/mock-endpoints`,
-        'http://increment-gallery-site.com'
-      )
+      await nockMockFolder(resourceFolder, resourceUrl)
 
       const { on } = await start()
       await new Promise(resolve => on('done', resolve))
@@ -53,8 +56,68 @@ describe('increment gallery site', () => {
         .to.be.deep.equal(expectedQueryResult)
     })
   })
+  describe('with cached scraper', () => {
+    it.only('should make the expected requests on first pass', async () => {
+      const count = { queued: { gallery: 0, image: 0 }, complete: { gallery: 0, image: 0 } }
+      await nockMockFolder(resourceFolder, resourceUrl)
 
-  describe('with value limit', function() {
+      const { start, query } = scrape(config, options, params)
+      const { on } = await start()
+      on('image:queued', () => count.queued.image++)
+      on('image:complete', () => count.complete.image++)
+      on('gallery:queued', () => count.queued.gallery++)
+      on('gallery:complete', () => count.complete.gallery++)
+      await new Promise(resolve => on('done', resolve))
+      expect(count.queued.gallery).to.be.equal(3)
+      expect(count.queued.image).to.be.equal(4)
+      expect(count.complete.gallery).to.be.equal(2)
+      expect(count.complete.image).to.be.equal(4)
+
+      const result = query({
+        scrapers: ['image', 'tag'],
+        groupBy: 'image-page'
+      })
+      expect(result)
+        .excludingEvery(['filename', 'id'])
+        .to.be.deep.equal(expectedQueryResult)
+    })
+    it.only('on second pass, it should make zero requests', async () => {
+      const count = { queued: { gallery: 0, image: 0 }, complete: { gallery: 0, image: 0 } }
+      await nockMockFolder(resourceFolder, resourceUrl)
+
+      const { start, query } = scrape(
+        config,
+        // { ...options, cache: true },
+        _.merge(copy(options), { cache: true, optionsEach: { gallery: { cache: false } } }),
+        { ...params, cleanFolder: false }
+      )
+      const { on } = await start()
+      on('image:queued', () => count.queued.image++)
+      on('image:complete', () => count.complete.image++)
+      on('gallery:queued', () => count.queued.gallery++)
+      on('gallery:complete', () => count.complete.gallery++)
+      await new Promise(resolve => on('done', resolve))
+
+      const result = query({ scrapers: ['image'], groupBy: 'image' })
+      console.log(result.map(r => r.map(r => r.downloadData)))
+
+      expect(count.queued.gallery).to.be.equal(3)
+      expect(count.queued.image).to.be.equal(0)
+      expect(count.complete.gallery).to.be.equal(2)
+      expect(count.complete.image).to.be.equal(4)
+
+
+      // const result = query({
+      //   scrapers: ['image', 'tag'],
+      //   groupBy: 'image-page'
+      // })
+      // expect(result)
+      //   .excludingEvery(['filename', 'id'])
+      //   .to.be.deep.equal(expectedQueryResult)
+    })
+  })
+
+  describe('with value limit', () => {
     const configWithLimit = {
       ...config,
       scrapers: { ...config.scrapers, gallery: { ...config.scrapers.gallery, limitValuesTo: 1 } }
@@ -62,10 +125,7 @@ describe('increment gallery site', () => {
     const { start, query } = scrape(configWithLimit, options, params)
 
     before(async () => {
-      await nockMockFolder(
-        `${__dirname}/resources/mock-endpoints`,
-        'http://increment-gallery-site.com'
-      )
+      await nockMockFolder(resourceFolder, resourceUrl)
 
       const { on } = await start()
       await new Promise(resolve => on('done', resolve))
@@ -86,15 +146,11 @@ describe('increment gallery site', () => {
     })
   })
 
-  describe('with psuedo-random delayed scraper', function() {
+  describe('with psuedo-random delayed scraper', () => {
     const { start, query } = scrape(config, options, params)
 
     before(async () => {
-      await nockMockFolder(
-        `${__dirname}/resources/mock-endpoints`,
-        'http://increment-gallery-site.com',
-        { randomSeed: 1 }
-      )
+      await nockMockFolder(resourceFolder, resourceUrl, { randomSeed: 1 })
 
       const { on } = await start()
       await new Promise(resolve => on('done', resolve))

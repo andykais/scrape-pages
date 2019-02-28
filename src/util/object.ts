@@ -1,3 +1,22 @@
+const copy = (obj: {}) => JSON.parse(JSON.stringify(obj))
+
+// const merge = <A extends {} | [], B extends {} | [], C>(a: A, b: B) => {
+//   if (Array.isArray(b)) {
+//     const union = []
+//     const aAsArray = Array.isArray(a) ? a : [a]
+//     for (let i = 0; i < Math.max(b.length, aAsArray.length); i++) {
+//       if (aAsArray.length > i && b.length > i) union[i] = merge(aAsArray[i], b[i])
+//       else if (b.length > i) union[i] = b[i]
+//       else union[i] = aAsArray[i]
+//     }
+//     return union
+//   } else if (typeof a === 'object' && typeof b === 'object') {
+//     for (const key in b) {
+//     }
+//   }
+//   return []
+// }
+
 // type cannot represent replacing a toplevel array, so we wont support it in `replaceInObject`
 type ReplaceInObject<I extends {}, Find, ReplaceWith> = I extends Find
   ? ReplaceWith
@@ -52,4 +71,4 @@ const marshaller = <T extends {}, F extends (...args: any[]) => T>(fn: F) => (
   ...args: ArgumentTypes<F>
 ) => marshalObject(fn(...args) as ReturnType<F>)
 
-export { replaceInObject, marshalObject, marshaller }
+export { copy, replaceInObject, marshalObject, marshaller }

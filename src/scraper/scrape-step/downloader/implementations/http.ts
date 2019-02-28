@@ -31,6 +31,7 @@ export class Downloader extends AbstractDownloader<DownloadData> {
   private urlTemplate: ReturnType<typeof compileTemplate>
   private headerTemplates: FMap<string, ReturnType<typeof compileTemplate>>
   private fetcher: FetchFunction
+  public type = 'http'
 
   public constructor(
     scraperName: ScraperName,
@@ -58,7 +59,7 @@ export class Downloader extends AbstractDownloader<DownloadData> {
     }
   }
 
-  protected constructDownload = ({
+  public constructDownload = ({
     value,
     incrementIndex: index
   }: DownloadParams): DownloadData => {
@@ -70,7 +71,7 @@ export class Downloader extends AbstractDownloader<DownloadData> {
     return [url, { headers, method: this.downloadConfig.method }]
   }
 
-  protected retrieve = (downloadId: number, downloadData: DownloadData) => {
+  public retrieve = (downloadId: number, downloadData: DownloadData) => {
     return this.fetcher(downloadId, downloadData)
   }
 

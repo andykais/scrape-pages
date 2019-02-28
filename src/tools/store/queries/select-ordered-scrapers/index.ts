@@ -8,7 +8,7 @@ export type SelectedRow = {
   id: number
   downloadId: number
   parsedValue?: string
-  url?: string
+  downloadData?: string
   filename?: string
 }
 type Statement = (scrapers: string[]) => () => SelectedRow[]
