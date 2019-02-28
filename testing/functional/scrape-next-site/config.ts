@@ -1,40 +1,58 @@
 import { ConfigInit } from '../../../src/settings/config/types'
 
 export const config: ConfigInit = {
-  scrape: {
-    name: 'index-page',
-    download: 'http://scrape-next-site.com/index.html',
-    parse: '#batch-id',
-    scrapeEach: {
-      name: 'gallery',
-      download: 'http://scrape-next-site.com/batch-id-page/id-{{ value }}.html',
-      scrapeNext: {
-        name: 'next-batch-id',
-        parse: '#batch-id'
+  scrapers: {
+    'index-page': {
+      download: 'http://scrape-next-site.com/index.html',
+      parse: '#batch-id'
+    },
+    gallery: {
+      download: 'http://scrape-next-site.com/batch-id-page/id-{{ value }}.html'
+    },
+    'next-batch-id': {
+      parse: '#batch-id'
+    },
+    'batch-page': {
+      parse: {
+        selector: 'li > a',
+        attribute: 'href'
+      }
+    },
+    'image-page': {
+      download: 'http://scrape-next-site.com{{ value }}'
+    },
+    tag: {
+      parse: '#tags > li'
+    },
+    'image-parse': {
+      parse: {
+        selector: 'img',
+        attribute: 'src'
+      }
+    },
+    image: {
+      download: 'http://scrape-next-site.com{{ value }}'
+    }
+  },
+  run: {
+    scraper: 'index-page',
+    forEach: {
+      scraper: 'gallery',
+      forNext: {
+        scraper: 'next-batch-id'
       },
-      scrapeEach: {
-        name: 'batch-page',
-        parse: {
-          selector: 'li > a',
-          attribute: 'href'
-        },
-        scrapeEach: {
-          name: 'image-page',
-          download: 'http://scrape-next-site.com{{ value }}',
-          scrapeEach: [
+      forEach: {
+        scraper: 'batch-page',
+        forEach: {
+          scraper: 'image-page',
+          forEach: [
             {
-              name: 'tag',
-              parse: '#tags > li'
+              scraper: 'tag'
             },
             {
-              name: 'image-parse',
-              parse: {
-                selector: 'img',
-                attribute: 'src'
-              },
-              scrapeEach: {
-                name: 'image',
-                download: 'http://scrape-next-site.com{{ value }}'
+              scraper: 'image-parse',
+              forEach: {
+                scraper: 'image'
               }
             }
           ]

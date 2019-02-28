@@ -1,33 +1,42 @@
 import cheerio from 'cheerio'
 import { AbstractParser } from '../abstract'
 // type imports
-import { ScrapeConfig } from '../../../../settings/config/types'
-import { Options } from '../../../../settings/options/types'
+import { ScrapeSettings } from '../../../../settings'
+import { ScraperName, ParseConfig } from '../../../../settings/config/types'
 import { Tools } from '../../../../tools'
 
 export class Parser extends AbstractParser {
+  protected parseConfig: ParseConfig
   private parser: (value: string) => string[]
 
-  public constructor(config: ScrapeConfig, options: Options, tools: Tools) {
-    super(config, options, tools)
-    this.parser = this.attribute ? this.selectAttrVals : this.selectTextVals
+  public constructor(
+    scraperName: ScraperName,
+    parseConfig: ParseConfig,
+    settings: ScrapeSettings,
+    tools: Tools
+  ) {
+    super(scraperName, parseConfig, settings, tools)
+    this.parseConfig = parseConfig // must be set on again on child classes https://github.com/babel/babel/issues/9439
+    this.parser = this.parseConfig.attribute
+      ? this.selectAttrVals(this.parseConfig.attribute)
+      : this.selectTextVals
   }
   protected parse = (value: string) => this.parser(value)
 
   private selectTextVals = (value: string) => {
     const $ = cheerio.load(value)
     const values: string[] = []
-    const selection = $(this.selector)
+    const selection = $(this.parseConfig.selector)
     selection.each(function() {
       values.push($(this).text())
     })
     return values
   }
-  private selectAttrVals = (value: string) => {
+  private selectAttrVals = (attribute: string) => (value: string) => {
     const $ = cheerio.load(value)
     const values: string[] = []
-    const selection = $(this.selector)
-    selection.attr(this.attribute, (i: number, attributeVal: string) => {
+    const selection = $(this.parseConfig.selector)
+    selection.attr(attribute, (i: number, attributeVal: string) => {
       if (attributeVal) values.push(attributeVal)
     })
     return values

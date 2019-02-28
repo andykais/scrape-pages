@@ -3,17 +3,17 @@ import fs from 'fs'
 import { promisify } from 'util'
 import sanitize from 'sanitize-filename'
 
-const [exists, readFile, mkdir, readdir, stat, unlink, rmdir] = [
-  fs.readFile,
-  fs.exists,
+const [mkdir, readdir, stat, unlink, rmdir, rename, access] = [
   fs.mkdir,
   fs.readdir,
   fs.stat,
   fs.unlink,
-  fs.rmdir
+  fs.rmdir,
+  fs.rename,
+  fs.access
 ].map(promisify)
 
-export { mkdir, exists, readFile, readdir, stat, unlink }
+export { readdir, stat, rename }
 
 export const mkdirp = async (folder: string) => {
   try {
@@ -48,5 +48,17 @@ export const rmrf = async (folder: string) => {
   }
 }
 
-export const sanitizeFilename = (filename: string) =>
-  sanitize(filename, { replacement: '_' })
+export const exists = async (file: string): Promise<boolean> => {
+  try {
+    await access(file, fs.constants.F_OK)
+    return true
+  } catch (e) {
+    if (e.code === 'ENOENT') {
+      return false
+    } else {
+      throw e
+    }
+  }
+}
+
+export const sanitizeFilename = (filename: string) => sanitize(filename, { replacement: '_' })

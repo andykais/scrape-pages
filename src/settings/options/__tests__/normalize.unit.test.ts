@@ -1,66 +1,44 @@
+import { FMap } from '../../../util/map'
 import { normalizeConfig } from '../../config'
 import { normalizeOptions } from '../'
 import * as testingConfigs from '../../../../testing/resources/testing-configs'
-import { FlatOptions } from '../types'
+import { OptionsInit, FlatOptions } from '../types'
 import { expect } from 'chai'
 
-describe('normalize run options with', () => {
+describe('normalize options with', () => {
   describe('simple config', () => {
-    const fullConfig = normalizeConfig(testingConfigs.__SIMPLE_CONFIG__)
-    it('should match returned run options', () => {
-      const runOptionsInit = {
-        folder: '/nonexistent'
-      }
-      const runOptions = normalizeOptions(fullConfig, runOptionsInit)
-      const runOptionsExpected: FlatOptions = new Map([
-        [
-          'level_0_index_0',
-          {
-            cache: true,
-            logLevel: 'error' as 'error',
-            downloadPriority: 0,
-            folder: '/nonexistent/level_0_index_0',
-            input: {}
-          }
-        ],
-        [
-          'level_1_index_0',
-          {
-            cache: true,
-            logLevel: 'error' as 'error',
-            downloadPriority: 0,
-            folder: '/nonexistent/level_1_index_0',
-            input: {}
-          }
-        ]
-      ])
-      expect(runOptionsExpected).to.be.deep.equal(runOptions)
+    const fullConfig = normalizeConfig(testingConfigs.SIMPLE_CONFIG)
+    it('should match returned options', () => {
+      const optionsInit: OptionsInit = {}
+      const options = normalizeOptions(fullConfig, optionsInit)
+      const optionsExpected: FlatOptions = FMap.fromObject({
+        index: {
+          cache: true,
+          read: true,
+          write: false,
+          logLevel: 'error' as 'error',
+          downloadPriority: 0
+        },
+        image: {
+          cache: true,
+          read: true,
+          write: false,
+          logLevel: 'error' as 'error',
+          downloadPriority: 0
+        }
+      })
+      expect([...options]).to.have.deep.members([...optionsExpected])
     })
   })
-
-  describe('config with input', () => {
-    const fullConfig = normalizeConfig(testingConfigs.__INPUT_CONFIG__)
-
-    it('should error out when there is no input', () => {
-      const runOptionsInit = { folder: '/nonexistent' }
-      const missingInputs = fullConfig.input.join()
-
-      expect(() => normalizeOptions(fullConfig, runOptionsInit)).to.throw(
-        `Invalid input! Options is missing keys(s) [${missingInputs}]`
-      )
-    })
-
-    it('should not error out when there are extra run option inputs', () => {
-      const runOptionsInit = {
-        input: { username: 'johnnybravo', password: 'sunglasses' },
-        folder: '/nonexistent'
-      }
-      const runOptions = normalizeOptions(fullConfig, runOptionsInit)
-      const normalizedInput = runOptions.get('level_0_index_0')!.input
-
-      expect(normalizedInput).to.be.deep.equal({
-        username: runOptionsInit.input.username
-      })
+  describe('poorly formed options', () => {
+    const optionsInit: any = { maxConcurrent: '1' }
+    const fullConfig = normalizeConfig(testingConfigs.EMPTY_CONFIG)
+    it('should throw a type assertion error', () => {
+      expect(() => normalizeOptions(fullConfig, optionsInit))
+        .to.throw(
+          `$; cause: at $; all causes: (at $: found 'maxConcurrent' in object; at $.maxConcurrent: expected number)`
+        )
+        .with.property('name', 'RuntimeTypeError')
     })
   })
 })

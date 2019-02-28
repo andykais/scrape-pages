@@ -1,5 +1,6 @@
-import { ScrapeConfig } from '../../../settings/config/types'
-import { Options } from '../../../settings/options/types'
+// type imports
+import { ScrapeSettings } from '../../../settings'
+import { ScraperName, ParseConfig } from '../../../settings/config/types'
 import { Tools } from '../../../tools'
 
 export type ParserValues = string[] | [undefined | string]
@@ -7,26 +8,27 @@ export type ParserValues = string[] | [undefined | string]
  * base abstract class which other downloaders derive from
  */
 export abstract class AbstractParser {
-  protected config: ScrapeConfig
-  protected options: Options
+  protected scraperName: ScraperName
+  protected parseConfig: ParseConfig | undefined
+  protected config: ScrapeSettings['config']
+  protected options: ScrapeSettings['options']
+  protected params: ScrapeSettings['params']
   protected tools: Tools
   protected selector: string
   protected attribute: string
 
-  public constructor(config: ScrapeConfig, options: Options, tools: Tools) {
-    Object.assign(this, { config, options, tools, ...config.parse })
+  public constructor(
+    scraperName: ScraperName,
+    parseConfig: ParseConfig | undefined,
+    settings: ScrapeSettings,
+    tools: Tools
+  ) {
+    Object.assign(this, { scraperName, parseConfig, ...settings, tools })
   }
-  public run = (value?: string) => {
-    /** TODO
-     * ok I need to re-evaluate what an undefined passed value means
-     * images should be undefined IF I MANUALLY SAY SO
-     * but that will stop the flow from happening
-     *
-     * any time we say dont store the value, it will stop the flow
-     * AND stop the scraper (unless we pass down a null value)
-     * but storing images as text is a waste of energy
-     */
-    return this.parse(value)
-  }
+  /**
+   * @param value only ever `undefined` if a download step has `read: false`.
+   */
+  public run = (value?: string) => this.parse(value)
+
   protected abstract parse: (value?: string) => ParserValues
 }

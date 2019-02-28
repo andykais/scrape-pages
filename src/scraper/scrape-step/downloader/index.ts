@@ -1,18 +1,19 @@
 import { Downloader as IdentityDownloader } from './implementations/identity'
 import { Downloader as HttpDownloader } from './implementations/http'
 // type imports
-import { ScrapeConfig } from '../../../settings/config/types'
-import { Options } from '../../../settings/options/types'
+import { ScrapeSettings } from '../../../settings'
+import { ScraperName } from '../../../settings/config/types'
 import { Tools } from '../../../tools'
 
 export const downloaderClassFactory = (
-  config: ScrapeConfig,
-  options: Options,
+  scraperName: ScraperName,
+  settings: ScrapeSettings,
   tools: Tools
 ) => {
+  const { download } = settings.config
   // TODO use type guards
-  if (config.download) return new HttpDownloader(config, options, tools)
-  else return new IdentityDownloader(config, options, tools)
+  if (download) return new HttpDownloader(scraperName, download, settings, tools)
+  else return new IdentityDownloader(scraperName, download, settings, tools)
 }
 
 export type DownloaderClass = IdentityDownloader | HttpDownloader

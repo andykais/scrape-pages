@@ -1,11 +1,11 @@
-import * as Rx from 'rxjs'
+import * as ops from 'rxjs/operators'
 import { Emitter } from './emitter'
 import { Store } from './store'
 import { Logger } from './logger'
 import { Queue } from './queue'
+
 // type imports
-import { Config } from '../settings/config/types'
-import { OptionsInit, FlatOptions } from '../settings/options/types'
+import { Settings } from '../settings'
 
 export type Tools = {
   store: Store
@@ -13,18 +13,14 @@ export type Tools = {
   logger: Logger
   queue: Queue
 }
-export const initTools = (
-  config: Config,
-  optionsInit: OptionsInit,
-  flatOptions: FlatOptions
-): Tools => {
-  const store = new Store(config, optionsInit)
-  const emitter = new Emitter(config)
-  const logger = new Logger(optionsInit, flatOptions)
-  const rateLimiterEventStream = emitter.getRxEventStream(
-    'useRateLimiter'
-  ) as Rx.Observable<boolean> // deal with incoming values on this event as truthy or falsey
-  const queue = new Queue(optionsInit, flatOptions, rateLimiterEventStream)
+export const initTools = (settings: Settings): Tools => {
+  const store = new Store(settings)
+  const emitter = new Emitter(settings)
+  const logger = new Logger(settings)
+  const rateLimiterEventStream = emitter
+    .getRxEventStream('useRateLimiter')
+    .pipe(ops.map(toggle => !!toggle))
+  const queue = new Queue(settings, rateLimiterEventStream)
 
   return {
     store,
@@ -32,4 +28,8 @@ export const initTools = (
     logger,
     queue
   }
+}
+
+export const initStore = (settings: Settings): Store => {
+  return new Store(settings)
 }

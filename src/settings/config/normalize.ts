@@ -1,99 +1,115 @@
+import { validateSlug } from '../../util/slug'
+import VError from 'verror'
 import {
   DownloadConfigInit,
   DownloadConfig,
   ParseConfigInit,
   ParseConfig,
+  // replacement
   ScrapeConfigInit,
+  ScrapeConfig,
   ConfigInit,
   Config
 } from './types'
 import { assertConfigType } from './'
 
-const downloadDefaults: {
-  headerTemplates: DownloadConfig['headerTemplates']
-  method: DownloadConfig['method']
+const reservedWords = ['value', 'index']
+
+const defaults: {
+  definition: Pick<ScrapeConfig, 'incrementUntil' | 'limitValuesTo'>
+  download: Pick<DownloadConfig, 'method' | 'headerTemplates'>
+  parse: Pick<ParseConfig, 'expect'>
 } = {
-  method: 'GET',
-  headerTemplates: {}
-}
-// TODO use type guards
-const assignDownloadDefaults = (download: DownloadConfigInit): DownloadConfig =>
-  typeof download === 'string'
-    ? {
-        ...downloadDefaults,
-        urlTemplate: download
-      }
-    : {
-        ...downloadDefaults,
-        ...download,
-        method: download.method || downloadDefaults.method
-      }
-
-const parseDefaults: {
-  expect: ParseConfig['expect']
-  attribute: ParseConfig['attribute']
-} = {
-  expect: 'html',
-  attribute: undefined
-}
-const assignParseDefaults = (parse: ParseConfigInit): ParseConfig =>
-  typeof parse === 'string'
-    ? {
-        ...parseDefaults,
-        selector: parse
-      }
-    : {
-        ...parseDefaults,
-        ...parse,
-        expect: parse.expect || parseDefaults.expect
-      }
-
-const fillInDefaultsRecurse = (level = 0, parentName = '') => (
-  scrapeConfig: ScrapeConfigInit,
-  index = 0
-): Config['scrape'] => {
-  const {
-    name,
-    download,
-    parse,
-    incrementUntil,
-    scrapeNext,
-    scrapeEach = []
-  } = scrapeConfig
-
-  const internalName = `${parentName}${
-    parentName ? '-' : ''
-  }level_${level}_index_${index}${scrapeNext ? '_next' : ''}`
-
-  return {
-    name: name || internalName,
-    download:
-      download === undefined ? undefined : assignDownloadDefaults(download),
-    parse: parse === undefined ? undefined : assignParseDefaults(parse),
-    incrementUntil: incrementUntil || 0,
-    scrapeNext:
-      scrapeNext && fillInDefaultsRecurse(level + 1, parentName)(scrapeNext),
-    scrapeEach: Array.isArray(scrapeEach)
-      ? scrapeEach.map(fillInDefaultsRecurse(level + 1, parentName))
-      : [fillInDefaultsRecurse(level + 1)(scrapeEach)]
+  definition: {
+    incrementUntil: 0,
+    limitValuesTo: undefined
+  },
+  download: {
+    method: 'GET',
+    headerTemplates: {}
+  },
+  parse: {
+    expect: 'html'
   }
 }
 
-const standardizeInput = (input: ConfigInit['input']): Config['input'] => {
-  if (!input) return []
-  else return Array.isArray(input) ? input : [input]
+const normalizeInputs = (inputsInit: ConfigInit['input']) => {
+  const inputs = normalizeUndefinedSingleArray(inputsInit)
+  // make sure no reserved words are used as input keys
+  const matchingReserves = reservedWords.filter(reserved => inputs.includes(reserved))
+  if (matchingReserves.length) {
+    throw new Error(`[${matchingReserves.join()}] are reserved word(s). The cannot be input names.`)
+  }
+  try {
+    for (const input of inputs) validateSlug(input)
+  } catch (e) {
+    throw new VError({ name: e.name, cause: e }, 'For an input key')
+  }
+  return inputs
 }
+
+// TODO use type guards
+const normalizeDownload = (download: DownloadConfigInit): DownloadConfig =>
+  typeof download === 'string'
+    ? {
+        ...defaults.download,
+        urlTemplate: download
+      }
+    : {
+        ...defaults.download,
+        ...download,
+        method: download.method || defaults.download.method
+      }
+
+const normalizeParse = (parse: ParseConfigInit): ParseConfig =>
+  typeof parse === 'string'
+    ? {
+        ...defaults.parse,
+        selector: parse
+      }
+    : {
+        ...defaults.parse,
+        ...parse,
+        expect: parse.expect || defaults.parse.expect
+      }
+
+const normalizeDefinition = (scrapeConfig: ScrapeConfigInit): ScrapeConfig => ({
+  ...defaults.definition,
+  ...scrapeConfig,
+  download:
+    scrapeConfig.download === undefined ? undefined : normalizeDownload(scrapeConfig.download),
+  parse: scrapeConfig.parse === undefined ? undefined : normalizeParse(scrapeConfig.parse)
+})
+
+const normalizeScraperDefs = (scraperDefs: ConfigInit['scrapers']) => {
+  return Object.keys(scraperDefs).reduce((acc: Config['scrapers'], scraperName) => {
+    try {
+      validateSlug(scraperName)
+      acc[scraperName] = normalizeDefinition(scraperDefs[scraperName])
+      return acc
+    } catch (e) {
+      throw new VError({ name: e.name, cause: e }, 'For a scraper name')
+    }
+  }, {})
+}
+
+const normalizeUndefinedSingleArray = <T>(val?: T | T[]): T[] =>
+  val === undefined ? [] : Array.isArray(val) ? val : [val]
+
+const normalizeStructure = ({ scraper, forNext, forEach }: ConfigInit['run']): Config['run'] => ({
+  scraper,
+  forNext: normalizeUndefinedSingleArray(forNext).map(normalizeStructure),
+  forEach: normalizeUndefinedSingleArray(forEach).map(normalizeStructure)
+})
 
 const normalizeConfig = (config: ConfigInit): Config => {
   assertConfigType(config)
 
-  const input = standardizeInput(config.input)
-
-  const fullConfig = fillInDefaultsRecurse()(config.scrape)
-
   return {
-    input,
-    scrape: fullConfig
+    input: normalizeInputs(config.input),
+    scrapers: normalizeScraperDefs(config.scrapers),
+    run: normalizeStructure(config.run)
   }
 }
+
 export { normalizeConfig }

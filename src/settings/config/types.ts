@@ -1,3 +1,4 @@
+import { FMap } from '../../util/map'
 // scraper name
 export type ScraperName = string
 // scraper group
@@ -7,7 +8,7 @@ type InputKey = string
 
 // RegexCleanup {{{
 type RegexRemove = string
-interface RegexReplace {
+type RegexReplace = {
   selector: string
   replacer: string
 }
@@ -15,12 +16,7 @@ type RegexCleanup = RegexRemove | RegexReplace
 // }}}
 
 // Input {{{
-type InputSimple = InputKey
-type InputCleaned = {
-  name: InputKey
-  regexCleanup: RegexCleanup
-}
-type Input = InputSimple | InputCleaned
+type Input = InputKey
 // }}}
 
 // DownloadConfig {{{
@@ -57,42 +53,44 @@ export interface ParseConfig extends ParseConfigInterface {
 
 type Incrementers = 'failed-download' | 'empty-parse' | number
 
-export interface ScrapeConfigInit {
-  name?: ScraperName
-  download?: DownloadConfigInit
-  parse?: ParseConfigInit
-  incrementUntil?: Incrementers
-  scrapeNext?: ScrapeConfigInit
-  scrapeEach?: ScrapeConfigInit | ScrapeConfigInit[]
-}
-
-export interface ConfigInit {
-  input?: Input | Input[]
-  scrape: ScrapeConfigInit
-}
-
-// returned by ./normalize.ts
-export interface ScrapeConfig {
-  name: ScraperName
-  download?: DownloadConfig
-  parse?: ParseConfig
-  incrementUntil: Incrementers
-  scrapeNext?: ScrapeConfig // scrape next only increments until 'empty-parse'
-  scrapeEach: ScrapeConfig[]
-}
-
-export interface Config extends ConfigInit {
-  input: Input[]
-  scrape: ScrapeConfig
-}
-
-// returned by ./make-flat-config.ts
+// returned by ./flatten.ts
 export type ConfigPositionInfo = {
   depth: number
   horizontalIndex: number
   name: ScraperName
   parentName?: ScraperName
 }
-export type FlatConfig = {
-  [scraperName: string]: ConfigPositionInfo
+export type FlatConfig = FMap<ScraperName, ConfigPositionInfo>
+
+export interface ScrapeConfigInit {
+  download?: DownloadConfigInit
+  parse?: ParseConfigInit
+  incrementUntil?: Incrementers
+  limitValuesTo?: number
+}
+export interface ScrapeConfig {
+  download?: DownloadConfig
+  parse?: ParseConfig
+  incrementUntil: Incrementers
+  limitValuesTo: number | undefined
+}
+interface StructureInit {
+  scraper: ScraperName
+  forEach?: StructureInit | StructureInit[]
+  forNext?: StructureInit | StructureInit[]
+}
+interface Structure extends StructureInit {
+  forEach: Structure[]
+  forNext: Structure[]
+}
+export interface ConfigInit {
+  input?: Input | Input[]
+  scrapers: { [scraperName: string]: ScrapeConfigInit }
+  run: StructureInit
+}
+// returned by ./normalize.ts
+export interface Config extends ConfigInit {
+  input: Input[]
+  scrapers: { [scraperName: string]: ScrapeConfig }
+  run: Structure
 }

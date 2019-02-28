@@ -1,104 +1,47 @@
 [
-  {
-    "image": [
-      {
-        "scraper": "image",
-        "parsedValue": null,
-        "url": "[\"http://scrape-next-site.com/image/the.jpg\",{\"headers\":{},\"method\":\"GET\"}]",
-        "filename": -1
-      }
-    ],
-    "tag": [
-      {
-        "scraper": "tag",
-        "parsedValue": "one",
-        "url": null,
-        "filename": -1
-      },
-      {
-        "scraper": "tag",
-        "parsedValue": "two",
-        "url": null,
-        "filename": -1
-      }
-    ]
-  },
-  {
-    "image": [
-      {
-        "scraper": "image",
-        "parsedValue": null,
-        "url": "[\"http://scrape-next-site.com/image/quick.jpg\",{\"headers\":{},\"method\":\"GET\"}]",
-        "filename": -1
-      }
-    ],
-    "tag": [
-      {
-        "scraper": "tag",
-        "parsedValue": "one",
-        "url": null,
-        "filename": -1
-      },
-      {
-        "scraper": "tag",
-        "parsedValue": "two",
-        "url": null,
-        "filename": -1
-      }
-    ]
-  },
-  {
-    "image": [
-      {
-        "scraper": "image",
-        "parsedValue": null,
-        "url": "[\"http://scrape-next-site.com/image/brown.jpg\",{\"headers\":{},\"method\":\"GET\"}]",
-        "filename": -1
-      }
-    ],
-    "tag": [
-      {
-        "scraper": "tag",
-        "parsedValue": "four",
-        "url": null,
-        "filename": -1
-      },
-      {
-        "scraper": "tag",
-        "parsedValue": "five",
-        "url": null,
-        "filename": -1
-      }
-    ]
-  },
-  {
-    "image": [
-      {
-        "scraper": "image",
-        "parsedValue": null,
-        "url": "[\"http://scrape-next-site.com/image/fox.jpg\",{\"headers\":{},\"method\":\"GET\"}]",
-        "filename": -1
-      }
-    ],
-    "tag": [
-      {
-        "scraper": "tag",
-        "parsedValue": "three",
-        "url": null,
-        "filename": -1
-      },
-      {
-        "scraper": "tag",
-        "parsedValue": "four",
-        "url": null,
-        "filename": -1
-      },
-      {
-        "scraper": "tag",
-        "parsedValue": "five",
-        "url": null,
-        "filename": -1
-      }
-    ]
-  }
+  [
+    { "id": 1, "scraper": "tag", "parsedValue": "one", "downloadData": null, "filename": null },
+    { "id": 1, "scraper": "tag", "parsedValue": "two", "downloadData": null, "filename": null },
+    {
+      "id": 1,
+      "scraper": "image",
+      "parsedValue": null,
+      "downloadData": "[\"http://scrape-next-site.com/image/the.jpg\",{\"headers\":{},\"method\":\"GET\"}]",
+      "filename": "/var/folders/0y/48hl3shx5tjg4kl_2kdjjzzr0000gn/T/scrape next site with instant scraper/image/10/http___scrape-next-site.com_image_the.jpg"
+    }
+  ],
+  [
+    { "id": 1, "scraper": "tag", "parsedValue": "one", "downloadData": null, "filename": null },
+    { "id": 1, "scraper": "tag", "parsedValue": "two", "downloadData": null, "filename": null },
+    {
+      "id": 1,
+      "scraper": "image",
+      "parsedValue": null,
+      "downloadData": "[\"http://scrape-next-site.com/image/quick.jpg\",{\"headers\":{},\"method\":\"GET\"}]",
+      "filename": "/var/folders/0y/48hl3shx5tjg4kl_2kdjjzzr0000gn/T/scrape next site with instant scraper/image/13/http___scrape-next-site.com_image_quick.jpg"
+    }
+  ],
+  [
+    { "id": 5, "scraper": "tag", "parsedValue": "four", "downloadData": null, "filename": null },
+    { "id": 5, "scraper": "tag", "parsedValue": "five", "downloadData": null, "filename": null },
+    {
+      "id": 5,
+      "scraper": "image",
+      "parsedValue": null,
+      "downloadData": "[\"http://scrape-next-site.com/image/brown.jpg\",{\"headers\":{},\"method\":\"GET\"}]",
+      "filename": "/var/folders/0y/48hl3shx5tjg4kl_2kdjjzzr0000gn/T/scrape next site with instant scraper/image/20/http___scrape-next-site.com_image_brown.jpg"
+    }
+  ],
+  [
+    { "id": 5, "scraper": "tag", "parsedValue": "three", "downloadData": null, "filename": null },
+    { "id": 5, "scraper": "tag", "parsedValue": "four", "downloadData": null, "filename": null },
+    { "id": 5, "scraper": "tag", "parsedValue": "five", "downloadData": null, "filename": null },
+    {
+      "id": 5,
+      "scraper": "image",
+      "parsedValue": null,
+      "downloadData": "[\"http://scrape-next-site.com/image/fox.jpg\",{\"headers\":{},\"method\":\"GET\"}]",
+      "filename": "/var/folders/0y/48hl3shx5tjg4kl_2kdjjzzr0000gn/T/scrape next site with instant scraper/image/23/http___scrape-next-site.com_image_fox.jpg"
+    }
+  ]
 ]

@@ -1,31 +1,43 @@
 import { ConfigInit } from '../../../src/settings/config/types'
 
 export const config: ConfigInit = {
-  scrape: {
-    name: 'gallery',
-    download: `http://increment-gallery-site.com/gallery-page/{{'+' 1 index }}.html`,
-    parse: {
-      selector: 'li > a',
-      attribute: 'href'
+  scrapers: {
+    gallery: {
+      download: `http://increment-gallery-site.com/gallery-page/{{'+' 1 index }}.html`,
+      parse: {
+        selector: 'li > a',
+        attribute: 'href'
+      },
+      incrementUntil: 'failed-download'
     },
-    incrementUntil: 'failed-download',
-    scrapeEach: {
-      name: 'image-page',
-      download: 'http://increment-gallery-site.com{{ value }}',
-      scrapeEach: [
+    'image-page': {
+      download: 'http://increment-gallery-site.com{{ value }}'
+    },
+    tag: {
+      parse: '#tags > li'
+    },
+    'image-page-parse': {
+      parse: {
+        selector: 'img',
+        attribute: 'src'
+      }
+    },
+    image: {
+      download: 'http://increment-gallery-site.com{{ value }}'
+    }
+  },
+  run: {
+    scraper: 'gallery',
+    forEach: {
+      scraper: 'image-page',
+      forEach: [
         {
-          name: 'tag',
-          parse: '#tags > li'
+          scraper: 'tag'
         },
         {
-          name: 'image-page-parse',
-          parse: {
-            selector: 'img',
-            attribute: 'src'
-          },
-          scrapeEach: {
-            name: 'image',
-            download: 'http://increment-gallery-site.com{{ value }}'
+          scraper: 'image-page-parse',
+          forEach: {
+            scraper: 'image'
           }
         }
       ]

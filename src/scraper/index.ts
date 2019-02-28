@@ -1,60 +1,85 @@
 import { initTools } from '../tools'
 import { ScrapeStep } from './scrape-step'
 import { mkdirp, rmrf } from '../util/fs'
-import { normalizeConfig } from '../settings/config'
-import { normalizeOptions } from '../settings/options'
+import { getSettings, getScrapeStepSettings } from '../settings'
+import { Logger } from '../tools/logger'
+import { Store } from '../tools/store'
+import { structureScrapers } from './flow'
 // type imports
-import { Config, ConfigInit } from '../settings/config/types'
-import { OptionsInit, FlatOptions } from '../settings/options/types'
+import { Settings } from '../settings'
+import { ConfigInit } from '../settings/config/types'
+import { OptionsInit } from '../settings/options/types'
+import { ParamsInit } from '../settings/params/types'
 
-const initFolders = async (
-  config: Config,
-  optionsInit: OptionsInit,
-  flatOptions: FlatOptions
-) => {
-  if (optionsInit.cleanFolder) await rmrf(optionsInit.folder)
-
-  await mkdirp(optionsInit.folder)
-  for (const { folder } of flatOptions.values()) await mkdirp(folder)
+const initFolders = async ({ paramsInit, flatParams }: Settings) => {
+  // remove folders if specified
+  if (paramsInit.cleanFolder) await rmrf(paramsInit.folder)
+  // create folders
+  await mkdirp(paramsInit.folder)
+  for (const { folder } of flatParams.values()) await mkdirp(folder)
+  // safely rename existing log files
+  await Logger.rotateLogFiles(paramsInit.folder)
 }
 
-export const scrape = async (
-  configInit: ConfigInit,
-  optionsInit: OptionsInit
-) => {
-  const config = normalizeConfig(configInit)
-  const flatOptions = normalizeOptions(config, optionsInit)
-  await initFolders(config, optionsInit, flatOptions)
-  const tools = initTools(config, optionsInit, flatOptions)
-  // create the observable
-  const scrapingScheme = new ScrapeStep(config.scrape, flatOptions, tools)
-  const scrapingObservable = scrapingScheme.run([{ parsedValue: '' }])
-  // start running the observable
-  const { emitter, queue, logger, store } = tools
-  const subscription = scrapingObservable.subscribe({
-    error: (error: Error) => {
-      emitter.emit.error(error)
-      subscription.unsubscribe()
-      queue.closeQueue()
-    },
-    complete: () => {
-      // TODO add timer to show how long it took
-      queue.closeQueue()
-      emitter.emit.done()
-      logger.info('Done!')
-    }
-  })
+const startScraping = async (settings: Settings) => {
+  await initFolders(settings)
+  const tools = initTools(settings)
 
-  emitter.on.stop(() => {
-    logger.info('Exiting manually.')
-    queue.closeQueue()
-    subscription.unsubscribe()
-    logger.info('Done!')
-    emitter.emit.done()
-  })
+  const scrapers = getScrapeStepSettings(settings).map(
+    (scrapeSettings, name) => new ScrapeStep(name, scrapeSettings, tools)
+  )
+
+  // create the observable
+  const scrapingScheme = structureScrapers(settings, scrapers)(settings.config.run)
+  const scrapingObservable = scrapingScheme([{ parsedValue: '' }])
+  // start running the observable
+  const { emitter, queue, logger } = tools
+  // necessary so that any listeners setup after function is called are setup before downloads begin
+  setTimeout(() => {
+    const subscription = scrapingObservable.subscribe({
+      error: (error: Error) => {
+        emitter.emit.error(error)
+        subscription.unsubscribe()
+        queue.closeQueue()
+      },
+      complete: () => {
+        // TODO add timer to show how long it took
+        queue.closeQueue()
+        emitter.emit.done()
+        logger.info('Done!')
+      }
+    })
+    emitter.on.stop(() => {
+      logger.info('Exiting manually.')
+      queue.closeQueue()
+      subscription.unsubscribe()
+      logger.info('Done!')
+      emitter.emit.done()
+    })
+  }, 0)
+
   return {
     on: emitter.getBoundOn(),
-    emit: emitter.getBoundEmit(),
-    query: store.query
+    emit: emitter.getBoundEmit()
   }
+}
+
+/**
+ * scrape is the entrypoint for this library
+ *
+ * @param configInit 'what' is going to be scraped (the actual urls and parse strings)
+ * @param optionsInit 'how' is the site going to be scraped (mostly how downloads should behave)
+ * @param paramsInit 'who' is going to be scraped (settings specific to each run)
+ */
+export const scrape = (
+  configInit: ConfigInit,
+  optionsInit: OptionsInit,
+  paramsInit: ParamsInit
+) => {
+  const settings = getSettings(configInit, optionsInit, paramsInit)
+
+  const start = () => startScraping(settings)
+  const query = Store.getQuerier(settings)
+
+  return { start, query }
 }

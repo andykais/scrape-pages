@@ -1,10 +1,10 @@
 import * as Rx from 'rxjs'
 
-export const whileLoopObservable = <In, Out>(
+const whileLoop = <In, Out>(
   inLoopFunction: (initialVal: In, index: number) => Promise<Out>,
   conditional: (loopValue: Out, index: number) => boolean,
   initialVal: In
-): Rx.Observable<Out> =>
+): Rx.Observable<[Out, number]> =>
   new Rx.Observable(observer => {
     ;(async () => {
       // stateful vars
@@ -14,7 +14,7 @@ export const whileLoopObservable = <In, Out>(
       do {
         try {
           nextVal = await inLoopFunction(initialVal, index)
-          observer.next(nextVal)
+          observer.next([nextVal, index])
           index++
         } catch (e) {
           observer.error(e)
@@ -24,3 +24,5 @@ export const whileLoopObservable = <In, Out>(
       observer.complete()
     })()
   })
+
+export { whileLoop }
