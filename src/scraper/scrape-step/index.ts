@@ -206,6 +206,9 @@ class ScrapeStep {
   //   * question: should I query for both a true child and one with matching download data?
   //   * question: what is expected when I want no cache, but I change the inputs?
   //   *  answer: Likely I want to keep both, so I will replace ONLY if the downloadData remains the same
+  //   * question: what is expected when I want cache, and there are more than one entry that match
+  //   downloadData?
+  //      answer: just grab the most recent one.
   //   * question: what is expected when I want no cache and an entry is no longer present on the webpage?
   //   *  answer: I will keep it all the same. There is a use case for only caching for performance, and not
   //   *          entries, but I cant guaruntee that is the only use case, so more is better. Track that
