@@ -1,4 +1,3 @@
-merge_mode: replace
 language: node_js
 
 node_js:
@@ -31,25 +30,19 @@ jobs:
       script: skip
       deploy:
         provider: script
-        script: |
-          (
-          set -Eeuo pipefail
-          set -x
-          # bump version based on github release tag
-          npm version --no-git-tag-version "$TRAVIS_TAG"
-          # publish package to npmjs.org
-          echo '//registry.npmjs.org/:_authToken=${NPM_AUTH_TOKEN}' >> ~/.npmrc
-          npm run build
-          cd lib
-          npm publish
-          cd ..
-          # push updated package.json to github
-          git checkout -b master
-          git add package.json package-lock.json
-          git commit --message "release $TRAVIS_TAG"
-          git remote add deploy https://${GITHUB_TOKEN}@github.com/${TRAVIS_REPO_SLUG}.git
+        skip_cleanup: true
+        script: >-
+          npm version --no-git-tag-version "$TRAVIS_TAG" &&
+          echo '//registry.npmjs.org/:_authToken=${NPM_AUTH_TOKEN}' >> ~/.npmrc &&
+          npm run build &&
+          cd lib &&
+          npm publish &&
+          cd .. &&
+          git checkout -b master &&
+          git add package.json package-lock.json &&
+          git commit --message "release $TRAVIS_TAG" &&
+          git remote add deploy https://${GITHUB_TOKEN}@github.com/${TRAVIS_REPO_SLUG}.git &&
           git push deploy master
-          )
         on:
           tags: true
 
