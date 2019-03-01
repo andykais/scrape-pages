@@ -59,6 +59,8 @@ jobs:
               git remote add deploy https://${GITHUB_TOKEN}@github.com/${TRAVIS_REPO_SLUG}.git
               git push deploy master
             )
+        on:
+          tags: true
 
     - stage: deploy website
       before_install: cd website
