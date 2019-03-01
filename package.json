@@ -23,10 +23,10 @@
     "format:check": "git ls-files '*.ts' '*.json' | xargs prettier --list-different",
     "typecheck": "tsc --noEmit --project tsconfig.json",
     "typecheck:watch": "npm run typecheck -- --watch",
-    "test": "run-s test:unit test:functional",
     "test:watch": "mocha-webpack --grep node_modules -i **/*.test.ts --watch",
     "test:unit": "mocha-webpack src/**/*.unit.test.ts",
-    "test:functional": "mocha-webpack testing/**/*functional.test.ts"
+    "test:functional": "mocha-webpack testing/**/*functional.test.ts",
+    "test": "run-s typecheck test:unit test:functional lint format:check"
   },
   "repository": {
     "type": "git",
@@ -38,10 +38,7 @@
     "node": "<=8.0"
   },
   "pre-push": [
-    "test:unit",
-    "test:functional",
-    "lint",
-    "format:check"
+    "test"
   ],
   "devDependencies": {
     "@babel/core": "^7.2.2",
