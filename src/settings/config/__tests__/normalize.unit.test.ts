@@ -21,8 +21,7 @@ describe('normalize config with', () => {
             attribute: (simpleConfig.scrapers.index.parse as any).attribute,
             expect: 'html'
           },
-          incrementUntil: 0,
-          limitValuesTo: undefined
+          incrementUntil: 0
         },
         image: {
           download: {
@@ -31,8 +30,7 @@ describe('normalize config with', () => {
             headerTemplates: {}
           },
           parse: undefined,
-          incrementUntil: 0,
-          limitValuesTo: undefined
+          incrementUntil: 0
         }
       },
       run: {

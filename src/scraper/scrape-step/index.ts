@@ -56,6 +56,7 @@ class ScrapeStep {
     }) || { id: undefined }
     if (downloadId) {
       const parsedValuesWithId = store.qs.selectParsedValues(downloadId)
+      this.parser.trim(parsedValuesWithId)
       this.scraperLogger.info({ parsedValuesWithId, downloadId }, 'loaded cached values')
       emitter.scraper(this.scraperName).emit.completed(downloadId)
       return parsedValuesWithId

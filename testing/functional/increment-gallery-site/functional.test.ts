@@ -57,7 +57,13 @@ describe('increment gallery site', () => {
   describe('with value limit', function() {
     const configWithLimit = {
       ...config,
-      scrapers: { ...config.scrapers, gallery: { ...config.scrapers.gallery, limitValuesTo: 1 } }
+      scrapers: {
+        ...config.scrapers,
+        gallery: {
+          ...config.scrapers.gallery,
+          parse: { ...(config.scrapers.gallery.parse as { selector: string }), limit: 1 }
+        }
+      }
     }
     const { start, query } = scrape(configWithLimit, options, params)
 
@@ -76,13 +82,10 @@ describe('increment gallery site', () => {
         scrapers: ['image'],
         groupBy: 'image'
       })
+      const expected = expectedQueryResult.map(g => g.filter(r => r.scraper === 'image'))
       expect(result)
         .excludingEvery(['filename', 'id'])
-        .to.be.deep.equal(
-          expectedQueryResult
-            .map(g => g.filter(r => r.scraper === 'image'))
-            .filter((_, i) => i <= 1)
-        )
+        .to.be.deep.equal([expected[0], expected[2]])
     })
   })
 

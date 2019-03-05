@@ -35,10 +35,6 @@ const chooseIncrementEvaluator = ({ incrementUntil }: ScrapeConfig): DownloadPar
       return incrementUntilNumericIndex(incrementUntil)
   }
 }
-const chooseValueLimit = <T>({ limitValuesTo }: ScrapeConfig): Rx.MonoTypeOperatorFunction<T> => {
-  if (limitValuesTo === undefined) return ops.tap()
-  else return ops.take(limitValuesTo)
-}
 const chooseIgnoreError = ({ incrementUntil }: ScrapeConfig) => {
   switch (incrementUntil) {
     case 'failed-download':
@@ -56,7 +52,6 @@ const structureScrapers = (settings: Settings, scrapers: FMap<ScraperName, Scrap
   const next = structure.forNext.map(structureScrapers(settings, scrapers))
 
   const okToIncrement = chooseIncrementEvaluator(scraper.config)
-  const valueLimitOperator = chooseValueLimit<ParsedValue[]>(scraper.config)
   const ignoreFetchError = chooseIgnoreError(scraper.config)
 
   return (parentValues: ParsedValue[]): Rx.Observable<ParsedValue[]> =>
@@ -84,7 +79,6 @@ const structureScrapers = (settings: Settings, scrapers: FMap<ScraperName, Scrap
           ops.map(([parsedValues]) => parsedValues)
         )
       ),
-      valueLimitOperator,
       each.length
         ? ops.flatMap(scraperValues => each.map(child => child(scraperValues)))
         : ops.map(scraperValues => [scraperValues]),

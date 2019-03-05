@@ -16,13 +16,12 @@ import { assertConfigType } from './'
 const reservedWords = ['value', 'index']
 
 const defaults: {
-  definition: Pick<ScrapeConfig, 'incrementUntil' | 'limitValuesTo'>
+  definition: Pick<ScrapeConfig, 'incrementUntil'>
   download: Pick<DownloadConfig, 'method' | 'headerTemplates'>
   parse: Pick<ParseConfig, 'expect'>
 } = {
   definition: {
-    incrementUntil: 0,
-    limitValuesTo: undefined
+    incrementUntil: 0
   },
   download: {
     method: 'GET',
