@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
-    "rootDir": "./src",
-    "outDir": "./src/settings/config/runtime/",
+    "rootDir": "../../../../src",
+    "outDir": "./",
     "sourceMap": true,
     "noImplicitAny": true,
     "strictNullChecks": true,
@@ -12,7 +12,13 @@
     "allowJs": true,
     "esModuleInterop": true,
     "resolveJsonModule": true,
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "plugins": [
+      {
+        "transform": "typescript-is/lib/transform-inline/transformer"
+      }
+    ]
   },
-  "include": ["src/**/*.ts", "custom.d.ts"]
+  "include": ["src/**/*.ts", "custom.d.ts"],
+  "files": ["../assert.ts", "../../../../custom.d.ts"]
 }

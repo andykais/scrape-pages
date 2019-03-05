@@ -10,10 +10,10 @@
   ],
   "main": "index.js",
   "scripts": {
-    "build": "run-s clean compile",
+    "build": "run-s clean compile:runtime compile",
     "build:watch": "webpack --mode=development --watch",
     "compile": "webpack --mode=production",
-    "compile:runtime:config": "tsr --libDeclarations --tsConfig src/settings/config/runtime/tsconfig.runtime.json src/settings/config/assert.ts && replace-in-file './tsr-declarations' '../../tsr-declarations' src/settings/config/runtime/settings/config/*",
+    "compile:runtime:config": "ttsc --project src/settings/config/runtime/tsconfig.runtime.json",
     "compile:runtime:options": "ttsc --project src/settings/options/runtime/tsconfig.runtime.json",
     "compile:runtime:params": "ttsc --project src/settings/params/runtime/tsconfig.runtime.json",
     "compile:runtime": "run-s compile:runtime:config compile:runtime:options compile:runtime:params",
@@ -72,13 +72,10 @@
     "pre-push": "^0.1.1",
     "prettier": "^1.13.5",
     "raw-loader": "^0.5.1",
-    "replace-in-file": "^3.4.3",
     "rimraf": "^2.6.2",
-    "rxjs-marbles": "^4.3.5",
     "terser-webpack-plugin": "^1.0.0",
     "ttypescript": "^1.5.6",
     "typescript": "^3.3.3",
-    "typescript-is": "^0.9.3",
     "webpack": "^4.28.3",
     "webpack-cli": "^3.0.6",
     "webpack-node-externals": "^1.7.2"
@@ -92,7 +89,7 @@
     "rxjs": "^6.3.3",
     "sanitize-filename": "^1.6.1",
     "source-map-support": "^0.5.6",
-    "ts-runtime": "^0.2.0",
+    "typescript-is": "^0.10.1",
     "verror": "^1.10.0"
   }
 }

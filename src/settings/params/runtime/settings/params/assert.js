@@ -5,10 +5,50 @@ const error_1 = require("../../util/error");
 /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
 exports.assertParamsType = (paramsInit) => {
     try {
-        (object => { var error = (() => { var error = [() => typeof object === "object" && object !== null && !Array.isArray(object) ? null : "at $: expected object", () => { var errors = [() => !("input" in object) ? null : "at $: found 'input' in object", () => { var error = [() => typeof object["input"] === "object" && object["input"] !== null && !Array.isArray(object["input"]) ? null : "at $.input: expected object", () => Object.keys(object["input"]).reduce((prev, key) => prev || (() => typeof object["input"][key] === "string" ? null : "at $.input.[]: expected string")(), null)].reduce((prev, next) => prev || next(), null); return error && "at $.input; cause: " + error; }].reduce((prev, next) => { var error = next(); return prev && (error && [...prev, error]); }, []); return errors && "at $; all causes: (" + (errors.join("; ") + ")"); }, () => { var error = [() => "folder" in object ? null : "at $: expected 'folder' in object", () => typeof object["folder"] === "string" ? null : "at $.folder: expected string"].reduce((prev, next) => prev || next(), null); return error && "at $; cause: " + error; }, () => { var errors = [() => !("cleanFolder" in object) ? null : "at $: found 'cleanFolder' in object", () => typeof object["cleanFolder"] === "boolean" ? null : "at $.cleanFolder: expected boolean"].reduce((prev, next) => { var error = next(); return prev && (error && [...prev, error]); }, []); return errors && "at $; all causes: (" + (errors.join("; ") + ")"); }].reduce((prev, next) => prev || next(), null); return error && "at $; cause: " + error; })(); if (error === null)
-            return object;
+        (object => { var path = ["$"]; function _string(object) { if (typeof object !== "string")
+            return "validation failed at " + path.join(".") + ": expected a string";
         else
-            throw new Error(error); })(paramsInit);
+            return null; } function _299(object) { if (typeof object !== "object" || object === null || Array.isArray(object))
+            return "validation failed at " + path.join(".") + ": expected an object"; for (const key of Object.keys(object)) {
+            path.push(key);
+            var error = _string(object[key]);
+            path.pop();
+            if (error)
+                return error;
+        } return null; } function _boolean(object) { if (typeof object !== "boolean")
+            return "validation failed at " + path.join(".") + ": expected a boolean";
+        else
+            return null; } function _298(object) { if (typeof object !== "object" || object === null || Array.isArray(object))
+            return "validation failed at " + path.join(".") + ": expected an object"; {
+            if ("input" in object) {
+                path.push("input");
+                var error = _299(object["input"]);
+                path.pop();
+                if (error)
+                    return error;
+            }
+        } {
+            if ("folder" in object) {
+                path.push("folder");
+                var error = _string(object["folder"]);
+                path.pop();
+                if (error)
+                    return error;
+            }
+            else
+                return "validation failed at " + path.join(".") + ": expected 'folder' in object";
+        } {
+            if ("cleanFolder" in object) {
+                path.push("cleanFolder");
+                var error = _boolean(object["cleanFolder"]);
+                path.pop();
+                if (error)
+                    return error;
+            }
+        } return null; } var error = _298(object); if (error)
+            throw new Error(error);
+        else
+            return object; })(paramsInit);
     }
     catch (e) {
         throw new error_1.RuntimeTypeError(e.message);
