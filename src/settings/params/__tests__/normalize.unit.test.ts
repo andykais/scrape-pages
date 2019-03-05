@@ -62,7 +62,7 @@ describe('normalize params with', () => {
 
     it('should throw a type assertion error', () => {
       expect(() => normalizeParams(config, options, paramsInit))
-        .to.throw(`$; cause: at $; cause: at $: expected 'folder' in object`)
+        .to.throw(`$: expected 'folder' in object`)
         .with.property('name', 'RuntimeTypeError')
     })
   })

@@ -86,7 +86,7 @@ describe('normalize config with', () => {
 
   describe('poorly formed config', () => {
     const configInit: any = {}
-    it.only('should throw a type assertion error', () => {
+    it('should throw a type assertion error', () => {
       expect(() => normalizeConfig(configInit))
         .to.throw(`$: expected 'scrapers' in object`)
         .with.property('name', 'RuntimeTypeError')

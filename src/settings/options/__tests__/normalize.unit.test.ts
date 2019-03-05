@@ -35,9 +35,7 @@ describe('normalize options with', () => {
     const fullConfig = normalizeConfig(testingConfigs.EMPTY_CONFIG)
     it('should throw a type assertion error', () => {
       expect(() => normalizeOptions(fullConfig, optionsInit))
-        .to.throw(
-          `$; cause: at $; all causes: (at $: found 'maxConcurrent' in object; at $.maxConcurrent: expected number)`
-        )
+        .to.throw('$.maxConcurrent: expected a number')
         .with.property('name', 'RuntimeTypeError')
     })
   })

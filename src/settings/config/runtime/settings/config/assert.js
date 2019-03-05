@@ -18,7 +18,10 @@ exports.assertConfigType = (configInit) => {
             var error = condition(object);
             if (!error)
                 return null;
-        } return "validation failed at " + path.join(".") + ": there are no valid alternatives"; } function _305(object) { if (object !== "GET")
+        } return "validation failed at " + path.join(".") + ": there are no valid alternatives"; } function _undefined(object) { if (object !== undefined)
+            return "validation failed at " + path.join(".") + ": expected undefined";
+        else
+            return null; } function _305(object) { if (object !== "GET")
             return "validation failed at " + path.join(".") + ": expected string 'GET'";
         else
             return null; } function _307(object) { if (object !== "POST")
@@ -101,7 +104,7 @@ exports.assertConfigType = (configInit) => {
                 if (error)
                     return error;
             }
-        } return null; } function _304(object) { var conditions = [_string, _303]; for (const condition of conditions) {
+        } return null; } function _304(object) { var conditions = [_undefined, _string, _303]; for (const condition of conditions) {
             var error = condition(object);
             if (!error)
                 return null;
@@ -115,7 +118,10 @@ exports.assertConfigType = (configInit) => {
             var error = condition(object);
             if (!error)
                 return null;
-        } return "validation failed at " + path.join(".") + ": there are no valid alternatives"; } function _317(object) { if (typeof object !== "object" || object === null || Array.isArray(object))
+        } return "validation failed at " + path.join(".") + ": there are no valid alternatives"; } function _number(object) { if (typeof object !== "number")
+            return "validation failed at " + path.join(".") + ": expected a number";
+        else
+            return null; } function _317(object) { if (typeof object !== "object" || object === null || Array.isArray(object))
             return "validation failed at " + path.join(".") + ": expected an object"; {
             if ("expect" in object) {
                 path.push("expect");
@@ -143,6 +149,14 @@ exports.assertConfigType = (configInit) => {
                     return error;
             }
         } {
+            if ("limit" in object) {
+                path.push("limit");
+                var error = _number(object["limit"]);
+                path.pop();
+                if (error)
+                    return error;
+            }
+        } {
             if ("regexCleanup" in object) {
                 path.push("regexCleanup");
                 var error = _316(object["regexCleanup"]);
@@ -150,14 +164,11 @@ exports.assertConfigType = (configInit) => {
                 if (error)
                     return error;
             }
-        } return null; } function _318(object) { var conditions = [_string, _317]; for (const condition of conditions) {
+        } return null; } function _318(object) { var conditions = [_undefined, _string, _317]; for (const condition of conditions) {
             var error = condition(object);
             if (!error)
                 return null;
-        } return "validation failed at " + path.join(".") + ": there are no valid alternatives"; } function _number(object) { if (typeof object !== "number")
-            return "validation failed at " + path.join(".") + ": expected a number";
-        else
-            return null; } function _324(object) { if (object !== "failed-download")
+        } return "validation failed at " + path.join(".") + ": there are no valid alternatives"; } function _324(object) { if (object !== "failed-download")
             return "validation failed at " + path.join(".") + ": expected string 'failed-download'";
         else
             return null; } function _326(object) { if (object !== "empty-parse")
@@ -188,14 +199,6 @@ exports.assertConfigType = (configInit) => {
             if ("incrementUntil" in object) {
                 path.push("incrementUntil");
                 var error = _328(object["incrementUntil"]);
-                path.pop();
-                if (error)
-                    return error;
-            }
-        } {
-            if ("limitValuesTo" in object) {
-                path.push("limitValuesTo");
-                var error = _number(object["limitValuesTo"]);
                 path.pop();
                 if (error)
                     return error;
