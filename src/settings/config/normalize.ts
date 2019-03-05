@@ -48,36 +48,39 @@ const normalizeInputs = (inputsInit: ConfigInit['input']) => {
 }
 
 // TODO use type guards
-const normalizeDownload = (download: DownloadConfigInit): DownloadConfig =>
-  typeof download === 'string'
-    ? {
-        ...defaults.download,
-        urlTemplate: download
-      }
-    : {
-        ...defaults.download,
-        ...download,
-        method: download.method || defaults.download.method
-      }
+const normalizeDownload = (download: DownloadConfigInit): DownloadConfig | undefined =>
+  download === undefined
+    ? undefined
+    : typeof download === 'string'
+      ? {
+          ...defaults.download,
+          urlTemplate: download
+        }
+      : {
+          ...defaults.download,
+          ...download,
+          method: download.method || defaults.download.method
+        }
 
-const normalizeParse = (parse: ParseConfigInit): ParseConfig =>
-  typeof parse === 'string'
-    ? {
-        ...defaults.parse,
-        selector: parse
-      }
-    : {
-        ...defaults.parse,
-        ...parse,
-        expect: parse.expect || defaults.parse.expect
-      }
+const normalizeParse = (parse: ParseConfigInit): ParseConfig | undefined =>
+  parse === undefined
+    ? undefined
+    : typeof parse === 'string'
+      ? {
+          ...defaults.parse,
+          selector: parse
+        }
+      : {
+          ...defaults.parse,
+          ...parse,
+          expect: parse.expect || defaults.parse.expect
+        }
 
 const normalizeDefinition = (scrapeConfig: ScrapeConfigInit): ScrapeConfig => ({
   ...defaults.definition,
   ...scrapeConfig,
-  download:
-    scrapeConfig.download === undefined ? undefined : normalizeDownload(scrapeConfig.download),
-  parse: scrapeConfig.parse === undefined ? undefined : normalizeParse(scrapeConfig.parse)
+  download: normalizeDownload(scrapeConfig.download),
+  parse: normalizeParse(scrapeConfig.parse)
 })
 
 const normalizeScraperDefs = (scraperDefs: ConfigInit['scrapers']) => {
