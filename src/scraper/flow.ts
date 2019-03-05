@@ -19,7 +19,7 @@ const incrementUntilNumericIndex = (incrementUntil: number): DownloadParseBoolea
 ) => incrementUntil >= incrementIndex
 const incrementAlways = () => true
 
-const catchDownloadError = (e: Error, ...args: any) => {
+const catchDownloadError = (e: Error) => {
   if (e instanceof Fetch.FetchError || e instanceof ResponseError) return Rx.empty()
   else return Rx.throwError(e)
 }

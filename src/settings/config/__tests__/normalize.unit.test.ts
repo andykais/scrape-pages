@@ -12,6 +12,7 @@ describe('normalize config with', () => {
       scrapers: {
         index: {
           download: {
+            protocol: 'http',
             method: 'GET',
             urlTemplate: simpleConfig.scrapers.index.download as string,
             headerTemplates: {}
@@ -19,12 +20,13 @@ describe('normalize config with', () => {
           parse: {
             selector: (simpleConfig.scrapers.index.parse as any).selector,
             attribute: (simpleConfig.scrapers.index.parse as any).attribute,
-            expect: 'html'
+            format: 'html'
           },
           incrementUntil: 0
         },
         image: {
           download: {
+            protocol: 'http',
             method: 'GET',
             urlTemplate: simpleConfig.scrapers.image.download as any,
             headerTemplates: {}

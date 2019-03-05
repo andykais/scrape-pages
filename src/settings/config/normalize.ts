@@ -17,18 +17,19 @@ const reservedWords = ['value', 'index']
 
 const defaults: {
   definition: Pick<ScrapeConfig, 'incrementUntil'>
-  download: Pick<DownloadConfig, 'method' | 'headerTemplates'>
-  parse: Pick<ParseConfig, 'expect'>
+  download: Pick<DownloadConfig, 'method' | 'headerTemplates' | 'protocol'>
+  parse: Pick<ParseConfig, 'format'>
 } = {
   definition: {
     incrementUntil: 0
   },
   download: {
     method: 'GET',
+    protocol: 'http',
     headerTemplates: {}
   },
   parse: {
-    expect: 'html'
+    format: 'html'
   }
 }
 
@@ -59,6 +60,7 @@ const normalizeDownload = (download: DownloadConfigInit): DownloadConfig | undef
       : {
           ...defaults.download,
           ...download,
+          protocol: download.protocol || defaults.download.protocol,
           method: download.method || defaults.download.method
         }
 
@@ -73,7 +75,7 @@ const normalizeParse = (parse: ParseConfigInit): ParseConfig | undefined =>
       : {
           ...defaults.parse,
           ...parse,
-          expect: parse.expect || defaults.parse.expect
+          format: parse.format || defaults.parse.format
         }
 
 const normalizeDefinition = (scrapeConfig: ScrapeConfigInit): ScrapeConfig => ({

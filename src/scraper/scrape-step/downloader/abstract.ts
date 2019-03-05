@@ -21,13 +21,13 @@ interface RunValue extends RetrieveValue {
  * base abstract class which other downloaders derive from
  */
 export abstract class AbstractDownloader<DownloadData> {
+  public type: string
   protected scraperName: ScraperName
   protected downloadConfig: DownloadConfig | undefined
   protected config: ScrapeSettings['config']
   protected options: ScrapeSettings['options']
   protected params: ScrapeSettings['params']
   protected tools: Tools
-  public type: string
 
   public constructor(
     scraperName: ScraperName,

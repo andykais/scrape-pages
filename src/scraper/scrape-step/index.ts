@@ -45,87 +45,6 @@ class ScrapeStep {
     })
   }
 
-  private selectCachedValues = (completedDownloadId: number) => {
-    const parsedValuesWithId = this.tools.store.qs.selectParsedValues(completedDownloadId)
-    this.scraperLogger.info(
-      { parsedValuesWithId, completedDownloadId },
-      'loaded exact cached values'
-    )
-    this.tools.emitter.scraper(this.scraperName).emit.completed(completedDownloadId)
-    return parsedValuesWithId
-  }
-  private reInsertCachedValues = (
-    matchingDownload: { id: number; filename: string | undefined },
-    downloadParams: DownloadParams,
-    downloadData: any
-  ) => {
-    const parsedValuesWithId = this.tools.store.qs.selectParsedValues(matchingDownload.id)
-    const strippedParsedValues = parsedValuesWithId.reduce((acc: string[], p) => {
-      if (p.parsedValue !== undefined) acc.push(p.parsedValue)
-      return acc
-    }, [])
-    const downloadId: number = this.tools.store.transaction(() => {
-      const downloadId = this.tools.store.qs.insertQueuedDownload(
-        this.scraperName,
-        downloadParams,
-        downloadData
-      )
-      this.tools.store.qs.updateDownloadToComplete({
-        downloadId,
-        filename: matchingDownload.filename
-      })
-      this.tools.store.qs.insertBatchParsedValues({
-        name: this.scraperName,
-        parentId: downloadParams.parentId,
-        downloadId,
-        parsedValues: strippedParsedValues
-      })
-      return downloadId
-    })()
-    this.tools.emitter.scraper(this.scraperName).emit.completed(downloadId)
-    return this.tools.store.qs.selectParsedValues(downloadId)
-  }
-  private reDownloadParseValues = async (
-    matchingDownload: { id: number; filename: string | undefined },
-    downloadParams: DownloadParams,
-    downloadData: any
-  ) => {
-    const { id: downloadId } = matchingDownload
-    this.tools.store.qs.updateCompletedDownloadToQueued(matchingDownload.id)
-    const { downloadValue, filename } = await this.downloader.retrieve(
-      matchingDownload.id,
-      downloadData
-    )
-    this.tools.emitter.scraper(this.scraperName).emit.queued(downloadId)
-
-    const parsedValues = this.parser.run(downloadValue)
-    this.tools.store.transaction(() => {
-      this.tools.store.qs.updateDownloadToComplete({ downloadId, filename })
-      // TODO this is a problem: we need to delete the values so that re can re-insert them (otherwise we are
-      // just duplicating values if they already exist) BUT we cannot delete them fully or else we lose all
-      // the children from the download as well.
-      //
-      // Possible solutions:
-      // a. only insert parsed values that do not exist yet
-      // b. create a third table for scrapestep caches.
-      //  Never delete from this table, and delete down the tree for downloads & parsedTree
-      //  Sometimes we will replace parse values though
-      // c. remove the foreign key and find a way to query for scrapers top-down instead of bottom-up
-      //
-      // this.tools.store.qs.deleteParsedValuesOnDownloadId(downloadId)
-      this.tools.store.qs.insertBatchParsedValues({
-        name: this.scraperName,
-        parentId: downloadParams.parentId,
-        downloadId,
-        parsedValues
-      })
-    })()
-    this.tools.emitter.scraper(this.scraperName).emit.completed(downloadId)
-    const parsedValuesWithId = this.tools.store.qs.selectParsedValues(downloadId)
-    if (this.scraperName === 'gallery') console.log(parsedValuesWithId)
-    return this.parser.trim(parsedValuesWithId)
-  }
-
   public downloadParseValues = async (downloadParams: DownloadParams, downloadData: any) => {
     const downloadId = this.tools.store.qs.insertQueuedDownload(
       this.scraperName,
@@ -148,6 +67,41 @@ class ScrapeStep {
     this.tools.emitter.scraper(this.scraperName).emit.completed(downloadId)
     return this.tools.store.qs.selectParsedValues(downloadId)
   }
+
+  //public downloadParseFunctionSimple: DownloadParseFunction = async (
+  //  { parsedValue: value, id: parentId },
+  //  incrementIndex
+  //) => {
+  //  const downloadParams = {
+  //    incrementIndex,
+  //    parentId,
+  //    value
+  //  }
+  //  const downloadData = this.downloader.constructDownload(downloadParams)
+
+  //  if (this.cache) {
+  //    // I think all the cache logic can move into the download step.
+  //    //
+  //    // select matching [scraper, downloadData]
+  //    //    if cache matching [scraper, downloadData]
+  //    //      insert cache id into downloads table
+  //    //      parse value
+  //    //      insert parsed values
+  //    //    else
+  //    //      get download
+  //    //      insert into cache table
+  //    //      insert cache id into downloads table
+  //    //      parse value
+  //    //      insert parsed values
+  //    //  on cache:false
+  //  } else {
+  //    //    get download
+  //    //    insert or update cache table
+  //    //    insert cache id into downloads table
+  //    //    parse value
+  //    //    insert parsed values
+  //  }
+  //}
 
   public downloadParseFunction: DownloadParseFunction = async (
     { parsedValue: value, id: parentId },
@@ -178,10 +132,10 @@ class ScrapeStep {
 
     // if (!this.options.duplicates && matchingDownload) return []
     if (this.options.cache && completedDownloadId) {
-      if (this.scraperName === 'gallery') console.log('selectCachedValues')
+      // if (this.scraperName === 'gallery') console.log('selectCachedValues')
       return this.selectCachedValues(completedDownloadId)
     } else if (this.options.cache && matchingDownload) {
-      if (this.scraperName === 'gallery') console.log('reInsertCachedValues')
+      // if (this.scraperName === 'gallery') console.log('reInsertCachedValues')
       return this.reInsertCachedValues(matchingDownload, downloadParams, downloadData)
     } else if (
       !this.options.cache &&
@@ -189,10 +143,10 @@ class ScrapeStep {
       matchingDownload !== undefined &&
       completedDownloadId === matchingDownload.id
     ) {
-      if (this.scraperName === 'gallery') console.log('reDownloadParseValues')
+      // if (this.scraperName === 'gallery') console.log('reDownloadParseValues')
       return this.reDownloadParseValues(matchingDownload, downloadParams, downloadData)
     } else {
-      if (this.scraperName === 'gallery') console.log('downloadParseValues')
+      // if (this.scraperName === 'gallery') console.log('downloadParseValues')
       return this.downloadParseValues(downloadParams, downloadData)
     }
   }
@@ -304,6 +258,139 @@ class ScrapeStep {
   //    return parsedValuesWithId
   //  }
   //}
+  private selectCachedValues = (completedDownloadId: number) => {
+    const parsedValuesWithId = this.tools.store.qs.selectParsedValues(completedDownloadId)
+    this.scraperLogger.info(
+      { parsedValuesWithId, completedDownloadId },
+      'loaded exact cached values'
+    )
+    this.tools.emitter.scraper(this.scraperName).emit.completed(completedDownloadId)
+    return parsedValuesWithId
+  }
+  private reInsertCachedValues = (
+    matchingDownload: { id: number; filename: string | undefined },
+    downloadParams: DownloadParams,
+    downloadData: any
+  ) => {
+    const parsedValuesWithId = this.tools.store.qs.selectParsedValues(matchingDownload.id)
+    const strippedParsedValues = parsedValuesWithId.reduce((acc: string[], p) => {
+      if (p.parsedValue !== undefined) acc.push(p.parsedValue)
+      return acc
+    }, [])
+    const downloadId: number = this.tools.store.transaction(() => {
+      const downloadId = this.tools.store.qs.insertQueuedDownload(
+        this.scraperName,
+        downloadParams,
+        downloadData
+      )
+      this.tools.store.qs.updateDownloadToComplete({
+        downloadId,
+        filename: matchingDownload.filename
+      })
+      this.tools.store.qs.insertBatchParsedValues({
+        name: this.scraperName,
+        parentId: downloadParams.parentId,
+        downloadId,
+        parsedValues: strippedParsedValues
+      })
+      return downloadId
+    })()
+    this.tools.emitter.scraper(this.scraperName).emit.completed(downloadId)
+    return this.tools.store.qs.selectParsedValues(downloadId)
+  }
+  private reDownloadParseValues = async (
+    matchingDownload: { id: number; filename: string | undefined },
+    downloadParams: DownloadParams,
+    downloadData: any
+  ) => {
+    const { id: downloadId } = matchingDownload
+    this.tools.store.qs.updateCompletedDownloadToQueued(matchingDownload.id)
+    const { downloadValue, filename } = await this.downloader.retrieve(
+      matchingDownload.id,
+      downloadData
+    )
+    this.tools.emitter.scraper(this.scraperName).emit.queued(downloadId)
+
+    const parsedValues = this.parser.run(downloadValue)
+    this.tools.store.transaction(() => {
+      this.tools.store.qs.updateDownloadToComplete({ downloadId, filename })
+      // TODO this is a problem: we need to delete the values so that re can re-insert them (otherwise we are
+      // just duplicating values if they already exist) BUT we cannot delete them fully or else we lose all
+      // the children from the download as well.
+      //
+      // Possible solutions:
+      // a. only insert parsed values that do not exist yet
+      // b. create a third table for scrapestep caches.
+      //  Never delete from this table, and delete down the tree for downloads & parsedTree
+      //  Sometimes we will replace parse values though
+      // c. remove the foreign key and find a way to query for scrapers top-down instead of bottom-up
+      // d. store cached download values in separate table,
+      //  on startup: drop parsedTree,downloads & create (keeping cache table)
+      //  on cache:true:
+      //    if cache matching [scraper, downloadData]
+      //      insert cache id into downloads table
+      //      parse value
+      //      insert parsed values
+      //    else
+      //      get download
+      //      insert into cache table
+      //      insert cache id into downloads table
+      //      parse value
+      //      insert parsed values
+      //  on cache:false
+      //    get download
+      //    insert or update cache table
+      //    insert cache id into downloads table
+      //    parse value
+      //    insert parsed values
+      //
+      //  possible downsides: I am storing a ton more data in the database, I am re-parsing things. As an alternative, I could store
+      //  cache files outside of the database. This would allow us to do things like streaming.
+      //  We will see if this becomes necessary.
+      //
+      //  upside: there is less magic happening, this is very straightforward.
+      //
+      //  Alternative: denormalize the data and store rows of downloadData & parsed values in the cached table
+      //
+      //  on cache:true:
+      //    if cache matching [scraper, downloadData]
+      //      if completedDownload.cacheId == matching.id
+      //        get from parsedTree and be done
+      //      else
+      //        delete all children on tree & download
+      //        insert download & mark complete
+      //        insert cached parsed values
+      //    else
+      //      if completedDownload
+      //        select parsed values
+      //      else
+      //        get download value
+      //        insert into download,cache tables
+      //        parse value
+      //        insert new parsed values
+      //  on cache:false:
+      //    grab downloaded value,
+      //    replace cache table downloaded value (matching [scraper,downloadData], there will only ever be 1 per scraper)
+      //    mark download table entry complete,
+      //    parse value,
+      //    delete all children on tree & download,
+      //    insert new parsed values
+      // d. start storing the output of downloads in the db. Fatter database files and reads upon caching
+      //    but updating a download is a single entry, not however many are parsed.
+      //
+      // this.tools.store.qs.deleteParsedValuesOnDownloadId(downloadId)
+      this.tools.store.qs.insertBatchParsedValues({
+        name: this.scraperName,
+        parentId: downloadParams.parentId,
+        downloadId,
+        parsedValues
+      })
+    })()
+    this.tools.emitter.scraper(this.scraperName).emit.completed(downloadId)
+    const parsedValuesWithId = this.tools.store.qs.selectParsedValues(downloadId)
+    // if (this.scraperName === 'gallery') console.log(parsedValuesWithId)
+    return this.parser.trim(parsedValuesWithId)
+  }
 }
 
 export { ScrapeStep }

@@ -26,6 +26,14 @@ CREATE TABLE IF NOT EXISTS parsedTree (
   FOREIGN KEY(downloadId) REFERENCES downloads(id)
 );
 
+CREATE TABLE IF NOT EXISTS downloadCache (
+  id INTEGER PRIMARY KEY NOT NULL,
+  scraper TEXT NOT NULL,
+  protocol TEXT NOT NULL,
+  downloadData TEXT NOT NULL,
+  downloadValue TEXT NOT NULL
+);
+
 --  horizontalIndex INT, -- index used for consitent order when two parsers are next to each other (priority low and only under certain circumstances)
 CREATE UNIQUE INDEX IF NOT EXISTS downloadId ON downloads(id);
 CREATE UNIQUE INDEX IF NOT EXISTS indexes ON downloads(scraper, incrementIndex, parseParentId);
