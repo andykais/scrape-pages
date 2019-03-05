@@ -29,7 +29,7 @@ interface DownloadConfigInterface {
   headerTemplates?: { [headerName: string]: Template }
   regexCleanup?: RegexCleanup
 }
-export type DownloadConfigInit = Template | DownloadConfigInterface
+export type DownloadConfigInit = Template | DownloadConfigInterface | undefined
 export interface DownloadConfig extends DownloadConfigInterface {
   method: UrlMethods
   headerTemplates: { [headerName: string]: Template }
@@ -43,9 +43,10 @@ interface ParseConfigInterface {
   expect?: ExpectedFormats
   selector: Selector
   attribute?: string
+  limit?: number
   regexCleanup?: RegexCleanup
 }
-export type ParseConfigInit = Selector | ParseConfigInterface
+export type ParseConfigInit = Selector | ParseConfigInterface | undefined
 export interface ParseConfig extends ParseConfigInterface {
   expect: ExpectedFormats
 }
@@ -66,13 +67,11 @@ export interface ScrapeConfigInit {
   download?: DownloadConfigInit
   parse?: ParseConfigInit
   incrementUntil?: Incrementers
-  limitValuesTo?: number
 }
 export interface ScrapeConfig {
   download?: DownloadConfig
   parse?: ParseConfig
   incrementUntil: Incrementers
-  limitValuesTo: number | undefined
 }
 interface StructureInit {
   scraper: ScraperName

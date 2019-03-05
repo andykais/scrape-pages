@@ -1,6 +1,6 @@
 {
   "name": "scrape-pages",
-  "version": "3.1.2",
+  "version": "3.2.0",
   "description": "generalized scraping using a single config object for any site that can be scraped without a headless browser",
   "keywords": [
     "crawler",
@@ -10,10 +10,10 @@
   ],
   "main": "index.js",
   "scripts": {
-    "build": "run-s clean compile",
+    "build": "run-s clean compile:runtime compile",
     "build:watch": "webpack --mode=development --watch",
     "compile": "webpack --mode=production",
-    "compile:runtime:config": "tsr --libDeclarations --tsConfig src/settings/config/runtime/tsconfig.runtime.json src/settings/config/assert.ts && replace-in-file './tsr-declarations' '../../tsr-declarations' src/settings/config/runtime/settings/config/*",
+    "compile:runtime:config": "ttsc --project src/settings/config/runtime/tsconfig.runtime.json",
     "compile:runtime:options": "ttsc --project src/settings/options/runtime/tsconfig.runtime.json",
     "compile:runtime:params": "ttsc --project src/settings/params/runtime/tsconfig.runtime.json",
     "compile:runtime": "run-s compile:runtime:config compile:runtime:options compile:runtime:params",
@@ -23,10 +23,10 @@
     "format:check": "git ls-files '*.ts' '*.json' | xargs prettier --list-different",
     "typecheck": "tsc --noEmit --project tsconfig.json",
     "typecheck:watch": "npm run typecheck -- --watch",
-    "test": "run-s test:unit test:functional",
     "test:watch": "mocha-webpack --grep node_modules -i **/*.test.ts --watch",
     "test:unit": "mocha-webpack src/**/*.unit.test.ts",
-    "test:functional": "mocha-webpack testing/**/*functional.test.ts"
+    "test:functional": "mocha-webpack testing/**/*functional.test.ts",
+    "test": "run-s typecheck test:unit test:functional lint format:check"
   },
   "repository": {
     "type": "git",
@@ -38,10 +38,7 @@
     "node": "<=8.0"
   },
   "pre-push": [
-    "test:unit",
-    "test:functional",
-    "lint",
-    "format:check"
+    "test"
   ],
   "devDependencies": {
     "@babel/core": "^7.2.2",
@@ -75,9 +72,7 @@
     "pre-push": "^0.1.1",
     "prettier": "^1.13.5",
     "raw-loader": "^0.5.1",
-    "replace-in-file": "^3.4.3",
     "rimraf": "^2.6.2",
-    "rxjs-marbles": "^4.3.5",
     "terser-webpack-plugin": "^1.0.0",
     "ttypescript": "^1.5.6",
     "typescript": "^3.3.3333",
@@ -95,7 +90,7 @@
     "rxjs": "^6.3.3",
     "sanitize-filename": "^1.6.1",
     "source-map-support": "^0.5.6",
-    "ts-runtime": "^0.2.0",
+    "typescript-is": "^0.10.1",
     "verror": "^1.10.0"
   }
 }

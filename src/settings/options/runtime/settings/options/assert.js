@@ -5,10 +5,158 @@ const error_1 = require("../../util/error");
 /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
 exports.assertOptionsType = (optionsInit) => {
     try {
-        (object => { var error = (() => { var error = [() => typeof object === "object" && object !== null && !Array.isArray(object) ? null : "at $: expected object", () => { var errors = [() => !("maxConcurrent" in object) ? null : "at $: found 'maxConcurrent' in object", () => typeof object["maxConcurrent"] === "number" ? null : "at $.maxConcurrent: expected number"].reduce((prev, next) => { var error = next(); return prev && (error && [...prev, error]); }, []); return errors && "at $; all causes: (" + (errors.join("; ") + ")"); }, () => { var errors = [() => !("rateLimit" in object) ? null : "at $: found 'rateLimit' in object", () => { var error = [() => typeof object["rateLimit"] === "object" && object["rateLimit"] !== null && !Array.isArray(object["rateLimit"]) ? null : "at $.rateLimit: expected object", () => { var error = [() => "rate" in object["rateLimit"] ? null : "at $.rateLimit: expected 'rate' in object", () => typeof object["rateLimit"]["rate"] === "number" ? null : "at $.rateLimit.rate: expected number"].reduce((prev, next) => prev || next(), null); return error && "at $.rateLimit; cause: " + error; }, () => { var error = [() => "limit" in object["rateLimit"] ? null : "at $.rateLimit: expected 'limit' in object", () => typeof object["rateLimit"]["limit"] === "number" ? null : "at $.rateLimit.limit: expected number"].reduce((prev, next) => prev || next(), null); return error && "at $.rateLimit; cause: " + error; }].reduce((prev, next) => prev || next(), null); return error && "at $.rateLimit; cause: " + error; }].reduce((prev, next) => { var error = next(); return prev && (error && [...prev, error]); }, []); return errors && "at $; all causes: (" + (errors.join("; ") + ")"); }, () => { var errors = [() => !("optionsEach" in object) ? null : "at $: found 'optionsEach' in object", () => { var error = [() => typeof object["optionsEach"] === "object" && object["optionsEach"] !== null && !Array.isArray(object["optionsEach"]) ? null : "at $.optionsEach: expected object", () => Object.keys(object["optionsEach"]).reduce((prev, key) => prev || (() => { var error = [() => typeof object["optionsEach"][key] === "object" && object["optionsEach"][key] !== null && !Array.isArray(object["optionsEach"][key]) ? null : "at $.optionsEach.[]: expected object", () => { var errors = [() => !("downloadPriority" in object["optionsEach"][key]) ? null : "at $.optionsEach.[]: found 'downloadPriority' in object", () => typeof object["optionsEach"][key]["downloadPriority"] === "number" ? null : "at $.optionsEach.[].downloadPriority: expected number"].reduce((prev, next) => { var error = next(); return prev && (error && [...prev, error]); }, []); return errors && "at $.optionsEach.[]; all causes: (" + (errors.join("; ") + ")"); }, () => { var errors = [() => !("logLevel" in object["optionsEach"][key]) ? null : "at $.optionsEach.[]: found 'logLevel' in object", () => { var errors = [() => object["optionsEach"][key]["logLevel"] === "debug" ? null : "at $.optionsEach.[].logLevel: expected string 'debug'", () => object["optionsEach"][key]["logLevel"] === "info" ? null : "at $.optionsEach.[].logLevel: expected string 'info'", () => object["optionsEach"][key]["logLevel"] === "warn" ? null : "at $.optionsEach.[].logLevel: expected string 'warn'", () => object["optionsEach"][key]["logLevel"] === "error" ? null : "at $.optionsEach.[].logLevel: expected string 'error'"].reduce((prev, next) => { var error = next(); return prev && (error && [...prev, error]); }, []); return errors && "at $.optionsEach.[].logLevel; all causes: (" + (errors.join("; ") + ")"); }].reduce((prev, next) => { var error = next(); return prev && (error && [...prev, error]); }, []); return errors && "at $.optionsEach.[]; all causes: (" + (errors.join("; ") + ")"); }, () => { var errors = [() => !("cache" in object["optionsEach"][key]) ? null : "at $.optionsEach.[]: found 'cache' in object", () => typeof object["optionsEach"][key]["cache"] === "boolean" ? null : "at $.optionsEach.[].cache: expected boolean"].reduce((prev, next) => { var error = next(); return prev && (error && [...prev, error]); }, []); return errors && "at $.optionsEach.[]; all causes: (" + (errors.join("; ") + ")"); }, () => { var errors = [() => !("read" in object["optionsEach"][key]) ? null : "at $.optionsEach.[]: found 'read' in object", () => typeof object["optionsEach"][key]["read"] === "boolean" ? null : "at $.optionsEach.[].read: expected boolean"].reduce((prev, next) => { var error = next(); return prev && (error && [...prev, error]); }, []); return errors && "at $.optionsEach.[]; all causes: (" + (errors.join("; ") + ")"); }, () => { var errors = [() => !("write" in object["optionsEach"][key]) ? null : "at $.optionsEach.[]: found 'write' in object", () => typeof object["optionsEach"][key]["write"] === "boolean" ? null : "at $.optionsEach.[].write: expected boolean"].reduce((prev, next) => { var error = next(); return prev && (error && [...prev, error]); }, []); return errors && "at $.optionsEach.[]; all causes: (" + (errors.join("; ") + ")"); }].reduce((prev, next) => prev || next(), null); return error && "at $.optionsEach.[]; cause: " + error; })(), null)].reduce((prev, next) => prev || next(), null); return error && "at $.optionsEach; cause: " + error; }].reduce((prev, next) => { var error = next(); return prev && (error && [...prev, error]); }, []); return errors && "at $; all causes: (" + (errors.join("; ") + ")"); }, () => { var errors = [() => !("logLevel" in object) ? null : "at $: found 'logLevel' in object", () => { var errors = [() => object["logLevel"] === "debug" ? null : "at $.logLevel: expected string 'debug'", () => object["logLevel"] === "info" ? null : "at $.logLevel: expected string 'info'", () => object["logLevel"] === "warn" ? null : "at $.logLevel: expected string 'warn'", () => object["logLevel"] === "error" ? null : "at $.logLevel: expected string 'error'"].reduce((prev, next) => { var error = next(); return prev && (error && [...prev, error]); }, []); return errors && "at $.logLevel; all causes: (" + (errors.join("; ") + ")"); }].reduce((prev, next) => { var error = next(); return prev && (error && [...prev, error]); }, []); return errors && "at $; all causes: (" + (errors.join("; ") + ")"); }, () => { var errors = [() => !("cache" in object) ? null : "at $: found 'cache' in object", () => typeof object["cache"] === "boolean" ? null : "at $.cache: expected boolean"].reduce((prev, next) => { var error = next(); return prev && (error && [...prev, error]); }, []); return errors && "at $; all causes: (" + (errors.join("; ") + ")"); }, () => { var errors = [() => !("read" in object) ? null : "at $: found 'read' in object", () => typeof object["read"] === "boolean" ? null : "at $.read: expected boolean"].reduce((prev, next) => { var error = next(); return prev && (error && [...prev, error]); }, []); return errors && "at $; all causes: (" + (errors.join("; ") + ")"); }, () => { var errors = [() => !("write" in object) ? null : "at $: found 'write' in object", () => typeof object["write"] === "boolean" ? null : "at $.write: expected boolean"].reduce((prev, next) => { var error = next(); return prev && (error && [...prev, error]); }, []); return errors && "at $; all causes: (" + (errors.join("; ") + ")"); }].reduce((prev, next) => prev || next(), null); return error && "at $; cause: " + error; })(); if (error === null)
-            return object;
+        (object => { var path = ["$"]; function _number(object) { if (typeof object !== "number")
+            return "validation failed at " + path.join(".") + ": expected a number";
         else
-            throw new Error(error); })(optionsInit);
+            return null; } function _300(object) { if (typeof object !== "object" || object === null || Array.isArray(object))
+            return "validation failed at " + path.join(".") + ": expected an object"; {
+            if ("rate" in object) {
+                path.push("rate");
+                var error = _number(object["rate"]);
+                path.pop();
+                if (error)
+                    return error;
+            }
+            else
+                return "validation failed at " + path.join(".") + ": expected 'rate' in object";
+        } {
+            if ("limit" in object) {
+                path.push("limit");
+                var error = _number(object["limit"]);
+                path.pop();
+                if (error)
+                    return error;
+            }
+            else
+                return "validation failed at " + path.join(".") + ": expected 'limit' in object";
+        } return null; } function _303(object) { if (object !== "debug")
+            return "validation failed at " + path.join(".") + ": expected string 'debug'";
+        else
+            return null; } function _305(object) { if (object !== "info")
+            return "validation failed at " + path.join(".") + ": expected string 'info'";
+        else
+            return null; } function _307(object) { if (object !== "warn")
+            return "validation failed at " + path.join(".") + ": expected string 'warn'";
+        else
+            return null; } function _309(object) { if (object !== "error")
+            return "validation failed at " + path.join(".") + ": expected string 'error'";
+        else
+            return null; } function _311(object) { var conditions = [_303, _305, _307, _309]; for (const condition of conditions) {
+            var error = condition(object);
+            if (!error)
+                return null;
+        } return "validation failed at " + path.join(".") + ": there are no valid alternatives"; } function _boolean(object) { if (typeof object !== "boolean")
+            return "validation failed at " + path.join(".") + ": expected a boolean";
+        else
+            return null; } function _302(object) { if (typeof object !== "object" || object === null || Array.isArray(object))
+            return "validation failed at " + path.join(".") + ": expected an object"; {
+            if ("downloadPriority" in object) {
+                path.push("downloadPriority");
+                var error = _number(object["downloadPriority"]);
+                path.pop();
+                if (error)
+                    return error;
+            }
+        } {
+            if ("logLevel" in object) {
+                path.push("logLevel");
+                var error = _311(object["logLevel"]);
+                path.pop();
+                if (error)
+                    return error;
+            }
+        } {
+            if ("cache" in object) {
+                path.push("cache");
+                var error = _boolean(object["cache"]);
+                path.pop();
+                if (error)
+                    return error;
+            }
+        } {
+            if ("read" in object) {
+                path.push("read");
+                var error = _boolean(object["read"]);
+                path.pop();
+                if (error)
+                    return error;
+            }
+        } {
+            if ("write" in object) {
+                path.push("write");
+                var error = _boolean(object["write"]);
+                path.pop();
+                if (error)
+                    return error;
+            }
+        } return null; } function _301(object) { if (typeof object !== "object" || object === null || Array.isArray(object))
+            return "validation failed at " + path.join(".") + ": expected an object"; for (const key of Object.keys(object)) {
+            path.push(key);
+            var error = _302(object[key]);
+            path.pop();
+            if (error)
+                return error;
+        } return null; } function _298(object) { if (typeof object !== "object" || object === null || Array.isArray(object))
+            return "validation failed at " + path.join(".") + ": expected an object"; {
+            if ("maxConcurrent" in object) {
+                path.push("maxConcurrent");
+                var error = _number(object["maxConcurrent"]);
+                path.pop();
+                if (error)
+                    return error;
+            }
+        } {
+            if ("rateLimit" in object) {
+                path.push("rateLimit");
+                var error = _300(object["rateLimit"]);
+                path.pop();
+                if (error)
+                    return error;
+            }
+        } {
+            if ("optionsEach" in object) {
+                path.push("optionsEach");
+                var error = _301(object["optionsEach"]);
+                path.pop();
+                if (error)
+                    return error;
+            }
+        } {
+            if ("logLevel" in object) {
+                path.push("logLevel");
+                var error = _311(object["logLevel"]);
+                path.pop();
+                if (error)
+                    return error;
+            }
+        } {
+            if ("cache" in object) {
+                path.push("cache");
+                var error = _boolean(object["cache"]);
+                path.pop();
+                if (error)
+                    return error;
+            }
+        } {
+            if ("read" in object) {
+                path.push("read");
+                var error = _boolean(object["read"]);
+                path.pop();
+                if (error)
+                    return error;
+            }
+        } {
+            if ("write" in object) {
+                path.push("write");
+                var error = _boolean(object["write"]);
+                path.pop();
+                if (error)
+                    return error;
+            }
+        } return null; } var error = _298(object); if (error)
+            throw new Error(error);
+        else
+            return object; })(optionsInit);
     }
     catch (e) {
         throw new error_1.RuntimeTypeError(e.message);

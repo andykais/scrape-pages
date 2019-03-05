@@ -121,9 +121,9 @@ class ScrapeStep {
       })
     })()
     this.tools.emitter.scraper(this.scraperName).emit.completed(downloadId)
-    const p = this.tools.store.qs.selectParsedValues(downloadId)
-    if (this.scraperName === 'gallery') console.log(p)
-    return p
+    const parsedValuesWithId = this.tools.store.qs.selectParsedValues(downloadId)
+    if (this.scraperName === 'gallery') console.log(parsedValuesWithId)
+    return this.parser.trim(parsedValuesWithId)
   }
 
   public downloadParseValues = async (downloadParams: DownloadParams, downloadData: any) => {

@@ -21,8 +21,7 @@ describe('normalize config with', () => {
             attribute: (simpleConfig.scrapers.index.parse as any).attribute,
             expect: 'html'
           },
-          incrementUntil: 0,
-          limitValuesTo: undefined
+          incrementUntil: 0
         },
         image: {
           download: {
@@ -31,8 +30,7 @@ describe('normalize config with', () => {
             headerTemplates: {}
           },
           parse: undefined,
-          incrementUntil: 0,
-          limitValuesTo: undefined
+          incrementUntil: 0
         }
       },
       run: {
@@ -90,7 +88,7 @@ describe('normalize config with', () => {
     const configInit: any = {}
     it('should throw a type assertion error', () => {
       expect(() => normalizeConfig(configInit))
-        .to.throw(TypeError)
+        .to.throw(`$: expected 'scrapers' in object`)
         .with.property('name', 'RuntimeTypeError')
     })
   })

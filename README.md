@@ -29,26 +29,26 @@ const config = {
       parse: {
         selector: 'body > b > a',
         attribute: 'href'
+        limit: 10
       },
-      limitValuesTo: 10
     },
     post: {
-      download: 'https://apod.nasa.gov/apod/{value}',
+      download: 'https://apod.nasa.gov/apod/{{ value }}',
       parse: {
-        selector: 'a[href^="image"]',
-        attribute: 'href'
+        selector: 'img[src^="image"]',
+        attribute: 'src'
       }
     },
     image: {
-      download: 'https://apod.nasa.gov/apod/{value}'
+      download: 'https://apod.nasa.gov/apod/{{ value }}'
     }
   },
   // describe how they work together
   run: {
     scraper: 'index',
-    scrapeEach: {
+    forEach: {
       scraper: 'post',
-      scrapeEach: {
+      forEach: {
         scraper: 'image'
       }
     }
@@ -128,7 +128,6 @@ While the scraper is working, you can affect its behavior by emitting these even
 | ------------------ | --------- | --------------------------------------------------------------------- |
 | `'useRateLimiter'` | boolean   | turn on or off the rate limit defined in the run options              |
 | `'stop'`           |           | stop the crawler (note that in progress requests will still complete) |
-
 
 #### query
 
