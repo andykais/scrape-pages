@@ -3,20 +3,21 @@ import { CreateQuery } from '../../types'
 
 type Statement = (
   params: {
-    name: string
+    scraper: string
     parentId?: number
     downloadId: number
-    parsedValues: (string | undefined)[]
+    parsedValues: string[]
+    format: string
     // parsedValues: string[] | [string | undefined]
   }
 ) => void
 export const query: CreateQuery<Statement> = (flatConfig, database) => {
   const statement = database.prepare(SQL_TEMPLATE)
 
-  return database.transaction((({ name, parentId, downloadId, parsedValues }) => {
+  return database.transaction((({ scraper, parentId, downloadId, parsedValues, format }) => {
     for (let parseIndex = 0; parseIndex < parsedValues.length; parseIndex++) {
       const parsedValue = parsedValues[parseIndex]
-      statement.run(name, parentId, downloadId, parseIndex, parsedValue)
+      statement.run(scraper, parentId, downloadId, parseIndex, parsedValue, format)
     }
   }) as Statement)
 }

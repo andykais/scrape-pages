@@ -6,6 +6,8 @@ import { ScraperName, ParseConfig } from '../../../../settings/config/types'
 import { Tools } from '../../../../tools'
 
 export class Parser extends AbstractParser {
+  public type = 'html' as 'html'
+
   protected parseConfig: ParseConfig
   private parser: (value: string) => string[]
   private cheerioFlags: {}

@@ -3,5 +3,6 @@ INSERT INTO parsedTree (
   parentId,
   downloadId,
   parseIndex,
-  parsedValue
-) VALUES (?,?,?,?,?)
+  parsedValue,
+  format
+) VALUES (?,?,?,?,?,?)

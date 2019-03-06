@@ -56,7 +56,6 @@ const structureScrapers = (settings: Settings, scrapers: FMap<ScraperName, Scrap
 
   return (parentValues: ParsedValue[]): Rx.Observable<ParsedValue[]> =>
     Rx.from(parentValues).pipe(
-      ops.catchError(wrapError(`scraper '${scraper.scraperName}'`)),
       ops.flatMap(parsedValueWithId =>
         RxCustom.whileLoop(scraper.downloadParseFunction, okToIncrement, parsedValueWithId).pipe(
           ops.catchError(ignoreFetchError),
@@ -79,6 +78,7 @@ const structureScrapers = (settings: Settings, scrapers: FMap<ScraperName, Scrap
           ops.map(([parsedValues]) => parsedValues)
         )
       ),
+      ops.catchError(wrapError(`scraper '${scraper.scraperName}'`)),
       each.length
         ? ops.flatMap(scraperValues => each.map(child => child(scraperValues)))
         : ops.map(scraperValues => [scraperValues]),

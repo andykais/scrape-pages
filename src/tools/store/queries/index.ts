@@ -13,15 +13,23 @@ import { query as updateCompletedDownloadToQueued } from './update-completed-dow
 import { query as insertBatchParsedValues } from './insert-batch-parsed-values'
 import { query as selectParsedValues } from './select-parsed-values'
 import { query as deleteParsedValuesOnDownloadId } from './delete-parsed-values-on-download-id'
+import { query as insertDownloadCache } from './insert-download-cache'
+import { query as insertDownloadRecord } from './insert-download-record'
+import { query as selectMatchingCachedDownload } from './select-matching-cached-download'
+import { query as updateMarkDownloadComplete } from './update-mark-download-complete'
 
 export const createStatements = (flatConfig: FlatConfig, database: Database) => ({
-  selectOrderedScrapers: selectOrderedScrapers(flatConfig, database),
-  selectCompletedDownloadId: selectCompletedDownloadId(flatConfig, database),
-  selectMatchingDownloadId: selectMatchingDownloadId(flatConfig, database),
   insertQueuedDownload: insertQueuedDownload(flatConfig, database),
-  updateDownloadToComplete: updateDownloadToComplete(flatConfig, database),
-  updateCompletedDownloadToQueued: updateCompletedDownloadToQueued(flatConfig, database),
+  selectMatchingCachedDownload: selectMatchingCachedDownload(flatConfig, database),
+  insertDownloadCache: insertDownloadCache(flatConfig, database),
+  updateMarkDownloadComplete: updateMarkDownloadComplete(flatConfig, database),
+  // insertDownloadRecord: insertDownloadRecord(flatConfig, database),
+  // selectOrderedScrapers: selectOrderedScrapers(flatConfig, database),
+  // selectCompletedDownloadId: selectCompletedDownloadId(flatConfig, database),
+  // selectMatchingDownloadId: selectMatchingDownloadId(flatConfig, database),
+  // updateDownloadToComplete: updateDownloadToComplete(flatConfig, database),
+  // updateCompletedDownloadToQueued: updateCompletedDownloadToQueued(flatConfig, database),
   insertBatchParsedValues: insertBatchParsedValues(flatConfig, database),
   selectParsedValues: selectParsedValues(flatConfig, database),
-  deleteParsedValuesOnDownloadId: deleteParsedValuesOnDownloadId(flatConfig, database)
+  // deleteParsedValuesOnDownloadId: deleteParsedValuesOnDownloadId(flatConfig, database),
 })

@@ -45,12 +45,7 @@ module.exports = (env, { mode = 'development' } = {}) => ({
     ]
   },
   plugins: [
-    new CopyWebpackPlugin([
-      'package.json',
-      'package-lock.json',
-      'LICENSE',
-      'README.md'
-    ]),
+    new CopyWebpackPlugin(['package.json', 'package-lock.json', 'LICENSE', 'README.md']),
     new ClearTerminalInWatchMode()
   ],
   optimization: {

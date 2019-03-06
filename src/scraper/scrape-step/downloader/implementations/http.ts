@@ -19,7 +19,7 @@ type FetchFunction = (
   downloadId: number,
   DownloadData: DownloadData
 ) => Promise<{
-  downloadValue?: string
+  downloadValue: string
   filename?: string
 }>
 
@@ -27,7 +27,7 @@ type FetchFunction = (
  * downloader pertaining to all http/https requests
  */
 export class Downloader extends AbstractDownloader<DownloadData> {
-  public type = 'http'
+  public type = 'http' as 'http'
   protected downloadConfig: DownloadConfig
   private urlTemplate: ReturnType<typeof compileTemplate>
   private headerTemplates: FMap<string, ReturnType<typeof compileTemplate>>
@@ -117,7 +117,7 @@ export class Downloader extends AbstractDownloader<DownloadData> {
       dest.on('close', resolve)
     })
     return {
-      downloadValue: undefined,
+      downloadValue: '',
       filename
     }
   }
@@ -135,5 +135,5 @@ export class Downloader extends AbstractDownloader<DownloadData> {
   private downloadOnly: FetchFunction = (downlodaId, [url, fetchOptions]) =>
     this.tools.queue
       .add(() => fetch(url, fetchOptions), this.options.downloadPriority)
-      .then(() => ({ downloadValue: undefined }))
+      .then(() => ({ downloadValue: '' }))
 }

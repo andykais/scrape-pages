@@ -5,7 +5,7 @@
     {
       "id": 1,
       "scraper": "image",
-      "parsedValue": null,
+      "parsedValue": "",
       "downloadData": "[\"http://scrape-next-site.com/image/the.jpg\",{\"headers\":{},\"method\":\"GET\"}]",
       "filename": "/var/folders/0y/48hl3shx5tjg4kl_2kdjjzzr0000gn/T/scrape next site with instant scraper/image/10/http___scrape-next-site.com_image_the.jpg"
     }
@@ -16,7 +16,7 @@
     {
       "id": 1,
       "scraper": "image",
-      "parsedValue": null,
+      "parsedValue": "",
       "downloadData": "[\"http://scrape-next-site.com/image/quick.jpg\",{\"headers\":{},\"method\":\"GET\"}]",
       "filename": "/var/folders/0y/48hl3shx5tjg4kl_2kdjjzzr0000gn/T/scrape next site with instant scraper/image/13/http___scrape-next-site.com_image_quick.jpg"
     }
@@ -27,7 +27,7 @@
     {
       "id": 5,
       "scraper": "image",
-      "parsedValue": null,
+      "parsedValue": "",
       "downloadData": "[\"http://scrape-next-site.com/image/brown.jpg\",{\"headers\":{},\"method\":\"GET\"}]",
       "filename": "/var/folders/0y/48hl3shx5tjg4kl_2kdjjzzr0000gn/T/scrape next site with instant scraper/image/20/http___scrape-next-site.com_image_brown.jpg"
     }
@@ -39,7 +39,7 @@
     {
       "id": 5,
       "scraper": "image",
-      "parsedValue": null,
+      "parsedValue": "",
       "downloadData": "[\"http://scrape-next-site.com/image/fox.jpg\",{\"headers\":{},\"method\":\"GET\"}]",
       "filename": "/var/folders/0y/48hl3shx5tjg4kl_2kdjjzzr0000gn/T/scrape next site with instant scraper/image/23/http___scrape-next-site.com_image_fox.jpg"
     }

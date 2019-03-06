@@ -4,24 +4,26 @@ import { ScraperName, DownloadConfig } from '../../../settings/config/types'
 import { Tools } from '../../../tools'
 import { Downloader as IdentityDownloader } from './implementations/identity'
 
+type ParseTreeId = number
 type DownloadId = number
 export type DownloadParams = {
-  parentId?: DownloadId
+  parentId?: ParseTreeId
+  downloadId: DownloadId
   incrementIndex: number
-  value?: string
+  value: string
 }
 interface RetrieveValue {
-  downloadValue?: string
+  cacheId?: number
+  downloadValue: string
   filename?: string
+  mimeType?: string
 }
-interface RunValue extends RetrieveValue {
-  downloadId: DownloadId
-}
+interface RunValue extends Exclude<RetrieveValue, 'mimeType'> {}
 /**
  * base abstract class which other downloaders derive from
  */
 export abstract class AbstractDownloader<DownloadData> {
-  public type: string
+  public type: DownloadConfig['protocol'] | 'identity'
   protected scraperName: ScraperName
   protected downloadConfig: DownloadConfig | undefined
   protected config: ScrapeSettings['config']
@@ -38,18 +40,38 @@ export abstract class AbstractDownloader<DownloadData> {
     Object.assign(this, { scraperName, downloadConfig, ...settings, tools })
   }
   public run = async (downloadParams: DownloadParams): Promise<RunValue> => {
+    const { store, emitter } = this.tools
+
     const downloadData = this.constructDownload(downloadParams)
-    const downloadId = this.tools.store.qs.insertQueuedDownload(
-      this.scraperName,
-      downloadParams,
-      // identity downloader is a special case. It does nothing, and the value being passed through is already stored somewhere else.
-      this instanceof IdentityDownloader ? undefined : downloadData
+
+    if (this.options.cache) {
+      const cachedDownload = store.qs.selectMatchingCachedDownload(this.scraperName, downloadData)
+      if (cachedDownload) {
+        return cachedDownload
+      }
+    }
+    emitter.scraper(this.scraperName).emit.queued(downloadParams.downloadId)
+
+    const { downloadValue, filename, mimeType } = await this.retrieve(
+      downloadParams.downloadId,
+      downloadData
     )
-    this.tools.emitter.scraper(this.scraperName).emit.queued(downloadId)
-    const { downloadValue, filename } = await this.retrieve(downloadId, downloadData)
+
+    // ignore this step for identity downloader
+    const cacheId = this.downloadConfig
+      ? store.qs.insertDownloadCache({
+          scraper: this.scraperName,
+          downloadData,
+          protocol: this.type,
+          downloadValue: downloadValue!,
+          filename,
+          mimeType,
+          failed: false
+        })
+      : undefined
 
     return {
-      downloadId,
+      cacheId,
       downloadValue,
       filename
     }

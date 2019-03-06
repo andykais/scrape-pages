@@ -1,12 +1,10 @@
 import SQL_TEMPLATE from './template.sql'
 import { CreateQuery } from '../../types'
 
-export type SelectedRow = {
-  id: number
-  parsedValue: string
-}
-type Statement = (downloadId: number) => SelectedRow[]
+type Statement = (params: { cacheId: Voidable<number>; downloadId: number }) => void
 export const query: CreateQuery<Statement> = (flatConfig, database) => {
   const statement = database.prepare(SQL_TEMPLATE)
-  return downloadId => statement.all(downloadId)
+  return ({ cacheId, downloadId }) => {
+    statement.run(cacheId, downloadId)
+  }
 }
