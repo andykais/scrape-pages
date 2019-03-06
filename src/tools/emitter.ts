@@ -24,8 +24,9 @@ class ScraperEmitter {
         let bytesLength = 0
         response.body.on('data', chunk => {
           bytesLength += chunk.length
+          // emitting Infinity signals that content-length was zero
           const progress = bytesLength / contentLength
-          this.emitter.emit(emitKey, progress, id)
+          this.emitter.emit(emitKey, id, progress)
         })
       }
     },

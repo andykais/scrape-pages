@@ -45,9 +45,7 @@ export abstract class AbstractDownloader<DownloadData> {
 
     if (this.options.cache) {
       const cachedDownload = store.qs.selectMatchingCachedDownload(this.scraperName, downloadData)
-      if (cachedDownload) {
-        return cachedDownload
-      }
+      if (cachedDownload) return cachedDownload
     }
     emitter.scraper(this.scraperName).emit.queued(downloadParams.downloadId)
 

@@ -13,14 +13,14 @@ describe('normalize options with', () => {
       const options = normalizeOptions(fullConfig, optionsInit)
       const optionsExpected: FlatOptions = FMap.fromObject({
         index: {
-          cache: true,
+          cache: false,
           read: true,
           write: false,
           logLevel: 'error' as 'error',
           downloadPriority: 0
         },
         image: {
-          cache: true,
+          cache: false,
           read: true,
           write: false,
           logLevel: 'error' as 'error',

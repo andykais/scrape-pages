@@ -64,6 +64,8 @@ const startScraping = async (settings: Settings) => {
   }
 }
 
+export type Start = () => ReturnType<typeof startScraping>
+export type Query = ReturnType<typeof Store.getQuerier>
 /**
  * scrape is the entrypoint for this library
  *
