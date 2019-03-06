@@ -7,7 +7,6 @@ import { Tools } from '../../tools'
 import { SelectedRow as ParsedValueWithId } from '../../tools/store/queries/select-parsed-values'
 import { DownloaderClass } from './downloader'
 import { ParserClass } from './parser'
-import { DownloadParams } from './downloader/abstract'
 
 type InputValue = {
   parsedValue: string
@@ -56,7 +55,7 @@ class ScrapeStep {
       parentId,
       incrementIndex
     })
-    const { downloadValue, filename, cacheId } = await this.downloader.run({
+    const { downloadValue, cacheId } = await this.downloader.run({
       parentId,
       incrementIndex,
       downloadId,

@@ -2,7 +2,6 @@
 import { ScrapeSettings } from '../../../settings'
 import { ScraperName, DownloadConfig } from '../../../settings/config/types'
 import { Tools } from '../../../tools'
-import { Downloader as IdentityDownloader } from './implementations/identity'
 
 type ParseTreeId = number
 type DownloadId = number
