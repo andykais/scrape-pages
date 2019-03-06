@@ -2,7 +2,7 @@ import { FMap } from '../../../util/map'
 import { normalizeConfig } from '../../config'
 import { normalizeOptions } from '../'
 import * as testingConfigs from '../../../../testing/resources/testing-configs'
-import { OptionsInit, FlatOptions } from '../types'
+import { OptionsInit, ScrapeOptions, FlatOptions } from '../types'
 import { expect } from 'chai'
 
 describe('normalize options with', () => {
@@ -11,18 +11,14 @@ describe('normalize options with', () => {
     it('should match returned options', () => {
       const optionsInit: OptionsInit = {}
       const options = normalizeOptions(fullConfig, optionsInit)
-      const optionsExpected: FlatOptions = FMap.fromObject({
+      const optionsExpected: FlatOptions = FMap.fromObject<ScrapeOptions>({
         index: {
           cache: false,
-          read: true,
-          write: false,
           logLevel: 'error' as 'error',
           downloadPriority: 0
         },
         image: {
           cache: false,
-          read: true,
-          write: false,
           logLevel: 'error' as 'error',
           downloadPriority: 0
         }

@@ -10,8 +10,6 @@ export type Input = { [inputName: string]: string }
 interface OptionsAnyInit {
   logLevel?: LogLevel
   cache?: boolean // should re-download or use db entry
-  read?: boolean // should download be read into memory
-  write?: boolean // should download be saved to a file (separate from a database entry)
 }
 
 interface ScrapeOptionsInit extends OptionsAnyInit {

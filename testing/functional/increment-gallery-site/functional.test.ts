@@ -14,14 +14,7 @@ import { scrape } from '../../../src'
 const resourceFolder = `${__dirname}/resources/mock-endpoints`
 const resourceUrl = 'http://increment-gallery-site.com'
 
-const options = {
-  optionsEach: {
-    image: {
-      read: false,
-      write: true
-    }
-  }
-}
+const options = {}
 const params = {
   folder: path.resolve(os.tmpdir(), 'scrape-pages--increment-gallery-site'),
   cleanFolder: true

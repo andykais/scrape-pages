@@ -14,8 +14,6 @@ const normalizeOptions = (config: Config, optionsInit: OptionsInit): FlatOptions
     downloadPriority: 0,
     logLevel: 'error',
     cache: false,
-    read: true,
-    write: false,
     ...globalOptions // user preferences for all things override
   }
 

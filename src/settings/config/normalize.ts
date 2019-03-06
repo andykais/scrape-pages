@@ -17,7 +17,7 @@ const reservedWords = ['value', 'index']
 
 const defaults: {
   definition: Pick<ScrapeConfig, 'incrementUntil'>
-  download: Pick<DownloadConfig, 'method' | 'headerTemplates' | 'protocol'>
+  download: Pick<DownloadConfig, 'method' | 'headerTemplates' | 'protocol' | 'read' | 'write'>
   parse: Pick<ParseConfig, 'format'>
 } = {
   definition: {
@@ -26,7 +26,9 @@ const defaults: {
   download: {
     method: 'GET',
     protocol: 'http',
-    headerTemplates: {}
+    headerTemplates: {},
+    read: true,
+    write: false
   },
   parse: {
     format: 'html'

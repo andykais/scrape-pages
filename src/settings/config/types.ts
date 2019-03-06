@@ -30,12 +30,16 @@ interface DownloadConfigInterface {
   urlTemplate: Template
   headerTemplates?: { [headerName: string]: Template }
   regexCleanup?: RegexCleanup
+  read?: boolean // should download be read into memory
+  write?: boolean // should download be saved to a file (separate from a database entry)
 }
 export type DownloadConfigInit = Template | DownloadConfigInterface | undefined
 export interface DownloadConfig extends DownloadConfigInterface {
   protocol: AcceptedProtocols
   method: UrlMethods
   headerTemplates: { [headerName: string]: Template }
+  read: boolean
+  write: boolean
 }
 // }}}
 

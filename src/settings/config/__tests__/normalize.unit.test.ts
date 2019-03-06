@@ -15,7 +15,9 @@ describe('normalize config with', () => {
             protocol: 'http',
             method: 'GET',
             urlTemplate: simpleConfig.scrapers.index.download as string,
-            headerTemplates: {}
+            headerTemplates: {},
+            read: true,
+            write: false
           },
           parse: {
             selector: (simpleConfig.scrapers.index.parse as any).selector,
@@ -29,7 +31,9 @@ describe('normalize config with', () => {
             protocol: 'http',
             method: 'GET',
             urlTemplate: simpleConfig.scrapers.image.download as any,
-            headerTemplates: {}
+            headerTemplates: {},
+            read: true,
+            write: false
           },
           parse: undefined,
           incrementUntil: 0

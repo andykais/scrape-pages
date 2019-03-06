@@ -41,18 +41,20 @@ export class Downloader extends AbstractDownloader<DownloadData> {
   ) {
     super(scraperName, downloadConfig, settings, tools)
     this.downloadConfig = downloadConfig // must be set on again on child classes https://github.com/babel/babel/issues/9439
+
+    const { read, write, urlTemplate, headerTemplates } = downloadConfig
     // set templates
-    this.urlTemplate = compileTemplate(this.downloadConfig.urlTemplate)
+    this.urlTemplate = compileTemplate(urlTemplate)
     this.headerTemplates = new FMap()
-    Object.entries(this.downloadConfig.headerTemplates).forEach(([key, templateStr]) =>
+    Object.entries(headerTemplates).forEach(([key, templateStr]) =>
       this.headerTemplates.set(key, compileTemplate(templateStr))
     )
     // choose fetcher
-    if (this.options.read && this.options.write) {
+    if (read && write) {
       this.fetcher = this.downloadToFileAndMemory
-    } else if (this.options.read) {
+    } else if (read) {
       this.fetcher = this.downloadToMemoryOnly
-    } else if (this.options.write) {
+    } else if (write) {
       this.fetcher = this.downloadToFileOnly
     } else {
       this.fetcher = this.downloadOnly

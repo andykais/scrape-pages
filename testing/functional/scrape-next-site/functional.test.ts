@@ -11,14 +11,7 @@ import { scrape } from '../../../src'
 const resourceFolder = `${__dirname}/resources/mock-endpoints`
 const resourceUrl = 'http://scrape-next-site.com'
 
-const options = {
-  optionsEach: {
-    image: {
-      read: false,
-      write: true
-    }
-  }
-}
+const options = {}
 // in this case, it is ok to reuse params since mocha runs async tests sequentially
 const params = {
   folder: path.resolve(os.tmpdir(), 'scrape-pages--scrape-next-site'),
