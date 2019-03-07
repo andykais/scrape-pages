@@ -73,22 +73,6 @@ exports.assertOptionsType = (optionsInit) => {
                 if (error)
                     return error;
             }
-        } {
-            if ("read" in object) {
-                path.push("read");
-                var error = _boolean(object["read"]);
-                path.pop();
-                if (error)
-                    return error;
-            }
-        } {
-            if ("write" in object) {
-                path.push("write");
-                var error = _boolean(object["write"]);
-                path.pop();
-                if (error)
-                    return error;
-            }
         } return null; } function _301(object) { if (typeof object !== "object" || object === null || Array.isArray(object))
             return "validation failed at " + path.join(".") + ": expected an object"; for (const key of Object.keys(object)) {
             path.push(key);
@@ -133,22 +117,6 @@ exports.assertOptionsType = (optionsInit) => {
             if ("cache" in object) {
                 path.push("cache");
                 var error = _boolean(object["cache"]);
-                path.pop();
-                if (error)
-                    return error;
-            }
-        } {
-            if ("read" in object) {
-                path.push("read");
-                var error = _boolean(object["read"]);
-                path.pop();
-                if (error)
-                    return error;
-            }
-        } {
-            if ("write" in object) {
-                path.push("write");
-                var error = _boolean(object["write"]);
                 path.pop();
                 if (error)
                     return error;

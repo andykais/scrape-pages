@@ -1,6 +1,6 @@
-import path from 'path'
+import * as path from 'path'
 import { readdir, stat } from '../src/util/fs'
-import nock from 'nock'
+import * as nock from 'nock'
 
 const findFilesRecursive = async (folder: string): Promise<string[]> => {
   const endpointFiles = []

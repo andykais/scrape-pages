@@ -1,4 +1,4 @@
-import cheerio from 'cheerio'
+import * as cheerio from 'cheerio'
 import { AbstractParser } from '../abstract'
 // type imports
 import { ScrapeSettings } from '../../../../settings'

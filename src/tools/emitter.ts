@@ -1,4 +1,4 @@
-import EventEmitter from 'events'
+import { EventEmitter } from 'events'
 import * as Rx from 'rxjs'
 import * as Fetch from 'node-fetch'
 // type imports

@@ -9,7 +9,6 @@
     "moduleResolution": "node",
     "target": "es2017",
     "allowJs": true,
-    "esModuleInterop": true,
     "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true
   },

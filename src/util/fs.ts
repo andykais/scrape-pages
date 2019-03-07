@@ -1,7 +1,7 @@
-import path from 'path'
-import fs from 'fs'
+import * as path from 'path'
+import * as fs from 'fs'
 import { promisify } from 'util'
-import sanitize from 'sanitize-filename'
+import * as sanitize from 'sanitize-filename'
 
 const [mkdir, readdir, stat, unlink, rmdir, rename, access] = [
   fs.mkdir,

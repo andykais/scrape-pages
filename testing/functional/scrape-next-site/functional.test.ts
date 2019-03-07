@@ -1,20 +1,23 @@
-import os from 'os'
-import path from 'path'
+import * as os from 'os'
+import * as path from 'path'
 
 import { expect } from 'chai'
 
 import { nockMockFolder } from '../../setup'
 import { config } from './config'
-import expectedQueryResult from './resources/expected-query-result.json'
+import * as querySnapshot from './resources/expected-query-result.json'
 import { scrape } from '../../../src'
 
+// fixes webpack json import error https://github.com/webpack/webpack/issues/8504
+const expectedQueryResult = Array.from((querySnapshot as any).default as typeof querySnapshot)
+
 const resourceFolder = `${__dirname}/resources/mock-endpoints`
-const resourceUrl = 'http://scrape-next-site.com'
+const resourceUrl = `http://${path.basename(__dirname)}.com`
 
 const options = {}
 // in this case, it is ok to reuse params since mocha runs async tests sequentially
 const params = {
-  folder: path.resolve(os.tmpdir(), 'scrape-pages--scrape-next-site'),
+  folder: path.resolve(os.tmpdir(), `scrape-pages--${path.basename(__dirname)}`),
   cleanFolder: true
 }
 describe('scrape next site', () => {

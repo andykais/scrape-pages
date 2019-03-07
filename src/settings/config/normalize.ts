@@ -1,5 +1,5 @@
 import { validateSlug } from '../../util/slug'
-import VError from 'verror'
+import { VError } from 'verror'
 import {
   DownloadConfigInit,
   DownloadConfig,

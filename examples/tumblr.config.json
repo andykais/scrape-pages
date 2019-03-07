@@ -1,6 +1,6 @@
 {
   "input": "username",
-  "defs": {
+  "scrapers": {
     "user": {
       "download": {
         "urlTemplate": "https://{{ username }}.tumblr.com/api/read/json?start={{'*' index 50 }}&num=50"
@@ -32,7 +32,7 @@
       }
     }
   },
-  "structure": {
+  "run": {
     "scraper": "user",
     "scrapeEach": {
       "scraper": "parse-json",

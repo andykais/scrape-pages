@@ -21,30 +21,33 @@ exports.assertConfigType = (configInit) => {
         } return "validation failed at " + path.join(".") + ": there are no valid alternatives"; } function _undefined(object) { if (object !== undefined)
             return "validation failed at " + path.join(".") + ": expected undefined";
         else
-            return null; } function _305(object) { if (object !== "GET")
+            return null; } function _305(object) { if (object !== "http")
+            return "validation failed at " + path.join(".") + ": expected string 'http'";
+        else
+            return null; } function _307(object) { if (object !== "GET")
             return "validation failed at " + path.join(".") + ": expected string 'GET'";
         else
-            return null; } function _307(object) { if (object !== "POST")
+            return null; } function _309(object) { if (object !== "POST")
             return "validation failed at " + path.join(".") + ": expected string 'POST'";
         else
-            return null; } function _309(object) { if (object !== "PUT")
+            return null; } function _311(object) { if (object !== "PUT")
             return "validation failed at " + path.join(".") + ": expected string 'PUT'";
         else
-            return null; } function _311(object) { if (object !== "DELETE")
+            return null; } function _313(object) { if (object !== "DELETE")
             return "validation failed at " + path.join(".") + ": expected string 'DELETE'";
         else
-            return null; } function _313(object) { var conditions = [_305, _307, _309, _311]; for (const condition of conditions) {
+            return null; } function _315(object) { var conditions = [_307, _309, _311, _313]; for (const condition of conditions) {
             var error = condition(object);
             if (!error)
                 return null;
-        } return "validation failed at " + path.join(".") + ": there are no valid alternatives"; } function _314(object) { if (typeof object !== "object" || object === null || Array.isArray(object))
+        } return "validation failed at " + path.join(".") + ": there are no valid alternatives"; } function _316(object) { if (typeof object !== "object" || object === null || Array.isArray(object))
             return "validation failed at " + path.join(".") + ": expected an object"; for (const key of Object.keys(object)) {
             path.push(key);
             var error = _string(object[key]);
             path.pop();
             if (error)
                 return error;
-        } return null; } function _315(object) { if (typeof object !== "object" || object === null || Array.isArray(object))
+        } return null; } function _317(object) { if (typeof object !== "object" || object === null || Array.isArray(object))
             return "validation failed at " + path.join(".") + ": expected an object"; {
             if ("selector" in object) {
                 path.push("selector");
@@ -65,15 +68,26 @@ exports.assertConfigType = (configInit) => {
             }
             else
                 return "validation failed at " + path.join(".") + ": expected 'replacer' in object";
-        } return null; } function _316(object) { var conditions = [_string, _315]; for (const condition of conditions) {
+        } return null; } function _318(object) { var conditions = [_string, _317]; for (const condition of conditions) {
             var error = condition(object);
             if (!error)
                 return null;
-        } return "validation failed at " + path.join(".") + ": there are no valid alternatives"; } function _303(object) { if (typeof object !== "object" || object === null || Array.isArray(object))
+        } return "validation failed at " + path.join(".") + ": there are no valid alternatives"; } function _boolean(object) { if (typeof object !== "boolean")
+            return "validation failed at " + path.join(".") + ": expected a boolean";
+        else
+            return null; } function _303(object) { if (typeof object !== "object" || object === null || Array.isArray(object))
             return "validation failed at " + path.join(".") + ": expected an object"; {
+            if ("protocol" in object) {
+                path.push("protocol");
+                var error = _305(object["protocol"]);
+                path.pop();
+                if (error)
+                    return error;
+            }
+        } {
             if ("method" in object) {
                 path.push("method");
-                var error = _313(object["method"]);
+                var error = _315(object["method"]);
                 path.pop();
                 if (error)
                     return error;
@@ -91,7 +105,7 @@ exports.assertConfigType = (configInit) => {
         } {
             if ("headerTemplates" in object) {
                 path.push("headerTemplates");
-                var error = _314(object["headerTemplates"]);
+                var error = _316(object["headerTemplates"]);
                 path.pop();
                 if (error)
                     return error;
@@ -99,7 +113,23 @@ exports.assertConfigType = (configInit) => {
         } {
             if ("regexCleanup" in object) {
                 path.push("regexCleanup");
-                var error = _316(object["regexCleanup"]);
+                var error = _318(object["regexCleanup"]);
+                path.pop();
+                if (error)
+                    return error;
+            }
+        } {
+            if ("read" in object) {
+                path.push("read");
+                var error = _boolean(object["read"]);
+                path.pop();
+                if (error)
+                    return error;
+            }
+        } {
+            if ("write" in object) {
+                path.push("write");
+                var error = _boolean(object["write"]);
                 path.pop();
                 if (error)
                     return error;
@@ -108,24 +138,27 @@ exports.assertConfigType = (configInit) => {
             var error = condition(object);
             if (!error)
                 return null;
-        } return "validation failed at " + path.join(".") + ": there are no valid alternatives"; } function _319(object) { if (object !== "html")
+        } return "validation failed at " + path.join(".") + ": there are no valid alternatives"; } function _321(object) { if (object !== "html")
             return "validation failed at " + path.join(".") + ": expected string 'html'";
         else
-            return null; } function _321(object) { if (object !== "json")
+            return null; } function _323(object) { if (object !== "xml")
+            return "validation failed at " + path.join(".") + ": expected string 'xml'";
+        else
+            return null; } function _325(object) { if (object !== "json")
             return "validation failed at " + path.join(".") + ": expected string 'json'";
         else
-            return null; } function _323(object) { var conditions = [_319, _321]; for (const condition of conditions) {
+            return null; } function _327(object) { var conditions = [_321, _323, _325]; for (const condition of conditions) {
             var error = condition(object);
             if (!error)
                 return null;
         } return "validation failed at " + path.join(".") + ": there are no valid alternatives"; } function _number(object) { if (typeof object !== "number")
             return "validation failed at " + path.join(".") + ": expected a number";
         else
-            return null; } function _317(object) { if (typeof object !== "object" || object === null || Array.isArray(object))
+            return null; } function _319(object) { if (typeof object !== "object" || object === null || Array.isArray(object))
             return "validation failed at " + path.join(".") + ": expected an object"; {
-            if ("expect" in object) {
-                path.push("expect");
-                var error = _323(object["expect"]);
+            if ("format" in object) {
+                path.push("format");
+                var error = _327(object["format"]);
                 path.pop();
                 if (error)
                     return error;
@@ -159,22 +192,22 @@ exports.assertConfigType = (configInit) => {
         } {
             if ("regexCleanup" in object) {
                 path.push("regexCleanup");
-                var error = _316(object["regexCleanup"]);
+                var error = _318(object["regexCleanup"]);
                 path.pop();
                 if (error)
                     return error;
             }
-        } return null; } function _318(object) { var conditions = [_undefined, _string, _317]; for (const condition of conditions) {
+        } return null; } function _320(object) { var conditions = [_undefined, _string, _319]; for (const condition of conditions) {
             var error = condition(object);
             if (!error)
                 return null;
-        } return "validation failed at " + path.join(".") + ": there are no valid alternatives"; } function _324(object) { if (object !== "failed-download")
+        } return "validation failed at " + path.join(".") + ": there are no valid alternatives"; } function _328(object) { if (object !== "failed-download")
             return "validation failed at " + path.join(".") + ": expected string 'failed-download'";
         else
-            return null; } function _326(object) { if (object !== "empty-parse")
+            return null; } function _330(object) { if (object !== "empty-parse")
             return "validation failed at " + path.join(".") + ": expected string 'empty-parse'";
         else
-            return null; } function _328(object) { var conditions = [_number, _324, _326]; for (const condition of conditions) {
+            return null; } function _332(object) { var conditions = [_number, _328, _330]; for (const condition of conditions) {
             var error = condition(object);
             if (!error)
                 return null;
@@ -190,7 +223,7 @@ exports.assertConfigType = (configInit) => {
         } {
             if ("parse" in object) {
                 path.push("parse");
-                var error = _318(object["parse"]);
+                var error = _320(object["parse"]);
                 path.pop();
                 if (error)
                     return error;
@@ -198,7 +231,7 @@ exports.assertConfigType = (configInit) => {
         } {
             if ("incrementUntil" in object) {
                 path.push("incrementUntil");
-                var error = _328(object["incrementUntil"]);
+                var error = _332(object["incrementUntil"]);
                 path.pop();
                 if (error)
                     return error;
@@ -210,18 +243,18 @@ exports.assertConfigType = (configInit) => {
             path.pop();
             if (error)
                 return error;
-        } return null; } function _51_329(object) { if (!Array.isArray(object))
+        } return null; } function _51_333(object) { if (!Array.isArray(object))
             return "validation failed at " + path.join(".") + ": expected an array"; for (let i = 0; i < object.length; i++) {
             path.push("[" + i + "]");
-            var error = _329(object[i]);
+            var error = _333(object[i]);
             path.pop();
             if (error)
                 return error;
-        } return null; } function _331(object) { var conditions = [_329, _51_329]; for (const condition of conditions) {
+        } return null; } function _335(object) { var conditions = [_333, _51_333]; for (const condition of conditions) {
             var error = condition(object);
             if (!error)
                 return null;
-        } return "validation failed at " + path.join(".") + ": there are no valid alternatives"; } function _329(object) { if (typeof object !== "object" || object === null || Array.isArray(object))
+        } return "validation failed at " + path.join(".") + ": there are no valid alternatives"; } function _333(object) { if (typeof object !== "object" || object === null || Array.isArray(object))
             return "validation failed at " + path.join(".") + ": expected an object"; {
             if ("scraper" in object) {
                 path.push("scraper");
@@ -235,7 +268,7 @@ exports.assertConfigType = (configInit) => {
         } {
             if ("forEach" in object) {
                 path.push("forEach");
-                var error = _331(object["forEach"]);
+                var error = _335(object["forEach"]);
                 path.pop();
                 if (error)
                     return error;
@@ -243,7 +276,7 @@ exports.assertConfigType = (configInit) => {
         } {
             if ("forNext" in object) {
                 path.push("forNext");
-                var error = _331(object["forNext"]);
+                var error = _335(object["forNext"]);
                 path.pop();
                 if (error)
                     return error;
@@ -270,7 +303,7 @@ exports.assertConfigType = (configInit) => {
         } {
             if ("run" in object) {
                 path.push("run");
-                var error = _329(object["run"]);
+                var error = _333(object["run"]);
                 path.pop();
                 if (error)
                     return error;
