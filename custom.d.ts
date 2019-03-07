@@ -12,5 +12,7 @@ type ArgumentTypes<F extends Function> = F extends (...args: infer A) => any ? A
 
 type Omit<T, K> = Pick<T, Exclude<keyof T, K>>
 
+type ThenArg<T> = T extends Promise<infer U> ? U : T
+
 type Nullable<T> = T | null
 type Voidable<T> = T | void

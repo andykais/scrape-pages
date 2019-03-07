@@ -35,8 +35,9 @@ const startScraping = async (settings: Settings) => {
   // start running the observable
   const { emitter, queue, logger } = tools
   // necessary so that any listeners setup after function is called are setup before downloads begin
+  let subscription: ReturnType<typeof scrapingObservable.subscribe>
   setTimeout(() => {
-    const subscription = scrapingObservable.subscribe({
+    subscription = scrapingObservable.subscribe({
       error: (error: Error) => {
         emitter.emit.error(error)
         subscription.unsubscribe()
@@ -49,14 +50,17 @@ const startScraping = async (settings: Settings) => {
         logger.info('Done!')
       }
     })
-    emitter.on.stop(() => {
-      logger.info('Exiting manually.')
-      queue.closeQueue()
+  }, 0)
+  emitter.on.stop(() => {
+    logger.info('Exiting manually.')
+    queue.closeQueue()
+    // necessary so we can listen to 'stop' event right away, but wait to cancel the observable until after it is started
+    setTimeout(() => {
       subscription.unsubscribe()
       logger.info('Done!')
       emitter.emit.done()
-    })
-  }, 0)
+    }, 0)
+  })
 
   return {
     on: emitter.getBoundOn(),
@@ -65,6 +69,7 @@ const startScraping = async (settings: Settings) => {
 }
 
 export type Start = () => ReturnType<typeof startScraping>
+export type Emitter = ThenArg<ReturnType<Start>>
 export type Query = ReturnType<typeof Store.getQuerier>
 /**
  * scrape is the entrypoint for this library

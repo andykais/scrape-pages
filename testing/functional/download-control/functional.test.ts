@@ -7,7 +7,7 @@ import { nockMockFolder } from '../../setup'
 import { config } from './config'
 import * as querySnapshot from './resources/expected-query-result.json'
 import { scrape } from '../../../src'
-import { Start } from '../../../src/scraper'
+import { Emitter } from '../../../src/scraper'
 import { ConfigInit } from '../../../src/settings/config/types'
 
 // fixes webpack json import error https://github.com/webpack/webpack/issues/8504
@@ -22,7 +22,7 @@ const params = {
   cleanFolder: true
 }
 
-const getRequestStats = async (config: ConfigInit, start: Start) => {
+const useRequestStatsRecorder = (config: ConfigInit, on: Emitter['on']) => {
   const scraperNames = Object.keys(config.scrapers)
   const counts = scraperNames.reduce(
     (acc, scraperName) => {
@@ -33,31 +33,34 @@ const getRequestStats = async (config: ConfigInit, start: Start) => {
       [scraperName: string]: { queued: number; complete: number }
     }
   )
-  const { on } = await start()
+  const stats = { counts, maxConcurrentRequests: 0 }
   const concurrentRequests = new Set()
-  let maxConcurrentRequests = 0
   for (const scraperName of scraperNames) {
     on(`${scraperName}:queued`, () => {
-      counts[scraperName].queued++
+      stats.counts[scraperName].queued++
     })
     on(`${scraperName}:complete`, id => {
-      counts[scraperName].complete++
+      stats.counts[scraperName].complete++
       concurrentRequests.delete(id)
     })
     on(`${scraperName}:progress`, id => {
-      maxConcurrentRequests = Math.max(maxConcurrentRequests, concurrentRequests.add(id).size)
+      stats.maxConcurrentRequests = Math.max(
+        stats.maxConcurrentRequests,
+        concurrentRequests.add(id).size
+      )
     })
   }
-  await new Promise(resolve => on('done', resolve))
-  return { counts, maxConcurrentRequests }
+  return stats
 }
 describe('download control', () => {
-  describe('first pass', () => {
-    const { start, query } = scrape(config, options, params)
+  describe('cache control', () => {
+    beforeEach(async () => await nockMockFolder(resourceFolder, resourceUrl))
 
-    it('should have made the expected number of requests', async () => {
-      await nockMockFolder(resourceFolder, resourceUrl)
-      const { counts } = await getRequestStats(config, start)
+    it('first pass should have made the expected number of requests', async () => {
+      const { start, query } = scrape(config, options, params)
+      const { on } = await start()
+      const { counts } = useRequestStatsRecorder(config, on)
+      await new Promise(resolve => on('done', resolve))
       expect(counts.index.queued).to.be.equal(1)
       expect(counts.index.complete).to.be.equal(1)
       expect(counts.postTitle.queued).to.be.equal(5)
@@ -66,17 +69,15 @@ describe('download control', () => {
       const result = query({ scrapers: ['postTitle'] })
       expect(result).to.be.deep.equal(expectedQueryResult)
     })
-  })
-  describe('second pass on same folder', () => {
-    const { start, query } = scrape(
-      config,
-      { cache: true, optionsEach: { index: { cache: false } } },
-      { ...params, cleanFolder: false }
-    )
-
-    it(`should make a request on 'index', but not on cached postTitle`, async () => {
-      await nockMockFolder(resourceFolder, resourceUrl)
-      const { counts } = await getRequestStats(config, start)
+    it(`second pass on same folder should make a request on 'index', but not on cached postTitle`, async () => {
+      const { start, query } = scrape(
+        config,
+        { cache: true, optionsEach: { index: { cache: false } } },
+        { ...params, cleanFolder: false }
+      )
+      const { on } = await start()
+      const { counts } = useRequestStatsRecorder(config, on)
+      await new Promise(resolve => on('done', resolve))
       expect(counts.index.queued).to.be.equal(1)
       expect(counts.index.complete).to.be.equal(1)
       expect(counts.postTitle.queued).to.be.equal(0)
@@ -87,19 +88,74 @@ describe('download control', () => {
     })
   })
 
-  describe('concurrency control', () => {
+  describe('concurrency control', function() {
+    this.timeout(5000)
+    beforeEach(async () => await nockMockFolder(resourceFolder, resourceUrl, { delay: 1000 }))
+
     it('should not have more than one concurrent request', async () => {
       const { start } = scrape(config, { maxConcurrent: 1 }, params)
-      await nockMockFolder(resourceFolder, resourceUrl)
-      const { maxConcurrentRequests } = await getRequestStats(config, start)
-      expect(maxConcurrentRequests).to.be.equal(1)
+      const { on } = await start()
+      const stats = useRequestStatsRecorder(config, on)
+      await new Promise(resolve => on('done', resolve))
+      expect(stats.maxConcurrentRequests).to.be.equal(1)
     })
-    it(`should schedule all 'postTitle' requests at once`, async () => {
+    // NOTE: it would be nice to test higher maxConcurrent values,
+    // but we cannot expect requests to be scheduled at the same time.
+    it.only(`{ maxConcurrent: 6 } should schedule all 'postTitle' requests at once`, async () => {
       const { start } = scrape(config, { maxConcurrent: 6 }, params)
-      await nockMockFolder(resourceFolder, resourceUrl)
-      const { maxConcurrentRequests } = await getRequestStats(config, start)
+      const { on } = await start()
+      const stats = useRequestStatsRecorder(config, on)
+      const posts = {}
+      on('postTitle:queued', id => posts[id] = process.hrtime())
+      let prev
+      let timer = process.hrtime()
+      on('postTitle:complete', id => {
+        console.log('complete', id)
+        const complete = process.hrtime(posts[id])
+        console.log('complete', id, complete[0] + complete[1] / 1e9)
+        const between = process.hrtime(timer)
+        console.log('between', id,'and', prev, between[0] + between[1] / 1e9)
+        timer = process.hrtime()
+        prev = id
+      })
+
+      await new Promise(resolve => on('done', resolve))
       // though max concurrent is 6, `index` will complete before the five image requests are queued
-      expect(maxConcurrentRequests).to.be.equal(5)
+      expect(stats.maxConcurrentRequests).to.be.equal(5)
+    })
+  })
+
+  describe('emit stop event', () => {
+    // nock sends an instant reply, this is not realistic and harder to test, so a delay is added
+    beforeEach(async () => await nockMockFolder(resourceFolder, resourceUrl, { delay: 200 }))
+
+    describe(`emit('stop')`, () => {
+      it(`should stop the whole scraper if triggered before any 'complete' event`, async () => {
+        const { start, query } = scrape(config, options, params)
+        const { on, emit } = await start()
+        on('index:queued', () => emit('stop'))
+        await new Promise(resolve => on('done', resolve))
+
+        const resultIndex = query({ scrapers: ['index'] })
+        expect(resultIndex.length).to.be.equal(0)
+        const result = query({ scrapers: ['postTitle'], groupBy: 'postTitle' })
+        expect(result.length).to.be.equal(0)
+      })
+    })
+    describe(`emit('stop:postTitle')`, () => {
+      it('should only stop the postTitle scraper', async () => {
+        const { start, query } = scrape(config, options, params)
+        // nock sends an instant reply, this is not realistic and harder to test, so a delay is added
+        // await nockMockFolder(resourceFolder, resourceUrl, { delay: 100 })
+        const { on, emit } = await start()
+        on('index:queued', () => emit('stop'))
+        await new Promise(resolve => on('done', resolve))
+
+        const resultIndex = query({ scrapers: ['index'] })
+        expect(resultIndex.length).to.be.equal(0)
+        const result = query({ scrapers: ['postTitle'], groupBy: 'postTitle' })
+        expect(result.length).to.be.equal(0)
+      })
     })
   })
 })

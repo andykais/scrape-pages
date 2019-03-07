@@ -21,6 +21,6 @@ export const groupUntilSeparator = <T>(
       grouping.push(item)
     }
   }
-  groupedArray.push(grouping)
+  if (grouping.length) groupedArray.push(grouping)
   return groupedArray
 }
