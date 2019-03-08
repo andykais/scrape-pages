@@ -51,25 +51,23 @@ const useRequestStatsRecorder = (config: ConfigInit, on: Emitter['on']) => {
   return stats
 }
 describe('download control', () => {
-  describe.only('cache control', () => {
+  describe('cache control', () => {
     beforeEach(async () => await nockMockFolder(resourceFolder, resourceUrl))
 
     it('first pass should have made the expected number of requests', async () => {
       const { start, query } = scrape(config, options, params)
       const { on } = await start()
-      // const { counts } = useRequestStatsRecorder(config, on)
+      const { counts } = useRequestStatsRecorder(config, on)
       await new Promise(resolve => on('done', resolve))
-      // expect(counts.index.queued).to.be.equal(1)
-      // expect(counts.index.complete).to.be.equal(1)
-      // expect(counts.postTitle.queued).to.be.equal(5)
-      // expect(counts.postTitle.complete).to.be.equal(5)
+      expect(counts.index.queued).to.be.equal(1)
+      expect(counts.index.complete).to.be.equal(1)
+      expect(counts.postTitle.queued).to.be.equal(5)
+      expect(counts.postTitle.complete).to.be.equal(5)
 
       const result = query({ scrapers: ['postTitle'] })
       expect(result).to.be.deep.equal(expectedQueryResult)
-      console.log('done?')
     })
     it(`second pass on same folder should make a request on 'index', but not on cached postTitle`, async () => {
-      console.log('starting second?')
       const { start, query } = scrape(
         config,
         { cache: true, optionsEach: { index: { cache: false } } },
@@ -85,30 +83,6 @@ describe('download control', () => {
 
       const result = query({ scrapers: ['postTitle'] })
       expect(result).to.be.deep.equal(expectedQueryResult)
-    })
-  })
-
-  describe('concurrency control', function() {
-    this.timeout(5000)
-    beforeEach(async () => await nockMockFolder(resourceFolder, resourceUrl, { delay: 1000 }))
-
-    it('should not have more than one concurrent request', async () => {
-      const { start } = scrape(config, { maxConcurrent: 1 }, params)
-      const { on } = await start()
-      const stats = useRequestStatsRecorder(config, on)
-      await new Promise(resolve => on('done', resolve))
-      expect(stats.maxConcurrentRequests).to.be.equal(1)
-    })
-    // NOTE: it would be nice to test higher maxConcurrent values,
-    // but we cannot expect requests to be scheduled at the same time.
-    it(`{ maxConcurrent: 6 } should schedule all 'postTitle' requests at once`, async () => {
-      const { start } = scrape(config, { maxConcurrent: 6 }, params)
-      const { on } = await start()
-      const stats = useRequestStatsRecorder(config, on)
-      await new Promise(resolve => on('done', resolve))
-
-      // though max concurrent is 6, `index` will complete before the five image requests are queued
-      expect(stats.maxConcurrentRequests).to.be.equal(5)
     })
   })
 
@@ -130,7 +104,7 @@ describe('download control', () => {
       })
     })
     describe(`emit('stop:postTitle')`, () => {
-      it('should only stop the postTitle scraper', async () => {
+      it.skip('should only stop the postTitle scraper', async () => {
         const { start, query } = scrape(config, options, params)
         // nock sends an instant reply, this is not realistic and harder to test, so a delay is added
         // await nockMockFolder(resourceFolder, resourceUrl, { delay: 100 })

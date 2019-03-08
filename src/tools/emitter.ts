@@ -1,6 +1,5 @@
 import { EventEmitter } from 'events'
 import * as Rx from 'rxjs'
-import * as Fetch from 'node-fetch'
 // type imports
 import { FMap } from '../util/map'
 import { Settings } from '../settings'
@@ -21,19 +20,6 @@ class ScraperEmitter {
     queued: (id: number) => {
       this.emitter.emit(`${this.name}:${this.listenable.QUEUED}`, id)
     },
-    // progress: (id: number, response: Fetch.Response) => {
-    //   const emitKey = `${this.name}:${ScraperEmitter.listenable.PROGRESS}`
-    //   if (this.emitter.listenerCount(emitKey)) {
-    //     const contentLength = parseInt(response.headers.get('content-length') || '0')
-    //     let bytesLength = 0
-    //     response.body.on('data', chunk => {
-    //       bytesLength += chunk.length
-    //       // emitting Infinity signals that content-length was zero
-    //       const progress = bytesLength / contentLength
-    //       this.emitter.emit(emitKey, id, progress)
-    //     })
-    //   }
-    // },
     progress: (id: number, progress: number) => {
       this.emitter.emit(`${this.name}:${this.listenable.PROGRESS}`, id, progress)
     },
@@ -46,8 +32,6 @@ class ScraperEmitter {
       this.emitter.on(`${this.name}:${this.emittable.STOP}`, callback)
     }
   }
-  public hasListenerFor = (eventName: string): boolean =>
-    this.emitter.listenerCount(`${this.name}:${eventName}`) !== 0
 
   private emitter: EventEmitter
   private name: string
@@ -56,6 +40,9 @@ class ScraperEmitter {
     this.emitter = emitter
     this.name = name
   }
+
+  public hasListenerFor = (eventName: string) =>
+    this.emitter.listenerCount(`${this.name}:${eventName}`) !== 0
 }
 
 type EmitterOn = (event: string, callback: (...args: any[]) => void) => void
@@ -63,12 +50,12 @@ type EmitterEmit = (event: 'stop' | 'useRateLimiter', ...emittedValues: any[]) =
 
 class Emitter {
   /** listenable by user */
-  static listenable = {
+  public static listenable = {
     DONE: 'done',
     ERROR: 'error'
   }
   /** emittable by user */
-  static emittable = {
+  public static emittable = {
     STOP: 'stop',
     USE_RATE_LIMITER: 'useRateLimiter'
   }
