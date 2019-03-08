@@ -47,7 +47,7 @@ export const nockMockFolder = async (
     } else {
       scope
         .get(`/${relativePath}`)
-        .delay({ head: delay })
+        .delay({ body: delay })
         .replyWithFile(200, fullPath)
     }
   }

@@ -9,6 +9,7 @@ import { AbstractDownloader, DownloadParams } from '../abstract'
 import { compileTemplate } from '../../../../util/handlebars'
 // type imports
 import { URL } from 'url'
+import * as Fetch from 'node-fetch'
 import { ScrapeSettings } from '../../../../settings'
 import { ScraperName, DownloadConfig } from '../../../../settings/config/types'
 import { Tools } from '../../../../tools'
@@ -32,6 +33,7 @@ export class Downloader extends AbstractDownloader<DownloadData> {
   private urlTemplate: ReturnType<typeof compileTemplate>
   private headerTemplates: FMap<string, ReturnType<typeof compileTemplate>>
   private fetcher: FetchFunction
+  private scraperEmitter: ReturnType<Tools['emitter']['scraper']>
 
   public constructor(
     scraperName: ScraperName,
@@ -49,6 +51,8 @@ export class Downloader extends AbstractDownloader<DownloadData> {
     Object.entries(headerTemplates).forEach(([key, templateStr]) =>
       this.headerTemplates.set(key, compileTemplate(templateStr))
     )
+
+    this.scraperEmitter = this.tools.emitter.scraper(this.scraperName)
     // choose fetcher
     if (read && write) {
       this.fetcher = this.downloadToFileAndMemory
@@ -70,20 +74,20 @@ export class Downloader extends AbstractDownloader<DownloadData> {
     return [url, { headers, method: this.downloadConfig.method }]
   }
 
-  public retrieve = (downloadId: number, downloadData: DownloadData) => {
-    return this.fetcher(downloadId, downloadData)
-  }
+  public retrieve = (downloadId: number, downloadData: DownloadData) =>
+    this.tools.queue.add(() => {
+      this.scraperEmitter.emit.progress(downloadId, 0)
+      return this.fetcher(downloadId, downloadData)
+    }, this.options.downloadPriority)
 
   private downloadToFileAndMemory: FetchFunction = async (downloadId, [url, fetchOptions]) => {
     const downloadFolder = path.resolve(this.params.folder, downloadId.toString())
     const filename = path.resolve(downloadFolder, sanitizeFilename(url))
 
-    const response = await this.tools.queue.add(
-      () => fetch(url, fetchOptions),
-      this.options.downloadPriority
-    )
-    await mkdirp(downloadFolder)
+    const response = await fetch(url, fetchOptions)
     if (!response.ok) throw new ResponseError(response, url)
+
+    await mkdirp(downloadFolder)
     const dest = createWriteStream(filename)
     const buffers: Buffer[] = []
 
@@ -91,7 +95,7 @@ export class Downloader extends AbstractDownloader<DownloadData> {
       response.body.pipe(dest)
       response.body.on('error', error => reject(error))
       response.body.on('data', chunk => buffers.push(chunk))
-      this.tools.emitter.scraper(this.scraperName).emit.progress(downloadId, response)
+      this.emitBodyProgress(downloadId, response)
       dest.on('error', error => reject(error))
       dest.on('close', () => resolve(Buffer.concat(buffers)))
     })
@@ -104,16 +108,14 @@ export class Downloader extends AbstractDownloader<DownloadData> {
     const downloadFolder = path.resolve(this.params.folder, downloadId.toString())
     const filename = path.resolve(downloadFolder, sanitizeFilename(url))
 
-    const response = await this.tools.queue.add(
-      () => fetch(url.toString(), fetchOptions),
-      this.options.downloadPriority
-    )
+    const response = await fetch(url, fetchOptions)
+    if (!response.ok) throw new ResponseError(response, url)
+
     await mkdirp(downloadFolder)
+    const dest = createWriteStream(filename)
     await new Promise((resolve, reject) => {
-      if (!response.ok) reject(new ResponseError(response, url))
-      const dest = createWriteStream(filename)
       response.body.pipe(dest)
-      this.tools.emitter.scraper(this.scraperName).emit.progress(downloadId, response)
+      this.emitBodyProgress(downloadId, response)
       response.body.on('error', error => reject(error))
       dest.on('error', error => reject(error))
       dest.on('close', resolve)
@@ -124,18 +126,27 @@ export class Downloader extends AbstractDownloader<DownloadData> {
     }
   }
   private downloadToMemoryOnly: FetchFunction = (downloadId, [url, fetchOptions]) =>
-    this.tools.queue
-      .add(() => fetch(url, fetchOptions), this.options.downloadPriority)
+    fetch(url, fetchOptions)
       .then(response => {
         if (!response.ok) throw new ResponseError(response, url)
-        this.tools.emitter.scraper(this.scraperName).emit.progress(downloadId, response)
+        this.emitBodyProgress(downloadId, response)
         return response.text()
       })
-      .then(downloadValue => ({
-        downloadValue
-      }))
+      .then(downloadValue => ({ downloadValue }))
+
   private downloadOnly: FetchFunction = (downlodaId, [url, fetchOptions]) =>
-    this.tools.queue
-      .add(() => fetch(url, fetchOptions), this.options.downloadPriority)
-      .then(() => ({ downloadValue: '' }))
+    fetch(url, fetchOptions).then(() => ({ downloadValue: '' }))
+
+  private emitBodyProgress = (downloadId: number, response: Fetch.Response) => {
+    if (this.scraperEmitter.hasListenerFor(this.scraperEmitter.listenable.PROGRESS)) {
+      const contentLength = parseInt(response.headers.get('content-length') || '0')
+      let bytesLength = 0
+      response.body.on('data', chunk => {
+        bytesLength += chunk.length
+        // emitting Infinity signals that content-length was zero
+        const progress = bytesLength / contentLength
+        this.scraperEmitter.emit.progress(downloadId, progress)
+      })
+    }
+  }
 }

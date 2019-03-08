@@ -8,41 +8,47 @@ import { ScraperName } from '../settings/config/types'
 
 class ScraperEmitter {
   /** listenable by user */
-  static listenable = {
+  public listenable = {
     QUEUED: 'queued',
     PROGRESS: 'progress',
     COMPLETE: 'complete'
   }
   /** emittable by user */
-  static emittable = {
+  public emittable = {
     STOP: 'done'
   }
   public emit = {
     queued: (id: number) => {
-      this.emitter.emit(`${this.name}:${ScraperEmitter.listenable.QUEUED}`, id)
+      this.emitter.emit(`${this.name}:${this.listenable.QUEUED}`, id)
     },
-    progress: (id: number, response: Fetch.Response) => {
-      const emitKey = `${this.name}:${ScraperEmitter.listenable.PROGRESS}`
-      if (this.emitter.listenerCount(emitKey)) {
-        const contentLength = parseInt(response.headers.get('content-length') || '0')
-        let bytesLength = 0
-        response.body.on('data', chunk => {
-          bytesLength += chunk.length
-          // emitting Infinity signals that content-length was zero
-          const progress = bytesLength / contentLength
-          this.emitter.emit(emitKey, id, progress)
-        })
-      }
+    // progress: (id: number, response: Fetch.Response) => {
+    //   const emitKey = `${this.name}:${ScraperEmitter.listenable.PROGRESS}`
+    //   if (this.emitter.listenerCount(emitKey)) {
+    //     const contentLength = parseInt(response.headers.get('content-length') || '0')
+    //     let bytesLength = 0
+    //     response.body.on('data', chunk => {
+    //       bytesLength += chunk.length
+    //       // emitting Infinity signals that content-length was zero
+    //       const progress = bytesLength / contentLength
+    //       this.emitter.emit(emitKey, id, progress)
+    //     })
+    //   }
+    // },
+    progress: (id: number, progress: number) => {
+      this.emitter.emit(`${this.name}:${this.listenable.PROGRESS}`, id, progress)
     },
     completed: (id: number) => {
-      this.emitter.emit(`${this.name}:${ScraperEmitter.listenable.COMPLETE}`, id)
+      this.emitter.emit(`${this.name}:${this.listenable.COMPLETE}`, id)
     }
   }
   public on = {
     stop: (callback: () => void) => {
-      this.emitter.on(`${this.name}:${ScraperEmitter.emittable.STOP}`, callback)
+      this.emitter.on(`${this.name}:${this.emittable.STOP}`, callback)
     }
   }
+  public hasListenerFor = (eventName: string): boolean =>
+    this.emitter.listenerCount(`${this.name}:${eventName}`) !== 0
+
   private emitter: EventEmitter
   private name: string
 

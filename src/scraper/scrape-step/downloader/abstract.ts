@@ -39,7 +39,7 @@ export abstract class AbstractDownloader<DownloadData> {
     Object.assign(this, { scraperName, downloadConfig, ...settings, tools })
   }
   public run = async (downloadParams: DownloadParams): Promise<RunValue> => {
-    const { store, emitter } = this.tools
+    const { queue, store, emitter } = this.tools
 
     const downloadData = this.constructDownload(downloadParams)
 
