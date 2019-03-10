@@ -38,7 +38,7 @@ describe('scrape next site', () => {
       })
       expect(result)
         .excludingEvery(['filename', 'id'])
-        .to.be.deep.equal(expectedQueryResult.map(g => g.filter(r => r.scraper === 'image')))
+        .to.deep.equal(expectedQueryResult.map(g => g.filter(r => r.scraper === 'image')))
     })
     it('should group tags and images together that were found on the same page', () => {
       const result = query({
@@ -47,7 +47,7 @@ describe('scrape next site', () => {
       })
       expect(result)
         .excludingEvery(['filename', 'id'])
-        .to.be.deep.equal(expectedQueryResult)
+        .to.deep.equal(expectedQueryResult)
     })
   })
 
@@ -70,7 +70,7 @@ describe('scrape next site', () => {
       })
       expect(result)
         .excludingEvery(['filename', 'id'])
-        .to.be.deep.equal(expectedQueryResult)
+        .to.deep.equal(expectedQueryResult)
     })
   })
 })

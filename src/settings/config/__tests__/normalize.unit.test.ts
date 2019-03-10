@@ -54,11 +54,11 @@ describe('normalize config with', () => {
 
     it('should match itself for a full filled in config', () => {
       const fullConfigFromGuess = normalizeConfig(fullConfigGuess)
-      expect(fullConfigFromGuess).to.be.deep.equal(fullConfigGuess)
+      expect(fullConfigFromGuess).to.deep.equal(fullConfigGuess)
     })
 
     it('should match the guessed full config', () => {
-      expect(fullConfig).to.be.deep.equal(fullConfigGuess)
+      expect(fullConfig).to.deep.equal(fullConfigGuess)
     })
   })
 
@@ -68,7 +68,7 @@ describe('normalize config with', () => {
 
     it('should match itself for a full filled in config', () => {
       const fullConfigFromGuess = normalizeConfig(fullConfig)
-      expect(fullConfigFromGuess).to.be.deep.equal(fullConfig)
+      expect(fullConfigFromGuess).to.deep.equal(fullConfig)
     })
   })
 

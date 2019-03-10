@@ -14,7 +14,7 @@ describe('find lowest common parent', () => {
       flatConfig.getOrThrow('img'),
       flatConfig.getOrThrow('tag')
     )
-    expect(parent).to.be.deep.equal(flatConfig.getOrThrow('post'))
+    expect(parent).to.deep.equal(flatConfig.getOrThrow('post'))
   })
 
   it('should select one of the two if one is a child of the other', () => {
@@ -23,7 +23,7 @@ describe('find lowest common parent', () => {
       flatConfig.getOrThrow('img-parse'),
       flatConfig.getOrThrow('img')
     )
-    expect(parent).to.be.deep.equal(flatConfig.getOrThrow('img-parse'))
+    expect(parent).to.deep.equal(flatConfig.getOrThrow('img-parse'))
   })
 
   it('should select one of the two if one is a child of the other (toplevel)', () => {
@@ -32,6 +32,6 @@ describe('find lowest common parent', () => {
       flatConfig.getOrThrow('gallery'),
       flatConfig.getOrThrow('post')
     )
-    expect(parent).to.be.deep.equal(flatConfig.getOrThrow('gallery'))
+    expect(parent).to.deep.equal(flatConfig.getOrThrow('gallery'))
   })
 })

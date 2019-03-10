@@ -39,7 +39,7 @@ describe('increment gallery site', () => {
       })
       expect(result)
         .excludingEvery(['filename', 'id'])
-        .to.be.deep.equal(expectedQueryResult.map(g => g.filter(r => r.scraper === 'image')))
+        .to.deep.equal(expectedQueryResult.map(g => g.filter(r => r.scraper === 'image')))
     })
     it('should group tags and images together that were found on the same page', () => {
       const result = query({
@@ -48,7 +48,7 @@ describe('increment gallery site', () => {
       })
       expect(result)
         .excludingEvery(['filename', 'id'])
-        .to.be.deep.equal(expectedQueryResult)
+        .to.deep.equal(expectedQueryResult)
     })
   })
   describe('with cached scraper', () => {
@@ -63,10 +63,10 @@ describe('increment gallery site', () => {
       on('gallery:queued', () => count.queued.gallery++)
       on('gallery:complete', () => count.complete.gallery++)
       await new Promise(resolve => on('done', resolve))
-      expect(count.queued.gallery).to.be.equal(3)
-      expect(count.queued.image).to.be.equal(4)
-      expect(count.complete.gallery).to.be.equal(2)
-      expect(count.complete.image).to.be.equal(4)
+      expect(count.queued.gallery).to.equal(3)
+      expect(count.queued.image).to.equal(4)
+      expect(count.complete.gallery).to.equal(2)
+      expect(count.complete.image).to.equal(4)
 
       const result = query({
         scrapers: ['image', 'tag'],
@@ -74,7 +74,7 @@ describe('increment gallery site', () => {
       })
       expect(result)
         .excludingEvery(['filename', 'id'])
-        .to.be.deep.equal(expectedQueryResult)
+        .to.deep.equal(expectedQueryResult)
     })
     it('on second pass, it should make zero requests', async () => {
       // const count = { queued: { gallery: 0, image: 0 }, complete: { gallery: 0, image: 0 } }
@@ -93,17 +93,17 @@ describe('increment gallery site', () => {
       // await new Promise(resolve => on('done', resolve))
       // const result = query({ scrapers: ['image'], groupBy: 'image' })
       // console.log(result.map(r => r.map(r => r.downloadData)))
-      // expect(count.queued.gallery).to.be.equal(3)
-      // expect(count.queued.image).to.be.equal(0)
-      // expect(count.complete.gallery).to.be.equal(2)
-      // expect(count.complete.image).to.be.equal(4)
+      // expect(count.queued.gallery).to.equal(3)
+      // expect(count.queued.image).to.equal(0)
+      // expect(count.complete.gallery).to.equal(2)
+      // expect(count.complete.image).to.equal(4)
       // const result = query({
       //   scrapers: ['image', 'tag'],
       //   groupBy: 'image-page'
       // })
       // expect(result)
       //   .excludingEvery(['filename', 'id'])
-      //   .to.be.deep.equal(expectedQueryResult)
+      //   .to.deep.equal(expectedQueryResult)
     })
   })
 
@@ -135,7 +135,7 @@ describe('increment gallery site', () => {
       const expected = expectedQueryResult.map(g => g.filter(r => r.scraper === 'image'))
       expect(result)
         .excludingEvery(['filename', 'id'])
-        .to.be.deep.equal([expected[0], expected[2]])
+        .to.deep.equal([expected[0], expected[2]])
     })
   })
 
@@ -156,7 +156,7 @@ describe('increment gallery site', () => {
       })
       expect(result)
         .excludingEvery(['filename', 'id'])
-        .to.be.deep.equal(expectedQueryResult)
+        .to.deep.equal(expectedQueryResult)
     })
   })
 })
