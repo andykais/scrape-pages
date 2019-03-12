@@ -1,21 +1,10 @@
 import { EventEmitter } from 'events'
 import * as Rx from 'rxjs'
 import * as ops from 'rxjs/operators'
-import * as RxTesting from 'rxjs/testing'
-import { expect } from 'chai'
 import { rateLimitToggle } from '../conditional-rate-limiter'
-
-type RunHelpers = ArgumentTypes<ArgumentTypes<RxTesting.TestScheduler['run']>[0]>[0]
-const testScheduler = (marbleTestEnv: (helpers: RunHelpers) => void) => {
-  const scheduler = new RxTesting.TestScheduler((actual, expected) => {
-    // asserting the two objects are equal
-    // e.g. using chai.
-    expect(actual).deep.equal(expected)
-  })
-  scheduler.run(helpers => {
-    marbleTestEnv(helpers)
-  })
-}
+// testing imports
+import { expect } from 'chai'
+import { rxjsTestScheduler } from '../../../../../testing/setup'
 
 describe('conditional-rate-limiter operator', () => {
   const emitter = new EventEmitter()
@@ -36,7 +25,7 @@ describe('conditional-rate-limiter operator', () => {
       const configuration = { ...rateLimitConfig, useLimiterFirst: false, maxConcurrent: 1 }
       const rateLimitToggleOperator = rateLimitToggle(handlers, configuration)
 
-      testScheduler(helpers => {
+      rxjsTestScheduler(helpers => {
         const { cold, expectObservable } = helpers
         const incomingRequests = cold('-a-b-c-----|')
         const expected = '- 1000ms v 999ms v 999ms v'
@@ -48,7 +37,7 @@ describe('conditional-rate-limiter operator', () => {
       const configuration = { ...rateLimitConfig, useLimiterFirst: false, maxConcurrent: 3 }
       const rateLimitToggleOperator = rateLimitToggle(handlers, configuration)
 
-      testScheduler(helpers => {
+      rxjsTestScheduler(helpers => {
         const { cold, expectObservable } = helpers
         const incomingRequests = cold('-a-b-c-d-e-|')
         // the concurrency is a sliding scale, so once the first execution resolves, the next is allowed in
@@ -61,7 +50,7 @@ describe('conditional-rate-limiter operator', () => {
       const configuration = { ...rateLimitConfig, useLimiterFirst: false, maxConcurrent: 3 }
       const rateLimitToggleOperator = rateLimitToggle(handlers, configuration)
 
-      testScheduler(helpers => {
+      rxjsTestScheduler(helpers => {
         const { cold, expectObservable } = helpers
         // 500ms is within the window of the first three executing, so it should resolve alongside the others
         const incomingRequests = cold('-(abc)-d 500ms -e-|')
@@ -80,7 +69,7 @@ describe('conditional-rate-limiter operator', () => {
       const configuration = rateLimitConfig
       const rateLimitToggleOperator = rateLimitToggle(handlers, configuration)
 
-      testScheduler(helpers => {
+      rxjsTestScheduler(helpers => {
         const { cold, expectObservable } = helpers
         const incomingRequests = cold('-a-b-c-----|')
         // TODO change the execution so the first request does not wait for the timer to make one whole interval
@@ -94,7 +83,7 @@ describe('conditional-rate-limiter operator', () => {
       const configuration = { ...rateLimitConfig, rate: 0 }
       const rateLimitToggleOperator = rateLimitToggle(handlers, configuration)
 
-      testScheduler(helpers => {
+      rxjsTestScheduler(helpers => {
         const { cold, expectObservable } = helpers
         const incomingRequests = cold('-a-b-c-----|')
         const expected = '- 1000ms v 999ms v 999ms v'
@@ -107,7 +96,7 @@ describe('conditional-rate-limiter operator', () => {
       const configuration = { ...rateLimitConfig, rate: 1000, limit: 3, maxConcurrent: Infinity }
       const rateLimitToggleOperator = rateLimitToggle(handlers, configuration)
 
-      testScheduler(helpers => {
+      rxjsTestScheduler(helpers => {
         const { cold, expectObservable } = helpers
         const incomingRequests = cold('-a-b-c-d-e-|')
         const expected = '2000ms (vvv) 995ms (vv)'

@@ -16,7 +16,10 @@ const incrementUntilEmptyParse: DownloadParseBoolean = parsedValues => !!parsedV
 const incrementUntilNumericIndex = (incrementUntil: number): DownloadParseBoolean => (
   parsedValues,
   incrementIndex
-) => incrementUntil >= incrementIndex
+) => {
+  // console.log(incrementUntil, incrementIndex, { eval: incrementUntil >= incrementIndex })
+  return incrementUntil >= incrementIndex
+}
 const incrementAlways = () => true
 
 const catchDownloadError = (e: Error) => {
@@ -56,28 +59,28 @@ const structureScrapers = (settings: Settings, scrapers: FMap<ScraperName, Scrap
 
   return (parentValues: ParsedValue[]): Rx.Observable<ParsedValue[]> =>
     Rx.from(parentValues).pipe(
-      ops.flatMap(parsedValueWithId =>
-        RxCustom.whileLoop(scraper.downloadParseFunction, okToIncrement, parsedValueWithId).pipe(
-          ops.catchError(ignoreFetchError),
-          ops.expand(([parsedValues, incrementIndex]) =>
-            Rx.merge(
-              ...next.map(nextScraper =>
-                nextScraper(parsedValues).pipe(
-                  ops.flatMap(parsedValues =>
-                    parsedValues.map(parsedValueWithId =>
-                      scraper.downloadParseFunction(parsedValueWithId, incrementIndex)
-                    )
-                  ),
-                  ops.mergeAll(),
-                  ops.filter(incrementUntilEmptyParse),
-                  ops.map((parsedValues): [ParsedValue[], number] => [parsedValues, incrementIndex])
+      ops.flatMap(parentValue =>
+        RxCustom.whileLoop(scraper.downloadParseFunction, okToIncrement, parentValue)
+      ),
+      ops.map((parsedValues, index): [ParsedValue[], number] => [parsedValues, index]),
+      ops.catchError(ignoreFetchError),
+      ops.expand(([parsedValues, incrementIndex]) =>
+        Rx.merge(
+          ...next.map(nextScraper =>
+            nextScraper(parsedValues).pipe(
+              ops.flatMap(parsedValues =>
+                parsedValues.map(parsedValueWithId =>
+                  scraper.downloadParseFunction(parsedValueWithId, incrementIndex)
                 )
-              )
+              ),
+              ops.mergeAll(),
+              ops.filter(incrementUntilEmptyParse),
+              ops.map((parsedValues): [ParsedValue[], number] => [parsedValues, incrementIndex])
             )
-          ),
-          ops.map(([parsedValues]) => parsedValues)
+          )
         )
       ),
+      ops.map(([parsedValues]) => parsedValues),
       ops.catchError(wrapError(`scraper '${scraper.scraperName}'`)),
       each.length
         ? ops.flatMap(scraperValues => each.map(child => child(scraperValues)))
