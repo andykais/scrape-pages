@@ -3,7 +3,6 @@ import * as Rx from 'rxjs'
 import * as ops from 'rxjs/operators'
 import { rateLimitToggle } from '../conditional-rate-limiter'
 // testing imports
-import { expect } from 'chai'
 import { rxjsTestScheduler } from '../../../../../testing/setup'
 
 describe('conditional-rate-limiter operator', () => {

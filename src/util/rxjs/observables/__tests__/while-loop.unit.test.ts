@@ -2,7 +2,6 @@ import * as Rx from 'rxjs'
 import * as ops from 'rxjs/operators'
 import { whileLoop } from '../while-loop'
 // testing imports
-import { expect } from 'chai'
 import { rxjsTestScheduler } from '../../../../../testing/setup'
 
 describe('while-loop observable', () => {
@@ -12,7 +11,7 @@ describe('while-loop observable', () => {
       incrementUntil >= index
 
     rxjsTestScheduler(helpers => {
-      const { cold, expectObservable } = helpers
+      const { expectObservable } = helpers
       const expected = '-01(2|)'
 
       expectObservable(

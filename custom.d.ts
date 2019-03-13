@@ -8,6 +8,9 @@ declare module 'flow-runtime' {
   export default content
 }
 
+// mocha-step is missing typescript types
+declare function step(...args: ArgumentTypes<typeof it>): ReturnType<typeof it>
+
 type ArgumentTypes<F extends Function> = F extends (...args: infer A) => any ? A : never
 
 type Omit<T, K> = Pick<T, Exclude<keyof T, K>>

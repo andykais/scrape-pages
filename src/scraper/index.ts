@@ -30,7 +30,7 @@ const startScraping = async (settings: Settings) => {
   )
 
   // create the observable
-  const scrapingScheme = structureScrapers(settings, scrapers)(settings.config.run)
+  const scrapingScheme = structureScrapers(settings, scrapers, tools)(settings.config.run)
   const scrapingObservable = scrapingScheme([{ parsedValue: '' }])
   // start running the observable
   const { emitter, queue, logger } = tools

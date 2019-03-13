@@ -1,5 +1,3 @@
-import * as Rx from 'rxjs'
-import * as ops from 'rxjs/operators'
 import * as RxTesting from 'rxjs/testing'
 import { expect } from 'chai'
 

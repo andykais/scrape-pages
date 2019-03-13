@@ -14,7 +14,7 @@ class ScraperEmitter {
   }
   /** emittable by user */
   public emittable = {
-    STOP: 'done'
+    STOP: 'stop'
   }
   public emit = {
     queued: (id: number) => {
@@ -29,7 +29,7 @@ class ScraperEmitter {
   }
   public on = {
     stop: (callback: () => void) => {
-      this.emitter.on(`${this.name}:${this.emittable.STOP}`, callback)
+      this.emitter.on(`${this.emittable.STOP}:${this.name}`, callback)
     }
   }
 
@@ -46,7 +46,7 @@ class ScraperEmitter {
 }
 
 type EmitterOn = (event: string, callback: (...args: any[]) => void) => void
-type EmitterEmit = (event: 'stop' | 'useRateLimiter', ...emittedValues: any[]) => void
+type EmitterEmit = (event: string, ...emittedValues: any[]) => void
 
 class Emitter {
   /** listenable by user */
