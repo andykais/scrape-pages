@@ -22,6 +22,8 @@ const initFolders = async ({ paramsInit, flatParams }: Settings) => {
 }
 
 const startScraping = async (settings: Settings) => {
+  // const stats = useStats()
+
   await initFolders(settings)
   const tools = initTools(settings)
 
@@ -57,8 +59,8 @@ const startScraping = async (settings: Settings) => {
     // necessary so we can listen to 'stop' event right away, but wait to cancel the observable until after it is started
     setTimeout(() => {
       subscription.unsubscribe()
-      logger.info('Done!')
       emitter.emit.done()
+      // logger.info(`Completed after ${stats.time.total}.`)
     }, 0)
   })
 

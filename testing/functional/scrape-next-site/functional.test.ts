@@ -3,13 +3,9 @@ import * as path from 'path'
 
 import { expect } from 'chai'
 
-import { nockMockFolder } from '../../setup'
+import { nockMockFolder, configureSnapshots } from '../../setup'
 import { config } from './config'
-import * as querySnapshot from './resources/expected-query-result.json'
 import { scrape } from '../../../src'
-
-// fixes webpack json import error https://github.com/webpack/webpack/issues/8504
-const expectedQueryResult = Array.from((querySnapshot as any).default as typeof querySnapshot)
 
 const resourceFolder = `${__dirname}/resources/mock-endpoints`
 const resourceUrl = `http://${path.basename(__dirname)}.com`
@@ -21,6 +17,10 @@ const params = {
   cleanFolder: true
 }
 describe('scrape next site', () => {
+  beforeEach(function() {
+    configureSnapshots({ __dirname, __filename, fullTitle: this.currentTest.fullTitle() })
+  })
+
   describe('with instant scraper', () => {
     const { start, query } = scrape(config, options, params)
 
@@ -38,7 +38,7 @@ describe('scrape next site', () => {
       })
       expect(result)
         .excludingEvery(['filename', 'id'])
-        .to.deep.equal(expectedQueryResult.map(g => g.filter(r => r.scraper === 'image')))
+        .to.matchSnapshot()
     })
     it('should group tags and images together that were found on the same page', () => {
       const result = query({
@@ -47,7 +47,7 @@ describe('scrape next site', () => {
       })
       expect(result)
         .excludingEvery(['filename', 'id'])
-        .to.deep.equal(expectedQueryResult)
+        .to.matchSnapshot()
     })
   })
 
@@ -70,7 +70,7 @@ describe('scrape next site', () => {
       })
       expect(result)
         .excludingEvery(['filename', 'id'])
-        .to.deep.equal(expectedQueryResult)
+        .to.matchSnapshot()
     })
   })
 })

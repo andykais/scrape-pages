@@ -6,13 +6,10 @@ var __importStar = (this && this.__importStar) || function (mod) {
     result["default"] = mod;
     return result;
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 const Rx = __importStar(require("rxjs"));
-const verror_1 = __importDefault(require("verror"));
-exports.wrapError = (message) => (e) => Rx.throwError(new verror_1.default({ name: e.name, cause: e }, message));
+const verror_1 = require("verror");
+exports.wrapError = (message) => (e) => Rx.throwError(new verror_1.VError({ name: e.name, cause: e }, message));
 class ResponseError extends Error {
     constructor(response, url) {
         super(`Request "${url}" failed. Received status ${response.status}`);
