@@ -1,6 +1,5 @@
 import * as os from 'os'
 import * as path from 'path'
-import { omit } from 'lodash'
 
 import { expect } from 'chai'
 
@@ -8,7 +7,7 @@ import { nockMockFolder, configureSnapshots } from '../../setup'
 import { config } from './config'
 import { scrape } from '../../../src'
 
-const resourceFolder = `${__dirname}/resources/mock-endpoints`
+const resourceFolder = `${__dirname}/fixtures`
 const resourceUrl = `http://${path.basename(__dirname)}.com`
 
 const options = {}
@@ -18,7 +17,7 @@ const params = {
 }
 describe('increment gallery site', () => {
   beforeEach(function() {
-    configureSnapshots({ __dirname, __filename, fullTitle: this.currentTest.fullTitle() })
+    configureSnapshots({ __dirname, __filename, fullTitle: this.currentTest!.fullTitle() })
   })
 
   describe('with instant scraper', () => {

@@ -150,11 +150,6 @@ export class Downloader extends AbstractDownloader<DownloadData> {
     }
   }
 
-  private useByteCounter = (downloadId: number, response: Fetch.Response) => {
-    const hasProgressListener = this.scraperEmitter.hasListenerFor(
-      this.scraperEmitter.listenable.PROGRESS
-    )
-  }
   private emitDownloadProgress = (downloadId: number, response: Fetch.Response) => {
     if (this.scraperEmitter.hasListenerFor(this.scraperEmitter.listenable.PROGRESS)) {
       const contentLength = parseInt(response.headers.get('content-length') || '0')

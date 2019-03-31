@@ -3,11 +3,11 @@ import * as path from 'path'
 
 import { expect } from 'chai'
 
-import { nockMockFolder, configureSnapshots } from '../../setup'
+import { nockMockFolder, configureSnapshots, stripResult } from '../../setup'
 import { config } from './config'
 import { scrape } from '../../../src'
 
-const resourceFolder = `${__dirname}/resources/mock-endpoints`
+const resourceFolder = `${__dirname}/fixtures`
 const resourceUrl = `http://${path.basename(__dirname)}.com`
 
 const options = {}
@@ -18,7 +18,7 @@ const params = {
 }
 describe('scrape next site', () => {
   beforeEach(function() {
-    configureSnapshots({ __dirname, __filename, fullTitle: this.currentTest.fullTitle() })
+    configureSnapshots({ __dirname, __filename, fullTitle: this.currentTest!.fullTitle() })
   })
 
   describe('with instant scraper', () => {
@@ -36,18 +36,14 @@ describe('scrape next site', () => {
         scrapers: ['image'],
         groupBy: 'image'
       })
-      expect(result)
-        .excludingEvery(['filename', 'id'])
-        .to.matchSnapshot()
+      expect(stripResult(result)).to.matchSnapshot()
     })
     it('should group tags and images together that were found on the same page', () => {
       const result = query({
         scrapers: ['image', 'tag'],
         groupBy: 'image-page'
       })
-      expect(result)
-        .excludingEvery(['filename', 'id'])
-        .to.matchSnapshot()
+      expect(stripResult(result)).to.matchSnapshot()
     })
   })
 
@@ -68,9 +64,7 @@ describe('scrape next site', () => {
         scrapers: ['image', 'tag'],
         groupBy: 'image-page'
       })
-      expect(result)
-        .excludingEvery(['filename', 'id'])
-        .to.matchSnapshot()
+      expect(stripResult(result)).to.matchSnapshot()
     })
   })
 })
