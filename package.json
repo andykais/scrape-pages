@@ -26,7 +26,8 @@
     "test:watch": "mocha-webpack '{testing,src,examples}/**/*.test.ts' --watch",
     "test:unit": "mocha-webpack src/**/*.unit.test.ts",
     "test:functional": "mocha-webpack testing/**/*functional.test.ts",
-    "test": "run-s typecheck test:unit test:functional lint format:check"
+    "test:examples": "mocha-webpack examples/**/*.unit.test.ts",
+    "test": "run-s typecheck test:unit test:functional test:examples lint format:check"
   },
   "repository": {
     "type": "git",

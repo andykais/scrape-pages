@@ -93,9 +93,9 @@ const structureScrapers = (
             )
           )
         ),
-        ops.map(([parsedValues]) => parsedValues),
-        ops.catchError(wrapError(`scraper '${scraper.scraperName}'`))
+        ops.map(([parsedValues]) => parsedValues)
       )
+      .pipe(ops.catchError(wrapError(`scraper '${scraper.scraperName}'`)))
       .pipe(
         // each
         each.length
