@@ -14,7 +14,8 @@ class ClearTerminalInWatchMode {
 module.exports = (env, { mode = 'development' } = {}) => ({
   target: 'node',
   node: {
-    __dirname: true
+    __dirname: true,
+    __filename: true
   },
   mode: 'development',
   devtool: 'inline-source-map',
@@ -41,6 +42,11 @@ module.exports = (env, { mode = 'development' } = {}) => ({
       {
         test: /\.sql$/,
         use: 'raw-loader'
+      },
+      {
+        test: /\.js$/,
+        loader: 'source-map-loader',
+        enforce: 'pre'
       }
     ]
   },
@@ -49,6 +55,7 @@ module.exports = (env, { mode = 'development' } = {}) => ({
     new ClearTerminalInWatchMode()
   ],
   optimization: {
+    minimize: false,
     minimizer: [new TerserPlugin()]
   },
   externals: [nodeExternals()]

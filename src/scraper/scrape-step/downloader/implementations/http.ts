@@ -95,12 +95,14 @@ export class Downloader extends AbstractDownloader<DownloadData> {
       response.body.pipe(dest)
       response.body.on('error', error => reject(error))
       response.body.on('data', chunk => buffers.push(chunk))
-      this.emitBodyProgress(downloadId, response)
+      this.emitDownloadProgress(downloadId, response)
       dest.on('error', error => reject(error))
       dest.on('close', () => resolve(Buffer.concat(buffers)))
     })
+    const byteLength = dest.bytesWritten
     return {
       downloadValue: buffer.toString(),
+      byteLength,
       filename
     }
   }
@@ -115,29 +117,45 @@ export class Downloader extends AbstractDownloader<DownloadData> {
     const dest = createWriteStream(filename)
     await new Promise((resolve, reject) => {
       response.body.pipe(dest)
-      this.emitBodyProgress(downloadId, response)
-      response.body.on('error', error => reject(error))
-      dest.on('error', error => reject(error))
+      this.emitDownloadProgress(downloadId, response)
+      response.body.on('error', reject)
+      dest.on('error', reject)
       dest.on('close', resolve)
     })
+    const byteLength = dest.bytesWritten
     return {
       downloadValue: '',
+      byteLength,
       filename
     }
   }
-  private downloadToMemoryOnly: FetchFunction = (downloadId, [url, fetchOptions]) =>
-    fetch(url, fetchOptions)
-      .then(response => {
-        if (!response.ok) throw new ResponseError(response, url)
-        this.emitBodyProgress(downloadId, response)
-        return response.text()
-      })
-      .then(downloadValue => ({ downloadValue }))
+  private downloadToMemoryOnly: FetchFunction = async (downloadId, [url, fetchOptions]) => {
+    const response = await fetch(url, fetchOptions)
+    if (!response.ok) throw new ResponseError(response, url)
+    this.emitDownloadProgress(downloadId, response)
+    const downloadValue = await response.text()
+    const byteLength = Buffer.byteLength(downloadValue)
+    return {
+      downloadValue,
+      byteLength
+    }
+  }
 
-  private downloadOnly: FetchFunction = (downlodaId, [url, fetchOptions]) =>
-    fetch(url, fetchOptions).then(() => ({ downloadValue: '' }))
+  private downloadOnly: FetchFunction = async (downlodaId, [url, fetchOptions]) => {
+    await fetch(url, fetchOptions)
+    const byteLength = 0
+    return {
+      downloadValue: '',
+      byteLength
+    }
+  }
 
-  private emitBodyProgress = (downloadId: number, response: Fetch.Response) => {
+  private useByteCounter = (downloadId: number, response: Fetch.Response) => {
+    const hasProgressListener = this.scraperEmitter.hasListenerFor(
+      this.scraperEmitter.listenable.PROGRESS
+    )
+  }
+  private emitDownloadProgress = (downloadId: number, response: Fetch.Response) => {
     if (this.scraperEmitter.hasListenerFor(this.scraperEmitter.listenable.PROGRESS)) {
       const contentLength = parseInt(response.headers.get('content-length') || '0')
       let bytesLength = 0

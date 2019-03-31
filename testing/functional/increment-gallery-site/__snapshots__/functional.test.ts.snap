@@ -1,0 +1,462 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`increment gallery site with cached scraper should make the expected requests on first pass 1`] = `
+Array [
+  Array [
+    Object {
+      "downloadData": null,
+      "parsedValue": "one",
+      "scraper": "tag",
+    },
+    Object {
+      "downloadData": null,
+      "parsedValue": "two",
+      "scraper": "tag",
+    },
+    Object {
+      "downloadData": "[\\"http://increment-gallery-site.com/image/the.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
+      "parsedValue": "",
+      "scraper": "image",
+    },
+  ],
+  Array [
+    Object {
+      "downloadData": null,
+      "parsedValue": "one",
+      "scraper": "tag",
+    },
+    Object {
+      "downloadData": null,
+      "parsedValue": "two",
+      "scraper": "tag",
+    },
+    Object {
+      "downloadData": "[\\"http://increment-gallery-site.com/image/quick.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
+      "parsedValue": "",
+      "scraper": "image",
+    },
+  ],
+  Array [
+    Object {
+      "downloadData": null,
+      "parsedValue": "four",
+      "scraper": "tag",
+    },
+    Object {
+      "downloadData": null,
+      "parsedValue": "five",
+      "scraper": "tag",
+    },
+    Object {
+      "downloadData": "[\\"http://increment-gallery-site.com/image/brown.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
+      "parsedValue": "",
+      "scraper": "image",
+    },
+  ],
+  Array [
+    Object {
+      "downloadData": null,
+      "parsedValue": "three",
+      "scraper": "tag",
+    },
+    Object {
+      "downloadData": null,
+      "parsedValue": "four",
+      "scraper": "tag",
+    },
+    Object {
+      "downloadData": null,
+      "parsedValue": "five",
+      "scraper": "tag",
+    },
+    Object {
+      "downloadData": "[\\"http://increment-gallery-site.com/image/fox.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
+      "parsedValue": "",
+      "scraper": "image",
+    },
+  ],
+]
+`;
+
+exports[`increment gallery site with instant scraper should group each image into a separate slot, in order 1`] = `
+Array [
+  Array [
+    Object {
+      "downloadData": "[\\"http://increment-gallery-site.com/image/the.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
+      "parsedValue": "",
+      "scraper": "image",
+    },
+  ],
+  Array [
+    Object {
+      "downloadData": "[\\"http://increment-gallery-site.com/image/quick.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
+      "parsedValue": "",
+      "scraper": "image",
+    },
+  ],
+  Array [
+    Object {
+      "downloadData": "[\\"http://increment-gallery-site.com/image/brown.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
+      "parsedValue": "",
+      "scraper": "image",
+    },
+  ],
+  Array [
+    Object {
+      "downloadData": "[\\"http://increment-gallery-site.com/image/fox.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
+      "parsedValue": "",
+      "scraper": "image",
+    },
+  ],
+]
+`;
+
+exports[`increment gallery site with instant scraper should group tags and images together that were found on the same page 1`] = `
+Array [
+  Array [
+    Object {
+      "downloadData": null,
+      "parsedValue": "one",
+      "scraper": "tag",
+    },
+    Object {
+      "downloadData": null,
+      "parsedValue": "two",
+      "scraper": "tag",
+    },
+    Object {
+      "downloadData": "[\\"http://increment-gallery-site.com/image/the.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
+      "parsedValue": "",
+      "scraper": "image",
+    },
+  ],
+  Array [
+    Object {
+      "downloadData": null,
+      "parsedValue": "one",
+      "scraper": "tag",
+    },
+    Object {
+      "downloadData": null,
+      "parsedValue": "two",
+      "scraper": "tag",
+    },
+    Object {
+      "downloadData": "[\\"http://increment-gallery-site.com/image/quick.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
+      "parsedValue": "",
+      "scraper": "image",
+    },
+  ],
+  Array [
+    Object {
+      "downloadData": null,
+      "parsedValue": "four",
+      "scraper": "tag",
+    },
+    Object {
+      "downloadData": null,
+      "parsedValue": "five",
+      "scraper": "tag",
+    },
+    Object {
+      "downloadData": "[\\"http://increment-gallery-site.com/image/brown.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
+      "parsedValue": "",
+      "scraper": "image",
+    },
+  ],
+  Array [
+    Object {
+      "downloadData": null,
+      "parsedValue": "three",
+      "scraper": "tag",
+    },
+    Object {
+      "downloadData": null,
+      "parsedValue": "four",
+      "scraper": "tag",
+    },
+    Object {
+      "downloadData": null,
+      "parsedValue": "five",
+      "scraper": "tag",
+    },
+    Object {
+      "downloadData": "[\\"http://increment-gallery-site.com/image/fox.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
+      "parsedValue": "",
+      "scraper": "image",
+    },
+  ],
+]
+`;
+
+exports[`increment gallery site with instant scraper should group tags and images together that were found on the same page 2`] = `
+Array [
+  Array [
+    Object {
+      "downloadData": null,
+      "parsedValue": "one",
+      "scraper": "tag",
+    },
+    Object {
+      "downloadData": null,
+      "parsedValue": "two",
+      "scraper": "tag",
+    },
+    Object {
+      "downloadData": "[\\"http://increment-gallery-site.com/image/the.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
+      "parsedValue": "",
+      "scraper": "image",
+    },
+  ],
+  Array [
+    Object {
+      "downloadData": null,
+      "parsedValue": "one",
+      "scraper": "tag",
+    },
+    Object {
+      "downloadData": null,
+      "parsedValue": "two",
+      "scraper": "tag",
+    },
+    Object {
+      "downloadData": "[\\"http://increment-gallery-site.com/image/quick.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
+      "parsedValue": "",
+      "scraper": "image",
+    },
+  ],
+  Array [
+    Object {
+      "downloadData": null,
+      "parsedValue": "four",
+      "scraper": "tag",
+    },
+    Object {
+      "downloadData": null,
+      "parsedValue": "five",
+      "scraper": "tag",
+    },
+    Object {
+      "downloadData": "[\\"http://increment-gallery-site.com/image/brown.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
+      "parsedValue": "",
+      "scraper": "image",
+    },
+  ],
+  Array [
+    Object {
+      "downloadData": null,
+      "parsedValue": "three",
+      "scraper": "tag",
+    },
+    Object {
+      "downloadData": null,
+      "parsedValue": "four",
+      "scraper": "tag",
+    },
+    Object {
+      "downloadData": null,
+      "parsedValue": "five",
+      "scraper": "tag",
+    },
+    Object {
+      "downloadData": "[\\"http://increment-gallery-site.com/image/fox.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
+      "parsedValue": "",
+      "scraper": "image",
+    },
+  ],
+]
+`;
+
+exports[`increment gallery site with instant scraper should group tags and images together that were found on the same page 3`] = `
+Array [
+  Array [
+    Object {
+      "downloadData": "[\\"http://increment-gallery-site.com/image/the.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
+      "parsedValue": "",
+      "scraper": "image",
+    },
+  ],
+  Array [
+    Object {
+      "downloadData": "[\\"http://increment-gallery-site.com/image/brown.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
+      "parsedValue": "",
+      "scraper": "image",
+    },
+  ],
+]
+`;
+
+exports[`increment gallery site with instant scraper should group tags and images together that were found on the same page 4`] = `
+Array [
+  Array [
+    Object {
+      "downloadData": null,
+      "parsedValue": "one",
+      "scraper": "tag",
+    },
+    Object {
+      "downloadData": null,
+      "parsedValue": "two",
+      "scraper": "tag",
+    },
+    Object {
+      "downloadData": "[\\"http://increment-gallery-site.com/image/the.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
+      "parsedValue": "",
+      "scraper": "image",
+    },
+  ],
+  Array [
+    Object {
+      "downloadData": null,
+      "parsedValue": "one",
+      "scraper": "tag",
+    },
+    Object {
+      "downloadData": null,
+      "parsedValue": "two",
+      "scraper": "tag",
+    },
+    Object {
+      "downloadData": "[\\"http://increment-gallery-site.com/image/quick.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
+      "parsedValue": "",
+      "scraper": "image",
+    },
+  ],
+  Array [
+    Object {
+      "downloadData": null,
+      "parsedValue": "four",
+      "scraper": "tag",
+    },
+    Object {
+      "downloadData": null,
+      "parsedValue": "five",
+      "scraper": "tag",
+    },
+    Object {
+      "downloadData": "[\\"http://increment-gallery-site.com/image/brown.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
+      "parsedValue": "",
+      "scraper": "image",
+    },
+  ],
+  Array [
+    Object {
+      "downloadData": null,
+      "parsedValue": "three",
+      "scraper": "tag",
+    },
+    Object {
+      "downloadData": null,
+      "parsedValue": "four",
+      "scraper": "tag",
+    },
+    Object {
+      "downloadData": null,
+      "parsedValue": "five",
+      "scraper": "tag",
+    },
+    Object {
+      "downloadData": "[\\"http://increment-gallery-site.com/image/fox.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
+      "parsedValue": "",
+      "scraper": "image",
+    },
+  ],
+]
+`;
+
+exports[`increment gallery site with psuedo-random delayed scraper should keep images and tags together, in order 1`] = `
+Array [
+  Array [
+    Object {
+      "downloadData": null,
+      "parsedValue": "one",
+      "scraper": "tag",
+    },
+    Object {
+      "downloadData": null,
+      "parsedValue": "two",
+      "scraper": "tag",
+    },
+    Object {
+      "downloadData": "[\\"http://increment-gallery-site.com/image/the.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
+      "parsedValue": "",
+      "scraper": "image",
+    },
+  ],
+  Array [
+    Object {
+      "downloadData": null,
+      "parsedValue": "one",
+      "scraper": "tag",
+    },
+    Object {
+      "downloadData": null,
+      "parsedValue": "two",
+      "scraper": "tag",
+    },
+    Object {
+      "downloadData": "[\\"http://increment-gallery-site.com/image/quick.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
+      "parsedValue": "",
+      "scraper": "image",
+    },
+  ],
+  Array [
+    Object {
+      "downloadData": null,
+      "parsedValue": "four",
+      "scraper": "tag",
+    },
+    Object {
+      "downloadData": null,
+      "parsedValue": "five",
+      "scraper": "tag",
+    },
+    Object {
+      "downloadData": "[\\"http://increment-gallery-site.com/image/brown.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
+      "parsedValue": "",
+      "scraper": "image",
+    },
+  ],
+  Array [
+    Object {
+      "downloadData": null,
+      "parsedValue": "three",
+      "scraper": "tag",
+    },
+    Object {
+      "downloadData": null,
+      "parsedValue": "four",
+      "scraper": "tag",
+    },
+    Object {
+      "downloadData": null,
+      "parsedValue": "five",
+      "scraper": "tag",
+    },
+    Object {
+      "downloadData": "[\\"http://increment-gallery-site.com/image/fox.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
+      "parsedValue": "",
+      "scraper": "image",
+    },
+  ],
+]
+`;
+
+exports[`increment gallery site with value limit should group each image into a separate slot, in order 1`] = `
+Array [
+  Array [
+    Object {
+      "downloadData": "[\\"http://increment-gallery-site.com/image/the.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
+      "parsedValue": "",
+      "scraper": "image",
+    },
+  ],
+  Array [
+    Object {
+      "downloadData": "[\\"http://increment-gallery-site.com/image/brown.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
+      "parsedValue": "",
+      "scraper": "image",
+    },
+  ],
+]
+`;

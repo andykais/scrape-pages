@@ -99,22 +99,29 @@ const normalizeScraperDefs = (scraperDefs: ConfigInit['scrapers']) => {
   }, {})
 }
 
-const normalizeUndefinedSingleArray = <T>(val?: T | T[]): T[] =>
+const normalizeUndefinedSingleArray = <T>(val: undefined | T | T[]): T[] =>
   val === undefined ? [] : Array.isArray(val) ? val : [val]
 
-const normalizeStructure = ({ scraper, forNext, forEach }: ConfigInit['run']): Config['run'] => ({
+const normalizeStructure = (scrapers: ConfigInit['scrapers']) => ({
   scraper,
-  forNext: normalizeUndefinedSingleArray(forNext).map(normalizeStructure),
-  forEach: normalizeUndefinedSingleArray(forEach).map(normalizeStructure)
-})
+  forNext,
+  forEach
+}: ConfigInit['run']): Config['run'] => {
+  if (!scrapers[scraper]) throw new Error(`config.scrapers is missing scraper "${scraper}"`)
+  return {
+    scraper,
+    forNext: normalizeUndefinedSingleArray(forNext).map(normalizeStructure(scrapers)),
+    forEach: normalizeUndefinedSingleArray(forEach).map(normalizeStructure(scrapers))
+  }
+}
 
-const normalizeConfig = (config: ConfigInit): Config => {
-  assertConfigType(config)
+const normalizeConfig = (configInit: ConfigInit): Config => {
+  assertConfigType(configInit)
 
   return {
-    input: normalizeInputs(config.input),
-    scrapers: normalizeScraperDefs(config.scrapers),
-    run: normalizeStructure(config.run)
+    input: normalizeInputs(configInit.input),
+    scrapers: normalizeScraperDefs(configInit.scrapers),
+    run: normalizeStructure(configInit.scrapers)(configInit.run)
   }
 }
 

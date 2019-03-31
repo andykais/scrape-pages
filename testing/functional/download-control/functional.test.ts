@@ -3,7 +3,7 @@ import * as path from 'path'
 
 import { expect } from 'chai'
 
-import { nockMockFolder } from '../../setup'
+import { nockMockFolder, configureSnapshots } from '../../setup'
 import { config } from './config'
 import * as querySnapshot from './resources/expected-query-result.json'
 import { scrape } from '../../../src'
@@ -51,6 +51,10 @@ const useRequestStatsRecorder = (config: ConfigInit, on: Emitter['on']) => {
   return stats
 }
 describe('download control', () => {
+  beforeEach(function() {
+    configureSnapshots({ __dirname, __filename, fullTitle: this.currentTest.fullTitle() })
+  })
+
   step('first pass should fetch all downloads since nothing is in cache', async () => {
     const { start, query } = scrape(config, { cache: true }, params)
     await nockMockFolder(resourceFolder, resourceUrl)
@@ -62,7 +66,9 @@ describe('download control', () => {
     expect(counts.postTitle.queued).to.equal(5)
     expect(counts.postTitle.complete).to.equal(5)
     const result = query({ scrapers: ['postTitle'] })
-    expect(result).to.deep.equal(expectedQueryResult)
+    expect(result)
+      .excludingEvery(['filename', 'id'])
+      .to.matchSnapshot()
   })
 
   step('with all scrapers cache: true, no requests should happen', async () => {
@@ -76,7 +82,24 @@ describe('download control', () => {
     expect(counts.postTitle.queued).to.equal(0)
     expect(counts.postTitle.complete).to.equal(5)
     const result = query({ scrapers: ['postTitle'] })
-    expect(result).to.deep.equal(expectedQueryResult)
+    console.time('strip')
+    const strippedResult = result.map(g =>
+      g.map(r => ({
+        ...r,
+        filename: typeof filename === 'string' ? true : false,
+        id: typeof r.id === 'number' ? true : false
+      }))
+    )
+    console.timeEnd('strip')
+    console.log(strippedResult)
+
+    expect(getInvariantResult(result)).to.matchSnapshot()
+
+    expect(stripResult(result)).to.matchSnapshot()
+
+    expect(result)
+      .excludingEvery(['filename', 'id'])
+      .to.matchSnapshot()
   })
 
   step(`second pass on same folder should request 'index', but not cached postTitle`, async () => {
@@ -94,7 +117,9 @@ describe('download control', () => {
     expect(counts.postTitle.queued).to.equal(0)
     expect(counts.postTitle.complete).to.equal(5)
     const result = query({ scrapers: ['postTitle'] })
-    expect(result).to.deep.equal(expectedQueryResult)
+    expect(result)
+      .excludingEvery(['filename', 'id'])
+      .to.matchSnapshot()
   })
 
   describe('emit stop event', () => {
