@@ -1,7 +1,7 @@
 import * as path from 'path'
 import { initTools } from '../tools'
 import { ScrapeStep } from './scrape-step'
-import { mkdirp, rmrf, writeFile } from '../util/fs'
+import { mkdirp, rmrf, exists, read, writeFile } from '../util/fs'
 import { getSettings, getScrapeStepSettings } from '../settings'
 import { Logger } from '../tools/logger'
 import { Store } from '../tools/store'
@@ -9,13 +9,12 @@ import { structureScrapers } from './flow'
 import { version } from '../../package.json'
 // type imports
 import { Settings } from '../settings'
+import { Tools } from '../tools'
 import { ConfigInit } from '../settings/config/types'
 import { OptionsInit } from '../settings/options/types'
 import { ParamsInit } from '../settings/params/types'
 
-const initFolders = async (settings: Settings) => {
-  const { paramsInit, optionsInit, configInit, flatParams } = settings
-
+const initFolders = async ({ paramsInit, flatParams }: Settings) => {
   // remove folders if specified
   if (paramsInit.cleanFolder) await rmrf(paramsInit.folder)
   // create folders
@@ -23,20 +22,30 @@ const initFolders = async (settings: Settings) => {
   for (const { folder } of flatParams.values()) await mkdirp(folder)
   // safely rename existing log files
   await Logger.rotateLogFiles(paramsInit.folder)
+}
 
+const writeMetadata = async (settings: Settings, { logger }: Tools) => {
+  const { paramsInit, optionsInit, configInit } = settings
+  const metadataFile = path.resolve(paramsInit.folder, 'metadata.json')
+  if (await exists(metadataFile)) {
+    const { version: oldVersion } = JSON.parse(await read(metadataFile))
+    if (oldVersion !== version) {
+      const logMessage = `This folder was created by an older version of scrape-pages! Old: ${oldVersion}, New: ${version}. Consider adding the param 'cleanFolder: true' and starting fresh.`
+      logger.warn(logMessage)
+    }
+  }
   await writeFile(
-    path.resolve(paramsInit.folder, 'metadata.json'),
+    metadataFile,
     JSON.stringify({ version, settingsInit: { configInit, optionsInit, paramsInit } })
   )
 }
 
 const startScraping = async (settings: Settings) => {
-  // const stats = useStats()
-
   await initFolders(settings)
   const tools = initTools(settings)
   const { emitter, queue, logger } = tools
 
+  await writeMetadata(settings, tools)
   logger.info({ inspected: settings.config }, 'config')
   logger.info({ inspected: settings.flatConfig }, 'flatConfig')
   logger.info({ inspected: settings.flatOptions }, 'flatOptions')
@@ -60,7 +69,6 @@ const startScraping = async (settings: Settings) => {
         queue.closeQueue()
       },
       complete: () => {
-        // TODO add timer to show how long it took
         queue.closeQueue()
         emitter.emit.done()
         logger.info('Done!')
@@ -74,7 +82,7 @@ const startScraping = async (settings: Settings) => {
     setTimeout(() => {
       subscription.unsubscribe()
       emitter.emit.done()
-      // logger.info(`Completed after ${stats.time.total}.`)
+      logger.info(`Done.`)
     }, 0)
   })
 

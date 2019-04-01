@@ -97,5 +97,13 @@ describe('normalize config with', () => {
         .to.throw(`$: expected 'scrapers' in object`)
         .with.property('name', 'RuntimeTypeError')
     })
+    describe('with scrapers that are not defined', () => {
+      const configInit = { scrapers: {}, run: { scraper: 'hello' } }
+      it('should throw an error', () => {
+        expect(() => normalizeConfig(configInit)).to.throw(
+          'config.scrapers is missing scraper "hello"'
+        )
+      })
+    })
   })
 })

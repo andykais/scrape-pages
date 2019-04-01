@@ -27,7 +27,7 @@ class Logger {
   public constructor({ optionsInit, flatOptions, paramsInit }: Settings) {
     this.logger = Bunyan.createLogger({
       name: 'root',
-      level: optionsInit.logLevel || ('error' as 'error'),
+      level: optionsInit.logLevel || ('warn' as 'warn'),
       serializers,
       streams: [{ path: path.resolve(paramsInit.folder, Logger.logFilename) }]
     })

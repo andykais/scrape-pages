@@ -3,6 +3,7 @@ import * as path from 'path'
 
 import { expect } from 'chai'
 
+import * as nock from 'nock'
 import { nockMockFolder, configureSnapshots, stripResult } from '../../setup'
 import { config } from './config'
 import { scrape } from '../../../src'
@@ -133,6 +134,35 @@ describe('download control', () => {
         expect(indexResult.length).to.equal(5)
         const result = query({ scrapers: ['postTitle'], groupBy: 'postTitle' })
         expect(result.length).to.equal(0)
+      })
+    })
+  })
+
+  describe('failing requests', () => {
+    it('should report the failure and stop the scraper', async () => {
+      const config = {
+        scrapers: { 'will-fail': { download: { urlTemplate: 'https://non-existent.com/a/b/c' } } },
+        run: { scraper: 'will-fail' }
+      }
+      nock('https://non-existent.com')
+        .get('/a/b/c')
+        .reply(500)
+
+      const { start } = scrape(config, options, params)
+      const { on } = await start()
+      const { counts } = useRequestStatsRecorder(config, on)
+      await new Promise((resolve, reject) => {
+        on('error', (e: Error) => {
+          expect(e).to.be.instanceof(Error)
+          expect(e.name).to.equal('ResponseError')
+          expect(e.message).to.include(
+            `scraper 'will-fail': Request "https://non-existent.com/a/b/c" failed.`
+          )
+          expect(counts['will-fail'].queued).to.equal(1)
+          expect(counts['will-fail'].complete).to.equal(0)
+          resolve()
+        })
+        on('done', () => reject(`scraper should have emitted 'error' not 'done'`))
       })
     })
   })

@@ -3,7 +3,7 @@ import * as fs from 'fs'
 import { promisify } from 'util'
 import * as sanitize from 'sanitize-filename'
 
-const [mkdir, readdir, stat, unlink, rmdir, rename, access, writeFile] = [
+const [mkdir, readdir, stat, unlink, rmdir, rename, access, readFile, writeFile] = [
   fs.mkdir,
   fs.readdir,
   fs.stat,
@@ -11,10 +11,11 @@ const [mkdir, readdir, stat, unlink, rmdir, rename, access, writeFile] = [
   fs.rmdir,
   fs.rename,
   fs.access,
+  fs.readFile,
   fs.writeFile
 ].map(promisify)
 
-export { readdir, stat, rename, writeFile }
+export { readdir, stat, rename, readFile, writeFile }
 
 export const mkdirp = async (folder: string) => {
   try {
@@ -60,6 +61,11 @@ export const exists = async (file: string): Promise<boolean> => {
       throw e
     }
   }
+}
+
+export const read = async (file: string): Promise<string> => {
+  const fileBuffer = await readFile(file)
+  return fileBuffer.toString()
 }
 
 export const sanitizeFilename = (filename: string) => sanitize(filename, { replacement: '_' })
