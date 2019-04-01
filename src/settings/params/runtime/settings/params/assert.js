@@ -8,7 +8,7 @@ exports.assertParamsType = (paramsInit) => {
         (object => { var path = ["$"]; function _string(object) { if (typeof object !== "string")
             return "validation failed at " + path.join(".") + ": expected a string";
         else
-            return null; } function _299(object) { if (typeof object !== "object" || object === null || Array.isArray(object))
+            return null; } function _300(object) { if (typeof object !== "object" || object === null || Array.isArray(object))
             return "validation failed at " + path.join(".") + ": expected an object"; for (const key of Object.keys(object)) {
             path.push(key);
             var error = _string(object[key]);
@@ -18,11 +18,11 @@ exports.assertParamsType = (paramsInit) => {
         } return null; } function _boolean(object) { if (typeof object !== "boolean")
             return "validation failed at " + path.join(".") + ": expected a boolean";
         else
-            return null; } function _298(object) { if (typeof object !== "object" || object === null || Array.isArray(object))
+            return null; } function _299(object) { if (typeof object !== "object" || object === null || Array.isArray(object))
             return "validation failed at " + path.join(".") + ": expected an object"; {
             if ("input" in object) {
                 path.push("input");
-                var error = _299(object["input"]);
+                var error = _300(object["input"]);
                 path.pop();
                 if (error)
                     return error;
@@ -45,7 +45,7 @@ exports.assertParamsType = (paramsInit) => {
                 if (error)
                     return error;
             }
-        } return null; } var error = _298(object); if (error)
+        } return null; } var error = _299(object); if (error)
             throw new Error(error);
         else
             return object; })(paramsInit);

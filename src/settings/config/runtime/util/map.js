@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const util_1 = require("util");
 class FMap extends Map {
     constructor() {
         super(...arguments);
@@ -42,6 +43,9 @@ class FMap extends Map {
             object[key.toString()] = fn(val, key);
         }
         return object;
+    }
+    [util_1.inspect.custom]() {
+        return new Map([...this]);
     }
 }
 FMap.fromObject = (object) => {
