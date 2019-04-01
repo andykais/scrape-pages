@@ -51,50 +51,55 @@ describe('download control', () => {
     configureSnapshots({ __dirname, __filename, fullTitle: this.currentTest!.fullTitle() })
   })
 
-  step('first pass should fetch all downloads since nothing is in cache', async () => {
-    const { start, query } = scrape(config, { cache: true }, params)
-    await nockMockFolder(resourceFolder, resourceUrl)
-    const { on } = await start()
-    const { counts } = useRequestStatsRecorder(config, on)
-    await new Promise(resolve => on('done', resolve))
-    expect(counts.index.queued).to.equal(1)
-    expect(counts.index.complete).to.equal(1)
-    expect(counts.postTitle.queued).to.equal(5)
-    expect(counts.postTitle.complete).to.equal(5)
-    const result = query({ scrapers: ['postTitle'] })
-    expect(stripResult(result)).to.matchSnapshot()
-  })
+  describe('cache control', () => {
+    step('first pass should fetch all downloads since nothing is in cache', async () => {
+      const { start, query } = scrape(config, { cache: true }, params)
+      await nockMockFolder(resourceFolder, resourceUrl)
+      const { on } = await start()
+      const { counts } = useRequestStatsRecorder(config, on)
+      await new Promise(resolve => on('done', resolve))
+      expect(counts.index.queued).to.equal(1)
+      expect(counts.index.complete).to.equal(1)
+      expect(counts.postTitle.queued).to.equal(5)
+      expect(counts.postTitle.complete).to.equal(5)
+      const result = query({ scrapers: ['postTitle'] })
+      expect(stripResult(result)).to.matchSnapshot()
+    })
 
-  step('with all scrapers cache: true, no requests should happen', async () => {
-    const { start, query } = scrape(config, { cache: true }, { ...params, cleanFolder: false })
-    await nockMockFolder(resourceFolder, resourceUrl)
-    const { on } = await start()
-    const { counts } = useRequestStatsRecorder(config, on)
-    await new Promise(resolve => on('done', resolve))
-    expect(counts.index.queued).to.equal(0)
-    expect(counts.index.complete).to.equal(1)
-    expect(counts.postTitle.queued).to.equal(0)
-    expect(counts.postTitle.complete).to.equal(5)
-    const result = query({ scrapers: ['postTitle'] })
-    expect(stripResult(result)).to.matchSnapshot()
-  })
+    step('with all scrapers cache: true, no requests should happen', async () => {
+      const { start, query } = scrape(config, { cache: true }, { ...params, cleanFolder: false })
+      await nockMockFolder(resourceFolder, resourceUrl)
+      const { on } = await start()
+      const { counts } = useRequestStatsRecorder(config, on)
+      await new Promise(resolve => on('done', resolve))
+      expect(counts.index.queued).to.equal(0)
+      expect(counts.index.complete).to.equal(1)
+      expect(counts.postTitle.queued).to.equal(0)
+      expect(counts.postTitle.complete).to.equal(5)
+      const result = query({ scrapers: ['postTitle'] })
+      expect(stripResult(result)).to.matchSnapshot()
+    })
 
-  step(`second pass on same folder should request 'index', but not cached postTitle`, async () => {
-    const { start, query } = scrape(
-      config,
-      { cache: true, optionsEach: { index: { cache: false } } },
-      { ...params, cleanFolder: false }
+    step(
+      `second pass on same folder should request 'index', but not cached postTitle`,
+      async () => {
+        const { start, query } = scrape(
+          config,
+          { logLevel: 'info', cache: true, optionsEach: { index: { cache: false } } },
+          { ...params, cleanFolder: false }
+        )
+        await nockMockFolder(resourceFolder, resourceUrl)
+        const { on } = await start()
+        const { counts } = useRequestStatsRecorder(config, on)
+        await new Promise(resolve => on('done', resolve))
+        expect(counts.index.queued).to.equal(1)
+        expect(counts.index.complete).to.equal(1)
+        expect(counts.postTitle.queued).to.equal(0)
+        expect(counts.postTitle.complete).to.equal(5)
+        const result = query({ scrapers: ['postTitle'] })
+        expect(stripResult(result)).to.matchSnapshot()
+      }
     )
-    await nockMockFolder(resourceFolder, resourceUrl)
-    const { on } = await start()
-    const { counts } = useRequestStatsRecorder(config, on)
-    await new Promise(resolve => on('done', resolve))
-    expect(counts.index.queued).to.equal(1)
-    expect(counts.index.complete).to.equal(1)
-    expect(counts.postTitle.queued).to.equal(0)
-    expect(counts.postTitle.complete).to.equal(5)
-    const result = query({ scrapers: ['postTitle'] })
-    expect(stripResult(result)).to.matchSnapshot()
   })
 
   describe('emit stop event', () => {

@@ -29,6 +29,7 @@ export abstract class AbstractDownloader<DownloadData> {
   protected options: ScrapeSettings['options']
   protected params: ScrapeSettings['params']
   protected tools: Tools
+  protected scraperLogger: ReturnType<Tools['logger']['scraper']>
 
   public constructor(
     scraperName: ScraperName,
@@ -36,15 +37,17 @@ export abstract class AbstractDownloader<DownloadData> {
     settings: ScrapeSettings,
     tools: Tools
   ) {
-    Object.assign(this, { scraperName, downloadConfig, ...settings, tools })
+    const scraperLogger = tools.logger.scraper(scraperName)!
+    Object.assign(this, { scraperName, downloadConfig, ...settings, tools, scraperLogger })
   }
   public run = async (downloadParams: DownloadParams): Promise<RunValue> => {
     const { store, emitter } = this.tools
 
     const downloadData = this.constructDownload(downloadParams)
 
+    let cachedDownload: ReturnType<typeof store.qs.selectMatchingCachedDownload>
     if (this.options.cache) {
-      const cachedDownload = store.qs.selectMatchingCachedDownload(this.scraperName, downloadData)
+      cachedDownload = store.qs.selectMatchingCachedDownload(this.scraperName, downloadData)
       if (cachedDownload) return cachedDownload
     }
     emitter.scraper(this.scraperName).emit.queued(downloadParams.downloadId)
@@ -66,6 +69,18 @@ export abstract class AbstractDownloader<DownloadData> {
           failed: false
         })
       : undefined
+
+    if (cachedDownload) {
+      this.scraperLogger.info(
+        `scraper '${this.scraperName}' grabbed download from cache id ${cachedDownload.id}`
+      )
+    } else {
+      this.scraperLogger.info(
+        `scraper '${this.scraperName}' downloaded ${downloadParams.downloadId}${
+          cacheId !== undefined ? ` and saved cache to ${cacheId}` : ''
+        }`
+      )
+    }
 
     return {
       cacheId,

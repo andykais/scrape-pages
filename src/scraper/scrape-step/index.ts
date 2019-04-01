@@ -62,6 +62,9 @@ class ScrapeStep {
       value
     })
     const parsedValues = this.parser.run(downloadValue)
+    this.scraperLogger.info(`parsed ${parsedValues.length} values from downloadId ${downloadId}`, {
+      parsedValues
+    })
     this.tools.store.transaction(() => {
       store.qs.updateMarkDownloadComplete({ downloadId, cacheId })
       store.qs.insertBatchParsedValues({

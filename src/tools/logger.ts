@@ -1,4 +1,5 @@
 import * as path from 'path'
+import { inspect } from 'util'
 import * as Bunyan from 'bunyan'
 import { tap } from 'rxjs/operators'
 import * as fs from '../util/fs'
@@ -9,7 +10,10 @@ import { ScraperName } from '../settings/config/types'
 import { ParsedValue } from '../scraper/scrape-step'
 
 const serializers = {
-  parsedValuesWithId: (values: ParsedValue[]) => values.map(v => v.parsedValue)
+  parsedValuesWithId: (values: ParsedValue[]) => values.map(v => v.parsedValue),
+  inspected: (object: {}) => {
+    return inspect(object, { showHidden: true, depth: null })
+  }
 }
 class Logger {
   private static logFilename = 'run.log.0'

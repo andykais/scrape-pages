@@ -3,17 +3,18 @@ import * as fs from 'fs'
 import { promisify } from 'util'
 import * as sanitize from 'sanitize-filename'
 
-const [mkdir, readdir, stat, unlink, rmdir, rename, access] = [
+const [mkdir, readdir, stat, unlink, rmdir, rename, access, writeFile] = [
   fs.mkdir,
   fs.readdir,
   fs.stat,
   fs.unlink,
   fs.rmdir,
   fs.rename,
-  fs.access
+  fs.access,
+  fs.writeFile
 ].map(promisify)
 
-export { readdir, stat, rename }
+export { readdir, stat, rename, writeFile }
 
 export const mkdirp = async (folder: string) => {
   try {

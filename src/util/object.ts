@@ -1,3 +1,5 @@
+import { inspect } from 'util'
+
 const copy = (obj: {}) => JSON.parse(JSON.stringify(obj))
 
 // const merge = <A extends {} | [], B extends {} | [], C>(a: A, b: B) => {
@@ -16,6 +18,8 @@ const copy = (obj: {}) => JSON.parse(JSON.stringify(obj))
 //   }
 //   return []
 // }
+
+export const serialize = (object: {}) => inspect(object, { showHidden: false, depth: null })
 
 // type cannot represent replacing a toplevel array, so we wont support it in `replaceInObject`
 type ReplaceInObject<I extends {}, Find, ReplaceWith> = I extends Find
@@ -64,11 +68,11 @@ const es6MapToObject = <K, V>(map: Map<K, V>): { [key: string]: V } => {
   for (const [key, val] of map) obj[key.toString()] = val
   return obj
 }
-const marshalObject = <T extends {}>(object: T) =>
+const marshal = <T extends {}>(object: T) =>
   (replaceInObject(isEs6Map, es6MapToObject, object) as any) as Marshal<T>
 
 const marshaller = <T extends {}, F extends (...args: any[]) => T>(fn: F) => (
   ...args: ArgumentTypes<F>
-) => marshalObject(fn(...args) as ReturnType<F>)
+) => marshal(fn(...args) as ReturnType<F>)
 
-export { copy, replaceInObject, marshalObject, marshaller }
+export { copy, replaceInObject, marshal, marshaller }

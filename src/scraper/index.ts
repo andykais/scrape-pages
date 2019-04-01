@@ -1,17 +1,21 @@
+import * as path from 'path'
 import { initTools } from '../tools'
 import { ScrapeStep } from './scrape-step'
-import { mkdirp, rmrf } from '../util/fs'
+import { mkdirp, rmrf, writeFile } from '../util/fs'
 import { getSettings, getScrapeStepSettings } from '../settings'
 import { Logger } from '../tools/logger'
 import { Store } from '../tools/store'
 import { structureScrapers } from './flow'
+import { version } from '../../package.json'
 // type imports
 import { Settings } from '../settings'
 import { ConfigInit } from '../settings/config/types'
 import { OptionsInit } from '../settings/options/types'
 import { ParamsInit } from '../settings/params/types'
 
-const initFolders = async ({ paramsInit, flatParams }: Settings) => {
+const initFolders = async (settings: Settings) => {
+  const { paramsInit, optionsInit, configInit, flatParams } = settings
+
   // remove folders if specified
   if (paramsInit.cleanFolder) await rmrf(paramsInit.folder)
   // create folders
@@ -19,6 +23,11 @@ const initFolders = async ({ paramsInit, flatParams }: Settings) => {
   for (const { folder } of flatParams.values()) await mkdirp(folder)
   // safely rename existing log files
   await Logger.rotateLogFiles(paramsInit.folder)
+
+  await writeFile(
+    path.resolve(paramsInit.folder, 'metadata.json'),
+    JSON.stringify({ version, settingsInit: { configInit, optionsInit, paramsInit } })
+  )
 }
 
 const startScraping = async (settings: Settings) => {
@@ -26,6 +35,12 @@ const startScraping = async (settings: Settings) => {
 
   await initFolders(settings)
   const tools = initTools(settings)
+  const { emitter, queue, logger } = tools
+
+  logger.info({ inspected: settings.config }, 'config')
+  logger.info({ inspected: settings.flatConfig }, 'flatConfig')
+  logger.info({ inspected: settings.flatOptions }, 'flatOptions')
+  logger.info({ inspected: settings.flatParams }, 'flatParams')
 
   const scrapers = getScrapeStepSettings(settings).map(
     (scrapeSettings, name) => new ScrapeStep(name, scrapeSettings, tools)
@@ -35,8 +50,7 @@ const startScraping = async (settings: Settings) => {
   const scrapingScheme = structureScrapers(settings, scrapers, tools)(settings.config.run)
   const scrapingObservable = scrapingScheme([{ parsedValue: '' }])
   // start running the observable
-  const { emitter, queue, logger } = tools
-  // necessary so that any listeners setup after function is called are setup before downloads begin
+  // initting subscription is necessary so that any listeners setup after function is called are setup before downloads begin
   let subscription: ReturnType<typeof scrapingObservable.subscribe>
   setTimeout(() => {
     subscription = scrapingObservable.subscribe({
