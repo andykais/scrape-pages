@@ -11,6 +11,7 @@ export class Downloader extends AbstractDownloader<DownloadData> {
 
   public retrieve = (downloadId: number, parentValue: DownloadData) => ({
     downloadValue: parentValue,
-    filename: undefined
+    filename: undefined,
+    byteLength: undefined
   })
 }

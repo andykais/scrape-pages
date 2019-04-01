@@ -55,7 +55,7 @@ class ScrapeStep {
       parentId,
       incrementIndex
     })
-    const { downloadValue, cacheId } = await this.downloader.run({
+    const { downloadValue, cacheId, filename, mimeType, byteLength } = await this.downloader.run({
       parentId,
       incrementIndex,
       downloadId,
@@ -75,7 +75,9 @@ class ScrapeStep {
         format: this.parser.type
       })
     })()
-    this.tools.emitter.scraper(this.scraperName).emit.completed(downloadId)
+    this.tools.emitter
+      .scraper(this.scraperName)
+      .emit.completed({ id: downloadId, filename, mimeType, byteLength })
     return store.qs.selectParsedValues(downloadId)
   }
 }

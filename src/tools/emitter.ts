@@ -5,6 +5,7 @@ import { FMap } from '../util/map'
 import { Settings } from '../settings'
 import { ScraperName } from '../settings/config/types'
 
+type DownloadInfo = { id: number; filename?: string; mimeType?: string; byteLength?: number }
 class ScraperEmitter {
   /** listenable by user */
   public listenable = {
@@ -23,8 +24,8 @@ class ScraperEmitter {
     progress: (id: number, progress: number) => {
       this.emitter.emit(`${this.name}:${this.listenable.PROGRESS}`, id, progress)
     },
-    completed: (id: number) => {
-      this.emitter.emit(`${this.name}:${this.listenable.COMPLETE}`, id)
+    completed: (downloadInfo: DownloadInfo) => {
+      this.emitter.emit(`${this.name}:${this.listenable.COMPLETE}`, downloadInfo)
     }
   }
   public on = {

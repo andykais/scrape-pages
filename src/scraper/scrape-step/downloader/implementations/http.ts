@@ -22,6 +22,7 @@ type FetchFunction = (
 ) => Promise<{
   downloadValue: string
   filename?: string
+  byteLength: number
 }>
 
 /**
@@ -143,10 +144,9 @@ export class Downloader extends AbstractDownloader<DownloadData> {
 
   private downloadOnly: FetchFunction = async (downlodaId, [url, fetchOptions]) => {
     await fetch(url, fetchOptions)
-    const byteLength = 0
     return {
       downloadValue: '',
-      byteLength
+      byteLength: 0
     }
   }
 

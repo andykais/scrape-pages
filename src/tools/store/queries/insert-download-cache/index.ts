@@ -10,13 +10,23 @@ type Statement = (
     downloadValue: string
     mimeType: Voidable<string>
     filename: Voidable<string>
+    byteLength: Voidable<number>
     failed: boolean
   }
 ) => CacheId
 export const query: CreateQuery<Statement> = (flatConfig, database) => {
   const statement = database.prepare(SQL_TEMPLATE)
 
-  return ({ scraper, protocol, downloadData, downloadValue, mimeType, filename, failed }) => {
+  return ({
+    scraper,
+    protocol,
+    downloadData,
+    downloadValue,
+    mimeType,
+    filename,
+    byteLength,
+    failed
+  }) => {
     const info = statement.run(
       scraper,
       protocol,
@@ -24,6 +34,7 @@ export const query: CreateQuery<Statement> = (flatConfig, database) => {
       downloadValue,
       mimeType,
       filename,
+      byteLength,
       +failed
     )
     return info.lastInsertRowid as CacheId

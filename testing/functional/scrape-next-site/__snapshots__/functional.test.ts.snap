@@ -4,6 +4,7 @@ exports[`scrape next site with instant scraper should group each image into a se
 Array [
   Array [
     Object {
+      "byteLength": "17.0",
       "downloadData": "[\\"http://scrape-next-site.com/image/the.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
       "filename": true,
       "id": true,
@@ -13,6 +14,7 @@ Array [
   ],
   Array [
     Object {
+      "byteLength": "17.0",
       "downloadData": "[\\"http://scrape-next-site.com/image/quick.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
       "filename": true,
       "id": true,
@@ -22,6 +24,7 @@ Array [
   ],
   Array [
     Object {
+      "byteLength": "17.0",
       "downloadData": "[\\"http://scrape-next-site.com/image/brown.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
       "filename": true,
       "id": true,
@@ -31,6 +34,7 @@ Array [
   ],
   Array [
     Object {
+      "byteLength": "17.0",
       "downloadData": "[\\"http://scrape-next-site.com/image/fox.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
       "filename": true,
       "id": true,
@@ -45,6 +49,7 @@ exports[`scrape next site with instant scraper should group tags and images toge
 Array [
   Array [
     Object {
+      "byteLength": null,
       "downloadData": null,
       "filename": false,
       "id": true,
@@ -52,6 +57,7 @@ Array [
       "scraper": "tag",
     },
     Object {
+      "byteLength": null,
       "downloadData": null,
       "filename": false,
       "id": true,
@@ -59,6 +65,7 @@ Array [
       "scraper": "tag",
     },
     Object {
+      "byteLength": "17.0",
       "downloadData": "[\\"http://scrape-next-site.com/image/the.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
       "filename": true,
       "id": true,
@@ -68,6 +75,7 @@ Array [
   ],
   Array [
     Object {
+      "byteLength": null,
       "downloadData": null,
       "filename": false,
       "id": true,
@@ -75,6 +83,7 @@ Array [
       "scraper": "tag",
     },
     Object {
+      "byteLength": null,
       "downloadData": null,
       "filename": false,
       "id": true,
@@ -82,6 +91,7 @@ Array [
       "scraper": "tag",
     },
     Object {
+      "byteLength": "17.0",
       "downloadData": "[\\"http://scrape-next-site.com/image/quick.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
       "filename": true,
       "id": true,
@@ -91,6 +101,7 @@ Array [
   ],
   Array [
     Object {
+      "byteLength": null,
       "downloadData": null,
       "filename": false,
       "id": true,
@@ -98,6 +109,7 @@ Array [
       "scraper": "tag",
     },
     Object {
+      "byteLength": null,
       "downloadData": null,
       "filename": false,
       "id": true,
@@ -105,6 +117,7 @@ Array [
       "scraper": "tag",
     },
     Object {
+      "byteLength": "17.0",
       "downloadData": "[\\"http://scrape-next-site.com/image/brown.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
       "filename": true,
       "id": true,
@@ -114,6 +127,7 @@ Array [
   ],
   Array [
     Object {
+      "byteLength": null,
       "downloadData": null,
       "filename": false,
       "id": true,
@@ -121,6 +135,7 @@ Array [
       "scraper": "tag",
     },
     Object {
+      "byteLength": null,
       "downloadData": null,
       "filename": false,
       "id": true,
@@ -128,6 +143,7 @@ Array [
       "scraper": "tag",
     },
     Object {
+      "byteLength": null,
       "downloadData": null,
       "filename": false,
       "id": true,
@@ -135,6 +151,7 @@ Array [
       "scraper": "tag",
     },
     Object {
+      "byteLength": "17.0",
       "downloadData": "[\\"http://scrape-next-site.com/image/fox.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
       "filename": true,
       "id": true,
@@ -149,6 +166,7 @@ exports[`scrape next site with psuedo-random delayed scraper should keep images 
 Array [
   Array [
     Object {
+      "byteLength": null,
       "downloadData": null,
       "filename": false,
       "id": true,
@@ -156,6 +174,7 @@ Array [
       "scraper": "tag",
     },
     Object {
+      "byteLength": null,
       "downloadData": null,
       "filename": false,
       "id": true,
@@ -163,6 +182,7 @@ Array [
       "scraper": "tag",
     },
     Object {
+      "byteLength": "17.0",
       "downloadData": "[\\"http://scrape-next-site.com/image/the.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
       "filename": true,
       "id": true,
@@ -172,6 +192,7 @@ Array [
   ],
   Array [
     Object {
+      "byteLength": null,
       "downloadData": null,
       "filename": false,
       "id": true,
@@ -179,6 +200,7 @@ Array [
       "scraper": "tag",
     },
     Object {
+      "byteLength": null,
       "downloadData": null,
       "filename": false,
       "id": true,
@@ -186,6 +208,7 @@ Array [
       "scraper": "tag",
     },
     Object {
+      "byteLength": "17.0",
       "downloadData": "[\\"http://scrape-next-site.com/image/quick.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
       "filename": true,
       "id": true,
@@ -195,6 +218,7 @@ Array [
   ],
   Array [
     Object {
+      "byteLength": null,
       "downloadData": null,
       "filename": false,
       "id": true,
@@ -202,6 +226,7 @@ Array [
       "scraper": "tag",
     },
     Object {
+      "byteLength": null,
       "downloadData": null,
       "filename": false,
       "id": true,
@@ -209,6 +234,7 @@ Array [
       "scraper": "tag",
     },
     Object {
+      "byteLength": "17.0",
       "downloadData": "[\\"http://scrape-next-site.com/image/brown.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
       "filename": true,
       "id": true,
@@ -218,6 +244,7 @@ Array [
   ],
   Array [
     Object {
+      "byteLength": null,
       "downloadData": null,
       "filename": false,
       "id": true,
@@ -225,6 +252,7 @@ Array [
       "scraper": "tag",
     },
     Object {
+      "byteLength": null,
       "downloadData": null,
       "filename": false,
       "id": true,
@@ -232,6 +260,7 @@ Array [
       "scraper": "tag",
     },
     Object {
+      "byteLength": null,
       "downloadData": null,
       "filename": false,
       "id": true,
@@ -239,6 +268,7 @@ Array [
       "scraper": "tag",
     },
     Object {
+      "byteLength": "17.0",
       "downloadData": "[\\"http://scrape-next-site.com/image/fox.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
       "filename": true,
       "id": true,

@@ -5,6 +5,7 @@ INSERT INTO downloadCache (
   downloadValue,
   mimeType,
   filename,
+  byteLength,
   failed
-) VALUES (?, ?, ?, ?, ?, ?, ?)
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
 

@@ -16,8 +16,9 @@ interface RetrieveValue {
   downloadValue: string
   filename?: string
   mimeType?: string
+  byteLength?: number
 }
-interface RunValue extends Exclude<RetrieveValue, 'mimeType'> {}
+//interface RunValue extends Exclude<RetrieveValue, 'mimeType'> {}
 /**
  * base abstract class which other downloaders derive from
  */
@@ -40,7 +41,7 @@ export abstract class AbstractDownloader<DownloadData> {
     const scraperLogger = tools.logger.scraper(scraperName)!
     Object.assign(this, { scraperName, downloadConfig, ...settings, tools, scraperLogger })
   }
-  public run = async (downloadParams: DownloadParams): Promise<RunValue> => {
+  public run = async (downloadParams: DownloadParams): Promise<RetrieveValue> => {
     const { store, emitter } = this.tools
 
     const downloadData = this.constructDownload(downloadParams)
@@ -52,7 +53,7 @@ export abstract class AbstractDownloader<DownloadData> {
     }
     emitter.scraper(this.scraperName).emit.queued(downloadParams.downloadId)
 
-    const { downloadValue, filename, mimeType } = await this.retrieve(
+    const { downloadValue, filename, mimeType, byteLength } = await this.retrieve(
       downloadParams.downloadId,
       downloadData
     )
@@ -66,6 +67,7 @@ export abstract class AbstractDownloader<DownloadData> {
           downloadValue: downloadValue!,
           filename,
           mimeType,
+          byteLength,
           failed: false
         })
       : undefined
@@ -85,7 +87,9 @@ export abstract class AbstractDownloader<DownloadData> {
     return {
       cacheId,
       downloadValue,
-      filename
+      filename,
+      mimeType,
+      byteLength
     }
   }
   // implement these methods

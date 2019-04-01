@@ -38,6 +38,7 @@ CREATE TABLE IF NOT EXISTS downloadCache (
   downloadValue TEXT NOT NULL,
   mimeType TEXT,
   filename TEXT,
+  byteLength TEXT,
   failed BIT DEFAULT (0) NOT NULL
 );
 

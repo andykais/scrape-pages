@@ -45,7 +45,7 @@ SELECT
   cte.scraper,
   parsedValue,
   --  downloadId,
-  downloadData, filename
+  downloadData, filename, byteLength
 FROM cte
 LEFT JOIN downloadCache ON downloadCache.id = cte.cacheId -- grab additional download information outside of ordering
 WHERE recurseDepth = {{lowestDepth}}
