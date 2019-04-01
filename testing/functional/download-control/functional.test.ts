@@ -115,7 +115,7 @@ describe('download control', () => {
         await new Promise(resolve => on('done', resolve))
 
         const resultIndex = query({ scrapers: ['index'] })
-        expect(resultIndex.length).to.equal(0)
+        expect(resultIndex[0][0].complete).to.equal(0)
         const result = query({ scrapers: ['postTitle'], groupBy: 'postTitle' })
         expect(result.length).to.equal(0)
       })
@@ -141,7 +141,7 @@ describe('download control', () => {
   describe('failing requests', () => {
     it('should report the failure and stop the scraper', async () => {
       const config = {
-        scrapers: { 'will-fail': { download: { urlTemplate: 'https://non-existent.com/a/b/c' } } },
+        scrapers: { 'will-fail': { download: 'https://non-existent.com/a/b/c' } },
         run: { scraper: 'will-fail' }
       }
       nock('https://non-existent.com')
@@ -164,6 +164,35 @@ describe('download control', () => {
         })
         on('done', () => reject(`scraper should have emitted 'error' not 'done'`))
       })
+    })
+  })
+
+  describe('in progress requests', () => {
+    it('it should show complete = 0 in result', async () => {
+      const config = {
+        scrapers: { slow: { download: 'https://slow-url.com/a' } },
+        run: { scraper: 'slow' }
+      }
+      nock('https://slow-url.com')
+        .get('/a')
+        .delayBody(1000)
+        .reply(200)
+      const { start, query } = scrape(config, options, params)
+      const { on } = await start()
+      const getSlowScraper = query.prepare({ scrapers: ['slow'] })
+
+      on('slow:queued', () => {
+        const result = getSlowScraper()
+        expect(result.length).to.equal(1)
+        expect(result[0].length).to.equal(1)
+        expect(result[0][0].complete).to.equal(0)
+      })
+
+      await new Promise(resolve => on('done', resolve))
+      const result = getSlowScraper()
+      expect(result.length).to.equal(1)
+      expect(result[0].length).to.equal(1)
+      expect(result[0][0].complete).to.equal(1)
     })
   })
 })

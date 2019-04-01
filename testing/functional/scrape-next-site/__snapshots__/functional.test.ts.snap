@@ -5,6 +5,7 @@ Array [
   Array [
     Object {
       "byteLength": "17.0",
+      "complete": 1,
       "downloadData": "[\\"http://scrape-next-site.com/image/the.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
       "filename": true,
       "id": true,
@@ -15,6 +16,7 @@ Array [
   Array [
     Object {
       "byteLength": "17.0",
+      "complete": 1,
       "downloadData": "[\\"http://scrape-next-site.com/image/quick.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
       "filename": true,
       "id": true,
@@ -25,6 +27,7 @@ Array [
   Array [
     Object {
       "byteLength": "17.0",
+      "complete": 1,
       "downloadData": "[\\"http://scrape-next-site.com/image/brown.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
       "filename": true,
       "id": true,
@@ -35,6 +38,7 @@ Array [
   Array [
     Object {
       "byteLength": "17.0",
+      "complete": 1,
       "downloadData": "[\\"http://scrape-next-site.com/image/fox.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
       "filename": true,
       "id": true,
@@ -50,6 +54,7 @@ Array [
   Array [
     Object {
       "byteLength": null,
+      "complete": 1,
       "downloadData": null,
       "filename": false,
       "id": true,
@@ -58,6 +63,7 @@ Array [
     },
     Object {
       "byteLength": null,
+      "complete": 1,
       "downloadData": null,
       "filename": false,
       "id": true,
@@ -66,6 +72,7 @@ Array [
     },
     Object {
       "byteLength": "17.0",
+      "complete": 1,
       "downloadData": "[\\"http://scrape-next-site.com/image/the.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
       "filename": true,
       "id": true,
@@ -76,6 +83,7 @@ Array [
   Array [
     Object {
       "byteLength": null,
+      "complete": 1,
       "downloadData": null,
       "filename": false,
       "id": true,
@@ -84,6 +92,7 @@ Array [
     },
     Object {
       "byteLength": null,
+      "complete": 1,
       "downloadData": null,
       "filename": false,
       "id": true,
@@ -92,6 +101,7 @@ Array [
     },
     Object {
       "byteLength": "17.0",
+      "complete": 1,
       "downloadData": "[\\"http://scrape-next-site.com/image/quick.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
       "filename": true,
       "id": true,
@@ -102,6 +112,7 @@ Array [
   Array [
     Object {
       "byteLength": null,
+      "complete": 1,
       "downloadData": null,
       "filename": false,
       "id": true,
@@ -110,6 +121,7 @@ Array [
     },
     Object {
       "byteLength": null,
+      "complete": 1,
       "downloadData": null,
       "filename": false,
       "id": true,
@@ -118,6 +130,7 @@ Array [
     },
     Object {
       "byteLength": "17.0",
+      "complete": 1,
       "downloadData": "[\\"http://scrape-next-site.com/image/brown.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
       "filename": true,
       "id": true,
@@ -128,6 +141,7 @@ Array [
   Array [
     Object {
       "byteLength": null,
+      "complete": 1,
       "downloadData": null,
       "filename": false,
       "id": true,
@@ -136,6 +150,7 @@ Array [
     },
     Object {
       "byteLength": null,
+      "complete": 1,
       "downloadData": null,
       "filename": false,
       "id": true,
@@ -144,6 +159,7 @@ Array [
     },
     Object {
       "byteLength": null,
+      "complete": 1,
       "downloadData": null,
       "filename": false,
       "id": true,
@@ -152,6 +168,7 @@ Array [
     },
     Object {
       "byteLength": "17.0",
+      "complete": 1,
       "downloadData": "[\\"http://scrape-next-site.com/image/fox.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
       "filename": true,
       "id": true,
@@ -167,6 +184,7 @@ Array [
   Array [
     Object {
       "byteLength": null,
+      "complete": 1,
       "downloadData": null,
       "filename": false,
       "id": true,
@@ -175,6 +193,7 @@ Array [
     },
     Object {
       "byteLength": null,
+      "complete": 1,
       "downloadData": null,
       "filename": false,
       "id": true,
@@ -183,6 +202,7 @@ Array [
     },
     Object {
       "byteLength": "17.0",
+      "complete": 1,
       "downloadData": "[\\"http://scrape-next-site.com/image/the.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
       "filename": true,
       "id": true,
@@ -193,6 +213,7 @@ Array [
   Array [
     Object {
       "byteLength": null,
+      "complete": 1,
       "downloadData": null,
       "filename": false,
       "id": true,
@@ -201,6 +222,7 @@ Array [
     },
     Object {
       "byteLength": null,
+      "complete": 1,
       "downloadData": null,
       "filename": false,
       "id": true,
@@ -209,6 +231,7 @@ Array [
     },
     Object {
       "byteLength": "17.0",
+      "complete": 1,
       "downloadData": "[\\"http://scrape-next-site.com/image/quick.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
       "filename": true,
       "id": true,
@@ -219,6 +242,7 @@ Array [
   Array [
     Object {
       "byteLength": null,
+      "complete": 1,
       "downloadData": null,
       "filename": false,
       "id": true,
@@ -227,6 +251,7 @@ Array [
     },
     Object {
       "byteLength": null,
+      "complete": 1,
       "downloadData": null,
       "filename": false,
       "id": true,
@@ -235,6 +260,7 @@ Array [
     },
     Object {
       "byteLength": "17.0",
+      "complete": 1,
       "downloadData": "[\\"http://scrape-next-site.com/image/brown.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
       "filename": true,
       "id": true,
@@ -245,6 +271,7 @@ Array [
   Array [
     Object {
       "byteLength": null,
+      "complete": 1,
       "downloadData": null,
       "filename": false,
       "id": true,
@@ -253,6 +280,7 @@ Array [
     },
     Object {
       "byteLength": null,
+      "complete": 1,
       "downloadData": null,
       "filename": false,
       "id": true,
@@ -261,6 +289,7 @@ Array [
     },
     Object {
       "byteLength": null,
+      "complete": 1,
       "downloadData": null,
       "filename": false,
       "id": true,
@@ -269,6 +298,7 @@ Array [
     },
     Object {
       "byteLength": "17.0",
+      "complete": 1,
       "downloadData": "[\\"http://scrape-next-site.com/image/fox.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
       "filename": true,
       "id": true,

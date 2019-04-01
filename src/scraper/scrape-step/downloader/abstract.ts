@@ -68,7 +68,7 @@ export abstract class AbstractDownloader<DownloadData> {
           filename,
           mimeType,
           byteLength,
-          failed: false
+          failed: false // TODO make this flag useful
         })
       : undefined
 

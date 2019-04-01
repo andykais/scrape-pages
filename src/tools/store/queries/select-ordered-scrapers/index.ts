@@ -10,6 +10,8 @@ export type SelectedRow = {
   parsedValue?: string
   downloadData?: string
   filename?: string
+  byteLength?: string
+  complete: number
 }
 type Statement = (scrapers: string[]) => () => SelectedRow[]
 export const query: CreateQuery<Statement> = (flatConfig, database) => scrapers => {

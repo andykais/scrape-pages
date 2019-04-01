@@ -8,4 +8,3 @@ INSERT INTO downloadCache (
   byteLength,
   failed
 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-

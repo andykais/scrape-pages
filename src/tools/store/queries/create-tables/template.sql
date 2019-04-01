@@ -11,7 +11,8 @@ CREATE TABLE downloads (
   scraper TEXT NOT NULL,
   incrementIndex INT NOT NULL, -- scrape config increment number
   parseParentId INT, -- necessary to distinguish identity steps
-  cacheId INT, -- identity steps will not reference downloadCache, neither will cache:false
+  cacheId INT, -- cacheId will be NULL when complete = 1 if and only if scraper is identity scraper
+  complete BIT DEFAULT (0) NOT NULL,
   FOREIGN KEY (parseParentId) REFERENCES parsedTree(id),
   FOREIGN KEY (cacheId) REFERENCES downloadCache(id)
 );

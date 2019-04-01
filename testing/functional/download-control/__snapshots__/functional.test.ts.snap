@@ -5,6 +5,7 @@ Array [
   Array [
     Object {
       "byteLength": "35.0",
+      "complete": 1,
       "downloadData": "[\\"http://download-control.com/post/1.html\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
       "filename": false,
       "id": true,
@@ -13,6 +14,7 @@ Array [
     },
     Object {
       "byteLength": "37.0",
+      "complete": 1,
       "downloadData": "[\\"http://download-control.com/post/2.html\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
       "filename": false,
       "id": true,
@@ -21,6 +23,7 @@ Array [
     },
     Object {
       "byteLength": "37.0",
+      "complete": 1,
       "downloadData": "[\\"http://download-control.com/post/3.html\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
       "filename": false,
       "id": true,
@@ -29,6 +32,7 @@ Array [
     },
     Object {
       "byteLength": "35.0",
+      "complete": 1,
       "downloadData": "[\\"http://download-control.com/post/4.html\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
       "filename": false,
       "id": true,
@@ -37,6 +41,7 @@ Array [
     },
     Object {
       "byteLength": "38.0",
+      "complete": 1,
       "downloadData": "[\\"http://download-control.com/post/5.html\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
       "filename": false,
       "id": true,
@@ -52,6 +57,7 @@ Array [
   Array [
     Object {
       "byteLength": "35.0",
+      "complete": 1,
       "downloadData": "[\\"http://download-control.com/post/1.html\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
       "filename": false,
       "id": true,
@@ -60,6 +66,7 @@ Array [
     },
     Object {
       "byteLength": "37.0",
+      "complete": 1,
       "downloadData": "[\\"http://download-control.com/post/2.html\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
       "filename": false,
       "id": true,
@@ -68,6 +75,7 @@ Array [
     },
     Object {
       "byteLength": "37.0",
+      "complete": 1,
       "downloadData": "[\\"http://download-control.com/post/3.html\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
       "filename": false,
       "id": true,
@@ -76,6 +84,7 @@ Array [
     },
     Object {
       "byteLength": "35.0",
+      "complete": 1,
       "downloadData": "[\\"http://download-control.com/post/4.html\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
       "filename": false,
       "id": true,
@@ -84,6 +93,7 @@ Array [
     },
     Object {
       "byteLength": "38.0",
+      "complete": 1,
       "downloadData": "[\\"http://download-control.com/post/5.html\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
       "filename": false,
       "id": true,
@@ -99,6 +109,7 @@ Array [
   Array [
     Object {
       "byteLength": "35.0",
+      "complete": 1,
       "downloadData": "[\\"http://download-control.com/post/1.html\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
       "filename": false,
       "id": true,
@@ -107,6 +118,7 @@ Array [
     },
     Object {
       "byteLength": "37.0",
+      "complete": 1,
       "downloadData": "[\\"http://download-control.com/post/2.html\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
       "filename": false,
       "id": true,
@@ -115,6 +127,7 @@ Array [
     },
     Object {
       "byteLength": "37.0",
+      "complete": 1,
       "downloadData": "[\\"http://download-control.com/post/3.html\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
       "filename": false,
       "id": true,
@@ -123,6 +136,7 @@ Array [
     },
     Object {
       "byteLength": "35.0",
+      "complete": 1,
       "downloadData": "[\\"http://download-control.com/post/4.html\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
       "filename": false,
       "id": true,
@@ -131,6 +145,7 @@ Array [
     },
     Object {
       "byteLength": "38.0",
+      "complete": 1,
       "downloadData": "[\\"http://download-control.com/post/5.html\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
       "filename": false,
       "id": true,

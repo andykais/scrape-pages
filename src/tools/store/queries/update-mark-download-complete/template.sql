@@ -1,4 +1,5 @@
 UPDATE downloads
 SET
-  cacheId = ?
+  cacheId = ?,
+  complete = 1
 WHERE id = ?
