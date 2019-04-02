@@ -9,7 +9,6 @@ import { structureScrapers } from './flow'
 import { version } from '../../package.json'
 // type imports
 import { Settings } from '../settings'
-import { Tools } from '../tools'
 import { ConfigInit } from '../settings/config/types'
 import { OptionsInit } from '../settings/options/types'
 import { ParamsInit } from '../settings/params/types'
@@ -24,15 +23,18 @@ const initFolders = async ({ paramsInit, flatParams }: Settings) => {
   await Logger.rotateLogFiles(paramsInit.folder)
 }
 
-const writeMetadata = async (settings: Settings, { logger }: Tools) => {
+const writeMetadata = async (settings: Settings) => {
   const { paramsInit, optionsInit, configInit } = settings
   const metadataFile = path.resolve(paramsInit.folder, 'metadata.json')
+  const logger = new Logger(settings)
   if (await exists(metadataFile)) {
     const { version: oldVersion } = JSON.parse(await read(metadataFile))
     if (oldVersion !== version) {
       const logMessage = `This folder was created by an older version of scrape-pages! Old: ${oldVersion}, New: ${version}. Consider adding the param 'cleanFolder: true' and starting fresh.`
       logger.warn(logMessage)
     }
+  } else {
+    logger.warn('This folder was created by an older version of scrape-pages!')
   }
   await writeFile(
     metadataFile,
@@ -42,10 +44,10 @@ const writeMetadata = async (settings: Settings, { logger }: Tools) => {
 
 const startScraping = async (settings: Settings) => {
   await initFolders(settings)
+  await writeMetadata(settings)
   const tools = initTools(settings)
   const { emitter, queue, logger } = tools
 
-  await writeMetadata(settings, tools)
   logger.info({ inspected: settings.config }, 'config')
   logger.info({ inspected: settings.flatConfig }, 'flatConfig')
   logger.info({ inspected: settings.flatOptions }, 'flatOptions')
