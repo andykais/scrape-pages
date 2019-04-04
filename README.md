@@ -6,8 +6,7 @@
 
 This package scrapes sites for text and files based on a single config file representing the crawler's flow.
 
-:warning: This project is under active development. Expect bugs and frequent api changes. If you wish to see
-progress, check out the [github projects boards](https://github.com/andykais/scrape-pages/projects)
+:warning: This project is under active development. Expect bugs and frequent api changes. If you wish to see progress, check out the [github projects boards](https://github.com/andykais/scrape-pages/projects)
 
 ## Installation
 
@@ -17,8 +16,7 @@ npm install scrape-pages
 
 ## Usage
 
-Lets download the ten most recent images from NASA's image of the day archive. First, define a `config`,
-`options`, and `params` to be passed into the scraper.
+Lets download the ten most recent images from NASA's image of the day archive. First, define a `config`, `options`, and `params` to be passed into the scraper.
 
 ```javascript
 const config = {
@@ -70,8 +68,7 @@ const params = {
 }
 ```
 
-After declaring your settings, the usage of the library is very simple. There is a way to start the scraper,
-listen to events, emit events back to the scraper, and query the scraped data.
+After declaring your settings, the usage of the library is very simple. There is a way to start the scraper, listen to events, emit events back to the scraper, and query the scraped data.
 
 ```javascript
 const { scraper } = require('scrape-pages')
@@ -92,9 +89,7 @@ For more real world examples, visit the [examples](examples) directory
 
 ## Documentation
 
-The scraper instance created from a config object is meant to be reusable and cached. It only knows about the
-config object. `scraper.run` can be called multiple times, and, as long as different folders are
-provided, each run will work independently. `scraper.run` returns **emitter**
+The scraper instance created from a config object is meant to be reusable and cached. It only knows about the config object. `scraper.run` can be called multiple times, and, as long as different folders are provided, each run will work independently. `scraper.run` returns **emitter**
 
 ### scrape
 
@@ -124,15 +119,15 @@ Listen for events from the scraper
 
 While the scraper is working, you can affect its behavior by emitting these events:
 
-| event              | arguments | description                                                           |
-| ------------------ | --------- | --------------------------------------------------------------------- |
-| `'useRateLimiter'` | boolean   | turn on or off the rate limit defined in the run options              |
-| `'stop'`           |           | stop the crawler (note that in progress requests will still complete) |
+| event              | arguments | description                                                                                                                                                |
+| ------------------ | --------- | ---------------------------------------------------------------------                                                                                      |
+| `'useRateLimiter'` | boolean   | turn on or off the rate limit defined in the run options                                                                                                   |
+| `'stop'`           |           | stop the crawler (note that in progress requests will still complete)                                                                                      |
+| `'stop:<scraper>'` |           | stop a specific scraper from accepting new downloads. This is useful when you want to control how many downloads a more complex run structure should make. |
 
 #### query
 
-This function is an argument in the emitter callback and is used to get data back out of the scraper whenever
-you need it. These are its arguments:
+The query function allows you to get scraped data out of a progress whenever you want _after_ `start()` has been called. Note that `query()` is a convenience wrapper around `query.prepare()()`. Use the latter to achieve faster queries, as the former will re-build your sqlite statements each time it is called! These are its arguments:
 
 | name       | type       | required | description                                                          |
 | ---------- | ---------- | -------- | -------------------------------------------------------------------- |
