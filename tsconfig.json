@@ -9,7 +9,8 @@
     "moduleResolution": "node",
     "target": "es2017",
     "allowJs": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "plugins": [{ "transform": "typescript-is/lib/transform-inline/transformer" }]
   },
   "include": ["src/**/*.ts", "examples/**/*.ts", "custom.d.ts", "testing/**/*.ts"]
 }

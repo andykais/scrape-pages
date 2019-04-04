@@ -1,3 +1,3 @@
 export { normalizeParams } from './normalize'
 
-export { assertParamsType } from './runtime/settings/params/assert'
+export { assertParamsType } from './assert.runtime'

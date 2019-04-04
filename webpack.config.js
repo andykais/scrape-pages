@@ -40,6 +40,12 @@ const config = {
         loader: 'babel-loader'
       },
       {
+        test: /\.runtime\.ts/,
+        exclude: /node_modules/,
+        loader: 'ts-loader',
+        options: { compiler: 'ttypescript' }
+      },
+      {
         test: /\.sql$/,
         use: 'raw-loader'
       },

@@ -2,4 +2,4 @@ export { normalizeConfig } from './normalize'
 
 export { flattenConfig } from './flatten'
 
-export { assertConfigType } from './runtime/settings/config/assert'
+export { assertConfigType } from './assert.runtime'
