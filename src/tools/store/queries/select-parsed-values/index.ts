@@ -3,7 +3,7 @@ import { CreateQuery } from '../../types'
 
 export type SelectedRow = {
   id: number
-  parsedValue?: string
+  parsedValue: string
 }
 type Statement = (downloadId: number) => SelectedRow[]
 export const query: CreateQuery<Statement> = (flatConfig, database) => {

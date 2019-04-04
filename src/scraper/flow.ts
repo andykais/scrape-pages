@@ -5,6 +5,7 @@ import * as RxCustom from '../util/rxjs/observables'
 import { ScrapeStep } from './scrape-step'
 import { wrapError, ResponseError } from '../util/error'
 // type imports
+import { Tools } from '../tools'
 import { FMap } from '../util/map'
 import { ParsedValue } from './scrape-step'
 import { Settings } from '../settings'
@@ -16,7 +17,10 @@ const incrementUntilEmptyParse: DownloadParseBoolean = parsedValues => !!parsedV
 const incrementUntilNumericIndex = (incrementUntil: number): DownloadParseBoolean => (
   parsedValues,
   incrementIndex
-) => incrementUntil >= incrementIndex
+) => {
+  // console.log(incrementUntil, incrementIndex, { eval: incrementUntil >= incrementIndex })
+  return incrementUntil >= incrementIndex
+}
 const incrementAlways = () => true
 
 const catchDownloadError = (e: Error) => {
@@ -44,46 +48,61 @@ const chooseIgnoreError = ({ incrementUntil }: ScrapeConfig) => {
   }
 }
 
-const structureScrapers = (settings: Settings, scrapers: FMap<ScraperName, ScrapeStep>) => (
-  structure: Config['run']
-) => {
+const structureScrapers = (
+  settings: Settings,
+  scrapers: FMap<ScraperName, ScrapeStep>,
+  tools: Tools
+) => (structure: Config['run']) => {
   const scraper = scrapers.getOrThrow(structure.scraper)
-  const each = structure.forEach.map(structureScrapers(settings, scrapers))
-  const next = structure.forNext.map(structureScrapers(settings, scrapers))
+  const each = structure.forEach.map(structureScrapers(settings, scrapers, tools))
+  const next = structure.forNext.map(structureScrapers(settings, scrapers, tools))
 
   const okToIncrement = chooseIncrementEvaluator(scraper.config)
   const ignoreFetchError = chooseIgnoreError(scraper.config)
 
+  const outsideCommands = { stop: false }
+  tools.emitter.scraper(structure.scraper).on.stop(() => (outsideCommands.stop = true))
+
   return (parentValues: ParsedValue[]): Rx.Observable<ParsedValue[]> =>
-    Rx.from(parentValues).pipe(
-      ops.catchError(wrapError(`scraper '${scraper.scraperName}'`)),
-      ops.flatMap(parsedValueWithId =>
-        RxCustom.whileLoop(scraper.downloadParseFunction, okToIncrement, parsedValueWithId).pipe(
-          ops.catchError(ignoreFetchError),
-          ops.expand(([parsedValues, incrementIndex]) =>
-            Rx.merge(
-              ...next.map(nextScraper =>
-                nextScraper(parsedValues).pipe(
-                  ops.flatMap(parsedValues =>
-                    parsedValues.map(parsedValueWithId =>
-                      scraper.downloadParseFunction(parsedValueWithId, incrementIndex)
-                    )
-                  ),
-                  ops.mergeAll(),
-                  ops.filter(incrementUntilEmptyParse),
-                  ops.map((parsedValues): [ParsedValue[], number] => [parsedValues, incrementIndex])
-                )
+    Rx.from(parentValues)
+      .pipe(
+        // scraper
+        ops.takeWhile(() => !outsideCommands.stop),
+        ops.flatMap(parentValue =>
+          RxCustom.whileLoop(scraper.downloadParseFunction, okToIncrement, parentValue)
+        ),
+        ops.takeWhile(() => !outsideCommands.stop),
+        ops.map((parsedValues, index): [ParsedValue[], number] => [parsedValues, index]),
+        ops.catchError(ignoreFetchError)
+      )
+      .pipe(
+        // next
+        ops.expand(([parsedValues, incrementIndex]) =>
+          Rx.merge(
+            ...next.map(nextScraper =>
+              nextScraper(parsedValues).pipe(
+                ops.flatMap(parsedValues =>
+                  parsedValues.map(parsedValueWithId =>
+                    scraper.downloadParseFunction(parsedValueWithId, incrementIndex)
+                  )
+                ),
+                ops.mergeAll(),
+                ops.filter(incrementUntilEmptyParse),
+                ops.map((parsedValues): [ParsedValue[], number] => [parsedValues, incrementIndex])
               )
             )
-          ),
-          ops.map(([parsedValues]) => parsedValues)
-        )
-      ),
-      each.length
-        ? ops.flatMap(scraperValues => each.map(child => child(scraperValues)))
-        : ops.map(scraperValues => [scraperValues]),
-      ops.mergeAll()
-    )
+          )
+        ),
+        ops.map(([parsedValues]) => parsedValues)
+      )
+      .pipe(ops.catchError(wrapError(`scraper '${scraper.scraperName}'`)))
+      .pipe(
+        // each
+        each.length
+          ? ops.flatMap(scraperValues => each.map(child => child(scraperValues)))
+          : ops.map(scraperValues => [scraperValues]),
+        ops.mergeAll()
+      )
 }
 
 export { structureScrapers }

@@ -11,9 +11,14 @@ export const downloaderClassFactory = (
   tools: Tools
 ) => {
   const { download } = settings.config
-  // TODO use type guards
-  if (download) return new HttpDownloader(scraperName, download, settings, tools)
-  else return new IdentityDownloader(scraperName, download, settings, tools)
+  const { protocol } = download || { protocol: undefined }
+
+  switch (protocol) {
+    case 'http':
+      return new HttpDownloader(scraperName, download!, settings, tools)
+    default:
+      return new IdentityDownloader(scraperName, download, settings, tools)
+  }
 }
 
 export type DownloaderClass = IdentityDownloader | HttpDownloader

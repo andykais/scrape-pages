@@ -4,11 +4,12 @@ import { ScraperName, ParseConfig } from '../../../settings/config/types'
 import { Tools } from '../../../tools'
 
 // export type ParserValues = string[] | [undefined | string]
-export type ParserValues = (string | undefined)[]
+export type ParserValues = string[]
 /**
  * base abstract class which other downloaders derive from
  */
 export abstract class AbstractParser {
+  public type: ParseConfig['format'] | 'identity'
   public trim: <T>(values: T[]) => T[]
   protected scraperName: ScraperName
   protected parseConfig: ParseConfig | undefined

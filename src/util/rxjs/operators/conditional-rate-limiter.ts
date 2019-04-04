@@ -7,6 +7,7 @@ export interface Queue<T> {
   push: Function
   pop: (amountToPop: number) => T
 }
+type PromiseLike<T> = Promise<T> | Rx.Observable<T>
 
 /**
  * rate toggle purely for controlling the rate at which things are executed.
@@ -21,7 +22,7 @@ const rateLimitToggle = <V>(
     executor
   }: {
     toggler: Rx.Observable<boolean>
-    executor: () => Promise<any>
+    executor: () => PromiseLike<any>
   },
   {
     limit,

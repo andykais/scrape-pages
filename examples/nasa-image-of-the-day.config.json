@@ -1,5 +1,5 @@
 {
-  "defs": {
+  "scrapers": {
     "archive": {
       "download": {
         "urlTemplate": "https://apod.nasa.gov/apod/archivepix.html"
@@ -20,7 +20,7 @@
       "download": "https://apod.nasa.gov/apod/{{value}}"
     }
   },
-  "structure": {
+  "run": {
     "scraper": "archive",
     "scrapeEach": {
       "scraper": "image-page",

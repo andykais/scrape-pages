@@ -1,6 +1,5 @@
-INSERT OR IGNORE INTO downloads (
+INSERT INTO downloads (
   scraper,
   parseParentId,
-  incrementIndex,
-  downloadData
-) VALUES (?, ?, ?, ?)
+  incrementIndex
+) VALUES (?, ?, ?)

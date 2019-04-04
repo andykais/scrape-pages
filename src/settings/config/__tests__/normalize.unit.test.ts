@@ -12,22 +12,28 @@ describe('normalize config with', () => {
       scrapers: {
         index: {
           download: {
+            protocol: 'http',
             method: 'GET',
             urlTemplate: simpleConfig.scrapers.index.download as string,
-            headerTemplates: {}
+            headerTemplates: {},
+            read: true,
+            write: false
           },
           parse: {
             selector: (simpleConfig.scrapers.index.parse as any).selector,
             attribute: (simpleConfig.scrapers.index.parse as any).attribute,
-            expect: 'html'
+            format: 'html'
           },
           incrementUntil: 0
         },
         image: {
           download: {
+            protocol: 'http',
             method: 'GET',
             urlTemplate: simpleConfig.scrapers.image.download as any,
-            headerTemplates: {}
+            headerTemplates: {},
+            read: true,
+            write: false
           },
           parse: undefined,
           incrementUntil: 0
@@ -48,11 +54,11 @@ describe('normalize config with', () => {
 
     it('should match itself for a full filled in config', () => {
       const fullConfigFromGuess = normalizeConfig(fullConfigGuess)
-      expect(fullConfigFromGuess).to.be.deep.equal(fullConfigGuess)
+      expect(fullConfigFromGuess).to.deep.equal(fullConfigGuess)
     })
 
     it('should match the guessed full config', () => {
-      expect(fullConfig).to.be.deep.equal(fullConfigGuess)
+      expect(fullConfig).to.deep.equal(fullConfigGuess)
     })
   })
 
@@ -62,7 +68,7 @@ describe('normalize config with', () => {
 
     it('should match itself for a full filled in config', () => {
       const fullConfigFromGuess = normalizeConfig(fullConfig)
-      expect(fullConfigFromGuess).to.be.deep.equal(fullConfig)
+      expect(fullConfigFromGuess).to.deep.equal(fullConfig)
     })
   })
 
@@ -90,6 +96,14 @@ describe('normalize config with', () => {
       expect(() => normalizeConfig(configInit))
         .to.throw(`$: expected 'scrapers' in object`)
         .with.property('name', 'RuntimeTypeError')
+    })
+    describe('with scrapers that are not defined', () => {
+      const configInit = { scrapers: {}, run: { scraper: 'hello' } }
+      it('should throw an error', () => {
+        expect(() => normalizeConfig(configInit)).to.throw(
+          'config.scrapers is missing scraper "hello"'
+        )
+      })
     })
   })
 })

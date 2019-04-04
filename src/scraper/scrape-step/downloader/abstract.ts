@@ -2,24 +2,35 @@
 import { ScrapeSettings } from '../../../settings'
 import { ScraperName, DownloadConfig } from '../../../settings/config/types'
 import { Tools } from '../../../tools'
-import { Downloader as IdentityDownloader } from './implementations/identity'
 
+type ParseTreeId = number
+type DownloadId = number
 export type DownloadParams = {
-  parentId?: number
+  parentId?: ParseTreeId
+  downloadId: DownloadId
   incrementIndex: number
-  value?: string
+  value: string
 }
-type RetrieveValue = { downloadValue?: string; filename?: string }
+interface RetrieveValue {
+  cacheId?: number
+  downloadValue: string
+  filename?: string
+  mimeType?: string
+  byteLength?: number
+}
+//interface RunValue extends Exclude<RetrieveValue, 'mimeType'> {}
 /**
  * base abstract class which other downloaders derive from
  */
 export abstract class AbstractDownloader<DownloadData> {
+  public type: DownloadConfig['protocol'] | 'identity'
   protected scraperName: ScraperName
   protected downloadConfig: DownloadConfig | undefined
   protected config: ScrapeSettings['config']
   protected options: ScrapeSettings['options']
   protected params: ScrapeSettings['params']
   protected tools: Tools
+  protected scraperLogger: ReturnType<Tools['logger']['scraper']>
 
   public constructor(
     scraperName: ScraperName,
@@ -27,28 +38,63 @@ export abstract class AbstractDownloader<DownloadData> {
     settings: ScrapeSettings,
     tools: Tools
   ) {
-    Object.assign(this, { scraperName, downloadConfig, ...settings, tools })
+    const scraperLogger = tools.logger.scraper(scraperName)!
+    Object.assign(this, { scraperName, downloadConfig, ...settings, tools, scraperLogger })
   }
-  public run = async (downloadParams: DownloadParams) => {
+  public run = async (downloadParams: DownloadParams): Promise<RetrieveValue> => {
+    const { store, emitter } = this.tools
+
     const downloadData = this.constructDownload(downloadParams)
-    const downloadId = this.tools.store.qs.insertQueuedDownload(
-      this.scraperName,
-      downloadParams,
-      // identity downloader is a special case. It does nothing, and the value being passed through is already stored somewhere else.
-      this instanceof IdentityDownloader ? undefined : downloadData
+
+    let cachedDownload: ReturnType<typeof store.qs.selectMatchingCachedDownload>
+    if (this.options.cache) {
+      cachedDownload = store.qs.selectMatchingCachedDownload(this.scraperName, downloadData)
+      if (cachedDownload) return cachedDownload
+    }
+    emitter.scraper(this.scraperName).emit.queued(downloadParams.downloadId)
+
+    const { downloadValue, filename, mimeType, byteLength } = await this.retrieve(
+      downloadParams.downloadId,
+      downloadData
     )
-    this.tools.emitter.scraper(this.scraperName).emit.queued(downloadId)
-    const { downloadValue, filename } = await this.retrieve(downloadId, downloadData)
+
+    // ignore this step for identity downloader
+    const cacheId = this.downloadConfig
+      ? store.qs.insertDownloadCache({
+          scraper: this.scraperName,
+          downloadData,
+          protocol: this.type,
+          downloadValue: downloadValue!,
+          filename,
+          mimeType,
+          byteLength,
+          failed: false // TODO make this flag useful
+        })
+      : undefined
+
+    if (cachedDownload) {
+      this.scraperLogger.info(
+        `scraper '${this.scraperName}' grabbed download from cache id ${cachedDownload.id}`
+      )
+    } else {
+      this.scraperLogger.info(
+        `scraper '${this.scraperName}' downloaded ${downloadParams.downloadId}${
+          cacheId !== undefined ? ` and saved cache to ${cacheId}` : ''
+        }`
+      )
+    }
 
     return {
-      downloadId,
+      cacheId,
       downloadValue,
-      filename
+      filename,
+      mimeType,
+      byteLength
     }
   }
   // implement these methods
-  protected abstract constructDownload(downloadParams: DownloadParams): DownloadData
-  protected abstract retrieve(
+  public abstract constructDownload(downloadParams: DownloadParams): DownloadData
+  public abstract retrieve(
     downloadId: number,
     downloadParams: DownloadData
   ): RetrieveValue | Promise<RetrieveValue>

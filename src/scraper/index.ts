@@ -1,10 +1,12 @@
+import * as path from 'path'
 import { initTools } from '../tools'
 import { ScrapeStep } from './scrape-step'
-import { mkdirp, rmrf } from '../util/fs'
+import { mkdirp, rmrf, exists, read, writeFile } from '../util/fs'
 import { getSettings, getScrapeStepSettings } from '../settings'
 import { Logger } from '../tools/logger'
 import { Store } from '../tools/store'
 import { structureScrapers } from './flow'
+import { version } from '../../package.json'
 // type imports
 import { Settings } from '../settings'
 import { ConfigInit } from '../settings/config/types'
@@ -21,42 +23,70 @@ const initFolders = async ({ paramsInit, flatParams }: Settings) => {
   await Logger.rotateLogFiles(paramsInit.folder)
 }
 
+const writeMetadata = async (settings: Settings) => {
+  const { paramsInit, optionsInit, configInit } = settings
+  const metadataFile = path.resolve(paramsInit.folder, 'metadata.json')
+  const logger = new Logger(settings)
+  if (await exists(metadataFile)) {
+    const { version: oldVersion } = JSON.parse(await read(metadataFile))
+    if (oldVersion !== version) {
+      const logMessage = `This folder was created by an older version of scrape-pages! Old: ${oldVersion}, New: ${version}. Consider adding the param 'cleanFolder: true' and starting fresh.`
+      logger.warn(logMessage)
+    }
+  } else {
+    logger.warn('This folder was created by an older version of scrape-pages!')
+  }
+  await writeFile(
+    metadataFile,
+    JSON.stringify({ version, settingsInit: { configInit, optionsInit, paramsInit } })
+  )
+}
+
 const startScraping = async (settings: Settings) => {
   await initFolders(settings)
+  await writeMetadata(settings)
   const tools = initTools(settings)
+  const { emitter, queue, logger } = tools
+
+  logger.info({ inspected: settings.config }, 'config')
+  logger.info({ inspected: settings.flatConfig }, 'flatConfig')
+  logger.info({ inspected: settings.flatOptions }, 'flatOptions')
+  logger.info({ inspected: settings.flatParams }, 'flatParams')
 
   const scrapers = getScrapeStepSettings(settings).map(
     (scrapeSettings, name) => new ScrapeStep(name, scrapeSettings, tools)
   )
 
   // create the observable
-  const scrapingScheme = structureScrapers(settings, scrapers)(settings.config.run)
+  const scrapingScheme = structureScrapers(settings, scrapers, tools)(settings.config.run)
   const scrapingObservable = scrapingScheme([{ parsedValue: '' }])
   // start running the observable
-  const { emitter, queue, logger } = tools
-  // necessary so that any listeners setup after function is called are setup before downloads begin
+  // initting subscription is necessary so that any listeners setup after function is called are setup before downloads begin
+  let subscription: ReturnType<typeof scrapingObservable.subscribe>
   setTimeout(() => {
-    const subscription = scrapingObservable.subscribe({
+    subscription = scrapingObservable.subscribe({
       error: (error: Error) => {
         emitter.emit.error(error)
         subscription.unsubscribe()
         queue.closeQueue()
       },
       complete: () => {
-        // TODO add timer to show how long it took
         queue.closeQueue()
         emitter.emit.done()
         logger.info('Done!')
       }
     })
-    emitter.on.stop(() => {
-      logger.info('Exiting manually.')
-      queue.closeQueue()
-      subscription.unsubscribe()
-      logger.info('Done!')
-      emitter.emit.done()
-    })
   }, 0)
+  emitter.on.stop(() => {
+    logger.info('Exiting manually.')
+    queue.closeQueue()
+    // necessary so we can listen to 'stop' event right away, but wait to cancel the observable until after it is started
+    setTimeout(() => {
+      subscription.unsubscribe()
+      emitter.emit.done()
+      logger.info(`Done.`)
+    }, 0)
+  })
 
   return {
     on: emitter.getBoundOn(),
@@ -64,6 +94,9 @@ const startScraping = async (settings: Settings) => {
   }
 }
 
+export type Start = () => ReturnType<typeof startScraping>
+export type Emitter = ThenArg<ReturnType<Start>>
+export type Query = ReturnType<typeof Store.getQuerier>
 /**
  * scrape is the entrypoint for this library
  *

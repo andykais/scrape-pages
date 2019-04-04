@@ -50,7 +50,7 @@ describe('normalize params with', () => {
       const flatParams = normalizeParams(config, options, paramsInit)
       const normalizedInput = flatParams.getOrThrow('identity').input
 
-      expect(normalizedInput).to.be.deep.equal({
+      expect(normalizedInput).to.deep.equal({
         username: paramsInit.input.username
       })
     })

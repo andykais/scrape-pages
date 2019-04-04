@@ -10,7 +10,7 @@ import { ParserClass } from './parser'
 
 type InputValue = {
   parsedValue: string
-  id?: number // nonexistent
+  id?: number // no parent id exists for the toplevel scrape step
 }
 export type ParsedValue = InputValue | ParsedValueWithId
 export type DownloadParseFunction = (
@@ -48,41 +48,37 @@ class ScrapeStep {
     { parsedValue: value, id: parentId },
     incrementIndex
   ) => {
-    const { store, emitter } = this.tools
-    const { id: downloadId } = store.qs.selectCompletedDownload({
-      incrementIndex,
+    const { store } = this.tools
+
+    const downloadId = store.qs.insertQueuedDownload({
+      scraper: this.scraperName,
       parentId,
-      scraper: this.scraperName
-    }) || { id: undefined }
-    if (downloadId) {
-      const parsedValuesWithId = store.qs.selectParsedValues(downloadId)
-      this.parser.trim(parsedValuesWithId)
-      this.scraperLogger.info({ parsedValuesWithId, downloadId }, 'loaded cached values')
-      emitter.scraper(this.scraperName).emit.completed(downloadId)
-      return parsedValuesWithId
-    } else {
-      const { downloadValue, downloadId, filename } = await this.downloader.run({
-        incrementIndex,
+      incrementIndex
+    })
+    const { downloadValue, cacheId, filename, mimeType, byteLength } = await this.downloader.run({
+      parentId,
+      incrementIndex,
+      downloadId,
+      value
+    })
+    const parsedValues = this.parser.run(downloadValue)
+    this.scraperLogger.info(`parsed ${parsedValues.length} values from downloadId ${downloadId}`, {
+      parsedValues
+    })
+    this.tools.store.transaction(() => {
+      store.qs.updateMarkDownloadComplete({ downloadId, cacheId })
+      store.qs.insertBatchParsedValues({
+        scraper: this.scraperName,
         parentId,
-        value
+        downloadId,
+        parsedValues,
+        format: this.parser.type
       })
-      const parsedValues = this.parser.run(downloadValue)
-
-      store.transaction(() => {
-        store.qs.updateDownloadToComplete({ downloadId, filename })
-        store.qs.insertBatchParsedValues({
-          name: this.scraperName,
-          parentId,
-          downloadId,
-          parsedValues
-        })
-      })()
-      const parsedValuesWithId = store.qs.selectParsedValues(downloadId)
-
-      this.scraperLogger.info({ parsedValuesWithId, downloadId }, 'inserted new values')
-      emitter.scraper(this.scraperName).emit.completed(downloadId)
-      return parsedValuesWithId
-    }
+    })()
+    this.tools.emitter
+      .scraper(this.scraperName)
+      .emit.completed({ id: downloadId, filename, mimeType, byteLength })
+    return store.qs.selectParsedValues(downloadId)
   }
 }
 

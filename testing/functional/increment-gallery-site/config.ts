@@ -23,7 +23,11 @@ export const config: ConfigInit = {
       }
     },
     image: {
-      download: 'http://increment-gallery-site.com{{ value }}'
+      download: {
+        urlTemplate: 'http://increment-gallery-site.com{{ value }}',
+        read: false,
+        write: true
+      }
     }
   },
   run: {

@@ -21,26 +21,33 @@ type Input = InputKey
 
 // DownloadConfig {{{
 // handlebars template
+type AcceptedProtocols = 'http'
 type Template = string
 type UrlMethods = 'GET' | 'POST' | 'PUT' | 'DELETE'
 interface DownloadConfigInterface {
+  protocol?: AcceptedProtocols
   method?: UrlMethods
   urlTemplate: Template
   headerTemplates?: { [headerName: string]: Template }
   regexCleanup?: RegexCleanup
+  read?: boolean // should download be read into memory
+  write?: boolean // should download be saved to a file (separate from a database entry)
 }
 export type DownloadConfigInit = Template | DownloadConfigInterface | undefined
 export interface DownloadConfig extends DownloadConfigInterface {
+  protocol: AcceptedProtocols
   method: UrlMethods
   headerTemplates: { [headerName: string]: Template }
+  read: boolean
+  write: boolean
 }
 // }}}
 
 // ParseConfig {{{
-type ExpectedFormats = 'html' | 'json'
+type AcceptedFormats = 'html' | 'xml' | 'json'
 type Selector = string
 interface ParseConfigInterface {
-  expect?: ExpectedFormats
+  format?: AcceptedFormats
   selector: Selector
   attribute?: string
   limit?: number
@@ -48,7 +55,7 @@ interface ParseConfigInterface {
 }
 export type ParseConfigInit = Selector | ParseConfigInterface | undefined
 export interface ParseConfig extends ParseConfigInterface {
-  expect: ExpectedFormats
+  format: AcceptedFormats
 }
 // }}}
 

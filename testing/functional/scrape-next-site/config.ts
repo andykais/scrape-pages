@@ -31,7 +31,11 @@ export const config: ConfigInit = {
       }
     },
     image: {
-      download: 'http://scrape-next-site.com{{ value }}'
+      download: {
+        urlTemplate: 'http://scrape-next-site.com{{ value }}',
+        read: false,
+        write: true
+      }
     }
   },
   run: {

@@ -1,38 +1,39 @@
-import EventEmitter from 'events'
+import { EventEmitter } from 'events'
 import * as Rx from 'rxjs'
-import * as Fetch from 'node-fetch'
 // type imports
 import { FMap } from '../util/map'
 import { Settings } from '../settings'
 import { ScraperName } from '../settings/config/types'
 
-const scraperEvents = {
-  QUEUED: 'queued',
-  PROGRESS: 'progress',
-  COMPLETE: 'complete'
-}
-
+type DownloadInfo = { id: number; filename?: string; mimeType?: string; byteLength?: number }
 class ScraperEmitter {
+  /** listenable by user */
+  public listenable = {
+    QUEUED: 'queued',
+    PROGRESS: 'progress',
+    COMPLETE: 'complete'
+  }
+  /** emittable by user */
+  public emittable = {
+    STOP: 'stop'
+  }
   public emit = {
     queued: (id: number) => {
-      this.emitter.emit(`${this.name}:${scraperEvents.QUEUED}`, id)
+      this.emitter.emit(`${this.name}:${this.listenable.QUEUED}`, id)
     },
-    progress: (id: number, response: Fetch.Response) => {
-      const emitKey = `${this.name}:${scraperEvents.PROGRESS}`
-      if (this.emitter.listenerCount(emitKey)) {
-        const contentLength = parseInt(response.headers.get('content-length') || '0')
-        let bytesLength = 0
-        response.body.on('data', chunk => {
-          bytesLength += chunk.length
-          const progress = bytesLength / contentLength
-          this.emitter.emit(emitKey, progress, id)
-        })
-      }
+    progress: (id: number, progress: number) => {
+      this.emitter.emit(`${this.name}:${this.listenable.PROGRESS}`, id, progress)
     },
-    completed: (id: number) => {
-      this.emitter.emit(`${this.name}:${scraperEvents.COMPLETE}`, id)
+    completed: (downloadInfo: DownloadInfo) => {
+      this.emitter.emit(`${this.name}:${this.listenable.COMPLETE}`, downloadInfo)
     }
   }
+  public on = {
+    stop: (callback: () => void) => {
+      this.emitter.on(`${this.emittable.STOP}:${this.name}`, callback)
+    }
+  }
+
   private emitter: EventEmitter
   private name: string
 
@@ -40,33 +41,40 @@ class ScraperEmitter {
     this.emitter = emitter
     this.name = name
   }
+
+  public hasListenerFor = (eventName: string) =>
+    this.emitter.listenerCount(`${this.name}:${eventName}`) !== 0
 }
 
-const events = {
-  // listenable
-  DONE: 'done',
-  ERROR: 'error',
-  // emittable
-  STOP: 'stop',
-  USE_RATE_LIMITER: 'useRateLimiter'
-}
 type EmitterOn = (event: string, callback: (...args: any[]) => void) => void
-type EmitterEmit = (event: 'stop' | 'useRateLimiter', ...emittedValues: any[]) => void
+type EmitterEmit = (event: string, ...emittedValues: any[]) => void
 
 class Emitter {
+  /** listenable by user */
+  public static listenable = {
+    DONE: 'done',
+    ERROR: 'error'
+  }
+  /** emittable by user */
+  public static emittable = {
+    STOP: 'stop',
+    USE_RATE_LIMITER: 'useRateLimiter'
+  }
   public emitter: EventEmitter
 
+  /** used internally (verbs are reversed) */
   public emit = {
     done: () => {
-      this.emitter.emit(events.DONE)
+      this.emitter.emit(Emitter.listenable.DONE)
     },
     error: (error: Error) => {
-      this.emitter.emit(events.ERROR, error)
+      this.emitter.emit(Emitter.listenable.ERROR, error)
     }
   }
+  /** used internally (verbs are reversed) */
   public on = {
     stop: (callback: () => void) => {
-      this.emitter.on(events.STOP, callback)
+      this.emitter.on(Emitter.emittable.STOP, callback)
     }
   }
   private scrapers: FMap<ScraperName, ScraperEmitter>

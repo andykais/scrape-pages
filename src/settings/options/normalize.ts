@@ -13,9 +13,7 @@ const normalizeOptions = (config: Config, optionsInit: OptionsInit): FlatOptions
   const defaults: ScrapeOptions = {
     downloadPriority: 0,
     logLevel: 'error',
-    cache: true,
-    read: true,
-    write: false,
+    cache: false,
     ...globalOptions // user preferences for all things override
   }
 

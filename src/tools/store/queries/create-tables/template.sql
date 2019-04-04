@@ -1,32 +1,50 @@
 BEGIN TRANSACTION;
 
-CREATE TABLE IF NOT EXISTS downloads (
+-- creating the tree and parsing is always re-done on a second pass.
+-- The reason for this is because we cannot assume the config is the same on a second run
+-- downloadCache remains 'cached' though, so we do not reuse bandwidth unnecessarily
+DROP TABLE IF EXISTS downloads;
+DROP TABLE IF EXISTS parsedTree;
+
+CREATE TABLE downloads (
   id INTEGER PRIMARY KEY NOT NULL,
   scraper TEXT NOT NULL,
-  incrementIndex INT NOT NULL, -- scrape config increment number (priority low)
+  incrementIndex INT NOT NULL, -- scrape config increment number
   parseParentId INT, -- necessary to distinguish identity steps
-  downloadData TEXT,
-  filename TEXT,
-  complete BIT,
-  failed BIT,
-  allChildrenDownloaded BIT,
-  identity BIT,
-  FOREIGN KEY (parseParentId) REFERENCES parsedTree(id)
+  cacheId INT, -- cacheId will be NULL when complete = 1 if and only if scraper is identity scraper
+  complete BIT DEFAULT (0) NOT NULL,
+  FOREIGN KEY (parseParentId) REFERENCES parsedTree(id),
+  FOREIGN KEY (cacheId) REFERENCES downloadCache(id)
 );
 
-CREATE TABLE IF NOT EXISTS parsedTree (
+CREATE TABLE parsedTree (
   id INTEGER PRIMARY KEY NOT NULL,
   scraper TEXT NOT NULL,
   downloadId INT NOT NULL,
-  parentId INT, -- parentIndex references this table
-  parseIndex INT NOT NULL, -- index the item appeared on the page (priority medium)
-  parsedValue TEXT,
-  identity BIT,
-  FOREIGN KEY (parentId) REFERENCES parsedTree(id)
+  parentId INT,
+  parseIndex INT NOT NULL, -- index the item appeared on the page
+  parsedValue TEXT NOT NULL,
+  format TEXT NOT NULL, -- html, json, identity
+
+  FOREIGN KEY (parentId) REFERENCES parsedTree(id),
   FOREIGN KEY(downloadId) REFERENCES downloads(id)
 );
 
---  horizontalIndex INT, -- index used for consitent order when two parsers are next to each other (priority low and only under certain circumstances)
+-- this table is only written to when cache:true
+CREATE TABLE IF NOT EXISTS downloadCache (
+  id INTEGER PRIMARY KEY NOT NULL,
+  scraper TEXT NOT NULL,
+  protocol TEXT NOT NULL,
+  downloadData TEXT NOT NULL,
+  downloadValue TEXT NOT NULL,
+  mimeType TEXT,
+  filename TEXT,
+  byteLength TEXT,
+  failed BIT DEFAULT (0) NOT NULL
+);
+
 CREATE UNIQUE INDEX IF NOT EXISTS downloadId ON downloads(id);
 CREATE UNIQUE INDEX IF NOT EXISTS indexes ON downloads(scraper, incrementIndex, parseParentId);
+CREATE UNIQUE INDEX IF NOT EXISTS indexes ON downloadCache(downloadData);
+
 COMMIT;

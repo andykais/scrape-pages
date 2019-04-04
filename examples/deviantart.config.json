@@ -1,6 +1,6 @@
 {
   "input": "artist",
-  "defs": {
+  "scrapers": {
     "gallery": {
       "download": {
         "urlTemplate": "https://{{ artist }}.deviantart.com/gallery/?catpath=/&offset={{'*' index 24}}"
@@ -22,7 +22,7 @@
       "download": "{value}"
     }
   },
-  "structure": {
+  "run": {
     "scraper": "gallery",
     "scrapeEach": {
       "scraper": "post",

@@ -1,16 +1,17 @@
 import { AbstractDownloader, DownloadParams } from '../abstract'
 
-type DownloadData = string | undefined
+type DownloadData = string
 /**
  * identitiy downloader, does nothing and passes value through itself
  */
 export class Downloader extends AbstractDownloader<DownloadData> {
-  protected insertDownloadData = false
+  public type = 'identity' as 'identity'
 
-  protected constructDownload = ({ value }: DownloadParams): DownloadData => value
+  public constructDownload = ({ value }: DownloadParams): DownloadData => value
 
-  protected retrieve = (downloadId: number, parentValue: DownloadData) => ({
+  public retrieve = (downloadId: number, parentValue: DownloadData) => ({
     downloadValue: parentValue,
-    filename: undefined
+    filename: undefined,
+    byteLength: undefined
   })
 }

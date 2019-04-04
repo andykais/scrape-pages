@@ -1,32 +1,31 @@
-import os from 'os'
-import path from 'path'
+import * as os from 'os'
+import * as path from 'path'
 
 import { expect } from 'chai'
 
-import { nockMockFolder } from '../../setup'
+import { nockMockFolder, configureSnapshots, stripResult } from '../../setup'
 import { config } from './config'
-import expectedQueryResult from './resources/expected-query-result.json'
 import { scrape } from '../../../src'
 
-const options = {
-  optionsEach: {
-    image: {
-      read: false,
-      write: true
-    }
-  }
-}
+const resourceFolder = `${__dirname}/fixtures`
+const resourceUrl = `http://${path.basename(__dirname)}.com`
+
+const options = {}
 // in this case, it is ok to reuse params since mocha runs async tests sequentially
 const params = {
-  folder: path.resolve(os.tmpdir(), 'scrape-pages--scrape-next-site'),
+  folder: path.resolve(os.tmpdir(), `scrape-pages--${path.basename(__dirname)}`),
   cleanFolder: true
 }
 describe('scrape next site', () => {
-  describe('with instant scraper', function() {
+  beforeEach(function() {
+    configureSnapshots({ __dirname, __filename, fullTitle: this.currentTest!.fullTitle() })
+  })
+
+  describe('with instant scraper', () => {
     const { start, query } = scrape(config, options, params)
 
     before(async () => {
-      await nockMockFolder(`${__dirname}/resources/mock-endpoints`, 'http://scrape-next-site.com')
+      await nockMockFolder(resourceFolder, resourceUrl)
 
       const { on } = await start()
       await new Promise(resolve => on('done', resolve))
@@ -37,26 +36,22 @@ describe('scrape next site', () => {
         scrapers: ['image'],
         groupBy: 'image'
       })
-      expect(result)
-        .excludingEvery(['filename', 'id'])
-        .to.be.deep.equal(expectedQueryResult.map(g => g.filter(r => r.scraper === 'image')))
+      expect(stripResult(result)).to.matchSnapshot()
     })
     it('should group tags and images together that were found on the same page', () => {
       const result = query({
         scrapers: ['image', 'tag'],
         groupBy: 'image-page'
       })
-      expect(result)
-        .excludingEvery(['filename', 'id'])
-        .to.be.deep.equal(expectedQueryResult)
+      expect(stripResult(result)).to.matchSnapshot()
     })
   })
 
-  describe('with psuedo-random delayed scraper', function() {
+  describe('with psuedo-random delayed scraper', () => {
     const { start, query } = scrape(config, options, params)
 
     before(async () => {
-      await nockMockFolder(`${__dirname}/resources/mock-endpoints`, 'http://scrape-next-site.com', {
+      await nockMockFolder(resourceFolder, resourceUrl, {
         randomSeed: 2
       })
 
@@ -69,9 +64,7 @@ describe('scrape next site', () => {
         scrapers: ['image', 'tag'],
         groupBy: 'image-page'
       })
-      expect(result)
-        .excludingEvery(['filename', 'id'])
-        .to.be.deep.equal(expectedQueryResult)
+      expect(stripResult(result)).to.matchSnapshot()
     })
   })
 })
