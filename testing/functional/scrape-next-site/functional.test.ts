@@ -16,7 +16,7 @@ const params = {
   folder: path.resolve(os.tmpdir(), `scrape-pages--${path.basename(__dirname)}`),
   cleanFolder: true
 }
-describe('scrape next site', () => {
+describe(__filename, () => {
   beforeEach(function() {
     configureSnapshots({ __dirname, __filename, fullTitle: this.currentTest!.fullTitle() })
   })

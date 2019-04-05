@@ -4,7 +4,7 @@ import { whileLoop } from '../while-loop'
 // testing imports
 import { rxjsTestScheduler } from '../../../../../testing/setup'
 
-describe('while-loop observable', () => {
+describe(__filename, () => {
   it('should not execute inLoopFunction after conditional returns false', () => {
     const asyncFunction = (initialVal: string, index: number) => Rx.of(index).pipe(ops.delay(1))
     const conditional = (incrementUntil: number) => (outVal: number, index: number) =>

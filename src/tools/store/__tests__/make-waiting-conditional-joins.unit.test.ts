@@ -3,8 +3,7 @@ import { flattenConfig, normalizeConfig } from '../../../settings/config'
 import { makeWaitingConditionalJoins } from '../sql-generators'
 import * as testingConfigs from '../../../../testing/resources/testing-configs'
 
-// should only give the higher one when their depths are unequal
-describe('make waiting conditional joins', () => {
+describe(__filename, () => {
   const galleryPostImgTag = testingConfigs.GALLERY_POST_IMG_TAG
   const fullConfig = normalizeConfig(galleryPostImgTag)
   const flatConfig = flattenConfig(fullConfig)

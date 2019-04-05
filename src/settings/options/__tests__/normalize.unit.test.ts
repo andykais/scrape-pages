@@ -5,7 +5,7 @@ import * as testingConfigs from '../../../../testing/resources/testing-configs'
 import { OptionsInit, ScrapeOptions, FlatOptions } from '../types'
 import { expect } from 'chai'
 
-describe('normalize options with', () => {
+describe(__filename, () => {
   describe('simple config', () => {
     const fullConfig = normalizeConfig(testingConfigs.SIMPLE_CONFIG)
     it('should match returned options', () => {

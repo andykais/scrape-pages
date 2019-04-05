@@ -47,7 +47,7 @@ const useRequestStatsRecorder = (config: ConfigInit, on: Emitter['on']) => {
   }
   return stats
 }
-describe('download control', () => {
+describe(__filename, () => {
   beforeEach(function() {
     configureSnapshots({ __dirname, __filename, fullTitle: this.currentTest!.fullTitle() })
   })

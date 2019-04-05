@@ -3,7 +3,7 @@ import * as testingConfigs from '../../../../testing/resources/testing-configs'
 import { Config } from '../types'
 import { expect } from 'chai'
 
-describe('normalize config with', () => {
+describe(__filename, () => {
   describe('simple config', () => {
     const simpleConfig = testingConfigs.SIMPLE_CONFIG
     const fullConfig = normalizeConfig(simpleConfig)
