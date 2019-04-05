@@ -96,7 +96,7 @@ const startScraping = async (settings: Settings) => {
 
 export type Start = () => ReturnType<typeof startScraping>
 export type Emitter = ThenArg<ReturnType<Start>>
-export type Query = ReturnType<typeof Store.getQuerier>
+export type Query = ReturnType<typeof Store.querierFactory>
 /**
  * scrape is the entrypoint for this library
  *
@@ -112,7 +112,7 @@ export const scrape = (
   const settings = getSettings(configInit, optionsInit, paramsInit)
 
   const start = () => startScraping(settings)
-  const query = Store.getQuerier(settings)
+  const query = Store.querierFactory(settings)
 
   return { start, query }
 }

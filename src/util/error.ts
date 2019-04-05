@@ -1,9 +1,12 @@
-import * as Rx from 'rxjs'
 import * as Fetch from 'node-fetch'
-import { VError } from 'verror'
 
-export const wrapError = (message: any) => (e: Error) =>
-  Rx.throwError(new VError({ name: e.name, cause: e }, message))
+export const typescriptIsWrapper = (fn: (encoded: any) => void) => (encoded: any) => {
+  try {
+    fn(encoded)
+  } catch (e) {
+    throw new RuntimeTypeError(e.message)
+  }
+}
 
 class ResponseError extends Error {
   public name = 'ResponseError'
