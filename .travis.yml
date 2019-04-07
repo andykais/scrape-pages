@@ -16,6 +16,8 @@ cache: npm
 stages:
   - name: test
     if: branch = master OR type IN (pull_request) OR tag IS present
+  - name: deploy coverage
+    if: branch = master
   - name: deploy npm
     if: tag IS present
   - name: deploy website
@@ -26,23 +28,28 @@ stages:
 # deploy jobs
 jobs:
   include:
+    - stage: deploy coverage
+      script: >-
+        npm run test:coverage
+        && npx nyc report --reporter=text-lcov | npx coveralls
+
     - stage: deploy npm
       script: skip
       deploy:
         provider: script
         skip_cleanup: true
         script: >-
-          npm version --no-git-tag-version "$TRAVIS_TAG" &&
-          echo '//registry.npmjs.org/:_authToken=${NPM_AUTH_TOKEN}' >> ~/.npmrc &&
-          npm run build &&
-          cd lib &&
-          npm publish &&
-          cd .. &&
-          git checkout -b master &&
-          git add package.json package-lock.json &&
-          git commit --message "release $TRAVIS_TAG" &&
-          git remote add deploy https://${GITHUB_TOKEN}@github.com/${TRAVIS_REPO_SLUG}.git &&
-          git push deploy master
+          npm version --no-git-tag-version "$TRAVIS_TAG"
+          && echo '//registry.npmjs.org/:_authToken=${NPM_AUTH_TOKEN}' >> ~/.npmrc
+          && npm run build
+          && cd lib 
+          && npm publish
+          && cd ..
+          && git checkout -b master
+          && git add package.json package-lock.json 
+          && git commit --message "release $TRAVIS_TAG"
+          && git remote add deploy https://${GITHUB_TOKEN}@github.com/${TRAVIS_REPO_SLUG}.git
+          && git push deploy master
         on:
           tags: true
 

@@ -4,6 +4,9 @@
 # build files
 lib
 
+# coverage reports
+.nyc_output
+
 # scratchwork folder
 scratchwork
 

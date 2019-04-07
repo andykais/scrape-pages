@@ -11,7 +11,7 @@ class ClearTerminalInWatchMode {
   }
 }
 
-module.exports = (env, { mode = 'development' } = {}) => ({
+const config = {
   target: 'node',
   node: {
     __dirname: true,
@@ -59,4 +59,26 @@ module.exports = (env, { mode = 'development' } = {}) => ({
     minimizer: [new TerserPlugin()]
   },
   externals: [nodeExternals()]
-})
+}
+
+module.exports = (env, { mode = 'development' } = {}) => {
+  switch (env) {
+    case 'coverage':
+      return {
+        ...config,
+        module: {
+          rules: [
+            {
+              test: /\.(ts|js)/,
+              include: resolve('src'),
+              loader: 'istanbul-instrumenter-loader',
+              options: { esModules: true }
+            },
+            ...config.module.rules
+          ]
+        }
+      }
+    default:
+      return config
+  }
+}
