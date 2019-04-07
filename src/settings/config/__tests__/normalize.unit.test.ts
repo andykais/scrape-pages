@@ -17,12 +17,14 @@ describe(__filename, () => {
             urlTemplate: simpleConfig.scrapers.index.download as string,
             headerTemplates: {},
             read: true,
-            write: false
+            write: false,
+            regexCleanup: undefined
           },
           parse: {
             selector: (simpleConfig.scrapers.index.parse as any).selector,
             attribute: (simpleConfig.scrapers.index.parse as any).attribute,
-            format: 'html'
+            format: 'html',
+            regexCleanup: undefined
           },
           incrementUntil: 0
         },
@@ -33,7 +35,8 @@ describe(__filename, () => {
             urlTemplate: simpleConfig.scrapers.image.download as any,
             headerTemplates: {},
             read: true,
-            write: false
+            write: false,
+            regexCleanup: undefined
           },
           parse: undefined,
           incrementUntil: 0
@@ -52,13 +55,13 @@ describe(__filename, () => {
       }
     }
 
+    it('should match the guessed full config', () => {
+      expect(fullConfig).to.deep.equal(fullConfigGuess)
+    })
+
     it('should match itself for a full filled in config', () => {
       const fullConfigFromGuess = normalizeConfig(fullConfigGuess)
       expect(fullConfigFromGuess).to.deep.equal(fullConfigGuess)
-    })
-
-    it('should match the guessed full config', () => {
-      expect(fullConfig).to.deep.equal(fullConfigGuess)
     })
   })
 

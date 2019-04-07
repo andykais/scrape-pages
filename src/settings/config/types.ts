@@ -8,11 +8,15 @@ type InputKey = string
 
 // RegexCleanup {{{
 type RegexRemove = string
-type RegexReplace = {
+interface RegexReplaceInit {
   selector: string
   replacer: string
+  flags?: string
 }
-type RegexCleanup = RegexRemove | RegexReplace
+export type RegexCleanupInit = RegexRemove | RegexReplaceInit
+export interface RegexCleanup extends RegexReplaceInit {
+  flags: string
+}
 // }}}
 
 // Input {{{
@@ -29,7 +33,7 @@ interface DownloadConfigInterface {
   method?: UrlMethods
   urlTemplate: Template
   headerTemplates?: { [headerName: string]: Template }
-  regexCleanup?: RegexCleanup
+  regexCleanup?: RegexCleanupInit | undefined
   read?: boolean // should download be read into memory
   write?: boolean // should download be saved to a file (separate from a database entry)
 }
@@ -40,6 +44,7 @@ export interface DownloadConfig extends DownloadConfigInterface {
   headerTemplates: { [headerName: string]: Template }
   read: boolean
   write: boolean
+  regexCleanup: RegexCleanup | undefined
 }
 // }}}
 
@@ -51,11 +56,12 @@ interface ParseConfigInterface {
   selector: Selector
   attribute?: string
   limit?: number
-  regexCleanup?: RegexCleanup
+  regexCleanup?: RegexCleanupInit | undefined
 }
 export type ParseConfigInit = Selector | ParseConfigInterface | undefined
 export interface ParseConfig extends ParseConfigInterface {
   format: AcceptedFormats
+  regexCleanup: RegexCleanup | undefined
 }
 // }}}
 

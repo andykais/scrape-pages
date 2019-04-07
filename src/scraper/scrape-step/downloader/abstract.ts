@@ -24,6 +24,7 @@ interface RetrieveValue {
  */
 export abstract class AbstractDownloader<DownloadData> {
   public type: DownloadConfig['protocol'] | 'identity'
+  public postProcess: (value: string) => string
   protected scraperName: ScraperName
   protected downloadConfig: DownloadConfig | undefined
   protected config: ScrapeSettings['config']
@@ -40,6 +41,7 @@ export abstract class AbstractDownloader<DownloadData> {
   ) {
     const scraperLogger = tools.logger.scraper(scraperName)!
     Object.assign(this, { scraperName, downloadConfig, ...settings, tools, scraperLogger })
+    this.postProcess = this.getPostProcessing(downloadConfig)
   }
   public run = async (downloadParams: DownloadParams): Promise<RetrieveValue> => {
     const { store, emitter } = this.tools
@@ -57,6 +59,7 @@ export abstract class AbstractDownloader<DownloadData> {
       downloadParams.downloadId,
       downloadData
     )
+    const processedDownloadValue = this.postProcess(downloadValue)
 
     // ignore this step for identity downloader
     const cacheId = this.downloadConfig
@@ -64,7 +67,7 @@ export abstract class AbstractDownloader<DownloadData> {
           scraper: this.scraperName,
           downloadData,
           protocol: this.type,
-          downloadValue: downloadValue!,
+          downloadValue: processedDownloadValue!,
           filename,
           mimeType,
           byteLength,
@@ -86,7 +89,7 @@ export abstract class AbstractDownloader<DownloadData> {
 
     return {
       cacheId,
-      downloadValue,
+      downloadValue: processedDownloadValue,
       filename,
       mimeType,
       byteLength
@@ -98,4 +101,22 @@ export abstract class AbstractDownloader<DownloadData> {
     downloadId: number,
     downloadParams: DownloadData
   ): RetrieveValue | Promise<RetrieveValue>
+
+  private getRegexCleanup = ({ regexCleanup }: DownloadConfig) => {
+    if (regexCleanup) {
+      const regex = new RegExp(regexCleanup.selector)
+      return (value: string) => value.replace(regex, regexCleanup.replacer)
+    } else {
+      return (value: string) => value
+    }
+  }
+  private valueNeedsPostProcessing = ({ regexCleanup }: DownloadConfig) => regexCleanup
+
+  private getPostProcessing = (downloadConfig?: DownloadConfig) => {
+    if (downloadConfig) {
+      const regexReplace = this.getRegexCleanup(downloadConfig)
+      if (this.valueNeedsPostProcessing(downloadConfig)) return regexReplace
+    }
+    return (values: string) => values
+  }
 }
