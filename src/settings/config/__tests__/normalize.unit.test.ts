@@ -98,7 +98,7 @@ describe(__filename, () => {
     it('should throw a type assertion error', () => {
       expect(() => normalizeConfig(configInit))
         .to.throw(`$: expected 'scrapers' in object`)
-        .with.property('name', 'RuntimeTypeError')
+        .with.property('name', 'TypeGuardError')
     })
     describe('with scrapers that are not defined', () => {
       const configInit = { scrapers: {}, run: { scraper: 'hello' } }

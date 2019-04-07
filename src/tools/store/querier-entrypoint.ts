@@ -1,11 +1,11 @@
-import { Database } from '../database'
-import { groupUntilSeparator } from '../../../util/array'
-import { selectOrderedScrapers } from '../queries'
-import { assertQueryArgumentsType } from './assert.runtime'
+import { Database } from './database'
+import { groupUntilSeparator } from '../../util/array'
+import { selectOrderedScrapers } from './queries'
+import { typecheckQueryArguments } from '../../util/typechecking.runtime'
 // type imports
-import { Settings } from '../../../settings'
-import { ScraperName } from '../../../settings/config/types'
-import { SelectedRow as OrderedScrapersRow } from '../queries/select-ordered-scrapers'
+import { Settings } from '../../settings'
+import { ScraperName } from '../../settings/config/types'
+import { SelectedRow as OrderedScrapersRow } from './queries/select-ordered-scrapers'
 
 export type QueryArguments = { scrapers: ScraperName[]; groupBy?: ScraperName }
 interface QueryFn {
@@ -24,7 +24,7 @@ const querierFactory = (settings: Settings): QueryFn => {
   let database: Database
 
   const prepare: QueryFn['prepare'] = queryArgs => {
-    assertQueryArgumentsType(queryArgs)
+    typecheckQueryArguments(queryArgs)
     const { scrapers, groupBy } = queryArgs
     if (firstCall) {
       // this stateful stuff is necessary so we can give this to the user before creating folders

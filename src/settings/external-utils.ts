@@ -1,13 +1,19 @@
-import { normalizeConfig, flattenConfig, assertConfigType } from './config'
-import { normalizeOptions, assertOptionsType } from './options'
-import { marshaller } from '../util/object'
+import { normalizeConfig, flattenConfig } from './config'
+import { normalizeOptions } from './options'
+import { normalizeParams } from './params'
+import { typecheckConfig, typecheckOptions, typecheckParams } from '../util/typechecking.runtime'
 
 export const config = {
-  normalize: marshaller(normalizeConfig),
-  flatten: marshaller(flattenConfig),
-  verify: assertConfigType
+  normalize: normalizeConfig,
+  flatten: flattenConfig,
+  typecheck: typecheckConfig
 }
 export const options = {
-  normalize: marshaller(normalizeOptions),
-  verify: assertOptionsType
+  normalize: normalizeOptions,
+  typecheck: typecheckOptions
+}
+
+export const params = {
+  normalize: normalizeParams,
+  typecheck: typecheckParams
 }

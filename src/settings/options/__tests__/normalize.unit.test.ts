@@ -32,7 +32,7 @@ describe(__filename, () => {
     it('should throw a type assertion error', () => {
       expect(() => normalizeOptions(fullConfig, optionsInit))
         .to.throw('$.maxConcurrent: expected a number')
-        .with.property('name', 'RuntimeTypeError')
+        .with.property('name', 'TypeGuardError')
     })
   })
 })

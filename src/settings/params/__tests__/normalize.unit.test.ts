@@ -63,7 +63,7 @@ describe(__filename, () => {
     it('should throw a type assertion error', () => {
       expect(() => normalizeParams(config, options, paramsInit))
         .to.throw(`$: expected 'folder' in object`)
-        .with.property('name', 'RuntimeTypeError')
+        .with.property('name', 'TypeGuardError')
     })
   })
 })

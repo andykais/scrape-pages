@@ -12,7 +12,7 @@ import {
   RegexCleanupInit,
   Config
 } from './types'
-import { assertConfigType } from './'
+import { typecheckConfig } from '../../util/typechecking.runtime'
 
 const reservedWords = ['value', 'index']
 
@@ -136,7 +136,7 @@ const normalizeStructure = (scrapers: ConfigInit['scrapers']) => ({
 }
 
 const normalizeConfig = (configInit: ConfigInit): Config => {
-  assertConfigType(configInit)
+  typecheckConfig(configInit)
 
   return {
     input: normalizeInputs(configInit.input),

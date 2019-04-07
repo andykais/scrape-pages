@@ -114,5 +114,5 @@ export const scrape = (
   const start = () => startScraping(settings)
   const query = Store.querierFactory(settings)
 
-  return { start, query }
+  return { start, query, settings }
 }

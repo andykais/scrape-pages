@@ -88,6 +88,7 @@
     "ts-loader": "^5.3.3",
     "ttypescript": "^1.5.6",
     "typescript": "^3.3.3333",
+    "typescript-is": "^0.10.6",
     "webpack": "^4.28.3",
     "webpack-cli": "^3.0.6",
     "webpack-node-externals": "^1.7.2"
