@@ -69,6 +69,8 @@ describe(__filename, () => {
 
     step('with all scrapers cache: true, no requests should happen', async () => {
       const { start, query } = scrape(config, { cache: true }, { ...params, cleanFolder: false })
+      const resultPre = query({ scrapers: ['postTitle'] })
+      expect(stripResult(resultPre)).to.matchSnapshot()
       await nockMockFolder(resourceFolder, resourceUrl)
       const { on } = await start()
       const { counts } = useRequestStatsRecorder(config, on)
@@ -78,7 +80,7 @@ describe(__filename, () => {
       expect(counts.postTitle.queued).to.equal(0)
       expect(counts.postTitle.complete).to.equal(5)
       const result = query({ scrapers: ['postTitle'] })
-      expect(stripResult(result)).to.matchSnapshot()
+      expect(stripResult(result)).to.deep.equal(stripResult(resultPre))
     })
 
     step(

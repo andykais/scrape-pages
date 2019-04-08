@@ -39,11 +39,13 @@ const querierFactory = (settings: Settings): QueryFn => {
     ])
     return () => {
       const result = preparedStatment()
-      return groupUntilSeparator(
-        result,
-        ({ scraper }) => scraper === groupBy,
-        groupBy !== undefined && scrapers.includes(groupBy)
-      )
+      return groupBy !== undefined
+        ? groupUntilSeparator(
+            result,
+            ({ scraper }) => scraper === groupBy,
+            groupBy !== undefined && scrapers.includes(groupBy)
+          )
+        : [result]
     }
   }
   // create external query function
