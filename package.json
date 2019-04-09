@@ -88,7 +88,6 @@
     "ts-loader": "^5.3.3",
     "ttypescript": "^1.5.6",
     "typescript": "^3.3.3333",
-    "typescript-is": "^0.10.6",
     "webpack": "^4.28.3",
     "webpack-cli": "^3.0.6",
     "webpack-node-externals": "^1.7.2"
@@ -101,7 +100,7 @@
     "node-fetch": "^2.1.2",
     "rxjs": "^6.4.0",
     "sanitize-filename": "^1.6.1",
-    "typescript-is": "^0.10.1",
+    "typescript-is": "^0.10.6",
     "verror": "^1.10.0"
   }
 }
