@@ -17,7 +17,7 @@ stages:
   - name: test
     if: branch = master OR type IN (pull_request) OR tag IS present
   - name: deploy coverage
-    if: branch = master
+    if: branch = master OR type IN (pull_request) OR tag IS present
   - name: deploy npm
     if: tag IS present
   - name: deploy website
