@@ -71,34 +71,34 @@ const normalizeDownload = (download: DownloadConfigInit): DownloadConfig | undef
   download === undefined
     ? undefined
     : typeof download === 'string'
-      ? {
-          ...defaults.download,
-          urlTemplate: download,
-          regexCleanup: undefined
-        }
-      : {
-          ...defaults.download,
-          ...download,
-          regexCleanup: normalizeRegexCleanup(download.regexCleanup),
-          protocol: download.protocol || defaults.download.protocol,
-          method: download.method || defaults.download.method
-        }
+    ? {
+        ...defaults.download,
+        urlTemplate: download,
+        regexCleanup: undefined
+      }
+    : {
+        ...defaults.download,
+        ...download,
+        regexCleanup: normalizeRegexCleanup(download.regexCleanup),
+        protocol: download.protocol || defaults.download.protocol,
+        method: download.method || defaults.download.method
+      }
 
 const normalizeParse = (parse: ParseConfigInit): ParseConfig | undefined =>
   parse === undefined
     ? undefined
     : typeof parse === 'string'
-      ? {
-          ...defaults.parse,
-          selector: parse,
-          regexCleanup: undefined
-        }
-      : {
-          ...defaults.parse,
-          ...parse,
-          regexCleanup: normalizeRegexCleanup(parse.regexCleanup),
-          format: parse.format || defaults.parse.format
-        }
+    ? {
+        ...defaults.parse,
+        selector: parse,
+        regexCleanup: undefined
+      }
+    : {
+        ...defaults.parse,
+        ...parse,
+        regexCleanup: normalizeRegexCleanup(parse.regexCleanup),
+        format: parse.format || defaults.parse.format
+      }
 
 const normalizeDefinition = (scrapeConfig: ScrapeConfigInit): ScrapeConfig => ({
   ...defaults.definition,

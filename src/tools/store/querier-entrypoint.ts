@@ -9,8 +9,8 @@ import { SelectedRow as OrderedScrapersRow } from './queries/select-ordered-scra
 
 export type QueryArguments = { scrapers: ScraperName[]; groupBy?: ScraperName }
 interface QueryFn {
-  (...args: ArgumentTypes<QueryFn['prepare']>): OrderedScrapersRow[][]
   prepare: (params: QueryArguments) => () => OrderedScrapersRow[][]
+  (...args: ArgumentTypes<QueryFn['prepare']>): OrderedScrapersRow[][]
 }
 
 /**

@@ -95,12 +95,6 @@ export abstract class AbstractDownloader<DownloadData> {
       byteLength
     }
   }
-  // implement these methods
-  public abstract constructDownload(downloadParams: DownloadParams): DownloadData
-  public abstract retrieve(
-    downloadId: number,
-    downloadParams: DownloadData
-  ): RetrieveValue | Promise<RetrieveValue>
 
   private getRegexCleanup = ({ regexCleanup }: DownloadConfig) => {
     if (regexCleanup) {
@@ -111,7 +105,6 @@ export abstract class AbstractDownloader<DownloadData> {
     }
   }
   private valueNeedsPostProcessing = ({ regexCleanup }: DownloadConfig) => regexCleanup
-
   private getPostProcessing = (downloadConfig?: DownloadConfig) => {
     if (downloadConfig) {
       const regexReplace = this.getRegexCleanup(downloadConfig)
@@ -119,4 +112,11 @@ export abstract class AbstractDownloader<DownloadData> {
     }
     return (values: string) => values
   }
+
+  // implement these methods
+  public abstract constructDownload(downloadParams: DownloadParams): DownloadData
+  public abstract retrieve(
+    downloadId: number,
+    downloadParams: DownloadData
+  ): RetrieveValue | Promise<RetrieveValue>
 }

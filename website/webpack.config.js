@@ -30,10 +30,7 @@ module.exports = {
   },
   resolve: {
     alias: {
-      'flow-runtime': resolve(
-        __dirname,
-        'node_modules/flow-runtime/dist/flow-runtime.es2015.js'
-      )
+      'flow-runtime': resolve(__dirname, 'node_modules/flow-runtime/dist/flow-runtime.es2015.js')
     }
   },
   plugins: [
