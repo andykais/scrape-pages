@@ -1,7 +1,6 @@
 const { resolve } = require('path')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const nodeExternals = require('webpack-node-externals')
-const TerserPlugin = require('terser-webpack-plugin')
 
 class ClearTerminalInWatchMode {
   apply(compiler) {
@@ -60,10 +59,6 @@ const config = {
     new CopyWebpackPlugin(['package.json', 'package-lock.json', 'LICENSE', 'README.md']),
     new ClearTerminalInWatchMode()
   ],
-  optimization: {
-    minimize: false,
-    minimizer: [new TerserPlugin()]
-  },
   externals: [nodeExternals()]
 }
 
