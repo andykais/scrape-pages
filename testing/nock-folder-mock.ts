@@ -1,21 +1,6 @@
 import * as path from 'path'
-import { readdir, stat } from '../src/util/fs'
+import { findFiles } from '../src/util/fs'
 import * as nock from 'nock'
-
-const findFilesRecursive = async (folder: string): Promise<string[]> => {
-  const endpointFiles = []
-  const filesInDir = await readdir(folder)
-  for (const file of filesInDir) {
-    const fileStats = await stat(path.resolve(folder, file))
-    if (fileStats.isDirectory()) {
-      const recursedFiles = await findFilesRecursive(path.resolve(folder, file))
-      endpointFiles.push(...recursedFiles)
-    } else {
-      endpointFiles.push(path.resolve(folder, file))
-    }
-  }
-  return endpointFiles
-}
 
 class SeedPsuedoRandom {
   private _seed: number
@@ -27,28 +12,50 @@ class SeedPsuedoRandom {
   public nextFloat = () => (this.next() - 1) / 2147483646
 }
 
-export const nockMockFolder = async (
-  mockEndpointsFolder: string,
-  baseUrl: string,
-  { randomSeed, delay = 0 }: { randomSeed?: number; delay?: number } = {}
-) => {
-  const scope = nock(baseUrl)
-  const random = randomSeed && new SeedPsuedoRandom(randomSeed)
+type Options = {
+  randomSeed?: number
+  delay?: number
+}
+class NockFolderMock {
+  private mockEndpointsFolder: string
+  private baseUrl: string
+  private options: Options
+  private interceptors?: nock.Interceptor[]
 
-  const files = await findFilesRecursive(mockEndpointsFolder)
-  for (const file of files) {
-    const relativePath = path.relative(mockEndpointsFolder, file)
-    const fullPath = path.resolve(mockEndpointsFolder, file)
-    if (random) {
-      scope
-        .get(`/${relativePath}`)
-        .delay(random.nextFloat() * 100)
-        .replyWithFile(200, fullPath)
-    } else {
-      scope
-        .get(`/${relativePath}`)
-        .delay({ body: delay })
-        .replyWithFile(200, fullPath)
-    }
+  public constructor(mockEndpointsFolder: string, baseUrl: string, options: Options = {}) {
+    Object.assign(this, { mockEndpointsFolder, baseUrl, options })
+  }
+
+  public init = async () => {
+    const scope = nock(this.baseUrl)
+    const random = this.options.randomSeed && new SeedPsuedoRandom(this.options.randomSeed)
+    const delay = this.options.delay || 0
+
+    const files = await findFiles(this.mockEndpointsFolder)
+
+    this.interceptors = files.map(file => {
+      const relativePath = path.relative(this.mockEndpointsFolder, file)
+      const fullPath = path.resolve(this.mockEndpointsFolder, file)
+      const interceptor = scope.get(`/${relativePath}`)
+      const randomMultiplier = random ? random.nextFloat() : 1
+      interceptor.delay(randomMultiplier * delay).replyWithFile(200, fullPath)
+      return interceptor
+    })
+  }
+
+  public done = () => {
+    if (this.interceptors) this.interceptors.forEach(nock.removeInterceptor)
+    else throw new Error('Must init() endpoints before calling done()')
+  }
+
+  public static create = async (
+    mockEndpointsFolder: string,
+    baseUrl: string,
+    options: Options = {}
+  ) => {
+    const siteMock = new NockFolderMock(mockEndpointsFolder, baseUrl, options)
+    await siteMock.init()
+    return siteMock
   }
 }
+export { NockFolderMock }

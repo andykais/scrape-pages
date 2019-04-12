@@ -4,7 +4,12 @@ import * as path from 'path'
 import { expect } from 'chai'
 
 import * as nock from 'nock'
-import { nockMockFolder, configureSnapshots, stripResult } from '../../setup'
+import {
+  NockFolderMock,
+  configureSnapshots,
+  stripResult,
+  useRequestStatsRecorder
+} from '../../setup'
 import { config } from './config'
 import { scrape } from '../../../src'
 import { Emitter } from '../../../src/scraper'
@@ -19,34 +24,6 @@ const params = {
   cleanFolder: true
 }
 
-const useRequestStatsRecorder = (config: ConfigInit, on: Emitter['on']) => {
-  const scraperNames = Object.keys(config.scrapers)
-  const counts = scraperNames.reduce(
-    (acc, scraperName) => {
-      acc[scraperName] = { queued: 0, complete: 0 }
-      return acc
-    },
-    {} as {
-      [scraperName: string]: { queued: number; complete: number }
-    }
-  )
-  const stats = { counts, maxConcurrentRequests: 0 }
-  const concurrentRequests = new Set()
-  for (const scraperName of scraperNames) {
-    on(`${scraperName}:queued`, () => {
-      stats.counts[scraperName].queued++
-    })
-    on(`${scraperName}:complete`, id => {
-      stats.counts[scraperName].complete++
-      concurrentRequests.delete(id)
-    })
-    on(`${scraperName}:progress`, id => {
-      concurrentRequests.add(id)
-      stats.maxConcurrentRequests = Math.max(stats.maxConcurrentRequests, concurrentRequests.size)
-    })
-  }
-  return stats
-}
 describe(__filename, () => {
   beforeEach(function() {
     configureSnapshots({ __dirname, __filename, fullTitle: this.currentTest!.fullTitle() })
@@ -55,10 +32,11 @@ describe(__filename, () => {
   describe('cache control', () => {
     step('first pass should fetch all downloads since nothing is in cache', async () => {
       const { start, query } = scrape(config, { cache: true }, params)
-      await nockMockFolder(resourceFolder, resourceUrl)
+      const siteMock = await NockFolderMock.create(resourceFolder, resourceUrl)
       const { on } = await start()
       const { counts } = useRequestStatsRecorder(config, on)
       await new Promise(resolve => on('done', resolve))
+      siteMock.done()
       expect(counts.index.queued).to.equal(1)
       expect(counts.index.complete).to.equal(1)
       expect(counts.postTitle.queued).to.equal(5)
@@ -71,10 +49,11 @@ describe(__filename, () => {
       const { start, query } = scrape(config, { cache: true }, { ...params, cleanFolder: false })
       const resultPre = query({ scrapers: ['postTitle'] })
       expect(stripResult(resultPre)).to.matchSnapshot()
-      await nockMockFolder(resourceFolder, resourceUrl)
+      const siteMock = await NockFolderMock.create(resourceFolder, resourceUrl)
       const { on } = await start()
       const { counts } = useRequestStatsRecorder(config, on)
       await new Promise(resolve => on('done', resolve))
+      siteMock.done()
       expect(counts.index.queued).to.equal(0)
       expect(counts.index.complete).to.equal(1)
       expect(counts.postTitle.queued).to.equal(0)
@@ -91,10 +70,11 @@ describe(__filename, () => {
           { logLevel: 'info', cache: true, optionsEach: { index: { cache: false } } },
           { ...params, cleanFolder: false }
         )
-        await nockMockFolder(resourceFolder, resourceUrl)
+        const siteMock = await NockFolderMock.create(resourceFolder, resourceUrl)
         const { on } = await start()
         const { counts } = useRequestStatsRecorder(config, on)
         await new Promise(resolve => on('done', resolve))
+        siteMock.done()
         expect(counts.index.queued).to.equal(1)
         expect(counts.index.complete).to.equal(1)
         expect(counts.postTitle.queued).to.equal(0)
@@ -106,8 +86,10 @@ describe(__filename, () => {
   })
 
   describe('emit stop event', () => {
+    const siteMock = new NockFolderMock(resourceFolder, resourceUrl, { delay: 200 })
     // nock sends an instant reply, this is not realistic and harder to test, so a delay is added
-    beforeEach(async () => await nockMockFolder(resourceFolder, resourceUrl, { delay: 200 }))
+    beforeEach(siteMock.init)
+    afterEach(siteMock.done)
 
     describe(`emit('stop')`, () => {
       it(`should stop the whole scraper if triggered before any 'complete' event`, async () => {

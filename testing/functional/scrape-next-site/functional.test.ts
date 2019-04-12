@@ -3,7 +3,7 @@ import * as path from 'path'
 
 import { expect } from 'chai'
 
-import { nockMockFolder, configureSnapshots, stripResult } from '../../setup'
+import { NockFolderMock, configureSnapshots, stripResult } from '../../setup'
 import { config } from './config'
 import { scrape } from '../../../src'
 
@@ -25,24 +25,19 @@ describe(__filename, () => {
     const { start, query } = scrape(config, options, params)
 
     before(async () => {
-      await nockMockFolder(resourceFolder, resourceUrl)
+      const siteMock = await NockFolderMock.create(resourceFolder, resourceUrl)
 
       const { on } = await start()
       await new Promise(resolve => on('done', resolve))
+      siteMock.done()
     })
 
     it('should group each image into a separate slot, in order', () => {
-      const result = query({
-        scrapers: ['image'],
-        groupBy: 'image'
-      })
+      const result = query({ scrapers: ['image'], groupBy: 'image' })
       expect(stripResult(result)).to.matchSnapshot()
     })
     it('should group tags and images together that were found on the same page', () => {
-      const result = query({
-        scrapers: ['image', 'tag'],
-        groupBy: 'image-page'
-      })
+      const result = query({ scrapers: ['image', 'tag'], groupBy: 'image-page' })
       expect(stripResult(result)).to.matchSnapshot()
     })
   })
@@ -51,26 +46,16 @@ describe(__filename, () => {
     const { start, query } = scrape(config, options, params)
 
     before(async () => {
-      await nockMockFolder(resourceFolder, resourceUrl, {
-        randomSeed: 2
-      })
+      const siteMock = await NockFolderMock.create(resourceFolder, resourceUrl, { randomSeed: 2 })
 
       const { on } = await start()
       await new Promise(resolve => on('done', resolve))
+      siteMock.done()
     })
 
     it('should keep images and tags together, in order', () => {
-      const result = query({
-        scrapers: ['image', 'tag'],
-        groupBy: 'image-page'
-      })
+      const result = query({ scrapers: ['image', 'tag'], groupBy: 'image-page' })
       expect(stripResult(result)).to.matchSnapshot()
     })
   })
 })
-
-/**
- * I need a way to say, use the cached response from certain scrapers if hit, and always download again for
- * others
- * - useCachedResponse? default to true?
- */

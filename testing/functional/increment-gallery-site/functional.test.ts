@@ -3,7 +3,12 @@ import * as path from 'path'
 
 import { expect } from 'chai'
 
-import { nockMockFolder, configureSnapshots } from '../../setup'
+import {
+  NockFolderMock,
+  configureSnapshots,
+  stripResult,
+  useRequestStatsRecorder
+} from '../../setup'
 import { config } from './config'
 import { scrape } from '../../../src'
 
@@ -24,55 +29,43 @@ describe(__filename, () => {
     const { start, query } = scrape(config, options, params)
 
     before(async () => {
-      await nockMockFolder(resourceFolder, resourceUrl)
+      const siteMock = await NockFolderMock.create(resourceFolder, resourceUrl)
 
       const { on } = await start()
       await new Promise(resolve => on('done', resolve))
+      siteMock.done()
     })
 
     it('should group each image into a separate slot, in order', () => {
-      const result = query({
-        scrapers: ['image'],
-        groupBy: 'image'
-      })
-      expect(result)
-        .excludingEvery(['filename', 'id'])
-        .to.matchSnapshot()
+      const result = query({ scrapers: ['image'], groupBy: 'image' })
+      expect(stripResult(result)).to.matchSnapshot()
     })
     it('should group tags and images together that were found on the same page', () => {
-      const result = query({
-        scrapers: ['image', 'tag'],
-        groupBy: 'image-page'
-      })
-      expect(result)
-        .excludingEvery(['filename', 'id'])
-        .to.matchSnapshot()
+      const result = query({ scrapers: ['image', 'tag'], groupBy: 'image-page' })
+      expect(stripResult(result)).to.matchSnapshot()
     })
   })
   describe('with cached scraper', () => {
     it('should make the expected requests on first pass', async () => {
       const count = { queued: { gallery: 0, image: 0 }, complete: { gallery: 0, image: 0 } }
-      await nockMockFolder(resourceFolder, resourceUrl)
+      const siteMock = await NockFolderMock.create(resourceFolder, resourceUrl)
 
       const { start, query } = scrape(config, options, params)
       const { on } = await start()
+      const { counts } = useRequestStatsRecorder(config, on)
       on('image:queued', () => count.queued.image++)
       on('image:complete', () => count.complete.image++)
       on('gallery:queued', () => count.queued.gallery++)
       on('gallery:complete', () => count.complete.gallery++)
       await new Promise(resolve => on('done', resolve))
-      expect(count.queued.gallery).to.equal(3)
-      expect(count.queued.image).to.equal(4)
-      expect(count.complete.gallery).to.equal(2)
-      expect(count.complete.image).to.equal(4)
+      siteMock.done()
+      expect(counts.gallery.queued).to.equal(3)
+      expect(counts.gallery.complete).to.equal(2)
+      expect(counts.image.queued).to.equal(4)
+      expect(counts.image.complete).to.equal(4)
 
-      const result = query({
-        scrapers: ['image', 'tag'],
-        groupBy: 'image-page'
-      })
-      expect(result)
-        .excludingEvery(['filename', 'id'])
-        .to.matchSnapshot()
+      const result = query({ scrapers: ['image', 'tag'], groupBy: 'image-page' })
+      expect(stripResult(result)).to.matchSnapshot()
     })
   })
 
@@ -90,20 +83,16 @@ describe(__filename, () => {
     const { start, query } = scrape(configWithLimit, options, params)
 
     before(async () => {
-      await nockMockFolder(resourceFolder, resourceUrl)
+      const siteMock = await NockFolderMock.create(resourceFolder, resourceUrl)
 
       const { on } = await start()
       await new Promise(resolve => on('done', resolve))
+      siteMock.done()
     })
 
     it('should group each image into a separate slot, in order', () => {
-      const result = query({
-        scrapers: ['image'],
-        groupBy: 'image'
-      })
-      expect(result)
-        .excludingEvery(['filename', 'id'])
-        .to.matchSnapshot()
+      const result = query({ scrapers: ['image'], groupBy: 'image' })
+      expect(stripResult(result)).to.matchSnapshot()
     })
   })
 
@@ -111,29 +100,16 @@ describe(__filename, () => {
     const { start, query } = scrape(config, options, params)
 
     before(async () => {
-      await nockMockFolder(resourceFolder, resourceUrl, { randomSeed: 1 })
+      const siteMock = await NockFolderMock.create(resourceFolder, resourceUrl, { randomSeed: 1 })
 
       const { on } = await start()
       await new Promise(resolve => on('done', resolve))
+      siteMock.done()
     })
 
     it('should keep images and tags together, in order', () => {
-      const result = query({
-        scrapers: ['image', 'tag'],
-        groupBy: 'image-page'
-      })
-      expect(result)
-        .excludingEvery(['filename', 'id'])
-        .to.matchSnapshot()
+      const result = query({ scrapers: ['image', 'tag'], groupBy: 'image-page' })
+      expect(stripResult(result)).to.matchSnapshot(true)
     })
   })
 })
-
-/**
- * I need a way to say, use the cached response from certain scrapers if hit, and always download again for
- * others
- * - useCachedResponse? default to true?
- *
- * I need a way to say reuse existing store if found, if not, remove the files
- * - cleanFolder
- */
