@@ -26,6 +26,16 @@ class NockFolderMock {
     Object.assign(this, { mockEndpointsFolder, baseUrl, options })
   }
 
+  public static create = async (
+    mockEndpointsFolder: string,
+    baseUrl: string,
+    options: Options = {}
+  ) => {
+    const siteMock = new NockFolderMock(mockEndpointsFolder, baseUrl, options)
+    await siteMock.init()
+    return siteMock
+  }
+
   public init = async () => {
     const scope = nock(this.baseUrl)
     const random = this.options.randomSeed && new SeedPsuedoRandom(this.options.randomSeed)
@@ -46,16 +56,6 @@ class NockFolderMock {
   public done = () => {
     if (this.interceptors) this.interceptors.forEach(nock.removeInterceptor)
     else throw new Error('Must init() endpoints before calling done()')
-  }
-
-  public static create = async (
-    mockEndpointsFolder: string,
-    baseUrl: string,
-    options: Options = {}
-  ) => {
-    const siteMock = new NockFolderMock(mockEndpointsFolder, baseUrl, options)
-    await siteMock.init()
-    return siteMock
   }
 }
 export { NockFolderMock }

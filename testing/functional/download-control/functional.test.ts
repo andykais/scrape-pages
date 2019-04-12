@@ -12,8 +12,6 @@ import {
 } from '../../setup'
 import { config } from './config'
 import { scrape } from '../../../src'
-import { Emitter } from '../../../src/scraper'
-import { ConfigInit } from '../../../src/settings/config/types'
 
 const resourceFolder = `${__dirname}/fixtures`
 const resourceUrl = `http://${path.basename(__dirname)}.com`
