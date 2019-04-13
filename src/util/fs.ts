@@ -83,5 +83,4 @@ export const findFiles = async (folder: string): Promise<string[]> => {
   return endpointFiles
 }
 
-
 export const sanitizeFilename = (filename: string) => sanitize(filename, { replacement: '_' })

@@ -1,14 +1,14 @@
 {
   "compilerOptions": {
     "outDir": "./lib/",
+    "incremental": true,
+    "tsBuildInfoFile": "./node_modules/.cache/tsconfig.buildinfo",
     "sourceMap": true,
     "noImplicitAny": true,
     "strictNullChecks": true,
-    "lib": ["es2015", "es2016", "es2017"],
     "module": "commonjs",
     "moduleResolution": "node",
     "target": "es2017",
-    "allowJs": true,
     "resolveJsonModule": true,
     "plugins": [{ "transform": "typescript-is/lib/transform-inline/transformer" }]
   },

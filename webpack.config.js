@@ -29,7 +29,7 @@ const config = {
     libraryTarget: 'umd'
   },
   resolve: {
-    extensions: ['.ts', '.js']
+    extensions: ['.ts']
   },
   module: {
     rules: [
