@@ -3,11 +3,6 @@ declare module '*.sql' {
   export default content
 }
 
-declare module 'flow-runtime' {
-  const content: {}
-  export default content
-}
-
 // mocha-step is missing typescript types
 declare function step(...args: ArgumentTypes<typeof it>): ReturnType<typeof it>
 

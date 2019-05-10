@@ -4,46 +4,44 @@
   "description": "generalized scraping using a single config object for any site that can be scraped without a headless browser",
   "keywords": [
     "crawler",
-    "scraper",
+    "emitter",
     "http",
-    "emitter"
+    "scraper"
   ],
-  "main": "index.js",
-  "scripts": {
-    "build": "run-s clean compile",
-    "build:watch": "webpack --mode=development --watch",
-    "compile": "webpack --mode=production",
-    "clean": "shx rm -rf lib node_modules/.cache/tsconfig.buildinfo",
-    "lint": "eslint --ignore-path .gitignore '**/*.ts'",
-    "format": "prettier --write --ignore-path=.gitignore '**/*.{json,ts,js}'",
-    "format:check": "prettier --check --ignore-path=.gitignore '**/*.{json,ts,js}'",
-    "typecheck": "tsc --noEmit --project tsconfig.json",
-    "typecheck:watch": "npm run typecheck -- --watch",
-    "test:watch": "mochapack '{testing,src,examples}/**/*.test.ts' --watch",
-    "test:unit": "mochapack src/**/*.unit.test.ts",
-    "test:functional": "mochapack testing/**/*functional.test.ts",
-    "test:examples": "mochapack examples/**/*.unit.test.ts",
-    "test": "run-s typecheck test:unit test:functional test:examples lint format:check",
-    "test:coverage": "nyc mochapack --webpack-env=coverage '{testing,src}/**/*.ts'"
-  },
   "repository": {
     "type": "git",
     "url": "git+ssh://git@github.com/andykais/scrape-pages.git"
   },
-  "author": "Andrew Kaiser",
   "license": "MIT",
-  "engines": {
-    "node": "<=8.0"
+  "author": "Andrew Kaiser",
+  "main": "index.js",
+  "scripts": {
+    "build": "run-s clean compile",
+    "build:watch": "webpack --mode=development --watch",
+    "clean": "shx rm -rf lib node_modules/.cache/tsconfig.buildinfo",
+    "compile": "webpack --mode=production",
+    "format": "prettier --write --ignore-path=.gitignore '**/*.{json,ts,js}'",
+    "format:check": "prettier --check --ignore-path=.gitignore '**/*.{json,ts,js}'",
+    "lint": "eslint --ignore-path .gitignore '**/*.ts'",
+    "test": "run-s typecheck test:unit test:functional test:examples lint format:check",
+    "test:coverage": "nyc mochapack --webpack-env=coverage '{testing,src}/**/*.ts'",
+    "test:examples": "mochapack examples/**/*.unit.test.ts",
+    "test:functional": "mochapack testing/**/*functional.test.ts",
+    "test:unit": "mochapack src/**/*.unit.test.ts",
+    "test:watch": "mochapack '{testing,src,examples}/**/*.test.ts' --watch",
+    "typecheck": "tsc --noEmit --project tsconfig.json",
+    "typecheck:watch": "npm run typecheck -- --watch"
   },
-  "pre-push": [
-    "test"
-  ],
-  "nyc": {
-    "include": [
-      "src/**/*.ts"
-    ],
-    "instrument": false,
-    "sourceMap": false
+  "dependencies": {
+    "better-sqlite3": "^5.4.0",
+    "bunyan": "^1.8.12",
+    "cheerio": "^1.0.0-rc.3",
+    "handlebars": "^4.1.1",
+    "node-fetch": "^2.3.0",
+    "rxjs": "^6.4.0",
+    "sanitize-filename": "^1.6.1",
+    "typescript-is": "^0.10.6",
+    "verror": "^1.10.0"
   },
   "devDependencies": {
     "@babel/core": "^7.4.3",
@@ -91,15 +89,17 @@
     "webpack-cli": "^3.3.0",
     "webpack-node-externals": "^1.7.2"
   },
-  "dependencies": {
-    "better-sqlite3": "^5.4.0",
-    "bunyan": "^1.8.12",
-    "cheerio": "^1.0.0-rc.3",
-    "handlebars": "^4.1.2",
-    "node-fetch": "^2.3.0",
-    "rxjs": "^6.4.0",
-    "sanitize-filename": "^1.6.1",
-    "typescript-is": "^0.10.6",
-    "verror": "^1.10.0"
-  }
+  "engines": {
+    "node": "<=8.0"
+  },
+  "nyc": {
+    "include": [
+      "src/**/*.ts"
+    ],
+    "instrument": false,
+    "sourceMap": false
+  },
+  "pre-push": [
+    "test"
+  ]
 }
