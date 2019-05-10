@@ -16,10 +16,5 @@
       }
     ]
   },
-  "include": [
-    "src/**/*.ts",
-    "examples/**/*.ts",
-    "custom.d.ts",
-    "testing/**/*.ts"
-  ]
+  "include": ["src/**/*.ts", "examples/**/*.ts", "custom.d.ts", "testing/**/*.ts"]
 }
