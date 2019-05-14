@@ -91,7 +91,7 @@ interface StructureInit {
   forEach?: StructureInit | StructureInit[]
   forNext?: StructureInit | StructureInit[]
 }
-interface Structure extends StructureInit {
+export interface Structure extends StructureInit {
   forEach: Structure[]
   forNext: Structure[]
 }

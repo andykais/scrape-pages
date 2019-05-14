@@ -6,12 +6,15 @@ import { getSettings, getScrapeStepSettings } from '../settings'
 import { Logger } from '../tools/logger'
 import { Store } from '../tools/store'
 import { structureScrapers } from './flow'
-import { version } from '../../package.json'
+// import { version } from '../../package.json'
+// TODO declare `version` in webpack.config.js
+const version = 1
 // type imports
 import { Settings } from '../settings'
 import { ConfigInit } from '../settings/config/types'
 import { OptionsInit } from '../settings/options/types'
 import { ParamsInit } from '../settings/params/types'
+import { ThenArg } from '../util/types'
 
 const initFolders = async ({ paramsInit, flatParams }: Settings) => {
   // remove folders if specified

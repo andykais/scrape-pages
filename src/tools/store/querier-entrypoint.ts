@@ -6,9 +6,10 @@ import { typecheckQueryArguments } from '../../util/typechecking.runtime'
 import { Settings } from '../../settings'
 import { ScraperName } from '../../settings/config/types'
 import { SelectedRow as OrderedScrapersRow } from './queries/select-ordered-scrapers'
+import { ArgumentTypes } from '../../util/types'
 
 export type QueryArguments = { scrapers: ScraperName[]; groupBy?: ScraperName }
-interface QueryFn {
+export interface QueryFn {
   prepare: (params: QueryArguments) => () => OrderedScrapersRow[][]
   (...args: ArgumentTypes<QueryFn['prepare']>): OrderedScrapersRow[][]
 }

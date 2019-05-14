@@ -1,4 +1,5 @@
 import { FMap } from '../../util/map'
+import { Omit } from '../../util/types'
 
 // until webpack can load ts-runtime, this is far more convienent than importing the type from '../config/types'
 type ScraperName = string

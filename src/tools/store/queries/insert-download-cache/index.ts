@@ -1,5 +1,6 @@
 import SQL_TEMPLATE from './template.sql'
 import { CreateQuery } from '../../types'
+import { Voidable } from '../../../../util/types'
 
 type CacheId = number
 type Statement = (params: {

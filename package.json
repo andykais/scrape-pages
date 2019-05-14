@@ -29,7 +29,7 @@
     "test:functional": "mochapack testing/**/*functional.test.ts",
     "test:unit": "mochapack src/**/*.unit.test.ts",
     "test:watch": "mochapack '{testing,src,examples}/**/*.test.ts' --watch",
-    "typecheck": "tsc --noEmit --project tsconfig.json",
+    "typecheck": "tsc --noEmit --project tsconfig/tsconfig.json",
     "typecheck:watch": "npm run typecheck -- --watch"
   },
   "dependencies": {
@@ -56,6 +56,7 @@
     "@types/cheerio": "^0.22.11",
     "@types/lodash": "^4.14.123",
     "@types/mocha": "^5.2.6",
+    "@types/mocha-steps": "^1.1.1",
     "@types/nock": "^9.3.1",
     "@types/node-fetch": "^2.3.2",
     "@types/sanitize-filename": "^1.1.28",
@@ -92,6 +93,7 @@
   "engines": {
     "node": "<=8.0"
   },
+  "types": "./declarations.d.ts",
   "nyc": {
     "include": [
       "src/**/*.ts"

@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
-    "outDir": "./lib/",
+    "outDir": "../lib/",
     "incremental": true,
-    "tsBuildInfoFile": "./node_modules/.cache/tsconfig.buildinfo",
+    "tsBuildInfoFile": "../node_modules/.cache/tsconfig.buildinfo",
     "sourceMap": true,
     "noImplicitAny": true,
     "strictNullChecks": true,
@@ -16,5 +16,5 @@
       }
     ]
   },
-  "include": ["src/**/*.ts", "examples/**/*.ts", "custom.d.ts", "testing/**/*.ts"]
+  "include": ["../src/**/*.ts", "../examples/**/*.ts", "custom.d.ts", "../testing/**/*.ts"]
 }

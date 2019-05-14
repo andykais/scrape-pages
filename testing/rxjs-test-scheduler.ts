@@ -1,5 +1,7 @@
 import * as RxTesting from 'rxjs/testing'
 import { expect } from 'chai'
+// type imports
+import { ArgumentTypes } from '../src/util/types'
 
 type RunHelpers = ArgumentTypes<ArgumentTypes<RxTesting.TestScheduler['run']>[0]>[0]
 const rxjsTestScheduler = (marbleTestEnv: (helpers: RunHelpers) => void) => {

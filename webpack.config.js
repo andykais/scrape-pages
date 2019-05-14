@@ -26,7 +26,7 @@ const config = {
     path: resolve(__dirname, 'lib'),
     filename: '[name].js',
     library: 'scrape-pages',
-    libraryTarget: 'umd'
+    libraryTarget: 'commonjs2'
   },
   resolve: {
     extensions: ['.ts']
@@ -42,7 +42,7 @@ const config = {
         test: /\.runtime\.ts/,
         exclude: /node_modules/,
         loader: 'ts-loader',
-        options: { compiler: 'ttypescript' }
+        options: { compiler: 'ttypescript', configFile: 'tsconfig/tsconfig.json' }
       },
       {
         test: /\.sql$/,
@@ -54,6 +54,12 @@ const config = {
         enforce: 'pre'
       }
     ]
+  },
+  optimization: {
+    splitChunks: {
+      minSize:1,
+      chunks: 'all'
+    }
   },
   plugins: [
     new CopyWebpackPlugin(['package.json', 'package-lock.json', 'LICENSE', 'README.md']),
