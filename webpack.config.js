@@ -1,5 +1,7 @@
-const { resolve } = require('path')
+const path = require('path')
+const glob = require('glob')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
+const WebpackEmitAllPlugin = require('webpack-emit-all-plugin')
 const nodeExternals = require('webpack-node-externals')
 
 class ClearTerminalInWatchMode {
@@ -10,6 +12,13 @@ class ClearTerminalInWatchMode {
   }
 }
 
+const sourceFiles = glob
+  .sync('./src/**/*.ts', { ignore: './src/**/*.test.ts' })
+  .reduce((acc, file) => {
+    acc[file.replace(/^\.\/src\/(.*?)\.ts$/, (_, filename) => filename)] = file
+    return acc
+  }, {})
+
 const config = {
   target: 'node',
   node: {
@@ -17,16 +26,16 @@ const config = {
     __filename: true
   },
   mode: 'development',
-  devtool: 'inline-source-map',
-  entry: {
-    index: './src/index.ts',
-    util: './src/settings/external-utils.ts'
-  },
+  devtool: 'source-map',
+  entry: glob.sync('./src/**/*.ts', { ignore: './src/**/*.test.ts' }).reduce((acc, file) => {
+    acc[file.replace(/^\.\/src\/(.*?)\.ts$/, (_, filename) => filename)] = file
+    return acc
+  }, {}),
   output: {
-    path: resolve(__dirname, 'lib'),
+    path: path.resolve(__dirname, 'lib'),
     filename: '[name].js',
     library: 'scrape-pages',
-    libraryTarget: 'commonjs2'
+    libraryTarget: 'commonjs'
   },
   resolve: {
     extensions: ['.ts']
@@ -56,10 +65,7 @@ const config = {
     ]
   },
   optimization: {
-    splitChunks: {
-      minSize:1,
-      chunks: 'all'
-    }
+    minimize: false
   },
   plugins: [
     new CopyWebpackPlugin(['package.json', 'package-lock.json', 'LICENSE', 'README.md']),

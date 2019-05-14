@@ -20,6 +20,7 @@
     "build:watch": "webpack --mode=development --watch",
     "clean": "shx rm -rf lib node_modules/.cache/tsconfig.buildinfo",
     "compile": "webpack --mode=production",
+    "compile:declarations": "tsc --project ./tsconfig/tsconfig.declarations.json",
     "format": "prettier --write --ignore-path=.gitignore '**/*.{json,ts,js}'",
     "format:check": "prettier --check --ignore-path=.gitignore '**/*.{json,ts,js}'",
     "lint": "eslint --ignore-path .gitignore '**/*.ts'",
@@ -88,6 +89,7 @@
     "typescript": "^3.4.3",
     "webpack": "^4.29.6",
     "webpack-cli": "^3.3.0",
+    "webpack-emit-all-plugin": "^2.0.1",
     "webpack-node-externals": "^1.7.2"
   },
   "engines": {
