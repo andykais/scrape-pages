@@ -2,19 +2,19 @@ import * as cheerio from 'cheerio'
 import { AbstractParser } from '../abstract'
 // type imports
 import { ScrapeSettings } from '../../../../settings'
-import { ScraperName, ParseConfigHtml, ParseConfigXml } from '../../../../settings/config/types'
+import { ScraperName, ParseConfigXml } from '../../../../settings/config/types'
 import { Tools } from '../../../../tools'
 
 export class Parser extends AbstractParser {
   public type: 'html' | 'xml' = 'html'
 
-  protected parseConfig: ParseConfigHtml | ParseConfigXml
+  protected parseConfig: ParseConfigXml
   protected cheerioFlags: {}
   private parser: (value: string) => string[]
 
   public constructor(
     scraperName: ScraperName,
-    parseConfig: ParseConfigHtml | ParseConfigXml,
+    parseConfig: ParseConfigXml,
     settings: ScrapeSettings,
     tools: Tools,
     cheerioFlags: {} = {}

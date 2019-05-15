@@ -5,7 +5,6 @@ import { ParseConfigJson } from '../../../../settings/config/types'
 
 export class Parser extends AbstractParser {
   public type: 'json' = 'json'
-  protected parseConfig: ParseConfigJson
 
   public parse = (value: string) => {
     const object = JSON.parse(value)
