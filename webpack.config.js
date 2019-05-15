@@ -32,6 +32,7 @@ module.exports = (env, { mode = 'development' } = {}) => ({
     rules: [
       {
         test: content => env === 'coverage' && /\.ts$/.test(content),
+        include: path.resolve(__dirname, 'src'),
         exclude: /node_modules|\.test.ts$/,
         loader: 'istanbul-instrumenter-loader',
         options: { esModules: true },

@@ -88,16 +88,6 @@
   "engines": {
     "node": "<=8.0"
   },
-  "nyc": {
-    "include": [
-      "src/**/*.ts"
-    ],
-    "extension": [
-      ".ts"
-    ],
-    "instrument": false,
-    "sourceMap": false
-  },
   "pre-push": [
     "test"
   ]
