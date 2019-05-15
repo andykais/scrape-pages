@@ -51,18 +51,39 @@ export interface DownloadConfig extends DownloadConfigInterface {
 // ParseConfig {{{
 type AcceptedFormats = 'html' | 'xml' | 'json'
 type Selector = string
-interface ParseConfigInterface {
-  format?: AcceptedFormats
-  selector: Selector
-  attribute?: string
+interface ParseConfigInitInterface {
   limit?: number
   regexCleanup?: RegexCleanupInit | undefined
 }
-export type ParseConfigInit = Selector | ParseConfigInterface | undefined
-export interface ParseConfig extends ParseConfigInterface {
-  format: AcceptedFormats
+interface ParseConfigHtmlInterface extends ParseConfigInitInterface {
+  format?: 'html'
+  selector: Selector
+  attribute?: string
+}
+interface ParseConfigXmlInterface extends ParseConfigInitInterface {
+  format: 'xml'
+  selector: Selector
+  attribute?: string
+}
+interface ParseConfigJsonInterface extends ParseConfigInitInterface {
+  format: 'json'
+  selector: Selector
+}
+// a string value will normalize to ParseConfigHtmlInterface
+export type ParseConfigInit =
+  | Selector
+  | ParseConfigHtmlInterface
+  | ParseConfigXmlInterface
+  | ParseConfigJsonInterface
+  | undefined
+
+export interface ParseConfigInterface extends ParseConfigInitInterface {
   regexCleanup: RegexCleanup | undefined
 }
+export type ParseConfigXml = ParseConfigXmlInterface & ParseConfigInterface
+export type ParseConfigHtml = ParseConfigHtmlInterface & ParseConfigInterface
+export type ParseConfigJson = ParseConfigJsonInterface & ParseConfigInterface
+export type ParseConfig = ParseConfigHtml | ParseConfigXml | ParseConfigJson
 // }}}
 
 type Incrementers = 'failed-download' | 'empty-parse' | number
