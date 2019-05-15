@@ -14,7 +14,8 @@
   },
   "license": "MIT",
   "author": "Andrew Kaiser",
-  "main": "index.js",
+  "main": "./index.js",
+  "typings": "./index.d.ts",
   "scripts": {
     "build": "run-s clean compile compile:declarations",
     "build:watch": "webpack --mode=development --watch",
@@ -25,11 +26,11 @@
     "format:check": "prettier --check --ignore-path=.gitignore '**/*.{json,ts,js}'",
     "lint": "eslint --ignore-path .gitignore '**/*.ts'",
     "test": "run-s typecheck test:unit test:functional test:examples lint format:check",
-    "test:coverage": "nyc mochapack --webpack-env=coverage '{testing,src}/**/*.ts'",
+    "test:coverage": "nyc mochapack --webpack-env=coverage '{testing,src,examples}/**/*.ts'",
     "test:examples": "mochapack examples/**/*.unit.test.ts",
     "test:functional": "mochapack testing/**/*functional.test.ts",
     "test:unit": "mochapack src/**/*.unit.test.ts",
-    "test:watch": "mochapack '{testing,src,examples}/**/*.test.ts' --watch",
+    "test:watch": "mochapack '{testing,src,examples}/**/*.ts' --watch",
     "typecheck": "tsc --noEmit --project tsconfig/tsconfig.json",
     "typecheck:watch": "npm run typecheck -- --watch"
   },
@@ -45,11 +46,6 @@
     "verror": "^1.10.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.4.3",
-    "@babel/plugin-proposal-class-properties": "^7.4.0",
-    "@babel/preset-env": "^7.4.3",
-    "@babel/preset-typescript": "^7.3.3",
-    "@babel/register": "^7.4.0",
     "@types/better-sqlite3": "^5.2.3",
     "@types/bunyan": "^1.8.6",
     "@types/chai": "^4.1.7",
@@ -64,7 +60,6 @@
     "@types/verror": "^1.10.3",
     "@typescript-eslint/eslint-plugin": "^1.6.0",
     "awesome-typescript-loader": "^5.2.1",
-    "babel-loader": "^8.0.5",
     "chai": "^4.2.0",
     "chai-exclude": "^2.0.1",
     "chai-jest-snapshot": "^2.0.0",
@@ -84,19 +79,15 @@
     "prettier": "^1.16.4",
     "raw-loader": "^2.0.0",
     "shx": "^0.3.2",
-    "source-map-loader": "^0.2.4",
-    "ts-loader": "^5.3.3",
     "ttypescript": "^1.5.6",
     "typescript": "^3.4.5",
     "webpack": "^4.29.6",
     "webpack-cli": "^3.3.0",
-    "webpack-emit-all-plugin": "^2.0.1",
     "webpack-node-externals": "^1.7.2"
   },
   "engines": {
     "node": "<=8.0"
   },
-  "types": "./declarations.d.ts",
   "nyc": {
     "include": [
       "src/**/*.ts"

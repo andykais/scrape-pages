@@ -1,7 +1,6 @@
 const path = require('path')
 const glob = require('glob')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
-const WebpackEmitAllPlugin = require('webpack-emit-all-plugin')
 const nodeExternals = require('webpack-node-externals')
 
 const sourceFiles = glob
