@@ -16,7 +16,7 @@
   "author": "Andrew Kaiser",
   "main": "index.js",
   "scripts": {
-    "build": "run-s clean compile",
+    "build": "run-s clean compile compile:declarations",
     "build:watch": "webpack --mode=development --watch",
     "clean": "shx rm -rf lib node_modules/.cache/tsconfig.buildinfo",
     "compile": "webpack --mode=production",
@@ -63,6 +63,7 @@
     "@types/sanitize-filename": "^1.1.28",
     "@types/verror": "^1.10.3",
     "@typescript-eslint/eslint-plugin": "^1.6.0",
+    "awesome-typescript-loader": "^5.2.1",
     "babel-loader": "^8.0.5",
     "chai": "^4.2.0",
     "chai-exclude": "^2.0.1",
@@ -86,7 +87,7 @@
     "source-map-loader": "^0.2.4",
     "ts-loader": "^5.3.3",
     "ttypescript": "^1.5.6",
-    "typescript": "^3.4.3",
+    "typescript": "^3.4.5",
     "webpack": "^4.29.6",
     "webpack-cli": "^3.3.0",
     "webpack-emit-all-plugin": "^2.0.1",
@@ -99,6 +100,9 @@
   "nyc": {
     "include": [
       "src/**/*.ts"
+    ],
+    "extension": [
+      ".ts"
     ],
     "instrument": false,
     "sourceMap": false
