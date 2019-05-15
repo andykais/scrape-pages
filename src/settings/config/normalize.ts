@@ -89,15 +89,24 @@ const normalizeParse = (parse: ParseConfigInit): ParseConfig | undefined =>
     ? undefined
     : typeof parse === 'string'
     ? {
-        ...defaults.parse,
+        format: 'html',
         selector: parse,
         regexCleanup: undefined
       }
+    : parse.format === 'json'
+    ? {
+        ...parse,
+        regexCleanup: normalizeRegexCleanup(parse.regexCleanup)
+      }
+    : parse.format === 'xml'
+    ? {
+        ...parse,
+        regexCleanup: normalizeRegexCleanup(parse.regexCleanup)
+      }
     : {
-        ...defaults.parse,
         ...parse,
         regexCleanup: normalizeRegexCleanup(parse.regexCleanup),
-        format: parse.format || defaults.parse.format
+        format: 'html'
       }
 
 const normalizeDefinition = (scrapeConfig: ScrapeConfigInit): ScrapeConfig => ({
