@@ -1,0 +1,12 @@
+{
+  "posts": [
+    { "type": "post", "content": "the\n" },
+    {
+      "type": "photo",
+      "url": "https://json-parsing.com/assets/post-photo-a.jpg"
+    },
+    { "type": "post", "content": "quick\n" },
+    { "type": "post", "content": "brown\n" },
+    { "type": "post", "content": "fox\n" }
+  ]
+}

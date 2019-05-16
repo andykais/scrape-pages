@@ -11,7 +11,8 @@ export class Parser extends AbstractParser {
     const object = JSON.parse(value)
 
     const result = JSONPath({
-      path: this.parseConfig.selector
+      path: this.parseConfig.selector,
+      json: object
     })
 
     return Array.isArray(result)
