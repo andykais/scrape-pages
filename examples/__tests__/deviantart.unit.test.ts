@@ -1,12 +1,9 @@
-import * as deviantartConfigJson from '../deviantart.config.json'
-import { assertConfigType } from '../../src/settings/config'
+import * as deviantartConfig from '../deviantart.config.json'
+import { typecheckConfig } from '../../src/util/typechecking.runtime'
 
-// fixes webpack json import error https://github.com/webpack/webpack/issues/8504
-const deviantartConfig = (deviantartConfigJson as any).default as typeof deviantartConfigJson
-
-describe('deviantart config', () => {
+describe(__filename, () => {
   it('is properly typed', () => {
-    assertConfigType(deviantartConfig)
+    typecheckConfig(deviantartConfig)
   })
 
   // TODO

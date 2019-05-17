@@ -1,4 +1,6 @@
+// type imports
 import { FlatConfig, ConfigPositionInfo } from '../../../../settings/config/types'
+import { Voidable } from '../../../../util/types'
 /*
  *   G
  *   |

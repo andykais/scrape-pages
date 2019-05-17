@@ -9,9 +9,10 @@ import {
   ScrapeConfigInit,
   ScrapeConfig,
   ConfigInit,
+  RegexCleanupInit,
   Config
 } from './types'
-import { assertConfigType } from './'
+import { typecheckConfig } from '../../util/typechecking.runtime'
 
 const reservedWords = ['value', 'index']
 
@@ -50,35 +51,54 @@ const normalizeInputs = (inputsInit: ConfigInit['input']) => {
   return inputs
 }
 
+const normalizeRegexCleanup = (regexCleanupInit?: RegexCleanupInit) => {
+  if (regexCleanupInit) {
+    return typeof regexCleanupInit === 'string'
+      ? {
+          selector: regexCleanupInit,
+          replacer: '',
+          flags: 'g'
+        }
+      : {
+          ...regexCleanupInit,
+          flags: regexCleanupInit.flags || 'g'
+        }
+  }
+}
+
 // TODO use type guards
 const normalizeDownload = (download: DownloadConfigInit): DownloadConfig | undefined =>
   download === undefined
     ? undefined
     : typeof download === 'string'
-      ? {
-          ...defaults.download,
-          urlTemplate: download
-        }
-      : {
-          ...defaults.download,
-          ...download,
-          protocol: download.protocol || defaults.download.protocol,
-          method: download.method || defaults.download.method
-        }
+    ? {
+        ...defaults.download,
+        urlTemplate: download,
+        regexCleanup: undefined
+      }
+    : {
+        ...defaults.download,
+        ...download,
+        regexCleanup: normalizeRegexCleanup(download.regexCleanup),
+        protocol: download.protocol || defaults.download.protocol,
+        method: download.method || defaults.download.method
+      }
 
 const normalizeParse = (parse: ParseConfigInit): ParseConfig | undefined =>
   parse === undefined
     ? undefined
     : typeof parse === 'string'
-      ? {
-          ...defaults.parse,
-          selector: parse
-        }
-      : {
-          ...defaults.parse,
-          ...parse,
-          format: parse.format || defaults.parse.format
-        }
+    ? {
+        ...defaults.parse,
+        selector: parse,
+        regexCleanup: undefined
+      }
+    : {
+        ...defaults.parse,
+        ...parse,
+        regexCleanup: normalizeRegexCleanup(parse.regexCleanup),
+        format: parse.format || defaults.parse.format
+      }
 
 const normalizeDefinition = (scrapeConfig: ScrapeConfigInit): ScrapeConfig => ({
   ...defaults.definition,
@@ -116,7 +136,7 @@ const normalizeStructure = (scrapers: ConfigInit['scrapers']) => ({
 }
 
 const normalizeConfig = (configInit: ConfigInit): Config => {
-  assertConfigType(configInit)
+  typecheckConfig(configInit)
 
   return {
     input: normalizeInputs(configInit.input),

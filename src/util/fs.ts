@@ -68,4 +68,19 @@ export const read = async (file: string): Promise<string> => {
   return fileBuffer.toString()
 }
 
+export const findFiles = async (folder: string): Promise<string[]> => {
+  const endpointFiles = []
+  const filesInDir = await readdir(folder)
+  for (const file of filesInDir) {
+    const fileStats = await stat(path.resolve(folder, file))
+    if (fileStats.isDirectory()) {
+      const recursedFiles = await findFiles(path.resolve(folder, file))
+      endpointFiles.push(...recursedFiles)
+    } else {
+      endpointFiles.push(path.resolve(folder, file))
+    }
+  }
+  return endpointFiles
+}
+
 export const sanitizeFilename = (filename: string) => sanitize(filename, { replacement: '_' })

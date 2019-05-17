@@ -5,7 +5,7 @@ import { rateLimitToggle } from '../conditional-rate-limiter'
 // testing imports
 import { rxjsTestScheduler } from '../../../../../testing/setup'
 
-describe('conditional-rate-limiter operator', () => {
+describe(__filename, () => {
   const emitter = new EventEmitter()
   const toggler = Rx.fromEvent<boolean>(emitter, 'toggle')
   const rateLimitConfig = {

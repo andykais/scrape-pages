@@ -3,7 +3,7 @@ import * as testingConfigs from '../../../../testing/resources/testing-configs'
 import { Config } from '../types'
 import { expect } from 'chai'
 
-describe('normalize config with', () => {
+describe(__filename, () => {
   describe('simple config', () => {
     const simpleConfig = testingConfigs.SIMPLE_CONFIG
     const fullConfig = normalizeConfig(simpleConfig)
@@ -17,12 +17,14 @@ describe('normalize config with', () => {
             urlTemplate: simpleConfig.scrapers.index.download as string,
             headerTemplates: {},
             read: true,
-            write: false
+            write: false,
+            regexCleanup: undefined
           },
           parse: {
             selector: (simpleConfig.scrapers.index.parse as any).selector,
             attribute: (simpleConfig.scrapers.index.parse as any).attribute,
-            format: 'html'
+            format: 'html',
+            regexCleanup: undefined
           },
           incrementUntil: 0
         },
@@ -33,7 +35,8 @@ describe('normalize config with', () => {
             urlTemplate: simpleConfig.scrapers.image.download as any,
             headerTemplates: {},
             read: true,
-            write: false
+            write: false,
+            regexCleanup: undefined
           },
           parse: undefined,
           incrementUntil: 0
@@ -52,13 +55,13 @@ describe('normalize config with', () => {
       }
     }
 
+    it('should match the guessed full config', () => {
+      expect(fullConfig).to.deep.equal(fullConfigGuess)
+    })
+
     it('should match itself for a full filled in config', () => {
       const fullConfigFromGuess = normalizeConfig(fullConfigGuess)
       expect(fullConfigFromGuess).to.deep.equal(fullConfigGuess)
-    })
-
-    it('should match the guessed full config', () => {
-      expect(fullConfig).to.deep.equal(fullConfigGuess)
     })
   })
 
@@ -95,7 +98,7 @@ describe('normalize config with', () => {
     it('should throw a type assertion error', () => {
       expect(() => normalizeConfig(configInit))
         .to.throw(`$: expected 'scrapers' in object`)
-        .with.property('name', 'RuntimeTypeError')
+        .with.property('name', 'TypeGuardError')
     })
     describe('with scrapers that are not defined', () => {
       const configInit = { scrapers: {}, run: { scraper: 'hello' } }

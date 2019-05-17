@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`download control cache control first pass should fetch all downloads since nothing is in cache 1`] = `
+exports[`testing/functional/download-control/functional.test.ts cache control first pass should fetch all downloads since nothing is in cache 1`] = `
 Array [
   Array [
     Object {
@@ -52,7 +52,7 @@ Array [
 ]
 `;
 
-exports[`download control cache control second pass on same folder should request 'index', but not cached postTitle 1`] = `
+exports[`testing/functional/download-control/functional.test.ts cache control second pass on same folder should request 'index', but not cached postTitle 1`] = `
 Array [
   Array [
     Object {
@@ -104,7 +104,7 @@ Array [
 ]
 `;
 
-exports[`download control cache control with all scrapers cache: true, no requests should happen 1`] = `
+exports[`testing/functional/download-control/functional.test.ts cache control with all scrapers cache: true, no requests should happen 1`] = `
 Array [
   Array [
     Object {
@@ -146,174 +146,6 @@ Array [
     Object {
       "byteLength": "38.0",
       "complete": 1,
-      "downloadData": "[\\"http://download-control.com/post/5.html\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
-      "filename": false,
-      "id": true,
-      "parsedValue": "Jumped",
-      "scraper": "postTitle",
-    },
-  ],
-]
-`;
-
-exports[`download control first pass should fetch all downloads since nothing is in cache 1`] = `
-Array [
-  Array [
-    Object {
-      "downloadData": "[\\"http://download-control.com/post/1.html\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
-      "filename": false,
-      "id": true,
-      "parsedValue": "The",
-      "scraper": "postTitle",
-    },
-    Object {
-      "downloadData": "[\\"http://download-control.com/post/2.html\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
-      "filename": false,
-      "id": true,
-      "parsedValue": "Quick",
-      "scraper": "postTitle",
-    },
-    Object {
-      "downloadData": "[\\"http://download-control.com/post/3.html\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
-      "filename": false,
-      "id": true,
-      "parsedValue": "Brown",
-      "scraper": "postTitle",
-    },
-    Object {
-      "downloadData": "[\\"http://download-control.com/post/4.html\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
-      "filename": false,
-      "id": true,
-      "parsedValue": "Fox",
-      "scraper": "postTitle",
-    },
-    Object {
-      "downloadData": "[\\"http://download-control.com/post/5.html\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
-      "filename": false,
-      "id": true,
-      "parsedValue": "Jumped",
-      "scraper": "postTitle",
-    },
-  ],
-]
-`;
-
-exports[`download control first pass should fetch all downloads since nothing is in cache 2`] = `
-Array [
-  Array [
-    Object {
-      "downloadData": "[\\"http://download-control.com/post/1.html\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
-      "filename": false,
-      "id": true,
-      "parsedValue": "The",
-      "scraper": "postTitle",
-    },
-    Object {
-      "downloadData": "[\\"http://download-control.com/post/2.html\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
-      "filename": false,
-      "id": true,
-      "parsedValue": "Quick",
-      "scraper": "postTitle",
-    },
-    Object {
-      "downloadData": "[\\"http://download-control.com/post/3.html\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
-      "filename": false,
-      "id": true,
-      "parsedValue": "Brown",
-      "scraper": "postTitle",
-    },
-    Object {
-      "downloadData": "[\\"http://download-control.com/post/4.html\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
-      "filename": false,
-      "id": true,
-      "parsedValue": "Fox",
-      "scraper": "postTitle",
-    },
-    Object {
-      "downloadData": "[\\"http://download-control.com/post/5.html\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
-      "filename": false,
-      "id": true,
-      "parsedValue": "Jumped",
-      "scraper": "postTitle",
-    },
-  ],
-]
-`;
-
-exports[`download control second pass on same folder should request 'index', but not cached postTitle 1`] = `
-Array [
-  Array [
-    Object {
-      "downloadData": "[\\"http://download-control.com/post/1.html\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
-      "filename": false,
-      "id": true,
-      "parsedValue": "The",
-      "scraper": "postTitle",
-    },
-    Object {
-      "downloadData": "[\\"http://download-control.com/post/2.html\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
-      "filename": false,
-      "id": true,
-      "parsedValue": "Quick",
-      "scraper": "postTitle",
-    },
-    Object {
-      "downloadData": "[\\"http://download-control.com/post/3.html\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
-      "filename": false,
-      "id": true,
-      "parsedValue": "Brown",
-      "scraper": "postTitle",
-    },
-    Object {
-      "downloadData": "[\\"http://download-control.com/post/4.html\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
-      "filename": false,
-      "id": true,
-      "parsedValue": "Fox",
-      "scraper": "postTitle",
-    },
-    Object {
-      "downloadData": "[\\"http://download-control.com/post/5.html\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
-      "filename": false,
-      "id": true,
-      "parsedValue": "Jumped",
-      "scraper": "postTitle",
-    },
-  ],
-]
-`;
-
-exports[`download control with all scrapers cache: true, no requests should happen 1`] = `
-Array [
-  Array [
-    Object {
-      "downloadData": "[\\"http://download-control.com/post/1.html\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
-      "filename": false,
-      "id": true,
-      "parsedValue": "The",
-      "scraper": "postTitle",
-    },
-    Object {
-      "downloadData": "[\\"http://download-control.com/post/2.html\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
-      "filename": false,
-      "id": true,
-      "parsedValue": "Quick",
-      "scraper": "postTitle",
-    },
-    Object {
-      "downloadData": "[\\"http://download-control.com/post/3.html\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
-      "filename": false,
-      "id": true,
-      "parsedValue": "Brown",
-      "scraper": "postTitle",
-    },
-    Object {
-      "downloadData": "[\\"http://download-control.com/post/4.html\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
-      "filename": false,
-      "id": true,
-      "parsedValue": "Fox",
-      "scraper": "postTitle",
-    },
-    Object {
       "downloadData": "[\\"http://download-control.com/post/5.html\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
       "filename": false,
       "id": true,

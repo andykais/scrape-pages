@@ -1,4 +1,5 @@
 import { FMap } from '../../util/map'
+// type imports
 import { Config, FlatConfig } from './types'
 
 const flattenConfig = (config: Config): FlatConfig => {

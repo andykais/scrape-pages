@@ -12,7 +12,7 @@ interface OptionsAnyInit {
   cache?: boolean // should re-download or use db entry
 }
 
-interface ScrapeOptionsInit extends OptionsAnyInit {
+export interface ScrapeOptionsInit extends OptionsAnyInit {
   downloadPriority?: number
 }
 export type ScrapeOptions = Readonly<Required<ScrapeOptionsInit>>

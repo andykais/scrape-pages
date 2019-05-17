@@ -10,7 +10,7 @@ export type ParserValues = string[]
  */
 export abstract class AbstractParser {
   public type: ParseConfig['format'] | 'identity'
-  public trim: <T>(values: T[]) => T[]
+  public postProcess: (values: string[]) => string[]
   protected scraperName: ScraperName
   protected parseConfig: ParseConfig | undefined
   protected config: ScrapeSettings['config']
@@ -28,18 +28,40 @@ export abstract class AbstractParser {
   ) {
     Object.assign(this, { scraperName, parseConfig, ...settings, tools })
 
-    this.trim =
-      parseConfig && parseConfig.limit !== undefined
-        ? this._trim(parseConfig.limit)
-        : <T>(values: T[]) => values
+    this.postProcess = this.getPostProcessing(parseConfig)
   }
   /**
    * @param value only ever `undefined` if a download step has `read: false`.
    */
-  public run = (value: string | undefined) => this.trim(this.parse(value))
+  public run = (value: string | undefined) => this.postProcess(this.parse(value))
 
-  private _trim = (limit: number) => <T>(values: T[]): T[] => {
-    return values.length > limit ? values.splice(0, limit) : values
+  private getRegexCleanup = ({ regexCleanup }: ParseConfig) => {
+    if (regexCleanup) {
+      const regex = new RegExp(regexCleanup.selector)
+      return (value: string) => value.replace(regex, regexCleanup.replacer)
+    } else {
+      return (value: string) => value
+    }
+  }
+  private valueNeedsPostProcessing = ({ regexCleanup, limit }: ParseConfig) => {
+    return limit !== undefined || regexCleanup
+  }
+  private getPostProcessing = (parseConfig?: ParseConfig) => {
+    if (parseConfig) {
+      const { limit } = parseConfig
+      const regexReplace = this.getRegexCleanup(parseConfig)
+      if (this.valueNeedsPostProcessing(parseConfig)) {
+        return (values: string[]) => {
+          const length = limit ? Math.min(limit, values.length) : values.length
+          const processedValues = new Array(length)
+          for (let i = 0; i < length; i++) {
+            processedValues[i] = regexReplace(values[i])
+          }
+          return processedValues
+        }
+      }
+    }
+    return (values: string[]) => values
   }
 
   protected abstract parse: (value?: string) => ParserValues

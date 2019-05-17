@@ -3,7 +3,7 @@ import { flattenConfig, normalizeConfig } from '../../../settings/config'
 import { findLowestCommonParent } from '../sql-generators/util/find-lowest-common-parent'
 import * as testingConfigs from '../../../../testing/resources/testing-configs'
 
-describe('find lowest common parent', () => {
+describe(__filename, () => {
   const galleryPostImgTag = testingConfigs.GALLERY_POST_IMG_TAG
   const fullConfig = normalizeConfig(galleryPostImgTag)
   const flatConfig = flattenConfig(fullConfig)

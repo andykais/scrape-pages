@@ -4,7 +4,7 @@ import { FlatConfig } from '../types'
 import { normalizeConfig, flattenConfig } from '../'
 import * as testingConfigs from '../../../../testing/resources/testing-configs'
 
-describe('make flat config', () => {
+describe(__filename, () => {
   const galleryPostImgTag = testingConfigs.GALLERY_POST_IMG_TAG
 
   const flatConfigGuess: FlatConfig = FMap.fromObject({

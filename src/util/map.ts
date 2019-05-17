@@ -55,7 +55,7 @@ class FMap<K = any, V = any> extends Map<K, V> {
       merged.set(key, val)
     }
     return merged
-  };
+  }
 
   public [inspect.custom]() {
     return new Map([...this])

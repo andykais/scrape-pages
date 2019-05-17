@@ -1,11 +1,11 @@
 import { flattenConfig } from '../config/flatten'
-import { assertOptionsType } from './'
+import { typecheckOptions } from '../../util/typechecking.runtime'
 // type imports
 import { OptionsInit, ScrapeOptions, FlatOptions } from './types'
 import { Config } from '../config/types'
 
 const normalizeOptions = (config: Config, optionsInit: OptionsInit): FlatOptions => {
-  assertOptionsType(optionsInit)
+  typecheckOptions(optionsInit)
 
   const flatConfig = flattenConfig(config)
   const { optionsEach = {}, ...globalOptions } = optionsInit

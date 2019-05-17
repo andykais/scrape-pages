@@ -3,8 +3,7 @@ import { flattenConfig, normalizeConfig } from '../../../settings/config'
 import { makeDynamicOrderLevelColumn } from '../sql-generators'
 import * as testingConfigs from '../../../../testing/resources/testing-configs'
 
-// should only give the higher one when their depths are unequal
-describe('make dynamic order level column', () => {
+describe(__filename, () => {
   const galleryPostImgTag = testingConfigs.GALLERY_POST_IMG_TAG
   const fullConfig = normalizeConfig(galleryPostImgTag)
   const flatConfig = flattenConfig(fullConfig)

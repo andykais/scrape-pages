@@ -6,7 +6,7 @@ import * as testingConfigs from '../../../../testing/resources/testing-configs'
 import { FlatParams, ScrapeParams } from '../types'
 import { expect } from 'chai'
 
-describe('normalize params with', () => {
+describe(__filename, () => {
   describe('simple config', () => {
     const config = normalizeConfig(testingConfigs.SIMPLE_CONFIG)
     const options = normalizeOptions(config, {})
@@ -63,7 +63,7 @@ describe('normalize params with', () => {
     it('should throw a type assertion error', () => {
       expect(() => normalizeParams(config, options, paramsInit))
         .to.throw(`$: expected 'folder' in object`)
-        .with.property('name', 'RuntimeTypeError')
+        .with.property('name', 'TypeGuardError')
     })
   })
 })

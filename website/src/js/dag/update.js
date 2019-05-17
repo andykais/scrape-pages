@@ -40,10 +40,7 @@ export default ({
   ])
   const treemap = d3
     .tree()
-    .nodeSize([
-      rectNode.height + rectNode.margin,
-      rectNode.width + rectNode.margin
-    ])
+    .nodeSize([rectNode.height + rectNode.margin, rectNode.width + rectNode.margin])
   treemap(root)
   const descendants = root.descendants().sort((a, b) => b.y - a.y) // sort for use w/ scrapeNext
   const links = root.links().map(d => ({
@@ -69,10 +66,7 @@ export default ({
     .enter()
     .append('g')
     // .merge(gNodeAll)
-    .attr(
-      'transform',
-      d => `translate(${d[get.x]}, ${d[get.y] - rectNode.height / 2})`
-    )
+    .attr('transform', d => `translate(${d[get.x]}, ${d[get.y] - rectNode.height / 2})`)
 
   // Labels
   const labelDiv = gNode
@@ -121,12 +115,10 @@ export default ({
       'd',
       d =>
         `M ${rectNode.width} ${rectNode.height / 2 + downloadToParse}
-      C ${rectNode.width + curvePull} ${rectNode.height / 2 +
-          downloadToParse} ${rectNode.width +
+      C ${rectNode.width + curvePull} ${rectNode.height / 2 + downloadToParse} ${rectNode.width +
           curvePull * 2} ${-curveHeight} ${rectNode.width / 2} ${-curveHeight}
-      C ${-curvePull - arrowSize - 10} ${-curveHeight} ${-curvePull -
-          arrowSize} ${rectNode.height / 2} ${-arrowSize} ${rectNode.height /
-          2}`
+      C ${-curvePull - arrowSize - 10} ${-curveHeight} ${-curvePull - arrowSize} ${rectNode.height /
+          2} ${-arrowSize} ${rectNode.height / 2}`
     )
   // scrapeNext Links
   // sort descendants by y
@@ -148,8 +140,5 @@ export default ({
   baseSvg
     .attr('width', treeBBox.width + margin.right + margin.left)
     .attr('height', treeBBox.height + margin.top + margin.bottom)
-  svgGroup.attr(
-    'transform',
-    `translate(${margin.left}, ${treeBBox.height / 2 + margin.top})`
-  )
+  svgGroup.attr('transform', `translate(${margin.left}, ${treeBBox.height / 2 + margin.top})`)
 }

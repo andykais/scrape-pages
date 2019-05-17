@@ -1,9 +1,9 @@
-import * as Fetch from 'node-fetch'
 import * as Rx from 'rxjs'
 import * as ops from 'rxjs/operators'
 import * as RxCustom from '../util/rxjs/observables'
 import { ScrapeStep } from './scrape-step'
-import { wrapError, ResponseError } from '../util/error'
+import { wrapError } from '../util/rxjs/operators'
+import { FetchError, ResponseError } from '../util/error'
 // type imports
 import { Tools } from '../tools'
 import { FMap } from '../util/map'
@@ -24,7 +24,7 @@ const incrementUntilNumericIndex = (incrementUntil: number): DownloadParseBoolea
 const incrementAlways = () => true
 
 const catchDownloadError = (e: Error) => {
-  if (e instanceof Fetch.FetchError || e instanceof ResponseError) return Rx.empty()
+  if (e instanceof FetchError || e instanceof ResponseError) return Rx.empty()
   else return Rx.throwError(e)
 }
 const throwAnyError = (e: Error) => Rx.throwError(e)

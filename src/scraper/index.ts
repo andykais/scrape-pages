@@ -6,12 +6,15 @@ import { getSettings, getScrapeStepSettings } from '../settings'
 import { Logger } from '../tools/logger'
 import { Store } from '../tools/store'
 import { structureScrapers } from './flow'
-import { version } from '../../package.json'
+// import { version } from '../../package.json'
+// TODO declare `version` in webpack.config.js
+const version = 1
 // type imports
 import { Settings } from '../settings'
 import { ConfigInit } from '../settings/config/types'
 import { OptionsInit } from '../settings/options/types'
 import { ParamsInit } from '../settings/params/types'
+import { ThenArg } from '../util/types'
 
 const initFolders = async ({ paramsInit, flatParams }: Settings) => {
   // remove folders if specified
@@ -96,7 +99,7 @@ const startScraping = async (settings: Settings) => {
 
 export type Start = () => ReturnType<typeof startScraping>
 export type Emitter = ThenArg<ReturnType<Start>>
-export type Query = ReturnType<typeof Store.getQuerier>
+export type Query = ReturnType<typeof Store.querierFactory>
 /**
  * scrape is the entrypoint for this library
  *
@@ -112,7 +115,7 @@ export const scrape = (
   const settings = getSettings(configInit, optionsInit, paramsInit)
 
   const start = () => startScraping(settings)
-  const query = Store.getQuerier(settings)
+  const query = Store.querierFactory(settings)
 
-  return { start, query }
+  return { start, query, settings }
 }

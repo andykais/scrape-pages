@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`scrape next site with instant scraper should group each image into a separate slot, in order 1`] = `
+exports[`testing/functional/scrape-next-site/functional.test.ts with instant scraper should group each image into a separate slot, in order 1`] = `
 Array [
   Array [
     Object {
@@ -49,7 +49,7 @@ Array [
 ]
 `;
 
-exports[`scrape next site with instant scraper should group tags and images together that were found on the same page 1`] = `
+exports[`testing/functional/scrape-next-site/functional.test.ts with instant scraper should group tags and images together that were found on the same page 1`] = `
 Array [
   Array [
     Object {
@@ -179,7 +179,7 @@ Array [
 ]
 `;
 
-exports[`scrape next site with psuedo-random delayed scraper should keep images and tags together, in order 1`] = `
+exports[`testing/functional/scrape-next-site/functional.test.ts with psuedo-random delayed scraper should keep images and tags together, in order 1`] = `
 Array [
   Array [
     Object {
