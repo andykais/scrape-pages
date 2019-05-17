@@ -10,7 +10,7 @@ var api_read = {
         {"word": "over" },
         {"word": "the" },
         {"word": "lazy" },
-        {"word": "dog" },
+        {"word": "dog" }
       ]
     }
   }

@@ -109,7 +109,7 @@ describe(__filename, () => {
 
     it('should keep images and tags together, in order', () => {
       const result = query({ scrapers: ['image', 'tag'], groupBy: 'image-page' })
-      expect(stripResult(result)).to.matchSnapshot(true)
+      expect(stripResult(result)).to.matchSnapshot()
     })
   })
 })
