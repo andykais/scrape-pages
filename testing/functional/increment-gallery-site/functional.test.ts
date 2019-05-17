@@ -86,4 +86,21 @@ describe(__filename, () => {
       expect(stripResult(result)).to.matchSnapshot()
     })
   })
+
+  describe('with psuedo-random delayed scraper', () => {
+    const { start, query } = scrape(config, options, params)
+
+    before(async () => {
+      const siteMock = await NockFolderMock.create(resourceFolder, resourceUrl, { randomSeed: 1 })
+
+      const { on } = await start()
+      await new Promise(resolve => on('done', resolve))
+      siteMock.done()
+    })
+
+    it('should keep images and tags together, in order', () => {
+      const result = query({ scrapers: ['image', 'tag'], groupBy: 'image-page' })
+      expect(stripResult(result)).to.matchSnapshot()
+    })
+  })
 })
