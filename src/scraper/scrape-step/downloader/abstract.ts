@@ -98,7 +98,7 @@ export abstract class AbstractDownloader<DownloadData> {
 
   private getRegexCleanup = ({ regexCleanup }: DownloadConfig) => {
     if (regexCleanup) {
-      const regex = new RegExp(regexCleanup.selector)
+      const regex = new RegExp(regexCleanup.selector, regexCleanup.flags)
       return (value: string) => value.replace(regex, regexCleanup.replacer)
     } else {
       return (value: string) => value
