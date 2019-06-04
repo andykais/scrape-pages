@@ -1,5 +1,7 @@
 import * as os from 'os'
 import * as path from 'path'
+import { rmrf } from '../../../src/util/fs'
+import { UninitializedDatabaseError } from '../../../src/util/errors'
 
 import { expect } from 'chai'
 
@@ -21,6 +23,7 @@ const params = {
   cleanFolder: true
 }
 describe(__filename, () => {
+  before(async () => await rmrf(params.folder))
   beforeEach(function() {
     configureSnapshots({ __dirname, __filename, fullTitle: this.currentTest!.fullTitle() })
   })
@@ -110,6 +113,15 @@ describe(__filename, () => {
     it('should keep images and tags together, in order', () => {
       const result = query({ scrapers: ['image', 'tag'], groupBy: 'image-page' })
       expect(stripResult(result)).to.matchSnapshot()
+    })
+  })
+
+  describe('running query() before starting the scraper', () => {
+    const { start, query } = scrape(config, options, params)
+    // ensure that the database & scraper folder is destroyed
+    before(async () => await rmrf(params.folder))
+    it('should throw an uninitialized error', () => {
+      expect(() => query({ scrapers: ['image'] })).to.throw(UninitializedDatabaseError)
     })
   })
 })

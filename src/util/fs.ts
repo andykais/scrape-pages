@@ -15,7 +15,7 @@ const [mkdir, readdir, stat, unlink, rmdir, rename, access, readFile, writeFile]
   fs.writeFile
 ].map(promisify)
 
-export { readdir, stat, rename, readFile, writeFile }
+export { readdir, stat, rename, readFile, writeFile, rmdir }
 
 export const mkdirp = async (folder: string) => {
   try {
@@ -55,11 +55,17 @@ export const exists = async (file: string): Promise<boolean> => {
     await access(file, fs.constants.F_OK)
     return true
   } catch (e) {
-    if (e.code === 'ENOENT') {
-      return false
-    } else {
-      throw e
-    }
+    if (e.code === 'ENOENT') return false
+    else throw e
+  }
+}
+export const existsSync = (file: string): boolean => {
+  try {
+    fs.accessSync(file, fs.constants.F_OK)
+    return true
+  } catch (e) {
+    if (e.code === 'ENOENT') return false
+    else throw e
   }
 }
 

@@ -3,7 +3,7 @@ import { createWriteStream } from 'fs'
 import * as path from 'path'
 import { mkdirp, sanitizeFilename } from '../../../../util/fs'
 import { FMap } from '../../../../util/map'
-import { ResponseError } from '../../../../util/error'
+import { ResponseError } from '../../../../util/errors'
 
 import { AbstractDownloader, DownloadParams } from '../abstract'
 import { compileTemplate } from '../../../../util/handlebars'
