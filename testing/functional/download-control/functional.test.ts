@@ -2,14 +2,8 @@ import * as os from 'os'
 import * as path from 'path'
 
 import { expect } from 'chai'
-
 import * as nock from 'nock'
-import {
-  NockFolderMock,
-  configureSnapshots,
-  stripResult,
-  useRequestStatsRecorder
-} from '../../setup'
+import { NockFolderMock, stripResult, useRequestStatsRecorder } from '../../setup'
 import { config } from './config'
 import { scrape } from '../../../src'
 
@@ -23,10 +17,6 @@ const params = {
 }
 
 describe(__filename, () => {
-  beforeEach(function() {
-    configureSnapshots({ __dirname, __filename, fullTitle: this.currentTest!.fullTitle() })
-  })
-
   describe('cache control', () => {
     step('first pass should fetch all downloads since nothing is in cache', async () => {
       const { start, query } = scrape(config, { cache: true }, params)
@@ -60,32 +50,30 @@ describe(__filename, () => {
       expect(stripResult(result)).to.deep.equal(stripResult(resultPre))
     })
 
-    step(
-      `second pass on same folder should request 'index', but not cached postTitle`,
-      async () => {
-        const { start, query } = scrape(
-          config,
-          { logLevel: 'info', cache: true, optionsEach: { index: { cache: false } } },
-          { ...params, cleanFolder: false }
-        )
-        const siteMock = await NockFolderMock.create(resourceFolder, resourceUrl)
-        const { on } = await start()
-        const { counts } = useRequestStatsRecorder(config, on)
-        await new Promise(resolve => on('done', resolve))
-        siteMock.done()
-        expect(counts.index.queued).to.equal(1)
-        expect(counts.index.complete).to.equal(1)
-        expect(counts.postTitle.queued).to.equal(0)
-        expect(counts.postTitle.complete).to.equal(5)
-        const result = query({ scrapers: ['postTitle'] })
-        expect(stripResult(result)).to.matchSnapshot()
-      }
-    )
+    step('should make requests for scrapers with cache turned off', async () => {
+      const { start, query } = scrape(
+        config,
+        { logLevel: 'info', cache: true, optionsEach: { index: { cache: false } } },
+        { ...params, cleanFolder: false }
+      )
+      const siteMock = await NockFolderMock.create(resourceFolder, resourceUrl)
+      const { on } = await start()
+      const { counts } = useRequestStatsRecorder(config, on)
+      await new Promise(resolve => on('done', resolve))
+      siteMock.done()
+      expect(counts.index.queued).to.equal(1)
+      expect(counts.index.complete).to.equal(1)
+      expect(counts.postTitle.queued).to.equal(0)
+      expect(counts.postTitle.complete).to.equal(5)
+      const result = query({ scrapers: ['postTitle'] })
+      expect(stripResult(result)).to.matchSnapshot()
+    })
   })
 
   describe('emit stop event', () => {
-    const siteMock = new NockFolderMock(resourceFolder, resourceUrl, { delay: 200 })
     // nock sends an instant reply, this is not realistic and harder to test, so a delay is added
+    const siteMock = new NockFolderMock(resourceFolder, resourceUrl, { delay: 200 })
+
     beforeEach(siteMock.init)
     afterEach(siteMock.done)
 
@@ -167,7 +155,7 @@ describe(__filename, () => {
         const result = getSlowScraper()
         expect(result.length).to.equal(1)
         expect(result[0].length).to.equal(1)
-        expect(result[0][0].complete).to.equal(0)
+        expect(result[0][0].complete).to.equal(0) // this is a BIT (1 | 0) column in sqlite
       })
 
       await new Promise(resolve => on('done', resolve))
