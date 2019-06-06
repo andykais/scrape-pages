@@ -18,9 +18,10 @@ const params = {
   cleanFolder: true
 }
 describe(__filename, () => {
-  before(async () => await rmrf(params.folder))
-  beforeEach(function() {
-    configureSnapshots({ __dirname, __filename, fullTitle: this.currentTest!.fullTitle() })
+  const { start, query } = scrape(config, options, params)
+  it('calling query() before start() should throw an uninitialized error', async () => {
+    await rmrf(params.folder)
+    expect(() => query({ scrapers: ['image'] })).to.throw(UninitializedDatabaseError)
   })
 
   describe('testing asynchronousity & ordering', () => {
@@ -83,32 +84,6 @@ describe(__filename, () => {
       const result = query({ scrapers: ['image'], groupBy: 'image' })
       expect(result).to.have.length(2)
       expect(stripResult(result)).to.matchSnapshot()
-    })
-  })
-
-  describe('with psuedo-random delayed scraper', () => {
-    const { start, query } = scrape(config, options, params)
-
-    before(async () => {
-      const siteMock = await NockFolderMock.create(resourceFolder, resourceUrl, { randomSeed: 1 })
-
-      const { on } = await start()
-      await new Promise(resolve => on('done', resolve))
-      siteMock.done()
-    })
-
-    it('should keep images and tags together, in order', () => {
-      const result = query({ scrapers: ['image', 'tag'], groupBy: 'image-page' })
-      expect(stripResult(result)).to.matchSnapshot()
-    })
-  })
-
-  describe('running query() before starting the scraper', () => {
-    const { start, query } = scrape(config, options, params)
-    // ensure that the database & scraper folder is destroyed
-    before(async () => await rmrf(params.folder))
-    it('should throw an uninitialized error', () => {
-      expect(() => query({ scrapers: ['image'] })).to.throw(UninitializedDatabaseError)
     })
   })
 })
