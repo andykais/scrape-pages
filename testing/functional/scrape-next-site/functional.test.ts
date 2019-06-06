@@ -3,7 +3,7 @@ import * as path from 'path'
 
 import { expect } from 'chai'
 
-import { NockFolderMock, configureSnapshots, stripResult } from '../../setup'
+import { NockFolderMock, stripResult } from '../../setup'
 import { config } from './config'
 import { scrape } from '../../../src'
 
@@ -17,10 +17,6 @@ const params = {
   cleanFolder: true
 }
 describe(__filename, () => {
-  beforeEach(function() {
-    configureSnapshots({ __dirname, __filename, fullTitle: this.currentTest!.fullTitle() })
-  })
-
   describe('with instant scraper', () => {
     const { start, query } = scrape(config, options, params)
 
