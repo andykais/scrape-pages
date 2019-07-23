@@ -10,7 +10,8 @@ A powerful scraper library focused on readability and reusability with tiny api 
 :warning: This project is under active development. Expect bugs and frequent api changes. If you wish to see progress, check out the 
 <a href="https://github.com/andykais/scrape-pages/projects">github projects boards</a>
 </sub>
-
+<br/>
+<br/>
 
 [![npm](https://img.shields.io/npm/v/scrape-pages.svg)](https://www.npmjs.com/package/scrape-pages)
 ![node](https://img.shields.io/node/v/scrape-pages.svg?style=flat)
