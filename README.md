@@ -1,14 +1,32 @@
-# scrape-pages
+<div align="center">
 
-[![Travis Master Build Status](https://travis-ci.com/andykais/scrape-pages.svg?branch=master)](https://travis-ci.com/andykais/scrape-pages)
+# scrape-pages
+**generalized scraper using JSON based instructions**
+
+
+A powerful scraper library focused on readability and reusability with tiny api footprint
+
+<sub>
+:warning: This project is under active development. Expect bugs and frequent api changes. If you wish to see progress, check out the 
+<a href="https://github.com/andykais/scrape-pages/projects">github projects boards</a>
+</sub>
+
+
 [![npm](https://img.shields.io/npm/v/scrape-pages.svg)](https://www.npmjs.com/package/scrape-pages)
+![node](https://img.shields.io/node/v/scrape-pages.svg?style=flat)
+[![Travis Master Build Status](https://travis-ci.com/andykais/scrape-pages.svg?branch=master)](https://travis-ci.com/andykais/scrape-pages)
 [![license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/andykais/scrape-pages/blob/master/LICENSE)
 [![Coverage Status](https://coveralls.io/repos/github/andykais/scrape-pages/badge.svg?branch=master)](https://coveralls.io/github/andykais/scrape-pages?branch=master)
 
+<h3>
+<a href="#documentation">Documentation</a>
+|
+<a href="https://scrape-pages.js.org">Playground</a>
+</h3>
 
-This package scrapes sites for text and files based on a single config file representing the crawler's flow.
 
-:warning: This project is under active development. Expect bugs and frequent api changes. If you wish to see progress, check out the [github projects boards](https://github.com/andykais/scrape-pages/projects)
+</div>
+
 
 ## Installation
 
