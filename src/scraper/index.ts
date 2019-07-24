@@ -14,7 +14,8 @@ import { Settings } from '../settings'
 import { ConfigInit } from '../settings/config/types'
 import { OptionsInit } from '../settings/options/types'
 import { ParamsInit } from '../settings/params/types'
-import { ThenArg } from '../util/types'
+import { PublicEmitter as Emitter } from '../tools/emitter'
+import { QueryFn } from '../tools/store/querier-entrypoint'
 
 const initFolders = async ({ paramsInit, flatParams }: Settings) => {
   // remove folders if specified
@@ -45,7 +46,8 @@ const writeMetadata = async (settings: Settings) => {
   )
 }
 
-const startScraping = async (settings: Settings) => {
+type Start = () => Promise<Emitter>
+const startScraping = (settings: Settings): Start => async () => {
   await initFolders(settings)
   await writeMetadata(settings)
   const tools = initTools(settings)
@@ -91,30 +93,26 @@ const startScraping = async (settings: Settings) => {
     }, 0)
   })
 
-  return {
-    on: emitter.getBoundOn(),
-    emit: emitter.getBoundEmit()
-  }
+  return emitter.getBoundPublicEmitter()
 }
 
-export type Start = () => ReturnType<typeof startScraping>
-export type Emitter = ThenArg<ReturnType<Start>>
-export type Query = ReturnType<typeof Store.querierFactory>
 /**
  * scrape is the entrypoint for this library
  *
- * @param configInit 'what' is going to be scraped (the actual urls and parse strings)
- * @param optionsInit 'how' is the site going to be scraped (mostly how downloads should behave)
- * @param paramsInit 'who' is going to be scraped (settings specific to each run)
+ * @public
+ *
+ * @param configInit - 'what' is going to be scraped (the actual urls and parse strings)
+ * @param optionsInit - 'how' is the site going to be scraped (mostly how downloads should behave)
+ * @param paramsInit - 'who' is going to be scraped (settings specific to each run)
  */
 export const scrape = (
   configInit: ConfigInit,
   optionsInit: OptionsInit,
   paramsInit: ParamsInit
-) => {
+): { start: Start; query: QueryFn; settings: Settings } => {
   const settings = getSettings(configInit, optionsInit, paramsInit)
 
-  const start = () => startScraping(settings)
+  const start = startScraping(settings)
   const query = Store.querierFactory(settings)
 
   return { start, query, settings }

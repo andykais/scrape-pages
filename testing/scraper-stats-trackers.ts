@@ -1,5 +1,5 @@
-import { Emitter } from '../src/scraper'
-import { ConfigInit } from '../src/settings/config/types'
+import { Emitter } from '../src'
+import { ConfigInit } from '../src'
 
 const useRequestStatsRecorder = (config: ConfigInit, on: Emitter['on']) => {
   const scraperNames = Object.keys(config.scrapers)

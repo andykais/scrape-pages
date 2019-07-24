@@ -1,5 +1,11 @@
 import * as Fetch from 'node-fetch'
 
+/**
+ * Error returned when a unexpected response is returned from a request.
+ * This error can be supressed by allowing failures on your scraper.
+ *
+ * @public
+ */
 class ResponseError extends Error {
   public name = 'ResponseError'
   public constructor(response: Fetch.Response, url: string) {
@@ -7,6 +13,12 @@ class ResponseError extends Error {
   }
 }
 
+/**
+ * Error when attempting to query a folder before starting the scraper.
+ * E.g. calling `query()` before calling `start()`.
+ *
+ * @public
+ */
 class UninitializedDatabaseError extends Error {
   public name = 'UninitializedDatabaseError'
   public constructor(databaseFile: string) {

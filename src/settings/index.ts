@@ -7,6 +7,7 @@ import { OptionsInit, FlatOptions, ScrapeOptions } from './options/types'
 import { ParamsInit, FlatParams, ScrapeParams } from './params/types'
 import { FMap } from '../util/map'
 
+/** @internal */
 export type Settings = {
   configInit: ConfigInit
   config: Config

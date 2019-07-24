@@ -17,6 +17,7 @@ export interface ScrapeOptionsInit extends OptionsAnyInit {
 }
 export type ScrapeOptions = Readonly<Required<ScrapeOptionsInit>>
 
+/** @public */
 export interface OptionsInit extends OptionsAnyInit {
   maxConcurrent?: number
   rateLimit?: {

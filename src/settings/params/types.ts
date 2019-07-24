@@ -6,6 +6,7 @@ type ScraperName = string
 
 export type Input = { [inputName: string]: string }
 
+/** @public */
 export interface ParamsInit {
   input?: Input
   folder: string

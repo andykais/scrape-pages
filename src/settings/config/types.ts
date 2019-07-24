@@ -1,5 +1,5 @@
 import { FMap } from '../../util/map'
-// scraper name
+/** scraper name @public */
 export type ScraperName = string
 // scraper group
 type ScraperGroup = string
@@ -7,28 +7,36 @@ type ScraperGroup = string
 type InputKey = string
 
 // RegexCleanup {{{
-type RegexRemove = string
-interface RegexReplaceInit {
+/** @public */
+export type RegexRemove = string
+/** @public */
+export interface RegexReplaceInit {
   selector: string
   replacer: string
   flags?: string
 }
+/** @public */
 export type RegexCleanupInit = RegexRemove | RegexReplaceInit
+/** @public */
 export interface RegexCleanup extends RegexReplaceInit {
   flags: string
 }
 // }}}
 
 // Input {{{
-type Input = InputKey
+/** @public */
+export type Input = InputKey
 // }}}
 
 // DownloadConfig {{{
 // handlebars template
 type AcceptedProtocols = 'http'
-type Template = string
-type UrlMethods = 'GET' | 'POST' | 'PUT' | 'DELETE'
-interface DownloadConfigInterface {
+/** @public */
+export type Template = string
+/** @public */
+export type UrlMethods = 'GET' | 'POST' | 'PUT' | 'DELETE'
+/** @public */
+export interface DownloadConfigInterface {
   protocol?: AcceptedProtocols
   method?: UrlMethods
   urlTemplate: Template
@@ -37,7 +45,9 @@ interface DownloadConfigInterface {
   read?: boolean // should download be read into memory
   write?: boolean // should download be saved to a file (separate from a database entry)
 }
+/** @public */
 export type DownloadConfigInit = Template | DownloadConfigInterface | undefined
+/** @public */
 export interface DownloadConfig extends DownloadConfigInterface {
   protocol: AcceptedProtocols
   method: UrlMethods
@@ -49,27 +59,34 @@ export interface DownloadConfig extends DownloadConfigInterface {
 // }}}
 
 // ParseConfig {{{
-type AcceptedFormats = 'html' | 'xml' | 'json'
-type Selector = string
-interface ParseConfigInitInterface {
+/** @public */
+export type AcceptedFormats = 'html' | 'xml' | 'json'
+/** @public */
+export type Selector = string
+/** @public */
+export interface ParseConfigInitInterface {
   limit?: number
   regexCleanup?: RegexCleanupInit | undefined
 }
-interface ParseConfigHtmlInterface extends ParseConfigInitInterface {
+/** @public */
+export interface ParseConfigHtmlInterface extends ParseConfigInitInterface {
   format?: 'html'
   selector: Selector
   attribute?: string
 }
-interface ParseConfigXmlInterface extends ParseConfigInitInterface {
+/** @public */
+export interface ParseConfigXmlInterface extends ParseConfigInitInterface {
   format: 'xml'
   selector: Selector
   attribute?: string
 }
-interface ParseConfigJsonInterface extends ParseConfigInitInterface {
+/** @public */
+export interface ParseConfigJsonInterface extends ParseConfigInitInterface {
   format: 'json'
   selector: Selector
 }
 // a string value will normalize to ParseConfigHtmlInterface
+/** @public */
 export type ParseConfigInit =
   | Selector
   | ParseConfigHtmlInterface
@@ -77,51 +94,71 @@ export type ParseConfigInit =
   | ParseConfigJsonInterface
   | undefined
 
+/** @public */
 export interface ParseConfigInterface extends ParseConfigInitInterface {
   regexCleanup: RegexCleanup | undefined
 }
+/** @public */
 export type ParseConfigXml = ParseConfigXmlInterface & ParseConfigInterface
+/** @public */
 export type ParseConfigHtml = ParseConfigHtmlInterface & ParseConfigInterface
+/** @public */
 export type ParseConfigJson = ParseConfigJsonInterface & ParseConfigInterface
+/** @public */
 export type ParseConfig = ParseConfigHtml | ParseConfigXml | ParseConfigJson
 // }}}
 
-type Incrementers = 'failed-download' | 'empty-parse' | number
+/** @public */
+export type Incrementers = 'failed-download' | 'empty-parse' | number
 
 // returned by ./flatten.ts
+/** @public */
 export type ConfigPositionInfo = {
   depth: number
   horizontalIndex: number
   name: ScraperName
   parentName?: ScraperName
 }
+/** @public */
 export type FlatConfig = FMap<ScraperName, ConfigPositionInfo>
 
+/** @public */
 export interface ScrapeConfigInit {
   download?: DownloadConfigInit
   parse?: ParseConfigInit
   incrementUntil?: Incrementers
 }
+/** @public */
 export interface ScrapeConfig {
   download?: DownloadConfig
   parse?: ParseConfig
   incrementUntil: Incrementers
 }
-interface StructureInit {
+/** @public */
+export interface StructureInit {
   scraper: ScraperName
   forEach?: StructureInit | StructureInit[]
   forNext?: StructureInit | StructureInit[]
 }
+/** @public */
 export interface Structure extends StructureInit {
   forEach: Structure[]
   forNext: Structure[]
 }
+/**
+ * @public
+ *
+ * request definitions and data flow descibed via a recursive structure
+ */
 export interface ConfigInit {
+  /** Optional field which specifies which inputs are required when calling `start()` */
   input?: Input | Input[]
+  /** Defines reusable scrapers consumed by the run portion of the config. */
   scrapers: { [scraperName: string]: ScrapeConfigInit }
+  /** One way data flow that describes how to scrape a site. */
   run: StructureInit
 }
-// returned by ./normalize.ts
+/** @public */
 export interface Config extends ConfigInit {
   input: Input[]
   scrapers: { [scraperName: string]: ScrapeConfig }

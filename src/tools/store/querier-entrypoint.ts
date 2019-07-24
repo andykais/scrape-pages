@@ -11,9 +11,17 @@ import { SelectedRow as OrderedScrapersRow } from './queries/select-ordered-scra
 import { ArgumentTypes } from '../../util/types'
 
 export type QueryArguments = { scrapers: ScraperName[]; groupBy?: ScraperName }
+
+/**
+ * @public
+ */
+export type QueryResult = OrderedScrapersRow[][]
+/**
+ * @public
+ */
 export interface QueryFn {
-  prepare: (params: QueryArguments) => () => OrderedScrapersRow[][]
-  (...args: ArgumentTypes<QueryFn['prepare']>): OrderedScrapersRow[][]
+  prepare: (params: QueryArguments) => () => QueryResult
+  (...args: ArgumentTypes<QueryFn['prepare']>): QueryResult
 }
 
 /**

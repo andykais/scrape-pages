@@ -1,8 +1,7 @@
 // type imports
-import { Query } from '../src/scraper'
+import { QueryResult } from '../src'
 
-type Result = ReturnType<Query>
-export const stripResult = (result: Result) =>
+export const stripResult = (result: QueryResult) =>
   result.map(g =>
     g.map(r => ({
       ...r,

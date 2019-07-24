@@ -46,8 +46,10 @@ class ScraperEmitter {
     this.emitter.listenerCount(`${this.name}:${eventName}`) !== 0
 }
 
-type EmitterOn = (event: string, callback: (...args: any[]) => void) => void
-type EmitterEmit = (event: string, ...emittedValues: any[]) => void
+export interface PublicEmitter {
+  on: (event: string, callback: (...args: any[]) => void) => void
+  emit: (event: string, ...emittedValues: any[]) => void
+}
 
 class Emitter {
   /** listenable by user */
@@ -85,8 +87,12 @@ class Emitter {
     this.scrapers = flatConfig.map((_, name) => new ScraperEmitter(name, this.emitter))
   }
   public scraper = (name: ScraperName) => this.scrapers.getOrThrow(name)
-  public getBoundOn = (): EmitterOn => this.emitter.on.bind(this.emitter)
-  public getBoundEmit = (): EmitterEmit => this.emitter.emit.bind(this.emitter)
+  public getBoundPublicEmitter = (): PublicEmitter => ({
+    on: this.emitter.on.bind(this.emitter),
+    emit: this.emitter.emit.bind(this.emitter)
+  })
+  public getBoundOn = (): PublicEmitter['on'] => this.emitter.on.bind(this.emitter)
+  public getBoundEmit = (): PublicEmitter['emit'] => this.emitter.emit.bind(this.emitter)
   public getRxEventStream = (eventName: string) => Rx.fromEvent(this.emitter, eventName)
 
   private hasListenerFor = (eventName: string): boolean =>

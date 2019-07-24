@@ -92,7 +92,7 @@ export class Downloader extends AbstractDownloader<DownloadData> {
     const dest = createWriteStream(filename)
     const buffers: Buffer[] = []
 
-    const buffer = await new Promise((resolve, reject) => {
+    const buffer: Buffer = await new Promise((resolve, reject) => {
       response.body.pipe(dest)
       response.body.on('error', error => reject(error))
       response.body.on('data', chunk => buffers.push(chunk))
