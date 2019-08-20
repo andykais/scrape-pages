@@ -2,7 +2,12 @@ import * as cheerio from 'cheerio'
 import { AbstractParser } from '../abstract'
 // type imports
 import { ScrapeSettings } from '../../../../settings'
-import { ScraperName, ParseConfigHtml, ParseConfigXml } from '../../../../settings/config/types'
+import {
+  ScraperName,
+  ParseConfigInterface,
+  ParseConfigHtml,
+  ParseConfigXml
+} from '../../../../settings/config/types'
 import { Tools } from '../../../../tools'
 
 export class Parser extends AbstractParser {
@@ -26,6 +31,11 @@ export class Parser extends AbstractParser {
       : this.selectTextVals
     this.cheerioFlags = cheerioFlags
   }
+
+  public static isHtmlParseConfig = (
+    parseConfig: ParseConfigInterface
+  ): parseConfig is ParseConfigHtml => (parseConfig as ParseConfigHtml).format === 'html'
+
   protected parse = (value: string) => this.parser(value)
 
   private selectTextVals = (value: string) => {

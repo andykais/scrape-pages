@@ -6,7 +6,7 @@ export const config: ConfigInit = {
       download: 'http://json-parsing.com/api-response.json',
       parse: {
         format: 'json',
-        selector: `posts[?(@.type=='post')].content`,
+        selector: `posts[type='post'].content`,
         regexCleanup: '\n$'
       }
     }
@@ -22,7 +22,7 @@ export const configParseJsonTwice: ConfigInit = {
       download: 'http://json-parsing.com/api-response.json',
       parse: {
         format: 'json',
-        selector: `posts[?(@.type=='post')]`
+        selector: `posts[type='post']`
       }
     },
     parseContentFromPost: {
@@ -54,7 +54,8 @@ export const configParseJsonInsideScript: ConfigInit = {
       },
       parse: {
         format: 'json',
-        selector: 'a.nested.story[*].word'
+        //selector: 'a.nested.story[*].word'
+        selector: 'a.nested.story[].word'
       }
     }
   },
