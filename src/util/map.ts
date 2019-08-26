@@ -16,7 +16,7 @@ class FMap<K = any, V = any> extends Map<K, V> {
   public toObject<T>(fn: (val: V, key: K) => T | V = (v: V) => v) {
     const object: { [key: string]: T | V } = {}
     for (const [key, val] of this) {
-      object[key.toString()] = fn(val, key)
+      object[(key as unknown) as string] = fn(val, key)
     }
     return object
   }

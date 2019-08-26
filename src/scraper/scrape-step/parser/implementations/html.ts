@@ -51,7 +51,7 @@ export class Parser extends AbstractParser {
     const $ = cheerio.load(value, this.cheerioFlags)
     const values: string[] = []
     const selection = $(this.parseConfig.selector)
-    selection.attr(attribute, (i: number, attributeVal: string) => {
+    selection.attr(attribute, (el, i, attributeVal) => {
       if (attributeVal) values.push(attributeVal)
     })
     return values
