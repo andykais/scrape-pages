@@ -51,7 +51,10 @@ export class Parser extends AbstractParser {
     const $ = cheerio.load(value, this.cheerioFlags)
     const values: string[] = []
     const selection = $(this.parseConfig.selector)
-    selection.attr(attribute, (el, i, attributeVal) => {
+    // this type definition is wrong because we are using the RC version of cheerio
+    // AttrFunction in @types/cheerio does not match the actual method
+    // type AttrFunction = (index: number, attributeVal: string) => void
+    selection.attr(attribute, (i: any, attributeVal: any) => {
       if (attributeVal) values.push(attributeVal)
     })
     return values

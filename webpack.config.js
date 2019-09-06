@@ -2,6 +2,7 @@ const path = require('path')
 const glob = require('glob')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const nodeExternals = require('webpack-node-externals')
+const typescriptIsTransformer = require('typescript-is/lib/transform-inline/transformer').default
 
 const sourceFiles = glob
   .sync('./src/**/*.ts', { ignore: './src/**/*.test.ts' })
@@ -38,11 +39,23 @@ module.exports = (env, { mode = 'development' } = {}) => ({
         options: { esModules: true },
         enforce: 'post'
       },
+      // {
+      //   test: /\.ts$/,
+      //   exclude: /node_modules/,
+      //   loader: 'awesome-typescript-loader',
+      //   options: { compiler: 'ttypescript', configFileName: 'tsconfig/tsconfig.json' }
+      // },
       {
         test: /\.ts$/,
         exclude: /node_modules/,
-        loader: 'awesome-typescript-loader',
-        options: { compiler: 'ttypescript', configFileName: 'tsconfig/tsconfig.json' }
+        loader: 'ts-loader',
+        options: {
+          getCustomTransformers: program => ({
+            before: [typescriptIsTransformer(program)]
+          }),
+          // compiler: 'ttypescript',
+          configFile: 'tsconfig/tsconfig.json'
+        }
       },
       {
         test: /\.sql$/,

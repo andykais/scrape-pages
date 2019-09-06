@@ -16,9 +16,7 @@ const makeWaitingConditionalJoins = (flatConfig: FlatConfig, scraperNames: strin
         .map(recurseDepth => `${recurseDepth}`)
         .join(',')
 
-      return `WHEN cte.scraper = '${
-        level.name
-      }' AND cte.recurseDepth IN (${waitingSteps}) THEN cte.id`
+      return `WHEN cte.scraper = '${level.name}' AND cte.recurseDepth IN (${waitingSteps}) THEN cte.id`
     })
     .join(' ')
   if (caseJoins) return `CASE ${caseJoins} ELSE cte.parentId END`
