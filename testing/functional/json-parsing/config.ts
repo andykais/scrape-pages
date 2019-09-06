@@ -54,7 +54,6 @@ export const configParseJsonInsideScript: ConfigInit = {
       },
       parse: {
         format: 'json',
-        //selector: 'a.nested.story[*].word'
         selector: 'a.nested.story[].word'
       }
     }

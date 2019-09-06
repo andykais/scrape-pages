@@ -39,12 +39,6 @@ module.exports = (env, { mode = 'development' } = {}) => ({
         options: { esModules: true },
         enforce: 'post'
       },
-      // {
-      //   test: /\.ts$/,
-      //   exclude: /node_modules/,
-      //   loader: 'awesome-typescript-loader',
-      //   options: { compiler: 'ttypescript', configFileName: 'tsconfig/tsconfig.json' }
-      // },
       {
         test: /\.ts$/,
         exclude: /node_modules/,
