@@ -10,7 +10,8 @@
     "module": "commonjs",
     "moduleResolution": "node",
     "target": "es2017",
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "esModuleInterop": true
   },
   "include": ["../src/**/*.ts", "../examples/**/*.ts", "custom.d.ts", "../testing/**/*.ts"]
 }

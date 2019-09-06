@@ -1,4 +1,4 @@
-import * as jsonata from 'jsonata'
+import jsonata from 'jsonata'
 import { AbstractParser } from '../abstract'
 // type imports
 import { ScrapeSettings } from '../../../../settings'

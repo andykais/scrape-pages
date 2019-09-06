@@ -2,7 +2,7 @@ import * as os from 'os'
 import * as path from 'path'
 
 import { expect } from 'chai'
-import * as nock from 'nock'
+import nock from 'nock'
 import { NockFolderMock, stripResult, useRequestStatsRecorder } from '../../setup'
 import { config } from './config'
 import { scrape } from '../../../src'

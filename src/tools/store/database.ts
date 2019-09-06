@@ -1,5 +1,5 @@
 import { resolve } from 'path'
-import * as BetterSqlite3Database from 'better-sqlite3'
+import BetterSqlite3Database from 'better-sqlite3'
 
 class Database extends BetterSqlite3Database {
   public constructor(folder: string) {

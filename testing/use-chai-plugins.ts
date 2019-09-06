@@ -1,7 +1,7 @@
 import * as path from 'path'
 import { use } from 'chai'
 import chaiExclude from 'chai-exclude'
-import * as chaiJestSnapshot from 'chai-jest-snapshot'
+import chaiJestSnapshot from 'chai-jest-snapshot'
 // type imports
 import * as mocha from 'mocha'
 

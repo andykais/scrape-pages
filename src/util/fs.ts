@@ -1,7 +1,7 @@
 import * as path from 'path'
 import * as fs from 'fs'
 import { promisify } from 'util'
-import * as sanitize from 'sanitize-filename'
+import sanitize from 'sanitize-filename'
 
 const [mkdir, readdir, stat, unlink, rmdir, rename, access, readFile, writeFile] = [
   fs.mkdir,

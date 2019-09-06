@@ -1,6 +1,6 @@
 import * as path from 'path'
 import { findFiles } from '../src/util/fs'
-import * as nock from 'nock'
+import nock from 'nock'
 
 class SeedPsuedoRandom {
   private _seed: number
