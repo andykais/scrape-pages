@@ -32,7 +32,5 @@ jobs:
       uses: coverallsapp/github-action@master
       with:
         github-token: ${{ secrets.github_token }}
-  coverage:
-    runs-on: ubuntu-latest
 
 # TODO add a 'test published package script'
