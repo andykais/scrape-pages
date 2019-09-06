@@ -58,7 +58,6 @@
     "@types/verror": "^1.10.3",
     "@typescript-eslint/eslint-plugin": "^2.1.0",
     "@typescript-eslint/parser": "^2.1.0",
-    "awesome-typescript-loader": "^5.2.1",
     "chai": "^4.2.0",
     "chai-exclude": "^2.0.1",
     "chai-jest-snapshot": "^2.0.0",
