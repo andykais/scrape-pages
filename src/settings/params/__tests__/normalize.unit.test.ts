@@ -1,9 +1,7 @@
-import { FMap } from '../../../util/map'
 import { normalizeConfig } from '../../config'
 import { normalizeOptions } from '../../options'
 import { normalizeParams } from '../'
 import * as testingConfigs from '../../../../testing/resources/testing-configs'
-import { FlatParams, ScrapeParams } from '../types'
 import { expect } from 'chai'
 
 describe(__filename, () => {
