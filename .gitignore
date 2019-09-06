@@ -6,6 +6,7 @@ lib
 
 # coverage reports
 .nyc_output
+coverage
 
 # scratchwork folder
 scratchwork

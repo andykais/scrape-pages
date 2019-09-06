@@ -1,5 +1,7 @@
 {
   "extension": [".ts"],
   "instrument": false,
-  "sourceMap": false
+  "sourceMap": false,
+  "all": true,
+  "reporter": ["lcov"]
 }
