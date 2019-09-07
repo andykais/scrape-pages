@@ -66,12 +66,12 @@ jobs:
 #    Deploy Github Pages     #
 ##############################
     - name: build github pages
-      if: github.ref == 'master' && matrix.os == 'ubuntu-latest' && matrix.node-version == '12'
+      if: github.ref == 'refs/heads/master' && matrix.os == 'ubuntu-latest' && matrix.node-version == '12'
       run: |
         cd website
         npm ci --no-audit
     - name: github pages
-      if: github.ref == 'master' && matrix.os == 'ubuntu-latest' && matrix.node-version == '12'
+      if: github.ref == 'refs/heads/master' && matrix.os == 'ubuntu-latest' && matrix.node-version == '12'
       uses: peaceiris/actions-gh-pages@v2.1.0
       env:
         GITHUB_TOKEN: ${{ secrets.github_token }}
