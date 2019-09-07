@@ -4,7 +4,11 @@
 # build files
 lib
 
+# testing cruft
+testing/functional/.run-output
+
 # coverage reports
+  folder: path.resolve(__dirname, '../', '.run-location', `${path.basename(__dirname)}`),
 .nyc_output
 coverage
 

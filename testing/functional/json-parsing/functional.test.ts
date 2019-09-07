@@ -1,9 +1,8 @@
-import * as os from 'os'
 import * as path from 'path'
 
 import { expect } from 'chai'
 
-import { NockFolderMock, stripResult } from '../../setup'
+import { RUN_OUTPUT_FOLDER, NockFolderMock, stripResult } from '../../setup'
 import { config, configParseJsonTwice, configParseJsonInsideScript } from './config'
 import { scrape } from '../../../src'
 
@@ -12,9 +11,10 @@ const resourceUrl = `http://${path.basename(__dirname)}.com`
 
 const options = {}
 const params = {
-  folder: path.resolve(os.tmpdir(), `scrape-pages--${path.basename(__dirname)}`),
+  folder: path.resolve(RUN_OUTPUT_FOLDER, `${path.basename(__dirname)}`),
   cleanFolder: true
 }
+
 describe(__filename, () => {
   describe('with simple json response', () => {
     const { start, query } = scrape(config, options, params)
