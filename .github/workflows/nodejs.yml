@@ -9,7 +9,9 @@ jobs:
     strategy:
       matrix:
         node-version: [8, 10, 12]
-        os: [ubuntu-latest, windows-latest]
+        os:
+        - ubuntu-latest
+        # - windows-latest # nock scope has an error w/ windows
       fail-fast: false
 
     steps:
