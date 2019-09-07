@@ -72,12 +72,12 @@ jobs:
         npm ci --no-audit
     - name: github pages
       if: github.ref == 'master' && matrix.os == 'ubuntu-latest' && matrix.node-version == '12'
-      uses: crazy-max/ghaction-github-pages@master
-        with:
-          target_branch: gh-pages
-          build_dir: public
-        env:
-          GITHUB_PAT: ${{ secrets.GITHUB_PAT }}
+      uses: peaceiris/actions-gh-pages@v2.1.0
+      env:
+        GITHUB_TOKEN: ${{ secrets.github_token }}
+        PUBLISH_BRANCH: gh-pages
+        PUBLISH_DIR: ./website/dist
+
 
 
 # TODO add a 'test published package script'
