@@ -15,7 +15,7 @@ A powerful scraper library focused on readability and reusability with tiny api 
 
 [![npm](https://img.shields.io/npm/v/scrape-pages.svg)](https://www.npmjs.com/package/scrape-pages)
 ![node](https://img.shields.io/node/v/scrape-pages.svg?style=flat)
-[![Travis Master Build Status](https://travis-ci.com/andykais/scrape-pages.svg?branch=master)](https://travis-ci.com/andykais/scrape-pages)
+[![Github Actions Build Status](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Factions-badge.atrox.dev%2Fandykais%2Fscrape-pages%2Fbadge&label=build)](https://actions-badge.atrox.dev/andykais/scrape-pages/goto)
 [![license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/andykais/scrape-pages/blob/master/LICENSE)
 [![Coverage Status](https://coveralls.io/repos/github/andykais/scrape-pages/badge.svg?branch=master)](https://coveralls.io/github/andykais/scrape-pages?branch=master)
 
