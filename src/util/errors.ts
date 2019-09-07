@@ -7,6 +7,15 @@ class ResponseError extends Error {
   }
 }
 
+class UninitializedDatabaseError extends Error {
+  public name = 'UninitializedDatabaseError'
+  public constructor(databaseFile: string) {
+    super(
+      `Database does not exist at ${databaseFile}. You must start the scraper before querying from the database!`
+    )
+  }
+}
+
 export { FetchError } from 'node-fetch'
 export { TypeGuardError } from 'typescript-is'
-export { ResponseError }
+export { ResponseError, UninitializedDatabaseError }

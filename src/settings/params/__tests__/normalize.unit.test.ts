@@ -1,9 +1,7 @@
-import { FMap } from '../../../util/map'
 import { normalizeConfig } from '../../config'
 import { normalizeOptions } from '../../options'
 import { normalizeParams } from '../'
 import * as testingConfigs from '../../../../testing/resources/testing-configs'
-import { FlatParams, ScrapeParams } from '../types'
 import { expect } from 'chai'
 
 describe(__filename, () => {
@@ -15,17 +13,8 @@ describe(__filename, () => {
         folder: '/nonexistent'
       }
       const params = normalizeParams(config, options, paramsInit)
-      const paramsExpected: FlatParams = FMap.fromObject<ScrapeParams>({
-        index: {
-          folder: '/nonexistent/index',
-          input: {}
-        },
-        image: {
-          folder: '/nonexistent/image',
-          input: {}
-        }
-      })
-      expect([...params]).to.have.deep.members([...paramsExpected])
+      expect(params).to.have.length(2)
+      expect(params).to.have.keys(['index', 'image'])
     })
   })
 

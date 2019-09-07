@@ -3,7 +3,7 @@ import * as ops from 'rxjs/operators'
 import * as RxCustom from '../util/rxjs/observables'
 import { ScrapeStep } from './scrape-step'
 import { wrapError } from '../util/rxjs/operators'
-import { FetchError, ResponseError } from '../util/error'
+import { FetchError, ResponseError } from '../util/errors'
 // type imports
 import { Tools } from '../tools'
 import { FMap } from '../util/map'

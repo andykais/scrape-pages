@@ -18,7 +18,6 @@ interface RetrieveValue {
   mimeType?: string
   byteLength?: number
 }
-//interface RunValue extends Exclude<RetrieveValue, 'mimeType'> {}
 /**
  * base abstract class which other downloaders derive from
  */
@@ -48,10 +47,14 @@ export abstract class AbstractDownloader<DownloadData> {
 
     const downloadData = this.constructDownload(downloadParams)
 
-    let cachedDownload: ReturnType<typeof store.qs.selectMatchingCachedDownload>
     if (this.options.cache) {
-      cachedDownload = store.qs.selectMatchingCachedDownload(this.scraperName, downloadData)
-      if (cachedDownload) return cachedDownload
+      const cachedDownload = store.qs.selectMatchingCachedDownload(this.scraperName, downloadData)
+      if (cachedDownload) {
+        this.scraperLogger.info(
+          `scraper '${this.scraperName}' grabbed download from cache id ${cachedDownload.id}`
+        )
+        return cachedDownload
+      }
     }
     emitter.scraper(this.scraperName).emit.queued(downloadParams.downloadId)
 
@@ -75,17 +78,11 @@ export abstract class AbstractDownloader<DownloadData> {
         })
       : undefined
 
-    if (cachedDownload) {
-      this.scraperLogger.info(
-        `scraper '${this.scraperName}' grabbed download from cache id ${cachedDownload.id}`
-      )
-    } else {
-      this.scraperLogger.info(
-        `scraper '${this.scraperName}' downloaded ${downloadParams.downloadId}${
-          cacheId !== undefined ? ` and saved cache to ${cacheId}` : ''
-        }`
-      )
-    }
+    this.scraperLogger.info(
+      `scraper '${this.scraperName}' downloaded ${downloadParams.downloadId}${
+        cacheId !== undefined ? ` and saved cache to ${cacheId}` : ''
+      }`
+    )
 
     return {
       cacheId,
@@ -98,7 +95,7 @@ export abstract class AbstractDownloader<DownloadData> {
 
   private getRegexCleanup = ({ regexCleanup }: DownloadConfig) => {
     if (regexCleanup) {
-      const regex = new RegExp(regexCleanup.selector)
+      const regex = new RegExp(regexCleanup.selector, regexCleanup.flags)
       return (value: string) => value.replace(regex, regexCleanup.replacer)
     } else {
       return (value: string) => value

@@ -37,7 +37,7 @@ export abstract class AbstractParser {
 
   private getRegexCleanup = ({ regexCleanup }: ParseConfig) => {
     if (regexCleanup) {
-      const regex = new RegExp(regexCleanup.selector)
+      const regex = new RegExp(regexCleanup.selector, regexCleanup.flags)
       return (value: string) => value.replace(regex, regexCleanup.replacer)
     } else {
       return (value: string) => value

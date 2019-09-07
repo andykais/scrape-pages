@@ -1,5 +1,6 @@
 /**
- * This is not an internal util file, it only exists for external use.
+ * This is a special file, it is not used internally.
+ * It only exists for external use.
  */
 import { normalizeConfig, flattenConfig } from '../settings/config'
 import { normalizeOptions } from '../settings/options'

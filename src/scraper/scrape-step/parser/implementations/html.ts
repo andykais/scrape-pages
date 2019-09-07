@@ -2,19 +2,24 @@ import * as cheerio from 'cheerio'
 import { AbstractParser } from '../abstract'
 // type imports
 import { ScrapeSettings } from '../../../../settings'
-import { ScraperName, ParseConfig } from '../../../../settings/config/types'
+import {
+  ScraperName,
+  ParseConfigInterface,
+  ParseConfigHtml,
+  ParseConfigXml
+} from '../../../../settings/config/types'
 import { Tools } from '../../../../tools'
 
 export class Parser extends AbstractParser {
-  public type = 'html' as 'html'
+  public type: 'html' | 'xml' = 'html'
 
-  protected parseConfig: ParseConfig
+  protected parseConfig: ParseConfigHtml | ParseConfigXml
+  protected cheerioFlags: {}
   private parser: (value: string) => string[]
-  private cheerioFlags: {}
 
   public constructor(
     scraperName: ScraperName,
-    parseConfig: ParseConfig,
+    parseConfig: ParseConfigHtml | ParseConfigXml,
     settings: ScrapeSettings,
     tools: Tools,
     cheerioFlags: {} = {}
@@ -26,6 +31,11 @@ export class Parser extends AbstractParser {
       : this.selectTextVals
     this.cheerioFlags = cheerioFlags
   }
+
+  public static isHtmlParseConfig = (
+    parseConfig: ParseConfigInterface
+  ): parseConfig is ParseConfigHtml => (parseConfig as ParseConfigHtml).format === 'html'
+
   protected parse = (value: string) => this.parser(value)
 
   private selectTextVals = (value: string) => {
@@ -41,7 +51,10 @@ export class Parser extends AbstractParser {
     const $ = cheerio.load(value, this.cheerioFlags)
     const values: string[] = []
     const selection = $(this.parseConfig.selector)
-    selection.attr(attribute, (i: number, attributeVal: string) => {
+    // this type definition is wrong because we are using the RC version of cheerio
+    // AttrFunction in @types/cheerio does not match the actual method
+    // type AttrFunction = (index: number, attributeVal: string) => void
+    selection.attr(attribute, (i: any, attributeVal: any) => {
       if (attributeVal) values.push(attributeVal)
     })
     return values

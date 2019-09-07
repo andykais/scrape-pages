@@ -29,7 +29,3 @@ export const initTools = (settings: Settings): Tools => {
     queue
   }
 }
-
-export const initStore = (settings: Settings): Store => {
-  return new Store(settings)
-}

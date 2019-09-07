@@ -1,0 +1,83 @@
+name: Node CI
+
+on: push
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        node-version: [8, 10, 12]
+        os:
+        - ubuntu-latest
+        - macOS-latest
+        # - windows-latest # nock scope has an error w/ windows
+      fail-fast: false
+    steps:
+
+##############################
+#           Test             #
+##############################
+    - uses: actions/checkout@v1
+      with:
+        fetch-depth: 1
+
+    - uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+
+    - run: npm ci --no-audit
+    - run: npm run build
+    - run: npm run test
+
+    - run: npm run test:coverage
+      if: matrix.os == 'ubuntu-latest' && matrix.node-version == '12'
+    - name: send coverage report
+      if: matrix.os == 'ubuntu-latest' && matrix.node-version == '12'
+      uses: coverallsapp/github-action@master
+      with:
+        github-token: ${{ secrets.github_token }}
+
+##############################
+#       NPM Publish          #
+##############################
+    - name: npm publish
+      if: github.event == 'release' && matrix.os == 'ubuntu-latest' && matrix.node-version == '12'
+      env:
+        NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.github_token }}
+        TAG: ${{ github.ref }}
+      run: |
+        npm version --no-git-tag-version $TAG
+        npm run build
+        cd lib
+        echo '//registry.npmjs.org/:_authToken=${NPM_AUTH_TOKEN}' > .npmrc
+        npm publish
+        cd ..
+        git fetch origin master
+        git checkout master
+        git add package.json package-lock.json
+        git commit --message "release $TAG"
+        git remote add deploy https://${GITHUB_TOKEN}@github.com/${{ github.repository }}.git
+        git push deploy master
+
+##############################
+#    Deploy Github Pages     #
+##############################
+    - name: build github pages
+      if: github.ref == 'master' && matrix.os == 'ubuntu-latest' && matrix.node-version == '12'
+      run: |
+        cd website
+        npm ci --no-audit
+    - name: github pages
+      if: github.ref == 'master' && matrix.os == 'ubuntu-latest' && matrix.node-version == '12'
+      uses: peaceiris/actions-gh-pages@v2.1.0
+      env:
+        GITHUB_TOKEN: ${{ secrets.github_token }}
+        PUBLISH_BRANCH: gh-pages
+        PUBLISH_DIR: ./website/dist
+
+
+
+# TODO add a 'test published package script'

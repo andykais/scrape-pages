@@ -1,3 +1,5 @@
+import { existsSync } from '../../util/fs'
+import { UninitializedDatabaseError } from '../../util/errors'
 import { Database } from './database'
 import { groupUntilSeparator } from '../../util/array'
 import { selectOrderedScrapers } from './queries'
@@ -28,8 +30,13 @@ const querierFactory = (settings: Settings): QueryFn => {
     typecheckQueryArguments(queryArgs)
     const { scrapers, groupBy } = queryArgs
     if (firstCall) {
-      // this stateful stuff is necessary so we can give this to the user before creating folders
-      database = new Database(paramsInit.folder)
+      const databaseFile = Database.getFilePath(paramsInit.folder)
+      if (existsSync(databaseFile)) {
+        // this stateful stuff is necessary so we can give this to the user before creating folders
+        database = new Database(paramsInit.folder)
+      } else {
+        throw new UninitializedDatabaseError(databaseFile)
+      }
     }
     if (!scrapers.some(s => flatConfig.has(s))) return () => []
 
