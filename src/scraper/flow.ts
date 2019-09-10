@@ -6,10 +6,9 @@ import { wrapError } from '../util/rxjs/operators'
 import { FetchError, ResponseError } from '../util/errors'
 // type imports
 import { Tools } from '../tools'
-import { FMap } from '../util/map'
 import { ParsedValue } from './scrape-step'
 import { Settings } from '../settings'
-import { Config, ScrapeConfig, ScraperName } from '../settings/config/types'
+import { FlowStep, ScrapeConfig } from '../settings/config/types'
 
 type DownloadParseBoolean = (parsedValues: ParsedValue[], incrementIndex: number) => boolean
 
@@ -48,61 +47,74 @@ const chooseIgnoreError = ({ incrementUntil }: ScrapeConfig) => {
   }
 }
 
-const structureScrapers = (
-  settings: Settings,
-  scrapers: FMap<ScraperName, ScrapeStep>,
-  tools: Tools
-) => (structure: Config['run']) => {
-  const scraper = scrapers.getOrThrow(structure.scraper)
-  const each = structure.forEach.map(structureScrapers(settings, scrapers, tools))
-  const next = structure.forNext.map(structureScrapers(settings, scrapers, tools))
+type ScraperPipeline = Rx.UnaryFunction<Rx.Observable<ParsedValue>, Rx.Observable<ParsedValue>>
+const setupFlowPipeline = (settings: Settings, tools: Tools) => (
+  flow: FlowStep[]
+): ScraperPipeline => {
+  const downPipeline: ScraperPipeline[] = flow.map(flowStep => {
+    const config = flowStep.scrape
+    const options = settings.flatOptions.getOrThrow(config.name)
+    const params = settings.flatParams.getOrThrow(config.name)
 
-  const okToIncrement = chooseIncrementEvaluator(scraper.config)
-  const ignoreFetchError = chooseIgnoreError(scraper.config)
+    // TODO remove scraperName arg now that its redundant
+    const scraper = new ScrapeStep(config.name, { config, options, params }, tools)
+    const branch = flowStep.branch.map(setupFlowPipeline(settings, tools))
+    const recurse = flowStep.recurse.map(setupFlowPipeline(settings, tools))
 
-  const outsideCommands = { stop: false }
-  tools.emitter.scraper(structure.scraper).on.stop(() => (outsideCommands.stop = true))
+    const outsideCommands = { stop: false }
+    tools.emitter.scraper(config.name).on.stop(() => (outsideCommands.stop = true))
 
-  return (parentValues: ParsedValue[]): Rx.Observable<ParsedValue[]> =>
-    Rx.from(parentValues)
-      .pipe(
-        // scraper
-        ops.takeWhile(() => !outsideCommands.stop),
-        ops.flatMap(parentValue =>
-          RxCustom.whileLoop(scraper.downloadParseFunction, okToIncrement, parentValue)
-        ),
-        ops.takeWhile(() => !outsideCommands.stop),
-        ops.map((parsedValues, index): [ParsedValue[], number] => [parsedValues, index]),
-        ops.catchError(ignoreFetchError)
-      )
-      .pipe(
-        // next
-        ops.expand(([parsedValues, incrementIndex]) =>
-          Rx.merge(
-            ...next.map(nextScraper =>
-              nextScraper(parsedValues).pipe(
-                ops.flatMap(parsedValues =>
-                  parsedValues.map(parsedValueWithId =>
-                    scraper.downloadParseFunction(parsedValueWithId, incrementIndex)
-                  )
-                ),
-                ops.mergeAll(),
-                ops.filter(incrementUntilEmptyParse),
-                ops.map((parsedValues): [ParsedValue[], number] => [parsedValues, incrementIndex])
-              )
+    const okToIncrement = chooseIncrementEvaluator(scraper.config)
+    const ignoreFetchError = chooseIgnoreError(scraper.config)
+
+    // TODO encode/classify/contractify the value,index relationship?
+    return Rx.pipe(
+      ops.takeWhile(() => !outsideCommands.stop), // itd be nice to use an Rx.fromEvent, but something funky is happeneing here
+      ops.flatMap(parentValue =>
+        RxCustom.whileLoop(scraper.downloadParseFunction, okToIncrement, parentValue)
+      ),
+      ops.takeWhile(() => !outsideCommands.stop),
+      ops.map((parsedValues, index): [ParsedValue[], number] => [parsedValues, index]),
+      ops.catchError(ignoreFetchError),
+      // recursion step
+      ops.expand(([parsedValues, incrementIndex]) =>
+        Rx.merge(
+          ...recurse.map(recursePipeline =>
+            Rx.from(parsedValues).pipe(
+              recursePipeline,
+              ops.flatMap(parsedValueWithId =>
+                scraper.downloadParseFunction(parsedValueWithId, incrementIndex)
+              ),
+              ops.filter(incrementUntilEmptyParse),
+              ops.map((parsedValues): [ParsedValue[], number] => [parsedValues, incrementIndex])
             )
           )
-        ),
-        ops.map(([parsedValues]) => parsedValues)
-      )
-      .pipe(ops.catchError(wrapError(`scraper '${scraper.scraperName}'`)))
-      .pipe(
-        // each
-        each.length
-          ? ops.flatMap(scraperValues => each.map(child => child(scraperValues)))
-          : ops.map(scraperValues => [scraperValues]),
-        ops.mergeAll()
-      )
+        )
+      ),
+      // Important distinction! new data flow now. We flow right,diagonal AND NOW down.
+      // down data flows from any branches above into it
+      ops.catchError(wrapError(`scraper '${scraper.scraperName}'`)),
+      // branching step
+      ops.flatMap(([parsedValues]) => {
+        const branchesSource = branch.map(branchPipeline =>
+          Rx.from(parsedValues).pipe(branchPipeline)
+        )
+        return Rx.merge(branchesSource, Rx.of(parsedValues))
+      }),
+      ops.mergeAll()
+    )
+  })
+  return (Rx.pipe as any)(...downPipeline)
 }
 
-export { structureScrapers }
+const compileProgram = (settings: Settings, tools: Tools): Rx.Observable<ParsedValue> => {
+  const pipes = setupFlowPipeline(settings, tools)(settings.config.flow)
+
+  const source: Rx.Observable<ParsedValue> = Rx.of({ parsedValue: '' })
+
+  // we lose type info when calling apply
+  // pipe args cannot be spread in typescript https://github.com/ReactiveX/rxjs/issues/3989
+  return source.pipe(pipes)
+}
+
+export { compileProgram }

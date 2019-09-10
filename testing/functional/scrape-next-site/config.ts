@@ -1,67 +1,60 @@
 import { ConfigInit } from '../../../src/settings/config/types'
 
 export const config: ConfigInit = {
-  scrapers: {
-    'index-page': {
+  flow: [
+    {
+      name: 'index-page',
       download: 'http://scrape-next-site.com/index.html',
       parse: '#batch-id'
     },
-    gallery: {
-      download: 'http://scrape-next-site.com/batch-id-page/id-{{ value }}.html'
-    },
-    'next-batch-id': {
-      parse: '#batch-id'
-    },
-    'batch-page': {
-      parse: {
-        selector: 'li > a',
-        attribute: 'href'
-      }
-    },
-    'image-page': {
-      download: 'http://scrape-next-site.com{{ value }}'
-    },
-    tag: {
-      parse: '#tags > li'
-    },
-    'image-parse': {
-      parse: {
-        selector: 'img',
-        attribute: 'src'
-      }
-    },
-    image: {
-      download: {
-        urlTemplate: 'http://scrape-next-site.com{{ value }}',
-        read: false,
-        write: true
-      }
-    }
-  },
-  run: {
-    scraper: 'index-page',
-    forEach: {
-      scraper: 'gallery',
-      forNext: {
-        scraper: 'next-batch-id'
+    {
+      scrape: {
+        name: 'gallery',
+        download: 'http://scrape-next-site.com/batch-id-page/id-{{ value }}.html'
       },
-      forEach: {
-        scraper: 'batch-page',
-        forEach: {
-          scraper: 'image-page',
-          forEach: [
-            {
-              scraper: 'tag'
-            },
-            {
-              scraper: 'image-parse',
-              forEach: {
-                scraper: 'image'
-              }
+      recurse: [
+        [
+          {
+            name: 'next-batch-id',
+            parse: '#batch-id'
+          }
+        ]
+      ],
+      // TODO flatten this
+      branch: [
+        [
+          {
+            name: 'batch-page',
+            parse: {
+              selector: 'li > a',
+              attribute: 'href'
             }
-          ]
-        }
-      }
+          },
+          {
+            scrape: { name: 'image-page', download: 'http://scrape-next-site.com{{ value }}' },
+            branch: [
+              [{ name: 'tag', parse: '#tags > li' }],
+              [
+                {
+                  name: 'image-parse',
+                  parse: {
+                    selector: 'img',
+                    attribute: 'src'
+                  }
+                },
+                {
+                  name: 'image',
+                  download: {
+                    urlTemplate: 'http://scrape-next-site.com{{ value }}',
+                    read: false,
+                    write: true
+                  }
+                }
+              ]
+            ]
+          }
+        ]
+      ]
     }
-  }
+  ]
 }

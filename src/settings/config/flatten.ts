@@ -1,38 +1,39 @@
 import { FMap } from '../../util/map'
 // type imports
-import { Config, FlatConfig } from './types'
+import { Config, ConfigPositionInfo, FlatConfig } from './types'
 
 const flattenConfig = (config: Config): FlatConfig => {
   const recurse = (
-    structure: Config['run'],
+    flow: Config['flow'],
     parentName?: string,
     depth = 0,
     horizontalIndex = 0
-  ): FlatConfig => {
-    const { scraper } = structure
-    const eachConfigs = structure.forEach.reduce(
-      (map, child, horizontalIndex) =>
-        map.merge(recurse(child, scraper, depth + 1, horizontalIndex)),
-      new FMap()
-    )
-    // previously forNext depth & horizontalIndex were disregarded, add functional test to prove it is not problem
-    // recurse(child)
-    const nextConfigs = structure.forNext.reduce(
-      (map, child, horizontalIndex) =>
-        map.merge(recurse(child, scraper, depth + 1, horizontalIndex)),
-      new FMap()
-    )
+  ): FlatConfig =>
+    flow
+      .map((flowStep, index) => {
+        const { name } = flowStep.scrape
 
-    return new FMap()
-      .set(scraper, {
-        name: scraper,
-        parentName,
-        depth,
-        horizontalIndex
+        const branchFlatConfigs = flowStep.branch
+          .map((flow, horizontalIndex) => recurse(flow, name, depth + index + 1, horizontalIndex))
+          .reduce((mapAcc, configPositionInfo) => mapAcc.merge(configPositionInfo), new FMap())
+
+        const recurseFlatConfigs = flowStep.recurse
+          .map((flow, horizontalIndex) => recurse(flow, name, depth + index + 1, horizontalIndex))
+          .reduce((mapAcc, configPositionInfo) => mapAcc.merge(configPositionInfo), new FMap())
+
+        return new FMap<string, ConfigPositionInfo>()
+          .set(name, {
+            name,
+            parentName: index ? flow[index - 1].scrape.name : parentName,
+            depth: depth + index,
+            horizontalIndex: index ? 0 : horizontalIndex // TODO find out if horizontal indexes should be preserved
+          })
+          .merge(branchFlatConfigs)
+          .merge(recurseFlatConfigs)
       })
-      .merge(eachConfigs)
-      .merge(nextConfigs)
-  }
-  return recurse(config.run)
+      .reduce((mapAcc, configPositionInfo) => mapAcc.merge(configPositionInfo), new FMap())
+
+  return recurse(config.flow)
 }
+
 export { flattenConfig }

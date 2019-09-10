@@ -1,6 +1,7 @@
 import * as path from 'path'
 import { rmrf } from '../../../src/util/fs'
 import { UninitializedDatabaseError } from '../../../src/util/errors'
+import { ScraperInit } from '../../../src/settings/config/types'
 
 import { expect } from 'chai'
 
@@ -67,13 +68,15 @@ describe(__filename, () => {
     })
     const configWithLimit = {
       ...config,
-      scrapers: {
-        ...config.scrapers,
-        gallery: {
-          ...config.scrapers.gallery,
-          parse: { ...(config.scrapers.gallery.parse as { selector: string }), limit: 1 }
+      flow: config.flow.map(flowStep => {
+        if ((flowStep as ScraperInit).name === 'gallery') {
+          return {
+            ...flowStep,
+            parse: { ...((flowStep as ScraperInit).parse as { selector: string }), limit: 1 }
+          }
         }
-      }
+        return flowStep
+      })
     }
     step('second pass should find only the images on the first gallery page', async () => {
       const { start, query } = scrape(configWithLimit, options, params)
@@ -84,5 +87,12 @@ describe(__filename, () => {
       expect(result).to.have.length(2)
       expect(stripResult(result)).to.matchSnapshot()
     })
+  })
+
+  describe('with merging flow', () => {
+    // TODO add test where we use data from a branch in a DOWN-LEFT direction. E.g.
+    // scrape
+    // branch - scrape, scrape
+    // scrape
   })
 })

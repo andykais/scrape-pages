@@ -15,6 +15,7 @@ const params = {
   folder: path.resolve(RUN_OUTPUT_FOLDER, `${path.basename(__dirname)}`),
   cleanFolder: true
 }
+// TODO add snapshot for flatconfig for each functional.test.ts
 describe(__filename, () => {
   describe('with instant scraper', () => {
     const { start, query } = scrape(config, options, params)
