@@ -1,11 +1,10 @@
 import * as path from 'path'
 import { initTools } from '../tools'
-import { ScrapeStep } from './scrape-step'
 import { mkdirp, rmrf, exists, read, writeFile } from '../util/fs'
-import { getSettings, getScrapeStepSettings } from '../settings'
+import { getSettings } from '../settings'
 import { Logger } from '../tools/logger'
 import { Store } from '../tools/store'
-import { structureScrapers } from './flow'
+import { compileProgram } from './flow'
 // import { version } from '../../package.json'
 // TODO declare `version` in webpack.config.js
 const version = 1
@@ -56,18 +55,14 @@ const startScraping = async (settings: Settings) => {
   logger.info({ inspected: settings.flatOptions }, 'flatOptions')
   logger.info({ inspected: settings.flatParams }, 'flatParams')
 
-  const scrapers = getScrapeStepSettings(settings).map(
-    (scrapeSettings, name) => new ScrapeStep(name, scrapeSettings, tools)
-  )
-
   // create the observable
-  const scrapingScheme = structureScrapers(settings, scrapers, tools)(settings.config.run)
-  const scrapingObservable = scrapingScheme([{ parsedValue: '' }])
+  const program = compileProgram(settings, tools)
+
   // start running the observable
-  // initting subscription is necessary so that any listeners setup after function is called are setup before downloads begin
-  let subscription: ReturnType<typeof scrapingObservable.subscribe>
+  // initting subscription is necessary so that any listeners setup after start() is called are setup before downloads begin
+  let subscription: ReturnType<typeof program.subscribe>
   setTimeout(() => {
-    subscription = scrapingObservable.subscribe({
+    subscription = program.subscribe({
       error: (error: Error) => {
         emitter.emit.error(error)
         subscription.unsubscribe()

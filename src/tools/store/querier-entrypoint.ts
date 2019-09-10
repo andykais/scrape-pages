@@ -28,6 +28,7 @@ const querierFactory = (settings: Settings): QueryFn => {
 
   const prepare: QueryFn['prepare'] = queryArgs => {
     typecheckQueryArguments(queryArgs)
+    // TODO throw error when scrapers do not exist? This might make it more tedious to reuse some functions in other libs
     const { scrapers, groupBy } = queryArgs
     if (firstCall) {
       const databaseFile = Database.getFilePath(paramsInit.folder)

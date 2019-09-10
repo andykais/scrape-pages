@@ -116,14 +116,67 @@ export interface Structure extends StructureInit {
   forEach: Structure[]
   forNext: Structure[]
 }
-export interface ConfigInit {
-  input?: Input | Input[]
-  scrapers: { [scraperName: string]: ScrapeConfigInit }
-  run: StructureInit
+// export interface ConfigInit {
+//   input?: Input | Input[]
+//   scrapers: { [scraperName: string]: ScrapeConfigInit }
+//   run: StructureInit
+// }
+// // returned by ./normalize.ts
+// export interface Config extends ConfigInit {
+//   input: Input[]
+//   scrapers: { [scraperName: string]: ScrapeConfig }
+//   run: Structure
+// }
+
+interface ScraperInit {
+  name: string
+  download?: DownloadConfigInit
+  parse?: ParseConfigInit
+  incrementUntil?: Incrementers
 }
-// returned by ./normalize.ts
-export interface Config extends ConfigInit {
-  input: Input[]
-  scrapers: { [scraperName: string]: ScrapeConfig }
-  run: Structure
+interface Scraper {
+  name: string
+  download?: DownloadConfig
+  parse?: ParseConfig
+  incrementUntil: Incrementers
 }
+
+interface FlowInitStep {
+  scrape: ScraperInit
+  recurse?: FlowInitStepOrScraper[][]
+  branch?: FlowInitStepOrScraper[][]
+}
+type FlowInitStepOrScraper = FlowInitStep | ScraperInit
+
+interface ConfigInit {
+  input?: string[]
+  flow: FlowInitStepOrScraper[]
+}
+
+// the ScrapeInit gets put into branch
+interface FlowStep {
+  scrape: Scraper
+  branch: FlowStep[][]
+  recurse: FlowStep[][]
+}
+interface Config {
+  input: string[]
+  flow: FlowStep[]
+}
+
+export { ScraperInit, Scraper, FlowInitStep, FlowInitStepOrScraper, FlowStep, ConfigInit, Config }
+
+/**
+ * WHY are we looking to io-ts?
+ *
+ * no transformers needed
+ * wrap normalize & validate into one module
+ */
+
+/**
+ * WHY change the config structure?
+ *
+ * scraper defintions dont need to be decoupled, use in-code variables for that
+ *  * maybe once reusable modules are a thing this will be revisted, but until then it dont matter
+ * we flatten the structure, its nice and more clear, like brads language idea (-_- )
+ */

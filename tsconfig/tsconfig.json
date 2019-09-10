@@ -2,6 +2,7 @@
   "compilerOptions": {
     "outDir": "../lib/",
     "incremental": true,
+    "lib": ["ES7"],
     "tsBuildInfoFile": "../node_modules/.cache/tsconfig.buildinfo",
     "sourceMap": true,
     "noImplicitAny": true,

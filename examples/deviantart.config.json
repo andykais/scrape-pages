@@ -1,7 +1,8 @@
 {
-  "input": "artist",
-  "scrapers": {
-    "gallery": {
+  "input": ["artist"],
+  "flow": [
+    {
+      "name": "gallery",
       "download": {
         "urlTemplate": "https://{{ artist }}.deviantart.com/gallery/?catpath=/&offset={{'*' index 24}}"
       },
@@ -11,24 +12,17 @@
       },
       "incrementUntil": "failed-download"
     },
-    "post": {
+    {
+      "name": "post",
       "download": "{value}",
       "parse": {
         "selector": ".dev-view-deviation",
         "attribute": "src"
       }
     },
-    "media": {
+    {
+      "name": "media",
       "download": "{value}"
     }
-  },
-  "run": {
-    "scraper": "gallery",
-    "scrapeEach": {
-      "scraper": "post",
-      "scrapeEach": {
-        "scraper": "media"
-      }
-    }
-  }
+  ]
 }

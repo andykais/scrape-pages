@@ -9,10 +9,11 @@ jobs:
     strategy:
       matrix:
         node-version: [8, 10, 12]
+        # nock scope has an error w/ windows
         os:
         - ubuntu-latest
         - macOS-latest
-        # - windows-latest # nock scope has an error w/ windows
+        - windows-latest
       fail-fast: false
     steps:
 
@@ -65,18 +66,19 @@ jobs:
 ##############################
 #    Deploy Github Pages     #
 ##############################
-    - name: build github pages
-      if: github.ref == 'refs/heads/master' && matrix.os == 'ubuntu-latest' && matrix.node-version == '12'
-      run: |
-        cd website
-        npm ci --no-audit
-    - name: github pages
-      if: github.ref == 'refs/heads/master' && matrix.os == 'ubuntu-latest' && matrix.node-version == '12'
-      uses: peaceiris/actions-gh-pages@v2.1.0
-      env:
-        GITHUB_TOKEN: ${{ secrets.github_token }}
-        PUBLISH_BRANCH: gh-pages
-        PUBLISH_DIR: ./website/dist
+# TODO enable after next iteration of structure
+    # - name: build github pages
+    #   if: github.ref == 'refs/heads/master' && matrix.os == 'ubuntu-latest' && matrix.node-version == '12'
+    #   run: |
+    #     cd website
+    #     npm ci --no-audit
+    # - name: github pages
+    #   if: github.ref == 'refs/heads/master' && matrix.os == 'ubuntu-latest' && matrix.node-version == '12'
+    #   uses: peaceiris/actions-gh-pages@v2.1.0
+    #   env:
+    #     GITHUB_TOKEN: ${{ secrets.github_token }}
+    #     PUBLISH_BRANCH: gh-pages
+    #     PUBLISH_DIR: ./website/dist
 
 
 

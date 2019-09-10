@@ -1,12 +1,11 @@
 import { validateSlug } from '../../util/slug'
 import { VError } from 'verror'
+import * as t from './types'
 import {
   DownloadConfigInit,
   DownloadConfig,
   ParseConfigInit,
   ParseConfig,
-  // replacement
-  ScrapeConfigInit,
   ScrapeConfig,
   ConfigInit,
   RegexCleanupInit,
@@ -109,48 +108,53 @@ const normalizeParse = (parse: ParseConfigInit): ParseConfig | undefined =>
         format: 'html'
       }
 
-const normalizeDefinition = (scrapeConfig: ScrapeConfigInit): ScrapeConfig => ({
-  ...defaults.definition,
-  ...scrapeConfig,
-  download: normalizeDownload(scrapeConfig.download),
-  parse: normalizeParse(scrapeConfig.parse)
-})
-
-const normalizeScraperDefs = (scraperDefs: ConfigInit['scrapers']) => {
-  return Object.keys(scraperDefs).reduce((acc: Config['scrapers'], scraperName) => {
-    try {
-      validateSlug(scraperName)
-      acc[scraperName] = normalizeDefinition(scraperDefs[scraperName])
-      return acc
-    } catch (e) {
-      throw new VError({ name: e.name, cause: e }, 'For a scraper name')
-    }
-  }, {})
-}
-
 const normalizeUndefinedSingleArray = <T>(val: undefined | T | T[]): T[] =>
   val === undefined ? [] : Array.isArray(val) ? val : [val]
 
-const normalizeStructure = (scrapers: ConfigInit['scrapers']) => ({
-  scraper,
-  forNext,
-  forEach
-}: ConfigInit['run']): Config['run'] => {
-  if (!scrapers[scraper]) throw new Error(`config.scrapers is missing scraper "${scraper}"`)
+const normalizeScraper = (scraperInit: t.ScraperInit): t.Scraper => {
+  try {
+    validateSlug(scraperInit.name)
+  } catch (e) {
+    // console.log(e)
+    throw new VError({ name: e.name, cause: e }, 'For a scraper name')
+  }
+
   return {
-    scraper,
-    forNext: normalizeUndefinedSingleArray(forNext).map(normalizeStructure(scrapers)),
-    forEach: normalizeUndefinedSingleArray(forEach).map(normalizeStructure(scrapers))
+    ...defaults.definition,
+    ...scraperInit,
+    download: normalizeDownload(scraperInit.download),
+    parse: normalizeParse(scraperInit.parse)
   }
 }
 
-const normalizeConfig = (configInit: ConfigInit): Config => {
-  typecheckConfig(configInit)
+const isScraperInit = (flowStepInit: t.FlowInitStepOrScraper): flowStepInit is t.ScraperInit =>
+  'name' in flowStepInit
 
+const normalizeFlow = (flowInit: t.ConfigInit['flow']): t.Config['flow'] =>
+  flowInit.map(flowInitStep => {
+    if (isScraperInit(flowInitStep)) {
+      return {
+        scrape: normalizeScraper(flowInitStep),
+        branch: [],
+        recurse: []
+      }
+    } else {
+      // man the pipeline proposal would be useful here https://github.com/tc39/proposal-pipeline-operator
+      return {
+        scrape: normalizeScraper(flowInitStep.scrape),
+        branch: normalizeUndefinedSingleArray(flowInitStep.branch).map(flow => normalizeFlow(flow)),
+        recurse: normalizeUndefinedSingleArray(flowInitStep.recurse).map(flow =>
+          normalizeFlow(flow)
+        )
+      }
+    }
+  })
+
+const normalizeConfig = (configInit: t.ConfigInit): t.Config => {
+  typecheckConfig(configInit)
   return {
     input: normalizeInputs(configInit.input),
-    scrapers: normalizeScraperDefs(configInit.scrapers),
-    run: normalizeStructure(configInit.scrapers)(configInit.run)
+    flow: normalizeFlow(configInit.flow)
   }
 }
 

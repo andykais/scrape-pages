@@ -5,7 +5,6 @@ import { normalizeParams } from './params/'
 import { ConfigInit, Config, FlatConfig, ScrapeConfig } from './config/types'
 import { OptionsInit, FlatOptions, ScrapeOptions } from './options/types'
 import { ParamsInit, FlatParams, ScrapeParams } from './params/types'
-import { FMap } from '../util/map'
 
 export type Settings = {
   configInit: ConfigInit
@@ -47,10 +46,3 @@ export const getSettings = (
     flatParams
   }
 }
-
-export const getScrapeStepSettings = (settings: Settings): FMap<string, ScrapeSettings> =>
-  settings.flatConfig.map((_, name) => ({
-    config: settings.config.scrapers[name],
-    options: settings.flatOptions.getOrThrow(name),
-    params: settings.flatParams.getOrThrow(name)
-  }))

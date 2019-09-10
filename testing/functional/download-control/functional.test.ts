@@ -8,7 +8,7 @@ import {
   stripResult,
   useRequestStatsRecorder
 } from '../../setup'
-import { config } from './config'
+import { config, configBranching } from './config'
 import { scrape } from '../../../src'
 
 const resourceFolder = `${__dirname}/fixtures`
@@ -96,18 +96,22 @@ describe(__filename, () => {
     })
     describe(`emit('stop:<scraper>')`, () => {
       it('should only stop the postTitle scraper', async () => {
-        const { start, query } = scrape(config, options, params)
+        const { start, query } = scrape(configBranching, options, params)
         const { on, emit } = await start()
-        const { counts } = useRequestStatsRecorder(config, on)
+        const { counts } = useRequestStatsRecorder(configBranching, on)
         on('index:queued', () => emit('stop:postTitle'))
         await new Promise(resolve => on('done', resolve))
 
         expect(counts.index.queued).to.equal(1)
         expect(counts.postTitle.queued).to.equal(0)
+        expect(counts.postTitle_dup.queued).to.equal(5)
+
         const indexResult = query({ scrapers: ['index'], groupBy: 'index' })
         expect(indexResult.length).to.equal(5)
         const result = query({ scrapers: ['postTitle'], groupBy: 'postTitle' })
         expect(result.length).to.equal(0)
+        const branchResult = query({ scrapers: ['postTitle_dup'], groupBy: 'postTitle_dup' })
+        expect(branchResult.length).to.equal(5)
       })
     })
   })
@@ -115,8 +119,7 @@ describe(__filename, () => {
   describe('failing requests', () => {
     it('should report the failure and stop the scraper', async () => {
       const config = {
-        scrapers: { 'will-fail': { download: 'https://non-existent.com/a/b/c' } },
-        run: { scraper: 'will-fail' }
+        flow: [{ name: 'will-fail', download: 'https://non-existent.com/a/b/c' }]
       }
       nock('https://non-existent.com')
         .get('/a/b/c')
@@ -144,8 +147,7 @@ describe(__filename, () => {
   describe('in progress requests', () => {
     it('it should show complete = 0 in result', async () => {
       const config = {
-        scrapers: { slow: { download: 'https://slow-url.com/a' } },
-        run: { scraper: 'slow' }
+        flow: [{ name: 'slow', download: 'https://slow-url.com/a' }]
       }
       nock('https://slow-url.com')
         .get('/a')
