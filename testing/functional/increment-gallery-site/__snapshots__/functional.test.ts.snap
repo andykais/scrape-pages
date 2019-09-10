@@ -850,3 +850,79 @@ Array [
   ],
 ]
 `;
+
+exports[`testing/functional/increment-gallery-site/functional.test.ts with value limit step 1 does not use the value limit 1`] = `
+Array [
+  Array [
+    Object {
+      "byteLength": "17.0",
+      "complete": 1,
+      "downloadData": "[\\"http://increment-gallery-site.com/image/the.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
+      "filename": true,
+      "id": true,
+      "parsedValue": "",
+      "scraper": "image",
+    },
+  ],
+  Array [
+    Object {
+      "byteLength": "17.0",
+      "complete": 1,
+      "downloadData": "[\\"http://increment-gallery-site.com/image/quick.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
+      "filename": true,
+      "id": true,
+      "parsedValue": "",
+      "scraper": "image",
+    },
+  ],
+  Array [
+    Object {
+      "byteLength": "17.0",
+      "complete": 1,
+      "downloadData": "[\\"http://increment-gallery-site.com/image/brown.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
+      "filename": true,
+      "id": true,
+      "parsedValue": "",
+      "scraper": "image",
+    },
+  ],
+  Array [
+    Object {
+      "byteLength": "17.0",
+      "complete": 1,
+      "downloadData": "[\\"http://increment-gallery-site.com/image/fox.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
+      "filename": true,
+      "id": true,
+      "parsedValue": "",
+      "scraper": "image",
+    },
+  ],
+]
+`;
+
+exports[`testing/functional/increment-gallery-site/functional.test.ts with value limit step 2 should overwrite image values and only find images from the first gallery page 1`] = `
+Array [
+  Array [
+    Object {
+      "byteLength": "17.0",
+      "complete": 1,
+      "downloadData": "[\\"http://increment-gallery-site.com/image/the.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
+      "filename": true,
+      "id": true,
+      "parsedValue": "",
+      "scraper": "image",
+    },
+  ],
+  Array [
+    Object {
+      "byteLength": "17.0",
+      "complete": 1,
+      "downloadData": "[\\"http://increment-gallery-site.com/image/brown.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
+      "filename": true,
+      "id": true,
+      "parsedValue": "",
+      "scraper": "image",
+    },
+  ],
+]
+`;

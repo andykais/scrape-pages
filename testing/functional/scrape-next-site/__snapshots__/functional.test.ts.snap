@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`testing/functional/scrape-next-site/functional.test.ts with instant scraper should group each image into a separate slot, in order 1`] = `
+exports[`should group each image into a separate slot, in order 1`] = `
 Array [
   Array [
     Object {
@@ -49,7 +49,105 @@ Array [
 ]
 `;
 
-exports[`testing/functional/scrape-next-site/functional.test.ts with instant scraper should group tags and images together that were found on the same page 1`] = `
+exports[`should group each image into a separate slot, in order 2`] = `
+Array [
+  Array [
+    Object {
+      "byteLength": "17.0",
+      "complete": 1,
+      "downloadData": "[\\"http://scrape-next-site.com/image/the.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
+      "filename": true,
+      "id": true,
+      "parsedValue": "",
+      "scraper": "image",
+    },
+  ],
+  Array [
+    Object {
+      "byteLength": "17.0",
+      "complete": 1,
+      "downloadData": "[\\"http://scrape-next-site.com/image/quick.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
+      "filename": true,
+      "id": true,
+      "parsedValue": "",
+      "scraper": "image",
+    },
+  ],
+  Array [
+    Object {
+      "byteLength": "17.0",
+      "complete": 1,
+      "downloadData": "[\\"http://scrape-next-site.com/image/brown.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
+      "filename": true,
+      "id": true,
+      "parsedValue": "",
+      "scraper": "image",
+    },
+  ],
+  Array [
+    Object {
+      "byteLength": "17.0",
+      "complete": 1,
+      "downloadData": "[\\"http://scrape-next-site.com/image/fox.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
+      "filename": true,
+      "id": true,
+      "parsedValue": "",
+      "scraper": "image",
+    },
+  ],
+]
+`;
+
+exports[`should group each image into a separate slot, in order 3`] = `
+Array [
+  Array [
+    Object {
+      "byteLength": "17.0",
+      "complete": 1,
+      "downloadData": "[\\"http://scrape-next-site.com/image/the.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
+      "filename": true,
+      "id": true,
+      "parsedValue": "",
+      "scraper": "image",
+    },
+  ],
+  Array [
+    Object {
+      "byteLength": "17.0",
+      "complete": 1,
+      "downloadData": "[\\"http://scrape-next-site.com/image/quick.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
+      "filename": true,
+      "id": true,
+      "parsedValue": "",
+      "scraper": "image",
+    },
+  ],
+  Array [
+    Object {
+      "byteLength": "17.0",
+      "complete": 1,
+      "downloadData": "[\\"http://scrape-next-site.com/image/brown.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
+      "filename": true,
+      "id": true,
+      "parsedValue": "",
+      "scraper": "image",
+    },
+  ],
+  Array [
+    Object {
+      "byteLength": "17.0",
+      "complete": 1,
+      "downloadData": "[\\"http://scrape-next-site.com/image/fox.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
+      "filename": true,
+      "id": true,
+      "parsedValue": "",
+      "scraper": "image",
+    },
+  ],
+]
+`;
+
+exports[`should group tags and images together that were found on the same page 1`] = `
 Array [
   Array [
     Object {
@@ -179,7 +277,674 @@ Array [
 ]
 `;
 
-exports[`testing/functional/scrape-next-site/functional.test.ts with psuedo-random delayed scraper should keep images and tags together, in order 1`] = `
+exports[`should group tags and images together that were found on the same page 2`] = `
+Array [
+  Array [
+    Object {
+      "byteLength": null,
+      "complete": 1,
+      "downloadData": null,
+      "filename": false,
+      "id": true,
+      "parsedValue": "one",
+      "scraper": "tag",
+    },
+    Object {
+      "byteLength": null,
+      "complete": 1,
+      "downloadData": null,
+      "filename": false,
+      "id": true,
+      "parsedValue": "two",
+      "scraper": "tag",
+    },
+    Object {
+      "byteLength": "17.0",
+      "complete": 1,
+      "downloadData": "[\\"http://scrape-next-site.com/image/the.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
+      "filename": true,
+      "id": true,
+      "parsedValue": "",
+      "scraper": "image",
+    },
+  ],
+  Array [
+    Object {
+      "byteLength": null,
+      "complete": 1,
+      "downloadData": null,
+      "filename": false,
+      "id": true,
+      "parsedValue": "one",
+      "scraper": "tag",
+    },
+    Object {
+      "byteLength": null,
+      "complete": 1,
+      "downloadData": null,
+      "filename": false,
+      "id": true,
+      "parsedValue": "two",
+      "scraper": "tag",
+    },
+    Object {
+      "byteLength": "17.0",
+      "complete": 1,
+      "downloadData": "[\\"http://scrape-next-site.com/image/quick.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
+      "filename": true,
+      "id": true,
+      "parsedValue": "",
+      "scraper": "image",
+    },
+  ],
+  Array [
+    Object {
+      "byteLength": null,
+      "complete": 1,
+      "downloadData": null,
+      "filename": false,
+      "id": true,
+      "parsedValue": "four",
+      "scraper": "tag",
+    },
+    Object {
+      "byteLength": null,
+      "complete": 1,
+      "downloadData": null,
+      "filename": false,
+      "id": true,
+      "parsedValue": "five",
+      "scraper": "tag",
+    },
+    Object {
+      "byteLength": "17.0",
+      "complete": 1,
+      "downloadData": "[\\"http://scrape-next-site.com/image/brown.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
+      "filename": true,
+      "id": true,
+      "parsedValue": "",
+      "scraper": "image",
+    },
+  ],
+  Array [
+    Object {
+      "byteLength": null,
+      "complete": 1,
+      "downloadData": null,
+      "filename": false,
+      "id": true,
+      "parsedValue": "three",
+      "scraper": "tag",
+    },
+    Object {
+      "byteLength": null,
+      "complete": 1,
+      "downloadData": null,
+      "filename": false,
+      "id": true,
+      "parsedValue": "four",
+      "scraper": "tag",
+    },
+    Object {
+      "byteLength": null,
+      "complete": 1,
+      "downloadData": null,
+      "filename": false,
+      "id": true,
+      "parsedValue": "five",
+      "scraper": "tag",
+    },
+    Object {
+      "byteLength": "17.0",
+      "complete": 1,
+      "downloadData": "[\\"http://scrape-next-site.com/image/fox.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
+      "filename": true,
+      "id": true,
+      "parsedValue": "",
+      "scraper": "image",
+    },
+  ],
+]
+`;
+
+exports[`should group tags and images together that were found on the same page 3`] = `
+Array [
+  Array [
+    Object {
+      "byteLength": null,
+      "complete": 1,
+      "downloadData": null,
+      "filename": false,
+      "id": true,
+      "parsedValue": "one",
+      "scraper": "tag",
+    },
+    Object {
+      "byteLength": null,
+      "complete": 1,
+      "downloadData": null,
+      "filename": false,
+      "id": true,
+      "parsedValue": "two",
+      "scraper": "tag",
+    },
+    Object {
+      "byteLength": "17.0",
+      "complete": 1,
+      "downloadData": "[\\"http://scrape-next-site.com/image/the.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
+      "filename": true,
+      "id": true,
+      "parsedValue": "",
+      "scraper": "image",
+    },
+  ],
+  Array [
+    Object {
+      "byteLength": null,
+      "complete": 1,
+      "downloadData": null,
+      "filename": false,
+      "id": true,
+      "parsedValue": "one",
+      "scraper": "tag",
+    },
+    Object {
+      "byteLength": null,
+      "complete": 1,
+      "downloadData": null,
+      "filename": false,
+      "id": true,
+      "parsedValue": "two",
+      "scraper": "tag",
+    },
+    Object {
+      "byteLength": "17.0",
+      "complete": 1,
+      "downloadData": "[\\"http://scrape-next-site.com/image/quick.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
+      "filename": true,
+      "id": true,
+      "parsedValue": "",
+      "scraper": "image",
+    },
+  ],
+  Array [
+    Object {
+      "byteLength": null,
+      "complete": 1,
+      "downloadData": null,
+      "filename": false,
+      "id": true,
+      "parsedValue": "four",
+      "scraper": "tag",
+    },
+    Object {
+      "byteLength": null,
+      "complete": 1,
+      "downloadData": null,
+      "filename": false,
+      "id": true,
+      "parsedValue": "five",
+      "scraper": "tag",
+    },
+    Object {
+      "byteLength": "17.0",
+      "complete": 1,
+      "downloadData": "[\\"http://scrape-next-site.com/image/brown.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
+      "filename": true,
+      "id": true,
+      "parsedValue": "",
+      "scraper": "image",
+    },
+  ],
+  Array [
+    Object {
+      "byteLength": null,
+      "complete": 1,
+      "downloadData": null,
+      "filename": false,
+      "id": true,
+      "parsedValue": "three",
+      "scraper": "tag",
+    },
+    Object {
+      "byteLength": null,
+      "complete": 1,
+      "downloadData": null,
+      "filename": false,
+      "id": true,
+      "parsedValue": "four",
+      "scraper": "tag",
+    },
+    Object {
+      "byteLength": null,
+      "complete": 1,
+      "downloadData": null,
+      "filename": false,
+      "id": true,
+      "parsedValue": "five",
+      "scraper": "tag",
+    },
+    Object {
+      "byteLength": "17.0",
+      "complete": 1,
+      "downloadData": "[\\"http://scrape-next-site.com/image/fox.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
+      "filename": true,
+      "id": true,
+      "parsedValue": "",
+      "scraper": "image",
+    },
+  ],
+]
+`;
+
+exports[`testing/functional/scrape-next-site/functional.test.ts with flattened config scraper should group each image into a separate slot, in order 1`] = `
+Array [
+  Array [
+    Object {
+      "byteLength": "17.0",
+      "complete": 1,
+      "downloadData": "[\\"http://scrape-next-site.com/image/the.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
+      "filename": true,
+      "id": true,
+      "parsedValue": "",
+      "scraper": "image",
+    },
+  ],
+  Array [
+    Object {
+      "byteLength": "17.0",
+      "complete": 1,
+      "downloadData": "[\\"http://scrape-next-site.com/image/quick.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
+      "filename": true,
+      "id": true,
+      "parsedValue": "",
+      "scraper": "image",
+    },
+  ],
+  Array [
+    Object {
+      "byteLength": "17.0",
+      "complete": 1,
+      "downloadData": "[\\"http://scrape-next-site.com/image/brown.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
+      "filename": true,
+      "id": true,
+      "parsedValue": "",
+      "scraper": "image",
+    },
+  ],
+  Array [
+    Object {
+      "byteLength": "17.0",
+      "complete": 1,
+      "downloadData": "[\\"http://scrape-next-site.com/image/fox.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
+      "filename": true,
+      "id": true,
+      "parsedValue": "",
+      "scraper": "image",
+    },
+  ],
+]
+`;
+
+exports[`testing/functional/scrape-next-site/functional.test.ts with flattened config scraper should group tags and images together that were found on the same page 1`] = `
+Array [
+  Array [
+    Object {
+      "byteLength": null,
+      "complete": 1,
+      "downloadData": null,
+      "filename": false,
+      "id": true,
+      "parsedValue": "one",
+      "scraper": "tag",
+    },
+    Object {
+      "byteLength": null,
+      "complete": 1,
+      "downloadData": null,
+      "filename": false,
+      "id": true,
+      "parsedValue": "two",
+      "scraper": "tag",
+    },
+    Object {
+      "byteLength": "17.0",
+      "complete": 1,
+      "downloadData": "[\\"http://scrape-next-site.com/image/the.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
+      "filename": true,
+      "id": true,
+      "parsedValue": "",
+      "scraper": "image",
+    },
+  ],
+  Array [
+    Object {
+      "byteLength": null,
+      "complete": 1,
+      "downloadData": null,
+      "filename": false,
+      "id": true,
+      "parsedValue": "one",
+      "scraper": "tag",
+    },
+    Object {
+      "byteLength": null,
+      "complete": 1,
+      "downloadData": null,
+      "filename": false,
+      "id": true,
+      "parsedValue": "two",
+      "scraper": "tag",
+    },
+    Object {
+      "byteLength": "17.0",
+      "complete": 1,
+      "downloadData": "[\\"http://scrape-next-site.com/image/quick.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
+      "filename": true,
+      "id": true,
+      "parsedValue": "",
+      "scraper": "image",
+    },
+  ],
+  Array [
+    Object {
+      "byteLength": null,
+      "complete": 1,
+      "downloadData": null,
+      "filename": false,
+      "id": true,
+      "parsedValue": "four",
+      "scraper": "tag",
+    },
+    Object {
+      "byteLength": null,
+      "complete": 1,
+      "downloadData": null,
+      "filename": false,
+      "id": true,
+      "parsedValue": "five",
+      "scraper": "tag",
+    },
+    Object {
+      "byteLength": "17.0",
+      "complete": 1,
+      "downloadData": "[\\"http://scrape-next-site.com/image/brown.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
+      "filename": true,
+      "id": true,
+      "parsedValue": "",
+      "scraper": "image",
+    },
+  ],
+  Array [
+    Object {
+      "byteLength": null,
+      "complete": 1,
+      "downloadData": null,
+      "filename": false,
+      "id": true,
+      "parsedValue": "three",
+      "scraper": "tag",
+    },
+    Object {
+      "byteLength": null,
+      "complete": 1,
+      "downloadData": null,
+      "filename": false,
+      "id": true,
+      "parsedValue": "four",
+      "scraper": "tag",
+    },
+    Object {
+      "byteLength": null,
+      "complete": 1,
+      "downloadData": null,
+      "filename": false,
+      "id": true,
+      "parsedValue": "five",
+      "scraper": "tag",
+    },
+    Object {
+      "byteLength": "17.0",
+      "complete": 1,
+      "downloadData": "[\\"http://scrape-next-site.com/image/fox.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
+      "filename": true,
+      "id": true,
+      "parsedValue": "",
+      "scraper": "image",
+    },
+  ],
+]
+`;
+
+exports[`testing/functional/scrape-next-site/functional.test.ts with normal scraper should group each image into a separate slot, in order 1`] = `
+Array [
+  Array [
+    Object {
+      "byteLength": "17.0",
+      "complete": 1,
+      "downloadData": "[\\"http://scrape-next-site.com/image/the.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
+      "filename": true,
+      "id": true,
+      "parsedValue": "",
+      "scraper": "image",
+    },
+  ],
+  Array [
+    Object {
+      "byteLength": "17.0",
+      "complete": 1,
+      "downloadData": "[\\"http://scrape-next-site.com/image/quick.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
+      "filename": true,
+      "id": true,
+      "parsedValue": "",
+      "scraper": "image",
+    },
+  ],
+  Array [
+    Object {
+      "byteLength": "17.0",
+      "complete": 1,
+      "downloadData": "[\\"http://scrape-next-site.com/image/brown.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
+      "filename": true,
+      "id": true,
+      "parsedValue": "",
+      "scraper": "image",
+    },
+  ],
+  Array [
+    Object {
+      "byteLength": "17.0",
+      "complete": 1,
+      "downloadData": "[\\"http://scrape-next-site.com/image/fox.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
+      "filename": true,
+      "id": true,
+      "parsedValue": "",
+      "scraper": "image",
+    },
+  ],
+]
+`;
+
+exports[`testing/functional/scrape-next-site/functional.test.ts with normal scraper should group tags and images together that were found on the same page 1`] = `
+Array [
+  Array [
+    Object {
+      "byteLength": null,
+      "complete": 1,
+      "downloadData": null,
+      "filename": false,
+      "id": true,
+      "parsedValue": "one",
+      "scraper": "tag",
+    },
+    Object {
+      "byteLength": null,
+      "complete": 1,
+      "downloadData": null,
+      "filename": false,
+      "id": true,
+      "parsedValue": "two",
+      "scraper": "tag",
+    },
+    Object {
+      "byteLength": "17.0",
+      "complete": 1,
+      "downloadData": "[\\"http://scrape-next-site.com/image/the.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
+      "filename": true,
+      "id": true,
+      "parsedValue": "",
+      "scraper": "image",
+    },
+  ],
+  Array [
+    Object {
+      "byteLength": null,
+      "complete": 1,
+      "downloadData": null,
+      "filename": false,
+      "id": true,
+      "parsedValue": "one",
+      "scraper": "tag",
+    },
+    Object {
+      "byteLength": null,
+      "complete": 1,
+      "downloadData": null,
+      "filename": false,
+      "id": true,
+      "parsedValue": "two",
+      "scraper": "tag",
+    },
+    Object {
+      "byteLength": "17.0",
+      "complete": 1,
+      "downloadData": "[\\"http://scrape-next-site.com/image/quick.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
+      "filename": true,
+      "id": true,
+      "parsedValue": "",
+      "scraper": "image",
+    },
+  ],
+  Array [
+    Object {
+      "byteLength": null,
+      "complete": 1,
+      "downloadData": null,
+      "filename": false,
+      "id": true,
+      "parsedValue": "four",
+      "scraper": "tag",
+    },
+    Object {
+      "byteLength": null,
+      "complete": 1,
+      "downloadData": null,
+      "filename": false,
+      "id": true,
+      "parsedValue": "five",
+      "scraper": "tag",
+    },
+    Object {
+      "byteLength": "17.0",
+      "complete": 1,
+      "downloadData": "[\\"http://scrape-next-site.com/image/brown.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
+      "filename": true,
+      "id": true,
+      "parsedValue": "",
+      "scraper": "image",
+    },
+  ],
+  Array [
+    Object {
+      "byteLength": null,
+      "complete": 1,
+      "downloadData": null,
+      "filename": false,
+      "id": true,
+      "parsedValue": "three",
+      "scraper": "tag",
+    },
+    Object {
+      "byteLength": null,
+      "complete": 1,
+      "downloadData": null,
+      "filename": false,
+      "id": true,
+      "parsedValue": "four",
+      "scraper": "tag",
+    },
+    Object {
+      "byteLength": null,
+      "complete": 1,
+      "downloadData": null,
+      "filename": false,
+      "id": true,
+      "parsedValue": "five",
+      "scraper": "tag",
+    },
+    Object {
+      "byteLength": "17.0",
+      "complete": 1,
+      "downloadData": "[\\"http://scrape-next-site.com/image/fox.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
+      "filename": true,
+      "id": true,
+      "parsedValue": "",
+      "scraper": "image",
+    },
+  ],
+]
+`;
+
+exports[`testing/functional/scrape-next-site/functional.test.ts with psuedo delayed scraper should group each image into a separate slot, in order 1`] = `
+Array [
+  Array [
+    Object {
+      "byteLength": "17.0",
+      "complete": 1,
+      "downloadData": "[\\"http://scrape-next-site.com/image/the.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
+      "filename": true,
+      "id": true,
+      "parsedValue": "",
+      "scraper": "image",
+    },
+  ],
+  Array [
+    Object {
+      "byteLength": "17.0",
+      "complete": 1,
+      "downloadData": "[\\"http://scrape-next-site.com/image/quick.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
+      "filename": true,
+      "id": true,
+      "parsedValue": "",
+      "scraper": "image",
+    },
+  ],
+  Array [
+    Object {
+      "byteLength": "17.0",
+      "complete": 1,
+      "downloadData": "[\\"http://scrape-next-site.com/image/brown.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
+      "filename": true,
+      "id": true,
+      "parsedValue": "",
+      "scraper": "image",
+    },
+  ],
+  Array [
+    Object {
+      "byteLength": "17.0",
+      "complete": 1,
+      "downloadData": "[\\"http://scrape-next-site.com/image/fox.jpg\\",{\\"headers\\":{},\\"method\\":\\"GET\\"}]",
+      "filename": true,
+      "id": true,
+      "parsedValue": "",
+      "scraper": "image",
+    },
+  ],
+]
+`;
+
+exports[`testing/functional/scrape-next-site/functional.test.ts with psuedo delayed scraper should group tags and images together that were found on the same page 1`] = `
 Array [
   Array [
     Object {

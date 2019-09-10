@@ -14,11 +14,15 @@ const flattenConfig = (config: Config): FlatConfig => {
         const { name } = flowStep.scrape
 
         const branchFlatConfigs = flowStep.branch
-          .map((flow, horizontalIndex) => recurse(flow, name, depth + index + 1, horizontalIndex))
+          .map((flow, horizontalIndexInner) =>
+            recurse(flow, name, depth + index + 1, horizontalIndex + horizontalIndexInner)
+          )
           .reduce((mapAcc, configPositionInfo) => mapAcc.merge(configPositionInfo), new FMap())
 
         const recurseFlatConfigs = flowStep.recurse
-          .map((flow, horizontalIndex) => recurse(flow, name, depth + index + 1, horizontalIndex))
+          .map((flow, horizontalIndexInner) =>
+            recurse(flow, name, depth + index + 1, horizontalIndex + horizontalIndexInner)
+          )
           .reduce((mapAcc, configPositionInfo) => mapAcc.merge(configPositionInfo), new FMap())
 
         return new FMap<string, ConfigPositionInfo>()

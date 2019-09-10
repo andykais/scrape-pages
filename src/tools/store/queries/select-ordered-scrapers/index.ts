@@ -6,11 +6,11 @@ import { CreateQuery } from '../../types'
 export type SelectedRow = {
   scraper: string
   id: number
-  downloadId: number
+  // downloadId: number
   parsedValue?: string
-  downloadData?: string
-  filename?: string
-  byteLength?: string
+  downloadData: string | null
+  filename: string | null
+  byteLength: string | null
   complete: number
 }
 type Statement = (scrapers: string[]) => () => SelectedRow[]

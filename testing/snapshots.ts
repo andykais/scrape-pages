@@ -1,6 +1,7 @@
 // type imports
 import { Query } from '../src/scraper'
 
+// were dealing with unpredictable insert order, so we just want to check if the keys exist or not
 type Result = ReturnType<Query>
 export const stripResult = (result: Result) =>
   result.map(g =>
