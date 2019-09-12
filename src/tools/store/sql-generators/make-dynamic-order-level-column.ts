@@ -36,6 +36,10 @@ const makeDynamicOrderLevelColumn = (flatConfig: FlatConfig, scraperNames: strin
         const scrapersToOrder = ancestors[commonParentName]
         return scrapersToOrder
           .map(({ name, depth, horizontalIndex }) => {
+            // TODO this is insufficient for large scrapers (e.g. horizontal index is larger than Math.pow(10, depth))
+            // to remedy, we should make the tuples ahead of time, then order them ourselves here and actually output a simple list
+            // e.g. horVertOrders = [[1,2], [12,0],[100,2]] => [0,1,2]
+            // const horizontalVerticalOrder = `${Math.pow(10, depth)}-${horizontalIndex}`
             const horizontalVerticalOrder = Math.pow(10, depth) + horizontalIndex
             return `WHEN cte.scraper = '${name}' AND recurseDepth = ${orderAtRecurseDepth} THEN ${horizontalVerticalOrder}`
           })
@@ -45,6 +49,7 @@ const makeDynamicOrderLevelColumn = (flatConfig: FlatConfig, scraperNames: strin
 
     const largestHorizontalVerticalIndex = Math.pow(10, lowestDepth + 1)
 
+    console.log(`CASE ${diagonalOrderColumn} ELSE ${largestHorizontalVerticalIndex} END`)
     return `CASE ${diagonalOrderColumn} ELSE ${largestHorizontalVerticalIndex} END`
   }
 }

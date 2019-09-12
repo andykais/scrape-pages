@@ -48,11 +48,12 @@ SELECT
   parsedValue,
   --  downloadId,
   downloadData, filename, byteLength, complete
+  /* recurseDepth, incrementIndex, parseIndex, levelOrder -- DEBUG data */
 FROM cte
 LEFT JOIN downloadCache ON downloadCache.id = cte.cacheId -- grab additional download information outside of ordering
 WHERE recurseDepth = {{lowestDepth}}
 ORDER BY
-  recurseDepth,
+  recurseDepth, -- TODO is this necessary if we have the WHERE clause above it?
   incrementIndex,
   parseIndex,
   levelOrder

@@ -53,6 +53,7 @@ const setupFlowPipeline = (settings: Settings, tools: Tools) => (
 ): ScraperPipeline => {
   const downPipeline: ScraperPipeline[] = flow.map(flowStep => {
     const config = flowStep.scrape
+    // TODO replace these with objects? We should probably trust the values at this point
     const options = settings.flatOptions.getOrThrow(config.name)
     const params = settings.flatParams.getOrThrow(config.name)
 
@@ -69,7 +70,8 @@ const setupFlowPipeline = (settings: Settings, tools: Tools) => (
 
     // TODO encode/classify/contractify the value,index relationship?
     return Rx.pipe(
-      ops.takeWhile(() => !outsideCommands.stop), // itd be nice to use an Rx.fromEvent, but something funky is happeneing here
+      // ops.tap(x => console.log(config.name, x)),
+      // ops.takeWhile(() => !outsideCommands.stop), // itd be nice to use an Rx.fromEvent, but something funky is happeneing here
       ops.flatMap(parentValue =>
         RxCustom.whileLoop(scraper.downloadParseFunction, okToIncrement, parentValue)
       ),
@@ -99,9 +101,14 @@ const setupFlowPipeline = (settings: Settings, tools: Tools) => (
         const branchesSource = branch.map(branchPipeline =>
           Rx.from(parsedValues).pipe(branchPipeline)
         )
-        return Rx.merge(branchesSource, Rx.of(parsedValues))
-      }),
-      ops.mergeAll()
+        return branchesSource.length ? Rx.merge(...branchesSource) : Rx.from(parsedValues)
+        // I dont think this is a good choice. theres way more variation in the returned stuff
+        // return Rx.merge(branchesSource, Rx.of(parsedValues))
+        //
+        // this one is the easiest to test. It would mean data only flows DOWN and RIGHT, not left-diagonal
+        // return Rx.merge(Rx.of(parsedValues), Rx.merge(...branchesSource).pipe(ops.filter(x=>false)))
+      })
+      // ops.mergeAll()
     )
   })
   return (Rx.pipe as any)(...downPipeline)

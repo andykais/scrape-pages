@@ -20,7 +20,7 @@ const params = {
   cleanFolder: true
 }
 
-describe(__filename, () => {
+describe.skip(__filename, () => {
   describe('cache control', () => {
     step('first pass should fetch all downloads since nothing is in cache', async () => {
       const { start, query } = scrape(config, { cache: true }, params)

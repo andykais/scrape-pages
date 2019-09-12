@@ -18,18 +18,18 @@ const params = {
   folder: path.resolve(RUN_OUTPUT_FOLDER, `${path.basename(__dirname)}`),
   cleanFolder: true
 }
-describe.only(__filename, () => {
+describe(__filename, () => {
   before(async () => {
     // ensure the scrape folder doesnt exist from a previous test run
     await rmrf(params.folder)
   })
 
   const testables = [
-    {
-      name: 'normal',
-      scraper: scrape(config, options, params),
-      siteMock: new NockFolderMock(resourceFolder, resourceUrl)
-    },
+    // {
+    //   name: 'normal',
+    //   scraper: scrape(config, options, params),
+    //   siteMock: new NockFolderMock(resourceFolder, resourceUrl)
+    // },
     //{
     //  name: 'psuedo delayed',
     //  scraper: scrape(config, options, params),
@@ -58,12 +58,12 @@ describe.only(__filename, () => {
         const result = query(queryArgs)
         expect(stripResult(result)).to.deep.equal(stripResult(expected[JSON.stringify(queryArgs)]))
       })
-      it('should group tags and images together that were found on the same page', () => {
-        if (name === 'flattened config') {
-          console.log(query({ scrapers: ['image', 'tag', 'image-page'] }))
-          console.log()
-          console.log(query({ scrapers: ['image', 'tag'], groupBy: 'image-page' }))
-        }
+      it.only('should group tags and images together that were found on the same page', () => {
+        const preResult = query({ scrapers: ['image', 'tag', 'image-page'] })[0]
+        console.log(preResult)
+        console.log(scraper.settings.flatConfig)
+        console.log(preResult.map(v => v.scraper).join('\n'))
+        return
         const queryArgs = { scrapers: ['image', 'tag'], groupBy: 'image-page' }
         const result = query(queryArgs)
         expect(stripResult(result)).to.deep.equal(stripResult(expected[JSON.stringify(queryArgs)]))

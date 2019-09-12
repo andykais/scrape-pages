@@ -74,3 +74,16 @@ export const configMerging: ConfigInit = {
     }
   ]
 }
+// export const configMerging: ConfigInit = {
+//   flow: [
+//     {
+//       scrape: gallery,
+//       branch: [[{ name: 'identity' }]]
+//     },
+//     // { name: 'identity' },
+//     {
+//       scrape: imagePage,
+//       branch: [[tag], [imagePageParse, image]]
+//     }
+//   ]
+// }

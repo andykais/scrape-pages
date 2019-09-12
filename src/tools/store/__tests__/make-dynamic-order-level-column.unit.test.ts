@@ -34,4 +34,7 @@ describe(__filename, () => {
       `CASE WHEN cte.scraper = 'img-parse' AND recurseDepth = 0 THEN 101 WHEN cte.scraper = 'img' AND recurseDepth = 0 THEN 1000 WHEN cte.scraper = 'tag' AND recurseDepth = 1 THEN 100 ELSE 10000 END`
     )
   })
+
+  // TODO does this break down with over 100 scrapers?
+  // a better ordering primitive would be a string like this: `${depth}-${horizontalIndex}`
 })

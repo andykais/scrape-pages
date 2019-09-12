@@ -29,6 +29,7 @@ export const query: CreateQuery<Statement> = (flatConfig, database) => scrapers 
     selectedScrapers,
     lowestDepth
   })
+  console.log(selectOrderedSql)
   const statement = database.prepare(selectOrderedSql)
   return () => statement.all()
 }

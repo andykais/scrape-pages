@@ -15,13 +15,13 @@ const flattenConfig = (config: Config): FlatConfig => {
 
         const branchFlatConfigs = flowStep.branch
           .map((flow, horizontalIndexInner) =>
-            recurse(flow, name, depth + index + 1, horizontalIndex + horizontalIndexInner)
+            recurse(flow, name, depth + index + 1, horizontalIndexInner + 1)
           )
           .reduce((mapAcc, configPositionInfo) => mapAcc.merge(configPositionInfo), new FMap())
 
         const recurseFlatConfigs = flowStep.recurse
           .map((flow, horizontalIndexInner) =>
-            recurse(flow, name, depth + index + 1, horizontalIndex + horizontalIndexInner)
+            recurse(flow, name, depth + index + 1, horizontalIndexInner + 1)
           )
           .reduce((mapAcc, configPositionInfo) => mapAcc.merge(configPositionInfo), new FMap())
 
@@ -30,6 +30,7 @@ const flattenConfig = (config: Config): FlatConfig => {
             name,
             parentName: index ? flow[index - 1].scrape.name : parentName,
             depth: depth + index,
+            // horizontalIndex: index + horizontalIndex
             horizontalIndex: index ? 0 : horizontalIndex // TODO find out if horizontal indexes should be preserved
           })
           .merge(branchFlatConfigs)
