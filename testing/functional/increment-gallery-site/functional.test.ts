@@ -10,6 +10,8 @@ import { config, configWithLimit, configMerging } from './config'
 import { expected } from './expected-query-results'
 import { scrape } from '../../../src'
 
+import { EXECUTION_DEBUGGER_VIEW } from '../../../src/tools/store/querier-entrypoint'
+
 const resourceFolder = `${__dirname}/fixtures`
 const resourceUrl = `http://${path.basename(__dirname)}.com`
 
@@ -25,21 +27,21 @@ describe(__filename, () => {
   })
 
   const testables = [
-    // {
-    //   name: 'normal',
-    //   scraper: scrape(config, options, params),
-    //   siteMock: new NockFolderMock(resourceFolder, resourceUrl)
-    // },
-    //{
-    //  name: 'psuedo delayed',
-    //  scraper: scrape(config, options, params),
-    //  siteMock: new NockFolderMock(resourceFolder, resourceUrl, { randomSeed: 2 })
-    //},
     {
-      name: 'flattened config',
-      scraper: scrape(configMerging, options, params),
+      name: 'normal',
+      scraper: scrape(config, options, params),
       siteMock: new NockFolderMock(resourceFolder, resourceUrl)
-    }
+    },
+    // {
+    //   name: 'psuedo delayed',
+    //   scraper: scrape(config, options, params),
+    //   siteMock: new NockFolderMock(resourceFolder, resourceUrl, { randomSeed: 2 })
+    // },
+    // {
+    //   name: 'flattened config',
+    //   scraper: scrape(configMerging, options, params),
+    //   siteMock: new NockFolderMock(resourceFolder, resourceUrl)
+    // }
   ]
 
   testables.forEach(({ name, scraper, siteMock }) => {
@@ -58,14 +60,20 @@ describe(__filename, () => {
         const result = query(queryArgs)
         expect(stripResult(result)).to.deep.equal(stripResult(expected[JSON.stringify(queryArgs)]))
       })
-      it.only('should group tags and images together that were found on the same page', () => {
-        const preResult = query({ scrapers: ['image', 'tag', 'image-page'] })[0]
-        console.log(preResult)
-        console.log(scraper.settings.flatConfig)
-        console.log(preResult.map(v => v.scraper).join('\n'))
+      it.only('should group tags and images together that were found on the same page', function() {
+        this.timeout(0)
+        const preResult = query({
+          scrapers: ['image', 'tag', 'image-page'],
+          [EXECUTION_DEBUGGER_VIEW]: ['recurseDepth', 'scraper', 'currentScraper', 'levelOrder']
+        })[0]
         return
+        // console.log(preResult)
+        // console.log(scraper.settings.flatConfig)
+        // console.log(preResult.map(v => v.scraper).join('\n'))
+        // console.log(preResult.map(v => v.recurseDepth).join('\n'))
         const queryArgs = { scrapers: ['image', 'tag'], groupBy: 'image-page' }
         const result = query(queryArgs)
+        console.log(result)
         expect(stripResult(result)).to.deep.equal(stripResult(expected[JSON.stringify(queryArgs)]))
       })
     })

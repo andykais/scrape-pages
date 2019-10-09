@@ -28,7 +28,12 @@ const flattenConfig = (config: Config): FlatConfig => {
         return new FMap<string, ConfigPositionInfo>()
           .set(name, {
             name,
+            // TODO experiment which is more ergonomic, keeping this conditional, or just having a mergeParent field
             parentName: index ? flow[index - 1].scrape.name : parentName,
+            // parentName: parentName,
+            // incorrect!
+            mergeParent: false,
+            configAtPosition: flowStep,
             depth: depth + index,
             // horizontalIndex: index + horizontalIndex
             horizontalIndex: index ? 0 : horizontalIndex // TODO find out if horizontal indexes should be preserved

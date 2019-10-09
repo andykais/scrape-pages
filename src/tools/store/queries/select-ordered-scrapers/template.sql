@@ -42,16 +42,18 @@ WITH cte AS (
   parentId -- parentId handles `scrapeNext`
 )
 SELECT
---  *
   cte.id,
   cte.scraper,
   parsedValue,
-  --  downloadId,
   downloadData, filename, byteLength, complete
-  /* recurseDepth, incrementIndex, parseIndex, levelOrder -- DEBUG data */
+{{#if debugMode}}
+  , downloadId, recurseDepth, incrementIndex, parseIndex, levelOrder, currentScraper -- DEBUG data
+{{/if}}
 FROM cte
 LEFT JOIN downloadCache ON downloadCache.id = cte.cacheId -- grab additional download information outside of ordering
-WHERE recurseDepth = {{lowestDepth}}
+{{#unless debugMode}}
+  WHERE recurseDepth = {{lowestDepth}} -- turn off during DEBUG
+{{/unless}}
 ORDER BY
   recurseDepth, -- TODO is this necessary if we have the WHERE clause above it?
   incrementIndex,

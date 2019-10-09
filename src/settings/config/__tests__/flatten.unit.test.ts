@@ -7,36 +7,47 @@ import * as testingConfigs from '../../../../testing/resources/testing-configs'
 describe(__filename, () => {
   const galleryPostImgTag = testingConfigs.GALLERY_POST_IMG_TAG
 
+  const configForPieces = galleryPostImgTag as any
   const flatConfigGuess: FlatConfig = FMap.fromObject({
     gallery: {
       depth: 0,
       horizontalIndex: 0,
       name: 'gallery',
-      parentName: undefined
+      parentName: undefined,
+      mergeParent: false,
+      configAtPosition: configForPieces.flow[0]
     },
     post: {
       depth: 1,
       horizontalIndex: 0,
       name: 'post',
-      parentName: 'gallery'
+      parentName: 'gallery',
+      mergeParent: false,
+      configAtPosition: configForPieces.flow[1]
     },
     'img-parse': {
       depth: 2,
       horizontalIndex: 1,
       name: 'img-parse',
-      parentName: 'post'
+      parentName: 'post',
+      mergeParent: false,
+      configAtPosition: configForPieces.flow[1].branch[1][0]
     },
     img: {
       depth: 3,
       horizontalIndex: 0,
       name: 'img',
-      parentName: 'img-parse'
+      parentName: 'img-parse',
+      mergeParent: false,
+      configAtPosition: configForPieces.flow[0].branch[1][1]
     },
     tag: {
       depth: 2,
       horizontalIndex: 0,
       name: 'tag',
-      parentName: 'post'
+      parentName: 'post',
+      mergeParent: false,
+      configAtPosition: configForPieces.flow[0].branch[0][0]
     }
   })
 

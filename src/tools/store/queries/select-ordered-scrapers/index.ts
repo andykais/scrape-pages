@@ -13,13 +13,15 @@ export type SelectedRow = {
   byteLength: string | null
   complete: number
 }
-type Statement = (scrapers: string[]) => () => SelectedRow[]
-export const query: CreateQuery<Statement> = (flatConfig, database) => scrapers => {
-  const scraperConfigs = scrapers.map(s => flatConfig.getOrThrow(s)).filter(c => c)
+type Statement = (scrapers: string[], debugMode: boolean) => () => SelectedRow[]
+export const query: CreateQuery<Statement> = (flatConfig, database) => (scrapers, debugMode) => {
+  const scraperConfigs = scrapers.map(flatConfig.getOrThrow)
 
   const lowestDepth = Math.max(...scraperConfigs.map(s => s.depth))
   const orderLevelColumnSql = makeDynamicOrderLevelColumn(flatConfig, scrapers)
   const waitingJoinsSql = makeWaitingConditionalJoins(flatConfig, scrapers)
+  console.log({ orderLevelColumnSql })
+  console.log({ waitingJoinsSql })
 
   const selectedScrapers = scrapers.map(s => `'${s}'`).join(',')
 
@@ -27,9 +29,9 @@ export const query: CreateQuery<Statement> = (flatConfig, database) => scrapers 
     orderLevelColumnSql,
     waitingJoinsSql,
     selectedScrapers,
-    lowestDepth
+    lowestDepth,
+    debugMode
   })
-  console.log(selectOrderedSql)
   const statement = database.prepare(selectOrderedSql)
   return () => statement.all()
 }
