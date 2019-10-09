@@ -95,6 +95,7 @@ const makeWaitingConditionalJoins = (flatConfig: FlatConfig, scraperNames: strin
 
   // pop the deepest depth
   const deepestDepth = maxLevelsTraversedByEachScraper.pop()!.maxLevelsTraversed
+  if (maxLevelsTraversedByEachScraper.length === 0) return 'cte.parentId'
   // console.log(maxLevelsTraversedByEachScraper)
 
   const caseJoins = maxLevelsTraversedByEachScraper
@@ -107,6 +108,8 @@ const makeWaitingConditionalJoins = (flatConfig: FlatConfig, scraperNames: strin
       // if (level.name === 'image-page')
       //   return `WHEN cte.scraper = '${level.name}' AND cte.recurseDepth IN (0,1,2) THEN cte.id`
       // else
+      return `cte.scraper = '${scraperInfo.name}' AND cte.recurseDepth < ${deepestDepth -
+        maxLevelsTraversed}`
       return `cte.scraper = '${scraperInfo.name}' AND cte.recurseDepth IN (${waitingSteps})`
     })
     .join(' OR ')
