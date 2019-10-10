@@ -1,4 +1,4 @@
-import { ScraperInit, ConfigInit } from '../../../src/settings/config/types'
+import { ConfigInit } from '../../../src/settings/config/types'
 
 const gallery = {
   name: 'gallery',
@@ -33,30 +33,12 @@ const image = {
   }
 }
 
-// normal (change back after fixing issue with merging)
-// export const config: ConfigInit = {
-//   flow: [
-//     gallery,
-//     {
-//       scrape: imagePage,
-//       branch: [[tag], [imagePageParse, image]]
-//     }
-//   ]
-// }
-
 export const config: ConfigInit = {
   flow: [
     gallery,
     {
       scrape: imagePage,
-      branch: [
-        [
-          {
-            scrape: { name: 'identity' },
-            branch: [[tag], [imagePageParse, image]]
-          }
-        ]
-      ]
+      branch: [[tag], [imagePageParse, image]]
     }
   ]
 }
@@ -82,11 +64,7 @@ export const configMerging: ConfigInit = {
   flow: [
     {
       scrape: gallery,
-      branch: [
-        [imagePage],
-        // TODO add this when we get the existing working
-        // [{ name: 'identity-a' }, { name: 'identity-b' }]
-      ]
+      branch: [[imagePage], [{ name: 'identity-a' }, { name: 'identity-b' }]]
     },
     {
       scrape: {
@@ -96,16 +74,3 @@ export const configMerging: ConfigInit = {
     }
   ]
 }
-// export const configMerging: ConfigInit = {
-//   flow: [
-//     {
-//       scrape: gallery,
-//       branch: [[{ name: 'identity' }]]
-//     },
-//     // { name: 'identity' },
-//     {
-//       scrape: imagePage,
-//       branch: [[tag], [imagePageParse, image]]
-//     }
-//   ]
-// }

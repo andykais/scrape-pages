@@ -9,7 +9,7 @@
     "no-unused-expressions": "error",
     "no-console": "warn",
     "no-unreachable": "error",
-    "@typescript-eslint/no-unused-vars": "error",
+    "@typescript-eslint/no-unused-vars": ["error", { "varsIgnorePattern": "^_" }],
     "@typescript-eslint/explicit-member-accessibility": "error",
     "@typescript-eslint/member-ordering": "error",
     "no-only-tests/no-only-tests": "error"

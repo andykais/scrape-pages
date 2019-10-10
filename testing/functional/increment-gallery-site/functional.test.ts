@@ -1,7 +1,6 @@
 import * as path from 'path'
 import { rmrf } from '../../../src/util/fs'
 import { UninitializedDatabaseError } from '../../../src/util/errors'
-import { ScraperInit } from '../../../src/settings/config/types'
 
 import { expect } from 'chai'
 
@@ -9,8 +8,6 @@ import { RUN_OUTPUT_FOLDER, NockFolderMock } from '../../setup'
 import { config, configWithLimit, configMerging } from './config'
 import { expected } from './expected-query-results'
 import { scrape } from '../../../src'
-
-import { EXECUTION_DEBUGGER_VIEW } from '../../../src/tools/store/querier-entrypoint'
 
 const resourceFolder = `${__dirname}/fixtures`
 const resourceUrl = `http://${path.basename(__dirname)}.com`
@@ -69,7 +66,7 @@ describe(__filename, () => {
   })
 
   it('calling query() before start() should throw an uninitialized error', async () => {
-    const { start, query } = scrape(config, options, params)
+    const { query } = scrape(config, options, params)
     expect(() => query({ scrapers: ['image'] })).to.throw(UninitializedDatabaseError)
   })
 

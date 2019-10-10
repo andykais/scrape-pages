@@ -13,9 +13,6 @@ import {
 } from './queries/select-ordered-scrapers'
 import { ArgumentTypes } from '../../util/types'
 
-export const EXECUTION_DEBUGGER_VIEW = Symbol.for('query-execution-stepper')
-const DEFAULT_VIEW = ['recurseDepth', 'incrementIndex', 'parseIndex', 'levelOrder', 'scraper']
-
 type DebuggerView = (keyof OrderedScrapersRowWithDebug)[]
 const queryExecutionDebugger = (
   scrapers: string[],
@@ -57,8 +54,8 @@ const queryExecutionDebugger = (
         return acc
       }, {})
     )
-    console.clear()
-    console.table(viewable)
+    console.clear() // eslint-disable-line no-console
+    console.table(viewable) // eslint-disable-line no-console
     key = readlineSync.keyIn(
       'Press [s] to move forward, press [w] to move backward, press [q] to exit the debugger',
       { limit: 'swq' }
@@ -68,6 +65,8 @@ const queryExecutionDebugger = (
     else if (key === 'w' && index > 0) index--
   }
 }
+
+export const EXECUTION_DEBUGGER_VIEW = Symbol.for('query-execution-stepper')
 export type QueryArguments = {
   scrapers: ScraperName[]
   groupBy?: ScraperName
