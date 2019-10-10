@@ -1,13 +1,15 @@
 import { existsSync } from '../../util/fs'
 import { UninitializedDatabaseError } from '../../util/errors'
 import { Database } from './database'
-import { groupUntilSeparator } from '../../util/array'
 import { selectOrderedScrapers } from './queries'
 import { typecheckQueryArguments } from '../../util/typechecking.runtime'
 // type imports
 import { Settings } from '../../settings'
 import { ScraperName } from '../../settings/config/types'
-import { SelectedRow as OrderedScrapersRow } from './queries/select-ordered-scrapers'
+import {
+  SelectedRow as OrderedScrapersRow,
+  SelectedRowWithDebugInfo as OrderedScrapersRowWithDebug
+} from './queries/select-ordered-scrapers'
 import { ArgumentTypes } from '../../util/types'
 
 import * as readlineSync from 'readline-sync'
@@ -18,24 +20,13 @@ const DEFAULT_VIEW = ['recurseDepth', 'incrementIndex', 'parseIndex', 'levelOrde
 // type DebuggerView = (keyof OrderedScrapersRow)[]
 // TODO replace with an expanded set of OrderedScrapersRow including all columns
 type DebuggerView = string[]
-export type QueryArguments = {
-  scrapers: ScraperName[]
-  groupBy?: ScraperName
-  // internal use only
-  [EXECUTION_DEBUGGER_VIEW]?: DebuggerView
-}
-export interface QueryFn {
-  prepare: (params: QueryArguments) => () => OrderedScrapersRow[][]
-  (...args: ArgumentTypes<QueryFn['prepare']>): OrderedScrapersRow[][]
-}
-
-type OrderedScrapersRowDebug = OrderedScrapersRow & { [key: string]: any }
 const queryExecutionDebugger = (
   scrapers: string[],
   settings: Settings,
-  result: OrderedScrapersRowDebug[],
+  result: OrderedScrapersRow[],
   debuggerView: DebuggerView
 ) => {
+  const resultAsDebug = (result as any) as OrderedScrapersRowWithDebug[]
   readlineSync.question(
     'This is an internal debugging method. It will hault execution until there is input. Press [enter] to continue.',
     { mask: '' }
@@ -44,7 +35,7 @@ const queryExecutionDebugger = (
   const scraperConfigs = scrapers.map(s => settings.flatConfig.getOrThrow(s))
   const lowestDepth = Math.max(...scraperConfigs.map(s => s.depth))
 
-  const resultAsDepthMap: Map<number, OrderedScrapersRow[]> = result.reduce((acc, row) => {
+  const resultAsDepthMap: Map<number, OrderedScrapersRow[]> = resultAsDebug.reduce((acc, row) => {
     acc
       .set(row.recurseDepth, acc.get(row.recurseDepth) || [])
       .get(row.recurseDepth)!
@@ -79,6 +70,18 @@ const queryExecutionDebugger = (
     else if (key === 'w' && index > 0) index--
   }
 }
+export type QueryArguments = {
+  scrapers: ScraperName[]
+  groupBy?: ScraperName
+  // internal use only
+  [EXECUTION_DEBUGGER_VIEW]?: DebuggerView
+}
+type OrderedScraperGroup = { [scraperName: string]: OrderedScrapersRow[] }
+export type QueryResult = OrderedScraperGroup[]
+export interface QueryFn {
+  prepare: (params: QueryArguments) => () => QueryResult
+  (...args: ArgumentTypes<QueryFn['prepare']>): QueryResult
+}
 
 /**
  * external function for grabbing data back out of the scraper
@@ -91,8 +94,12 @@ const querierFactory = (settings: Settings): QueryFn => {
 
   const prepare: QueryFn['prepare'] = queryArgs => {
     typecheckQueryArguments(queryArgs)
+
+    let { scrapers, groupBy, [EXECUTION_DEBUGGER_VIEW]: debuggerView } = queryArgs
     // TODO throw error when scrapers do not exist? This might make it more tedious to reuse some functions in other libs
-    const { scrapers, groupBy, [EXECUTION_DEBUGGER_VIEW]: debuggerView } = queryArgs
+    scrapers = scrapers.filter(s => flatConfig.has(s))
+    groupBy = groupBy && flatConfig.has(groupBy) ? groupBy : undefined
+    if (scrapers.length === 0) return () => []
 
     const databaseFile = Database.getFilePath(paramsInit.folder)
     if (existsSync(databaseFile)) {
@@ -102,27 +109,42 @@ const querierFactory = (settings: Settings): QueryFn => {
       throw new UninitializedDatabaseError(databaseFile)
     }
 
-    if (!scrapers.some(s => flatConfig.has(s))) return () => []
+    const scrapersInQuery = scrapers.concat(groupBy || [])
 
-    const scrapersInConfig = scrapers.concat(groupBy || []).filter(s => flatConfig.has(s))
-
-    // TODO conditionally show the extra fields using debuggerView
     const preparedStatment = selectOrderedScrapers(flatConfig, database)(
-      Array.from(new Set(scrapersInConfig)),
+      Array.from(new Set(scrapersInQuery)),
       Boolean(debuggerView)
     )
+
     return () => {
       const result = preparedStatment()
 
-      if (debuggerView) queryExecutionDebugger(scrapers, settings, result, debuggerView)
+      if (debuggerView) queryExecutionDebugger(scrapersInQuery, settings, result, debuggerView)
 
-      return groupBy !== undefined
-        ? groupUntilSeparator(
-            result,
-            ({ scraper }) => scraper === groupBy,
-            groupBy !== undefined && scrapers.includes(groupBy)
-          )
-        : [result]
+      const groupedResults = []
+      let groupCount = 0
+      let group: OrderedScraperGroup = scrapers.reduce((acc: OrderedScraperGroup, name) => {
+        acc[name] = []
+        return acc
+      }, {})
+      const initialGroupCopy = JSON.stringify(group)
+
+      for (const row of result) {
+        if ((groupBy && scrapers.includes(groupBy)) || row.scraper !== groupBy) {
+          group[row.scraper].push(row)
+          groupCount++
+        }
+        if (row.scraper === groupBy) {
+          if (groupCount !== 0) {
+            groupedResults.push(group)
+            group = JSON.parse(initialGroupCopy)
+            groupCount = 0
+          }
+        }
+      }
+      if (groupCount !== 0) groupedResults.push(group)
+
+      return groupedResults
     }
   }
   // create external query function

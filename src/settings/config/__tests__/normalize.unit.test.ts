@@ -88,7 +88,7 @@ describe(__filename, () => {
         flow: [{ name: 'scraper+' }]
       }
       expect(() => normalizeConfig(config)).to.throw(
-        'For a scraper name: "scraper+" is not valid. Allowed characters are /^[a-zA-Z-_]*$/'
+        'For a scraper name: "scraper+" is not valid. Allowed characters are /^[a-zA-Z0-9-_]*$/'
       )
     })
   })

@@ -94,7 +94,6 @@ export type ConfigPositionInfo = {
   horizontalIndex: number
   name: ScraperName
   parentName?: ScraperName
-  mergeParent: boolean
   configAtPosition: FlowStep
 }
 export type FlatConfig = FMap<ScraperName, ConfigPositionInfo>

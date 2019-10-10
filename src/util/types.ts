@@ -6,3 +6,5 @@ export type ThenArg<T> = T extends Promise<infer U> ? U : T
 
 export type Nullable<T> = T | null
 export type Voidable<T> = T | void
+
+export type Overwrite<T, U> = Pick<T, Exclude<keyof T, keyof U>> & U

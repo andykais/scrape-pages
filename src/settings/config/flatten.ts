@@ -15,24 +15,20 @@ const flattenConfig = (config: Config): FlatConfig => {
 
         const branchFlatConfigs = flowStep.branch
           .map((flow, horizontalIndexInner) =>
-            recurse(flow, name, depth + index + 1, horizontalIndexInner + 1)
+            recurse(flow, name, depth + index + 1, horizontalIndexInner)
           )
           .reduce((mapAcc, configPositionInfo) => mapAcc.merge(configPositionInfo), new FMap())
 
         const recurseFlatConfigs = flowStep.recurse
           .map((flow, horizontalIndexInner) =>
-            recurse(flow, name, depth + index + 1, horizontalIndexInner + 1)
+            recurse(flow, name, depth + index + 1, horizontalIndexInner)
           )
           .reduce((mapAcc, configPositionInfo) => mapAcc.merge(configPositionInfo), new FMap())
 
         return new FMap<string, ConfigPositionInfo>()
           .set(name, {
             name,
-            // TODO experiment which is more ergonomic, keeping this conditional, or just having a mergeParent field
             parentName: index ? flow[index - 1].scrape.name : parentName,
-            // parentName: parentName,
-            // incorrect!
-            mergeParent: false,
             configAtPosition: flowStep,
             depth: depth + index,
             // horizontalIndex: index + horizontalIndex

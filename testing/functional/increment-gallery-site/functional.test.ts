@@ -5,7 +5,7 @@ import { ScraperInit } from '../../../src/settings/config/types'
 
 import { expect } from 'chai'
 
-import { RUN_OUTPUT_FOLDER, NockFolderMock, stripResult } from '../../setup'
+import { RUN_OUTPUT_FOLDER, NockFolderMock } from '../../setup'
 import { config, configWithLimit, configMerging } from './config'
 import { expected } from './expected-query-results'
 import { scrape } from '../../../src'
@@ -32,16 +32,16 @@ describe(__filename, () => {
       scraper: scrape(config, options, params),
       siteMock: new NockFolderMock(resourceFolder, resourceUrl)
     },
-    // {
-    //   name: 'psuedo delayed',
-    //   scraper: scrape(config, options, params),
-    //   siteMock: new NockFolderMock(resourceFolder, resourceUrl, { randomSeed: 2 })
-    // },
-    // {
-    //   name: 'flattened config',
-    //   scraper: scrape(configMerging, options, params),
-    //   siteMock: new NockFolderMock(resourceFolder, resourceUrl)
-    // }
+    {
+      name: 'psuedo delayed',
+      scraper: scrape(config, options, params),
+      siteMock: new NockFolderMock(resourceFolder, resourceUrl, { randomSeed: 2 })
+    },
+    {
+      name: 'flattened config',
+      scraper: scrape(configMerging, options, params),
+      siteMock: new NockFolderMock(resourceFolder, resourceUrl)
+    }
   ]
 
   testables.forEach(({ name, scraper, siteMock }) => {
@@ -58,23 +58,12 @@ describe(__filename, () => {
       it('should group each image into a separate slot, in order', () => {
         const queryArgs = { scrapers: ['image'], groupBy: 'image' }
         const result = query(queryArgs)
-        expect(stripResult(result)).to.deep.equal(stripResult(expected[JSON.stringify(queryArgs)]))
+        expect(result).to.equalQueryResult(expected[JSON.stringify(queryArgs)])
       })
-      it.only('should group tags and images together that were found on the same page', function() {
-        this.timeout(0)
-        const preResult = query({
-          scrapers: ['image', 'tag', 'image-page'],
-          [EXECUTION_DEBUGGER_VIEW]: ['recurseDepth', 'scraper', 'currentScraper', 'levelOrder']
-        })[0]
-        return
-        // console.log(preResult)
-        // console.log(scraper.settings.flatConfig)
-        // console.log(preResult.map(v => v.scraper).join('\n'))
-        // console.log(preResult.map(v => v.recurseDepth).join('\n'))
+      it('should group tags and images together that were found on the same page', function() {
         const queryArgs = { scrapers: ['image', 'tag'], groupBy: 'image-page' }
         const result = query(queryArgs)
-        console.log(result)
-        expect(stripResult(result)).to.deep.equal(stripResult(expected[JSON.stringify(queryArgs)]))
+        expect(result).to.equalQueryResult(expected[JSON.stringify(queryArgs)])
       })
     })
   })
@@ -101,7 +90,7 @@ describe(__filename, () => {
       expect(result).to.have.length(2)
       // the first value is parsed from each gallery page
       const [expected1, _, expected3] = expected[JSON.stringify(queryArgs)]
-      expect(stripResult(result)).to.deep.equal(stripResult([expected1, expected3]))
+      expect(result).to.equalQueryResult([expected1, expected3])
     })
     it('should group tags and images together that were found on the same page', () => {
       const queryArgs = { scrapers: ['image', 'tag'], groupBy: 'image-page' }
@@ -109,14 +98,7 @@ describe(__filename, () => {
 
       expect(result).to.have.length(2)
       const [expected1, _, expected3] = expected[JSON.stringify(queryArgs)]
-      expect(stripResult(result)).to.deep.equal(stripResult([expected1, expected3]))
+      expect(result).to.equalQueryResult([expected1, expected3])
     })
-  })
-
-  describe('with merging flow', () => {
-    // TODO add test where we use data from a branch in a DOWN-LEFT direction. E.g.
-    // scrape
-    // branch - scrape, scrape
-    // scrape
   })
 })

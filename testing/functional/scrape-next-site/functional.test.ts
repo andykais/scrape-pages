@@ -4,7 +4,7 @@ import jsonata from 'jsonata'
 import { expect } from 'chai'
 import chaiJestSnapshot from 'chai-jest-snapshot'
 
-import { RUN_OUTPUT_FOLDER, NockFolderMock, stripResult } from '../../setup'
+import { RUN_OUTPUT_FOLDER, NockFolderMock } from '../../setup'
 import { config, configFlattened } from './config'
 import { expected } from './expected-query-results'
 import { scrape } from '../../../src'
@@ -51,12 +51,12 @@ describe(__filename, () => {
       it('should group each image into a separate slot, in order', () => {
         const queryArgs = { scrapers: ['image'], groupBy: 'image' }
         const result = query(queryArgs)
-        expect(stripResult(result)).to.deep.equal(stripResult(expected[JSON.stringify(queryArgs)]))
+        expect(result).to.equalQueryResult(expected[JSON.stringify(queryArgs)])
       })
       it('should group tags and images together that were found on the same page', () => {
         const queryArgs = { scrapers: ['image', 'tag'], groupBy: 'image-page' }
         const result = query(queryArgs)
-        expect(stripResult(result)).to.deep.equal(stripResult(expected[JSON.stringify(queryArgs)]))
+        expect(result).to.equalQueryResult(expected[JSON.stringify(queryArgs)])
       })
     })
   })

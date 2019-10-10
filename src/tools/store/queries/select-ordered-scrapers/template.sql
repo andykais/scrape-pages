@@ -9,9 +9,8 @@ WITH cte AS (
     parseIndex,
     incrementIndex,
     0 as recurseDepth,
-    parsedTree.scraper,
-    parsedTree.scraper AS currentScraper,
-    0 as levelOrder
+    downloads.scraper,
+    parsedTree.scraper AS currentScraper
   FROM downloads
   LEFT JOIN parsedTree ON parsedTree.downloadId = downloads.id
   WHERE downloads.scraper in ({{{ selectedScrapers }}})
@@ -27,8 +26,7 @@ WITH cte AS (
     pDownloads.incrementIndex,
     cte.recurseDepth + 1,
     cte.scraper,
-    pTree.scraper AS currentScraper,
-    {{{orderLevelColumnSql}}} as levelOrder
+    pTree.scraper AS currentScraper
   FROM cte
   INNER JOIN parsedTree as pTree
   ON {{{ waitingJoinsSql }}} = pTree.id
@@ -38,7 +36,6 @@ WITH cte AS (
   recurseDepth, -- recurseDepth ensures that we move from the bottom of the tree to the top
   parseIndex, -- parseIndex orders by appearance on html/json
   incrementIndex, -- incrementIndex handles `incrementUntil`
-  levelOrder, -- see make-dynamic-order-level-column.ts
   parentId -- parentId handles `scrapeNext`
 )
 SELECT
@@ -47,15 +44,14 @@ SELECT
   parsedValue,
   downloadData, filename, byteLength, complete
 {{#if debugMode}}
-  , downloadId, recurseDepth, incrementIndex, parseIndex, levelOrder, currentScraper -- DEBUG data
+  , downloadId, recurseDepth, incrementIndex, parseIndex, currentScraper
 {{/if}}
 FROM cte
 LEFT JOIN downloadCache ON downloadCache.id = cte.cacheId -- grab additional download information outside of ordering
 {{#unless debugMode}}
-  WHERE recurseDepth = {{lowestDepth}} -- turn off during DEBUG
+  WHERE recurseDepth = {{lowestDepth}}
 {{/unless}}
 ORDER BY
-  recurseDepth, -- TODO is this necessary if we have the WHERE clause above it?
+  recurseDepth,
   incrementIndex,
-  parseIndex,
-  levelOrder
+  parseIndex

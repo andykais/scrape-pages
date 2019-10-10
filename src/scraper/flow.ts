@@ -71,7 +71,7 @@ const setupFlowPipeline = (settings: Settings, tools: Tools) => (
     // TODO encode/classify/contractify the value,index relationship?
     return Rx.pipe(
       // ops.tap(x => console.log(config.name, x)),
-      // ops.takeWhile(() => !outsideCommands.stop), // itd be nice to use an Rx.fromEvent, but something funky is happeneing here
+      ops.takeWhile(() => !outsideCommands.stop), // itd be nice to use an Rx.fromEvent, but something funky is happeneing here
       ops.flatMap(parentValue =>
         RxCustom.whileLoop(scraper.downloadParseFunction, okToIncrement, parentValue)
       ),

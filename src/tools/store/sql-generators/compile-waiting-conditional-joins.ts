@@ -1,7 +1,7 @@
 // type imports
 import { FlatConfig, ConfigPositionInfo, FlowStep } from '../../../settings/config/types'
 
-const makeWaitingConditionalJoins = (flatConfig: FlatConfig, scraperNames: string[]) => {
+const compileWaitingConditionalJoins = (flatConfig: FlatConfig, scraperNames: string[]) => {
   // console.log(flatConfig)
 
   const levels = scraperNames.map(flatConfig.getOrThrow).sort((a, b) => b.depth - a.depth)
@@ -192,4 +192,4 @@ const makeWaitingConditionalJoins = (flatConfig: FlatConfig, scraperNames: strin
 //else return 'cte.parentId'
 // }
 
-export { makeWaitingConditionalJoins }
+export { compileWaitingConditionalJoins }

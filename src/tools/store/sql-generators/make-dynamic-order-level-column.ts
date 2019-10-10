@@ -2,21 +2,20 @@ import { findLowestCommonParent } from './util/find-lowest-common-parent'
 // type imports
 import { FlatConfig, ConfigPositionInfo } from '../../../settings/config/types'
 
+// ok ok IF this field is purely used for ordering non groupby fields, then I think we can just remove it and
+// change the output structure to:
+//
+// {[scraperName: string]: SelectOrderedScraperRow[]}[]
+// its how I plan to use the library, and the ordering in between them is an opinion I had, not the single
+// right way to do it. Its kinda wasted energy
+
 /**
- * ensures that when multiple scrapes are selected at once, the proper order is attached at each level of the
+ * makeDynamicOrderLevelColumn: ensures that when multiple scrapes are selected at once, the proper order is attached at each level of the
  * tree
+ * @deprecated
  */
 
-// WANT:
-console.log(`
-CASE
-WHEN cte.scraper = 'image' AND recurseDepth = 2 THEN 10000
-WHEN cte.scraper = 'tag' AND recurseDepth = 2 THEN 1001
-WHEN cte.scraper = 'image-page' AND recurseDepth = 2 THEN 10 ELSE 100000
-END
-`)
 const makeDynamicOrderLevelColumn = (flatConfig: FlatConfig, scraperNames: string[]) => {
-  console.log(flatConfig)
   if (scraperNames.length < 2) {
     return '0'
   } else {
@@ -31,7 +30,7 @@ const makeDynamicOrderLevelColumn = (flatConfig: FlatConfig, scraperNames: strin
         const comparison = flatConfig.getOrThrow(comparisonName)
         if (current.name !== comparison.name) {
           const commonAncestor = findLowestCommonParent(flatConfig, current, comparison)
-          if (!min || min.depth < commonAncestor.depth) {
+          if (!min || min!.depth < commonAncestor.depth) {
             min = commonAncestor
           }
         }
@@ -50,7 +49,6 @@ const makeDynamicOrderLevelColumn = (flatConfig: FlatConfig, scraperNames: strin
             // to remedy, we should make the tuples ahead of time, then order them ourselves here and actually output a simple list
             // e.g. horVertOrders = [[1,2], [12,0],[100,2]] => [0,1,2]
             // const horizontalVerticalOrder = `${Math.pow(10, depth)}-${horizontalIndex}`
-            console.log(name, depth, horizontalIndex)
             const horizontalVerticalOrder = Math.pow(10, depth) + horizontalIndex
             return `WHEN cte.scraper = '${name}' AND recurseDepth = ${orderAtRecurseDepth} THEN ${horizontalVerticalOrder}`
           })
@@ -60,15 +58,6 @@ const makeDynamicOrderLevelColumn = (flatConfig: FlatConfig, scraperNames: strin
 
     const largestHorizontalVerticalIndex = Math.pow(10, lowestDepth + 1)
 
-    // console.log(`CASE ${diagonalOrderColumn} ELSE ${largestHorizontalVerticalIndex} END`)
-    // return `
-// CASE
-// WHEN cte.scraper = 'image' AND recurseDepth = 2 THEN 10000
-// WHEN cte.scraper = 'tag' AND recurseDepth = 2 THEN 1001
-// WHEN cte.scraper = 'image-page' AND recurseDepth = 2 THEN 10 ELSE 100000
-// END
-
-    // `
     return `CASE ${diagonalOrderColumn} ELSE ${largestHorizontalVerticalIndex} END`
   }
 }
