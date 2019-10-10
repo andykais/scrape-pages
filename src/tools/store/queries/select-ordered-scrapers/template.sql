@@ -32,6 +32,7 @@ WITH cte AS (
   ON {{{ waitingJoinsSql }}} = pTree.id
   INNER JOIN downloads as pDownloads
   ON pTree.downloadId = pDownloads.id
+  WHERE recurseDepth < {{lowestDepth}} -- this may be a problem, or it may be fine. This prevents extra work past what we calculate the maximum amount of work is
   ORDER BY
   recurseDepth, -- recurseDepth ensures that we move from the bottom of the tree to the top
   parseIndex, -- parseIndex orders by appearance on html/json
