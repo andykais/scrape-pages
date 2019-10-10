@@ -2,7 +2,6 @@ import * as path from 'path'
 import jsonata from 'jsonata'
 
 import { expect } from 'chai'
-import chaiJestSnapshot from 'chai-jest-snapshot'
 
 import { RUN_OUTPUT_FOLDER, NockFolderMock } from '../../setup'
 import { config, configFlattened } from './config'

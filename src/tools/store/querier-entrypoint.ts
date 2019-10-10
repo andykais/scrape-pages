@@ -1,3 +1,4 @@
+import * as readlineSync from 'readline-sync'
 import { existsSync } from '../../util/fs'
 import { UninitializedDatabaseError } from '../../util/errors'
 import { Database } from './database'
@@ -12,20 +13,17 @@ import {
 } from './queries/select-ordered-scrapers'
 import { ArgumentTypes } from '../../util/types'
 
-import * as readlineSync from 'readline-sync'
-
 export const EXECUTION_DEBUGGER_VIEW = Symbol.for('query-execution-stepper')
 const DEFAULT_VIEW = ['recurseDepth', 'incrementIndex', 'parseIndex', 'levelOrder', 'scraper']
 
-// type DebuggerView = (keyof OrderedScrapersRow)[]
-// TODO replace with an expanded set of OrderedScrapersRow including all columns
-type DebuggerView = string[]
+type DebuggerView = (keyof OrderedScrapersRowWithDebug)[]
 const queryExecutionDebugger = (
   scrapers: string[],
   settings: Settings,
   result: OrderedScrapersRow[],
   debuggerView: DebuggerView
 ) => {
+  // we are cheating with the type here because function overloading in typescript doesnt play nicely with higher order functions
   const resultAsDebug = (result as any) as OrderedScrapersRowWithDebug[]
   readlineSync.question(
     'This is an internal debugging method. It will hault execution until there is input. Press [enter] to continue.',
