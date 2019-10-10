@@ -117,18 +117,6 @@ export interface Structure extends StructureInit {
   forEach: Structure[]
   forNext: Structure[]
 }
-// export interface ConfigInit {
-//   input?: Input | Input[]
-//   scrapers: { [scraperName: string]: ScrapeConfigInit }
-//   run: StructureInit
-// }
-// // returned by ./normalize.ts
-// export interface Config extends ConfigInit {
-//   input: Input[]
-//   scrapers: { [scraperName: string]: ScrapeConfig }
-//   run: Structure
-// }
-
 interface ScraperInit {
   name: string
   download?: DownloadConfigInit

@@ -5,9 +5,6 @@ import { getSettings } from '../settings'
 import { Logger } from '../tools/logger'
 import { Store } from '../tools/store'
 import { compileProgram } from './flow'
-// import { version } from '../../package.json'
-// TODO declare `version` in webpack.config.js
-const version = 1
 // type imports
 import { Settings } from '../settings'
 import { ConfigInit } from '../settings/config/types'
@@ -24,15 +21,14 @@ const initFolders = async ({ paramsInit, flatParams }: Settings) => {
   // safely rename existing log files
   await Logger.rotateLogFiles(paramsInit.folder)
 }
-
 const writeMetadata = async (settings: Settings) => {
   const { paramsInit, optionsInit, configInit } = settings
   const metadataFile = path.resolve(paramsInit.folder, 'metadata.json')
   const logger = new Logger(settings)
   if (await exists(metadataFile)) {
     const { version: oldVersion } = JSON.parse(await read(metadataFile))
-    if (oldVersion !== version) {
-      const logMessage = `This folder was created by an older version of scrape-pages! Old: ${oldVersion}, New: ${version}. Consider adding the param 'cleanFolder: true' and starting fresh.`
+    if (oldVersion !== process.env.PACKAGE_VERSION) {
+      const logMessage = `This folder was created by an older version of scrape-pages! Old: ${oldVersion}, New: ${process.env.PACKAGE_VERSION}. Consider adding the param 'cleanFolder: true' and starting fresh.`
       logger.warn(logMessage)
     }
   } else {
@@ -40,7 +36,10 @@ const writeMetadata = async (settings: Settings) => {
   }
   await writeFile(
     metadataFile,
-    JSON.stringify({ version, settingsInit: { configInit, optionsInit, paramsInit } })
+    JSON.stringify({
+      version: process.env.PACKAGE_VERSION,
+      settingsInit: { configInit, optionsInit, paramsInit }
+    })
   )
 }
 

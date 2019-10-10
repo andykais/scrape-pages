@@ -1,8 +1,10 @@
 const path = require('path')
 const glob = require('glob')
+const webpack = require('webpack')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const nodeExternals = require('webpack-node-externals')
 const typescriptIsTransformer = require('typescript-is/lib/transform-inline/transformer').default
+const packageJson = require('./package')
 
 const sourceFiles = glob
   .sync('./src/**/*.ts', { ignore: './src/**/*.test.ts' })
@@ -60,6 +62,11 @@ module.exports = (env, { mode = 'development' } = {}) => ({
   optimization: {
     minimize: false
   },
-  plugins: [new CopyWebpackPlugin(['package.json', 'package-lock.json', 'LICENSE', 'README.md'])],
+  plugins: [
+    new CopyWebpackPlugin(['package.json', 'package-lock.json', 'LICENSE', 'README.md']),
+    new webpack.DefinePlugin({
+      'process.env.PACKAGE_VERSION': JSON.stringify(packageJson.version)
+    })
+  ],
   externals: [nodeExternals()]
 })
