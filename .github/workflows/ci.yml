@@ -2,7 +2,7 @@ name: Node CI
 
 on:
   push:
-    branch:
+    branches:
       - '*'
     tags-ignore:
       - '*'
