@@ -1,6 +1,7 @@
 {
-  "scrapers": {
-    "archive": {
+  "flow": [
+    {
+      "name": "archive",
       "download": {
         "urlTemplate": "https://apod.nasa.gov/apod/archivepix.html"
       },
@@ -9,24 +10,17 @@
         "attribute": "href"
       }
     },
-    "image-page": {
+    {
+      "name": "image-page",
       "download": "https://apod.nasa.gov/apod/{{value}}",
       "parse": {
         "selector": "body > center:nth-child(1) > p:nth-child(3) > a > img",
         "attribute": "src"
       }
     },
-    "image": {
+    {
+      "name": "image",
       "download": "https://apod.nasa.gov/apod/{{value}}"
     }
-  },
-  "run": {
-    "scraper": "archive",
-    "scrapeEach": {
-      "scraper": "image-page",
-      "scrapeEach": {
-        "scraper": "image"
-      }
-    }
-  }
+  ]
 }

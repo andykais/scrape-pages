@@ -1,9 +1,9 @@
 import * as path from 'path'
-
 import { expect } from 'chai'
 
-import { RUN_OUTPUT_FOLDER, NockFolderMock, stripResult } from '../../setup'
-import { config } from './config'
+import { RUN_OUTPUT_FOLDER, NockFolderMock } from '../../setup'
+import { config, configFlattened } from './config'
+import { expected } from './expected-query-results'
 import { scrape } from '../../../src'
 
 const resourceFolder = `${__dirname}/fixtures`
@@ -16,41 +16,45 @@ const params = {
   cleanFolder: true
 }
 describe(__filename, () => {
-  describe('with instant scraper', () => {
-    const { start, query } = scrape(config, options, params)
+  const testables = [
+    {
+      name: 'normal',
+      scraper: scrape(config, options, params),
+      siteMock: new NockFolderMock(resourceFolder, resourceUrl)
+    },
+    {
+      name: 'psuedo delayed',
+      scraper: scrape(config, options, params),
+      siteMock: new NockFolderMock(resourceFolder, resourceUrl, { randomSeed: 2 })
+    },
+    {
+      name: 'flattened config',
+      scraper: scrape(configFlattened, options, params),
+      siteMock: new NockFolderMock(resourceFolder, resourceUrl)
+    }
+  ]
 
-    before(async () => {
-      const siteMock = await NockFolderMock.create(resourceFolder, resourceUrl)
+  testables.forEach(({ name, scraper, siteMock }) => {
+    describe(`with ${name} scraper`, () => {
+      const { start, query } = scraper
 
-      const { on } = await start()
-      await new Promise(resolve => on('done', resolve))
-      siteMock.done()
-    })
+      before(async () => {
+        await siteMock.init()
+        const { on } = await start()
+        await new Promise(resolve => on('done', resolve))
+        siteMock.done()
+      })
 
-    it('should group each image into a separate slot, in order', () => {
-      const result = query({ scrapers: ['image'], groupBy: 'image' })
-      expect(stripResult(result)).to.matchSnapshot()
-    })
-    it('should group tags and images together that were found on the same page', () => {
-      const result = query({ scrapers: ['image', 'tag'], groupBy: 'image-page' })
-      expect(stripResult(result)).to.matchSnapshot()
-    })
-  })
-
-  describe('with psuedo-random delayed scraper', () => {
-    const { start, query } = scrape(config, options, params)
-
-    before(async () => {
-      const siteMock = await NockFolderMock.create(resourceFolder, resourceUrl, { randomSeed: 2 })
-
-      const { on } = await start()
-      await new Promise(resolve => on('done', resolve))
-      siteMock.done()
-    })
-
-    it('should keep images and tags together, in order', () => {
-      const result = query({ scrapers: ['image', 'tag'], groupBy: 'image-page' })
-      expect(stripResult(result)).to.matchSnapshot()
+      it('should group each image into a separate slot, in order', () => {
+        const queryArgs = { scrapers: ['image'], groupBy: 'image' }
+        const result = query(queryArgs)
+        expect(result).to.equalQueryResult(expected[JSON.stringify(queryArgs)])
+      })
+      it('should group tags and images together that were found on the same page', () => {
+        const queryArgs = { scrapers: ['image', 'tag'], groupBy: 'image-page' }
+        const result = query(queryArgs)
+        expect(result).to.equalQueryResult(expected[JSON.stringify(queryArgs)])
+      })
     })
   })
 })

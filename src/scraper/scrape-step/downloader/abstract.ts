@@ -33,11 +33,11 @@ export abstract class AbstractDownloader<DownloadData> {
   protected scraperLogger: ReturnType<Tools['logger']['scraper']>
 
   public constructor(
-    scraperName: ScraperName,
     downloadConfig: DownloadConfig | undefined,
     settings: ScrapeSettings,
     tools: Tools
   ) {
+    const scraperName = settings.config.name
     const scraperLogger = tools.logger.scraper(scraperName)!
     Object.assign(this, { scraperName, downloadConfig, ...settings, tools, scraperLogger })
     this.postProcess = this.getPostProcessing(downloadConfig)

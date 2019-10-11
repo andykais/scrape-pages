@@ -9,50 +9,50 @@ describe(__filename, () => {
     const fullConfig = normalizeConfig(simpleConfig)
     const fullConfigGuess: Config = {
       input: [],
-      scrapers: {
-        index: {
-          download: {
-            protocol: 'http',
-            method: 'GET',
-            urlTemplate: simpleConfig.scrapers.index.download as string,
-            headerTemplates: {},
-            read: true,
-            write: false,
-            regexCleanup: undefined
+      flow: [
+        {
+          scrape: {
+            name: 'index',
+            download: {
+              protocol: 'http',
+              method: 'GET',
+              urlTemplate: (simpleConfig.flow[0] as any).download,
+              // urlTemplate: simpleConfig.scrapers.index.download as string,
+              headerTemplates: {},
+              read: true,
+              write: false,
+              regexCleanup: undefined
+            },
+            parse: {
+              selector: (simpleConfig.flow[0] as any).parse.selector,
+              attribute: (simpleConfig.flow[0] as any).parse.attribute,
+              format: 'html',
+              regexCleanup: undefined
+            },
+            incrementUntil: 0
           },
-          parse: {
-            selector: (simpleConfig.scrapers.index.parse as any).selector,
-            attribute: (simpleConfig.scrapers.index.parse as any).attribute,
-            format: 'html',
-            regexCleanup: undefined
-          },
-          incrementUntil: 0
+          branch: [],
+          recurse: []
         },
-        image: {
-          download: {
-            protocol: 'http',
-            method: 'GET',
-            urlTemplate: simpleConfig.scrapers.image.download as any,
-            headerTemplates: {},
-            read: true,
-            write: false,
-            regexCleanup: undefined
+        {
+          scrape: {
+            name: 'image',
+            download: {
+              protocol: 'http',
+              method: 'GET',
+              urlTemplate: (simpleConfig.flow[1] as any).download,
+              headerTemplates: {},
+              read: true,
+              write: false,
+              regexCleanup: undefined
+            },
+            parse: undefined,
+            incrementUntil: 0
           },
-          parse: undefined,
-          incrementUntil: 0
+          branch: [],
+          recurse: []
         }
-      },
-      run: {
-        scraper: 'index',
-        forNext: [],
-        forEach: [
-          {
-            scraper: 'image',
-            forNext: [],
-            forEach: []
-          }
-        ]
-      }
+      ]
     }
 
     it('should match the guessed full config', () => {
@@ -79,17 +79,17 @@ describe(__filename, () => {
     it('for input names should error out', () => {
       const config = {
         input: ['test+'],
-        scrapers: { identity: {} },
-        run: { scraper: 'identitiy' }
+        flow: []
       }
       expect(() => normalizeConfig(config)).to.throw()
     })
     it('for scraper names should error out', () => {
       const config = {
-        scrapers: { 'scraper+': {} },
-        run: { scraper: 'identitiy' }
+        flow: [{ name: 'scraper+' }]
       }
-      expect(() => normalizeConfig(config)).to.throw()
+      expect(() => normalizeConfig(config)).to.throw(
+        'For a scraper name: "scraper+" is not valid. Allowed characters are /^[a-zA-Z0-9-_]*$/'
+      )
     })
   })
 
@@ -97,16 +97,8 @@ describe(__filename, () => {
     const configInit: any = {}
     it('should throw a type assertion error', () => {
       expect(() => normalizeConfig(configInit))
-        .to.throw(`$: expected 'scrapers' in object`)
+        .to.throw(`$: expected 'flow' in object`)
         .with.property('name', 'TypeGuardError')
-    })
-    describe('with scrapers that are not defined', () => {
-      const configInit = { scrapers: {}, run: { scraper: 'hello' } }
-      it('should throw an error', () => {
-        expect(() => normalizeConfig(configInit)).to.throw(
-          'config.scrapers is missing scraper "hello"'
-        )
-      })
     })
   })
 })

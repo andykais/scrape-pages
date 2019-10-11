@@ -1,4 +1,4 @@
-const slugRegex = /^[a-zA-Z-_]*$/
+const slugRegex = /^[a-zA-Z0-9-_]*$/
 
 export const validateSlug = (slugStr: string) => {
   if (!slugRegex.test(slugStr)) {

@@ -65,18 +65,19 @@ jobs:
 ##############################
 #    Deploy Github Pages     #
 ##############################
-    - name: build github pages
-      if: github.ref == 'refs/heads/master' && matrix.os == 'ubuntu-latest' && matrix.node-version == '8'
-      run: |
-        cd website
-        npm ci --no-audit
-    - name: github pages
-      if: github.ref == 'refs/heads/master' && matrix.os == 'ubuntu-latest' && matrix.node-version == '8'
-      uses: peaceiris/actions-gh-pages@v2.1.0
-      env:
-        ACTIONS_DEPLOY_KEY: ${{ secrets.ACTIONS_DEPLOY_KEY }}
-        PUBLISH_BRANCH: gh-pages
-        PUBLISH_DIR: ./website/dist
+# TODO website needs to be updated after this PR is merged.
+#    - name: build github pages
+#      if: github.ref == 'refs/heads/master' && matrix.os == 'ubuntu-latest' && matrix.node-version == '8'
+#      run: |
+#        cd website
+#        npm ci --no-audit
+#    - name: github pages
+#      if: github.ref == 'refs/heads/master' && matrix.os == 'ubuntu-latest' && matrix.node-version == '8'
+#      uses: peaceiris/actions-gh-pages@v2.1.0
+#      env:
+#        ACTIONS_DEPLOY_KEY: ${{ secrets.ACTIONS_DEPLOY_KEY }}
+#        PUBLISH_BRANCH: gh-pages
+#        PUBLISH_DIR: ./website/dist
 
 
 

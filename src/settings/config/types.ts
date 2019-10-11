@@ -94,36 +94,59 @@ export type ConfigPositionInfo = {
   horizontalIndex: number
   name: ScraperName
   parentName?: ScraperName
+  configAtPosition: FlowStep
 }
 export type FlatConfig = FMap<ScraperName, ConfigPositionInfo>
 
-export interface ScrapeConfigInit {
+interface ScraperInit {
+  name: string
   download?: DownloadConfigInit
   parse?: ParseConfigInit
   incrementUntil?: Incrementers
 }
-export interface ScrapeConfig {
+interface Scraper {
+  name: string
   download?: DownloadConfig
   parse?: ParseConfig
   incrementUntil: Incrementers
 }
-interface StructureInit {
-  scraper: ScraperName
-  forEach?: StructureInit | StructureInit[]
-  forNext?: StructureInit | StructureInit[]
+
+interface FlowInitStep {
+  scrape: ScraperInit
+  recurse?: FlowInitStepOrScraper[][]
+  branch?: FlowInitStepOrScraper[][]
 }
-export interface Structure extends StructureInit {
-  forEach: Structure[]
-  forNext: Structure[]
+type FlowInitStepOrScraper = FlowInitStep | ScraperInit
+
+interface ConfigInit {
+  input?: string[]
+  flow: FlowInitStepOrScraper[]
 }
-export interface ConfigInit {
-  input?: Input | Input[]
-  scrapers: { [scraperName: string]: ScrapeConfigInit }
-  run: StructureInit
+
+// the ScrapeInit gets put into branch
+interface FlowStep {
+  scrape: Scraper
+  branch: FlowStep[][]
+  recurse: FlowStep[][]
 }
-// returned by ./normalize.ts
-export interface Config extends ConfigInit {
-  input: Input[]
-  scrapers: { [scraperName: string]: ScrapeConfig }
-  run: Structure
+interface Config {
+  input: string[]
+  flow: FlowStep[]
 }
+
+export { ScraperInit, Scraper, FlowInitStep, FlowInitStepOrScraper, FlowStep, ConfigInit, Config }
+
+/**
+ * WHY are we looking to io-ts?
+ *
+ * no transformers needed
+ * wrap normalize & validate into one module
+ */
+
+/**
+ * WHY change the config structure?
+ *
+ * scraper defintions dont need to be decoupled, use in-code variables for that
+ *  * maybe once reusable modules are a thing this will be revisted, but until then it dont matter
+ * we flatten the structure, its nice and more clear, like brads language idea (-_- )
+ */

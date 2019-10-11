@@ -2,7 +2,7 @@ import * as path from 'path'
 
 import { expect } from 'chai'
 
-import { RUN_OUTPUT_FOLDER, NockFolderMock, stripResult } from '../../setup'
+import { RUN_OUTPUT_FOLDER, NockFolderMock } from '../../setup'
 import { config, configParseJsonTwice, configParseJsonInsideScript } from './config'
 import { scrape } from '../../../src'
 
@@ -27,10 +27,9 @@ describe(__filename, () => {
     })
     it('should get em', () => {
       const result = query({ scrapers: ['apiResponse'] })
-      expect(result.map(r => r.map(c => c.parsedValue))).to.be.deep.equal([
+      expect(result.map(r => r['apiResponse'].map(c => c.parsedValue))).to.be.deep.equal([
         ['the', 'quick', 'brown', 'fox']
       ])
-      expect(stripResult(result)).to.matchSnapshot()
     })
   })
 
@@ -45,13 +44,12 @@ describe(__filename, () => {
     it('should stringify, then parse, then stringify', () => {
       const result = query({ scrapers: ['parseContentFromPost'], groupBy: 'parseContentFromPost' })
       expect(result).to.have.length(4)
-      expect(result.map(r => r.map(c => c.parsedValue))).to.be.deep.equal([
+      expect(result.map(r => r['parseContentFromPost'].map(c => c.parsedValue))).to.be.deep.equal([
         ['the'],
         ['quick'],
         ['brown'],
         ['fox']
       ])
-      expect(stripResult(result)).to.matchSnapshot()
     })
   })
 
@@ -65,8 +63,8 @@ describe(__filename, () => {
     })
     it('should stringify, then parse, then stringify', () => {
       const result = query({ scrapers: ['jsonInJs'] })
-      expect(result[0]).to.have.length(9)
-      expect(result.map(r => r.map(c => c.parsedValue))).to.be.deep.equal([
+      expect(result[0]['jsonInJs']).to.have.length(9)
+      expect(result.map(r => r['jsonInJs'].map(c => c.parsedValue))).to.be.deep.equal([
         ['the', 'quick', 'brown', 'fox', 'jumped', 'over', 'the', 'lazy', 'dog']
       ])
     })

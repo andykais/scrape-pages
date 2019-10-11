@@ -1,14 +1,10 @@
 import * as path from 'path'
 import { initTools } from '../tools'
-import { ScrapeStep } from './scrape-step'
 import { mkdirp, rmrf, exists, read, writeFile } from '../util/fs'
-import { getSettings, getScrapeStepSettings } from '../settings'
+import { getSettings } from '../settings'
 import { Logger } from '../tools/logger'
 import { Store } from '../tools/store'
-import { structureScrapers } from './flow'
-// import { version } from '../../package.json'
-// TODO declare `version` in webpack.config.js
-const version = 1
+import { compileProgram } from './flow'
 // type imports
 import { Settings } from '../settings'
 import { ConfigInit } from '../settings/config/types'
@@ -25,15 +21,14 @@ const initFolders = async ({ paramsInit, flatParams }: Settings) => {
   // safely rename existing log files
   await Logger.rotateLogFiles(paramsInit.folder)
 }
-
 const writeMetadata = async (settings: Settings) => {
   const { paramsInit, optionsInit, configInit } = settings
   const metadataFile = path.resolve(paramsInit.folder, 'metadata.json')
   const logger = new Logger(settings)
   if (await exists(metadataFile)) {
     const { version: oldVersion } = JSON.parse(await read(metadataFile))
-    if (oldVersion !== version) {
-      const logMessage = `This folder was created by an older version of scrape-pages! Old: ${oldVersion}, New: ${version}. Consider adding the param 'cleanFolder: true' and starting fresh.`
+    if (oldVersion !== process.env.PACKAGE_VERSION) {
+      const logMessage = `This folder was created by an older version of scrape-pages! Old: ${oldVersion}, New: ${process.env.PACKAGE_VERSION}. Consider adding the param 'cleanFolder: true' and starting fresh.`
       logger.warn(logMessage)
     }
   } else {
@@ -41,7 +36,10 @@ const writeMetadata = async (settings: Settings) => {
   }
   await writeFile(
     metadataFile,
-    JSON.stringify({ version, settingsInit: { configInit, optionsInit, paramsInit } })
+    JSON.stringify({
+      version: process.env.PACKAGE_VERSION,
+      settingsInit: { configInit, optionsInit, paramsInit }
+    })
   )
 }
 
@@ -56,18 +54,14 @@ const startScraping = async (settings: Settings) => {
   logger.info({ inspected: settings.flatOptions }, 'flatOptions')
   logger.info({ inspected: settings.flatParams }, 'flatParams')
 
-  const scrapers = getScrapeStepSettings(settings).map(
-    (scrapeSettings, name) => new ScrapeStep(name, scrapeSettings, tools)
-  )
-
   // create the observable
-  const scrapingScheme = structureScrapers(settings, scrapers, tools)(settings.config.run)
-  const scrapingObservable = scrapingScheme([{ parsedValue: '' }])
+  const program = compileProgram(settings, tools)
+
   // start running the observable
-  // initting subscription is necessary so that any listeners setup after function is called are setup before downloads begin
-  let subscription: ReturnType<typeof scrapingObservable.subscribe>
+  // initting subscription is necessary so that any listeners setup after start() is called are setup before downloads begin
+  let subscription: ReturnType<typeof program.subscribe>
   setTimeout(() => {
-    subscription = scrapingObservable.subscribe({
+    subscription = program.subscribe({
       error: (error: Error) => {
         emitter.emit.error(error)
         subscription.unsubscribe()

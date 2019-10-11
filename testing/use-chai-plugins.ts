@@ -1,27 +1,31 @@
-import * as path from 'path'
-import { use } from 'chai'
-import chaiExclude from 'chai-exclude'
-import chaiJestSnapshot from 'chai-jest-snapshot'
 // type imports
-import * as mocha from 'mocha'
+import { Assertion } from 'chai'
+import { Overwrite } from '../src/util/types'
+import { SelectedRow as OrderedScrapersRow } from '../src/tools/store/queries/select-ordered-scrapers'
+import { QueryResult } from '../src/tools/store/querier-entrypoint'
 
-use(chaiExclude)
-use(chaiJestSnapshot)
-
-const getOriginalParent = (testSuite: mocha.Test | mocha.Suite): string =>
-  testSuite.parent && testSuite.parent.title ? getOriginalParent(testSuite.parent) : testSuite.title
-
-before(function() {
-  chaiJestSnapshot.resetSnapshotRegistry()
+Assertion.addMethod('equalQueryResult', function(expectedResult) {
+  const actualResult = this._obj
+  new Assertion(stripResult(actualResult)).to.be.deep.equal(stripResult(expectedResult))
 })
-beforeEach(function() {
-  // this works because all our tests start with a describe(__filename, () => {}) block
-  const testFile = getOriginalParent(this.currentTest!)
-  const fullTitle = this.currentTest!.fullTitle()
-  const filename = path.basename(testFile)
-  const dirname = path.dirname(testFile)
-  const snapshotFile = path.resolve(dirname, '__snapshots__', path.basename(filename) + '.snap')
 
-  chaiJestSnapshot.setFilename(snapshotFile)
-  chaiJestSnapshot.setTestName(fullTitle)
-})
+type StrippedQueryResultRow = Overwrite<
+  OrderedScrapersRow,
+  {
+    filename: boolean
+    id: boolean
+  }
+>
+type StrippedQueryResult = { [scraper: string]: StrippedQueryResultRow[] }[]
+// were dealing with unpredictable insert order, so we just want to check if the keys exist or not
+export const stripResult = (result: QueryResult): StrippedQueryResult =>
+  result.map(g =>
+    Object.keys(g).reduce((acc: StrippedQueryResult[0], scraperName) => {
+      acc[scraperName] = g[scraperName].map(r => ({
+        ...r,
+        filename: typeof r.filename === 'string' ? true : false,
+        id: typeof r.id === 'number' ? true : false
+      }))
+      return acc
+    }, {})
+  )

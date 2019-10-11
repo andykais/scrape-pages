@@ -2,13 +2,9 @@ import * as path from 'path'
 
 import { expect } from 'chai'
 import nock from 'nock'
-import {
-  RUN_OUTPUT_FOLDER,
-  NockFolderMock,
-  stripResult,
-  useRequestStatsRecorder
-} from '../../setup'
-import { config } from './config'
+import { RUN_OUTPUT_FOLDER, NockFolderMock, useRequestStatsRecorder } from '../../setup'
+import { config, configBranching } from './config'
+import { expected } from './expected-query-results'
 import { scrape } from '../../../src'
 
 const resourceFolder = `${__dirname}/fixtures`
@@ -22,6 +18,7 @@ const params = {
 
 describe(__filename, () => {
   describe('cache control', () => {
+    const queryArgs = { scrapers: ['postTitle'] }
     step('first pass should fetch all downloads since nothing is in cache', async () => {
       const { start, query } = scrape(config, { cache: true }, params)
       const siteMock = await NockFolderMock.create(resourceFolder, resourceUrl)
@@ -33,14 +30,15 @@ describe(__filename, () => {
       expect(counts.index.complete).to.equal(1)
       expect(counts.postTitle.queued).to.equal(5)
       expect(counts.postTitle.complete).to.equal(5)
-      const result = query({ scrapers: ['postTitle'] })
-      expect(stripResult(result)).to.matchSnapshot()
+      const result = query(queryArgs)
+      expect(result).to.equalQueryResult(expected[JSON.stringify(queryArgs)])
     })
 
     step('with all scrapers cache: true, no requests should happen', async () => {
       const { start, query } = scrape(config, { cache: true }, { ...params, cleanFolder: false })
-      const resultPre = query({ scrapers: ['postTitle'] })
-      expect(stripResult(resultPre)).to.matchSnapshot()
+      const resultPre = query(queryArgs)
+      expect(resultPre).to.equalQueryResult(expected[JSON.stringify(queryArgs)])
+
       const siteMock = await NockFolderMock.create(resourceFolder, resourceUrl)
       const { on } = await start()
       const { counts } = useRequestStatsRecorder(config, on)
@@ -50,8 +48,8 @@ describe(__filename, () => {
       expect(counts.index.complete).to.equal(1)
       expect(counts.postTitle.queued).to.equal(0)
       expect(counts.postTitle.complete).to.equal(5)
-      const result = query({ scrapers: ['postTitle'] })
-      expect(stripResult(result)).to.deep.equal(stripResult(resultPre))
+      const result = query(queryArgs)
+      expect(result).to.equalQueryResult(expected[JSON.stringify(queryArgs)])
     })
 
     step('should make requests for scrapers with cache turned off', async () => {
@@ -69,8 +67,8 @@ describe(__filename, () => {
       expect(counts.index.complete).to.equal(1)
       expect(counts.postTitle.queued).to.equal(0)
       expect(counts.postTitle.complete).to.equal(5)
-      const result = query({ scrapers: ['postTitle'] })
-      expect(stripResult(result)).to.matchSnapshot()
+      const result = query(queryArgs)
+      expect(result).to.deep.equal(expected[JSON.stringify(queryArgs)])
     })
   })
 
@@ -89,25 +87,30 @@ describe(__filename, () => {
         await new Promise(resolve => on('done', resolve))
 
         const resultIndex = query({ scrapers: ['index'] })
-        expect(resultIndex[0][0].complete).to.equal(0)
+        expect(resultIndex[0]['index'][0].complete).to.equal(0)
         const result = query({ scrapers: ['postTitle'], groupBy: 'postTitle' })
         expect(result.length).to.equal(0)
       })
     })
     describe(`emit('stop:<scraper>')`, () => {
       it('should only stop the postTitle scraper', async () => {
-        const { start, query } = scrape(config, options, params)
+        const { start, query } = scrape(configBranching, options, params)
         const { on, emit } = await start()
-        const { counts } = useRequestStatsRecorder(config, on)
+        const { counts } = useRequestStatsRecorder(configBranching, on)
+        // TODO stop is still fickle on continuous runs...sometimes postTitle queues get through
         on('index:queued', () => emit('stop:postTitle'))
         await new Promise(resolve => on('done', resolve))
 
         expect(counts.index.queued).to.equal(1)
         expect(counts.postTitle.queued).to.equal(0)
+        expect(counts.postTitle_dup.queued).to.equal(5)
+
         const indexResult = query({ scrapers: ['index'], groupBy: 'index' })
         expect(indexResult.length).to.equal(5)
         const result = query({ scrapers: ['postTitle'], groupBy: 'postTitle' })
         expect(result.length).to.equal(0)
+        const branchResult = query({ scrapers: ['postTitle_dup'], groupBy: 'postTitle_dup' })
+        expect(branchResult.length).to.equal(5)
       })
     })
   })
@@ -115,8 +118,7 @@ describe(__filename, () => {
   describe('failing requests', () => {
     it('should report the failure and stop the scraper', async () => {
       const config = {
-        scrapers: { 'will-fail': { download: 'https://non-existent.com/a/b/c' } },
-        run: { scraper: 'will-fail' }
+        flow: [{ name: 'will-fail', download: 'https://non-existent.com/a/b/c' }]
       }
       nock('https://non-existent.com')
         .get('/a/b/c')
@@ -144,8 +146,7 @@ describe(__filename, () => {
   describe('in progress requests', () => {
     it('it should show complete = 0 in result', async () => {
       const config = {
-        scrapers: { slow: { download: 'https://slow-url.com/a' } },
-        run: { scraper: 'slow' }
+        flow: [{ name: 'slow', download: 'https://slow-url.com/a' }]
       }
       nock('https://slow-url.com')
         .get('/a')
@@ -158,15 +159,15 @@ describe(__filename, () => {
       on('slow:queued', () => {
         const result = getSlowScraper()
         expect(result.length).to.equal(1)
-        expect(result[0].length).to.equal(1)
-        expect(result[0][0].complete).to.equal(0) // this is a BIT (1 | 0) column in sqlite
+        expect(result[0]['slow'].length).to.equal(1)
+        expect(result[0]['slow'][0].complete).to.equal(0) // this is a BIT (1 | 0) column in sqlite
       })
 
       await new Promise(resolve => on('done', resolve))
       const result = getSlowScraper()
       expect(result.length).to.equal(1)
-      expect(result[0].length).to.equal(1)
-      expect(result[0][0].complete).to.equal(1)
+      expect(result[0]['slow'].length).to.equal(1)
+      expect(result[0]['slow'][0].complete).to.equal(1)
     })
   })
 })

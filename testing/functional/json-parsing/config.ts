@@ -1,8 +1,9 @@
 import { ConfigInit } from '../../../src/settings/config/types'
 
 export const config: ConfigInit = {
-  scrapers: {
-    apiResponse: {
+  flow: [
+    {
+      name: 'apiResponse',
       download: 'http://json-parsing.com/api-response.json',
       parse: {
         format: 'json',
@@ -10,40 +11,34 @@ export const config: ConfigInit = {
         regexCleanup: '\n$'
       }
     }
-  },
-  run: {
-    scraper: 'apiResponse'
-  }
+  ]
 }
 
 export const configParseJsonTwice: ConfigInit = {
-  scrapers: {
-    parsePosts: {
+  flow: [
+    {
+      name: 'parsePosts',
       download: 'http://json-parsing.com/api-response.json',
       parse: {
         format: 'json',
         selector: `posts[type='post']`
       }
     },
-    parseContentFromPost: {
+    {
+      name: 'parseContentFromPost',
       parse: {
         format: 'json',
         selector: 'content',
         regexCleanup: '\n$'
       }
     }
-  },
-  run: {
-    scraper: 'parsePosts',
-    forEach: {
-      scraper: 'parseContentFromPost'
-    }
-  }
+  ]
 }
 
 export const configParseJsonInsideScript: ConfigInit = {
-  scrapers: {
-    jsonInJs: {
+  flow: [
+    {
+      name: 'jsonInJs',
       download: {
         urlTemplate: 'http://json-parsing.com/json-inside-js-response.js.txt',
         regexCleanup: {
@@ -57,8 +52,5 @@ export const configParseJsonInsideScript: ConfigInit = {
         selector: 'a.nested.story[].word'
       }
     }
-  },
-  run: {
-    scraper: 'jsonInJs'
-  }
+  ]
 }
