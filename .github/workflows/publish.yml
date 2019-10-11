@@ -26,7 +26,7 @@ jobs:
     - name: npm publish
       env:
         NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
-        GITHUB_TOKEN: ${{ secrets.github_token }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_PUSH_ACCESS_TOKEN }}
         TAG: ${{ github.event.release.tag_name }}
       run: |
         npm version --no-git-tag-version $TAG
