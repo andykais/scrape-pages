@@ -5,7 +5,7 @@ on:
     types: [published]
 
 jobs:
-  test:
+  publish:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
@@ -38,3 +38,4 @@ jobs:
       with:
         github-token: ${{ secrets.GITHUB_PUSH_ACCESS_TOKEN }}
         commit-message: release ${{  github.event.release.tag_name }}
+        push-branch: 'master'

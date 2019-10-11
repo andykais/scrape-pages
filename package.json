@@ -1,6 +1,6 @@
 {
   "name": "scrape-pages",
-  "version": "3.3.0",
+  "version": "3.4.1",
   "description": "generalized scraping using a single config object for any site that can be scraped without a headless browser",
   "keywords": [
     "crawler",
