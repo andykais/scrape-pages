@@ -42,7 +42,6 @@
     "jsonata": "^1.7.0",
     "node-fetch": "^2.5.0",
     "rxjs": "^6.5.2",
-    "sanitize-filename": "^1.6.1",
     "typescript-is": "^0.12.6",
     "verror": "^1.10.0"
   },

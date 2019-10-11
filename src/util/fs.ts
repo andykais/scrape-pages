@@ -1,7 +1,6 @@
 import * as path from 'path'
 import * as fs from 'fs'
 import { promisify } from 'util'
-import sanitize from 'sanitize-filename'
 
 const [mkdir, readdir, stat, unlink, rmdir, rename, access, readFile, writeFile] = [
   fs.mkdir,
@@ -88,5 +87,3 @@ export const findFiles = async (folder: string): Promise<string[]> => {
   }
   return endpointFiles
 }
-
-export const sanitizeFilename = (filename: string) => sanitize(filename, { replacement: '_' })

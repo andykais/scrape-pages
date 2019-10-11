@@ -1,7 +1,7 @@
 import fetch from 'node-fetch'
 import { createWriteStream } from 'fs'
 import * as path from 'path'
-import { mkdirp, sanitizeFilename } from '../../../../util/fs'
+import { mkdirp } from '../../../../util/fs'
 import { FMap } from '../../../../util/map'
 import { ResponseError } from '../../../../util/errors'
 
