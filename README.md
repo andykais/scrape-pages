@@ -1,17 +1,9 @@
 <div align="center">
 
 # scrape-pages
-**generalized scraper using JSON based instructions**
 
-
-A powerful scraper library focused on readability and reusability with tiny api footprint
-
-<sub>
-:warning: This project is under active development. Expect bugs and frequent api changes. If you wish to see progress, check out the 
-<a href="https://github.com/andykais/scrape-pages/projects">github projects boards</a>
-</sub>
-<br/>
-<br/>
+A generalized scraper library using JSON based instructions.
+It focuses on readability and reusability with a tiny api footprint.
 
 [![npm](https://img.shields.io/npm/v/scrape-pages.svg)](https://www.npmjs.com/package/scrape-pages)
 ![node](https://img.shields.io/node/v/scrape-pages.svg?style=flat)
@@ -20,14 +12,16 @@ A powerful scraper library focused on readability and reusability with tiny api 
 [![Coverage Status](https://coveralls.io/repos/github/andykais/scrape-pages/badge.svg?branch=master)](https://coveralls.io/github/andykais/scrape-pages?branch=master)
 
 <h3>
-<a href="#documentation">Documentation</a>
-|
-<a href="https://scrape-pages.js.org">Playground</a>
+<a href="#documentation">Documentation</a> | <a href="https://scrape-pages.js.org">Playground</a>
 </h3>
 
 
-</div>
+<sub>
+:warning: This project is under active development. Expect bugs and frequent api changes.
 
+See the  <a href="https://github.com/andykais/scrape-pages/projects">github issues page</a> for an overview of ongoing work.
+</sub>
+</div>
 
 ## Installation
 
@@ -37,13 +31,14 @@ npm install scrape-pages
 
 ## Usage
 
-Lets download the ten most recent images from NASA's image of the day archive. First, define a `config`, `options`, and `params` to be passed into the scraper.
+Lets download the ten most recent images from NASA's image of the day archive.
 
 ```javascript
+// First, define a `config`, `options`, and `params` to be passed into the scraper.
 const config = {
-  // define some scrapers
-  scrapers: {
-    index: {
+  flow: [
+    {
+      name: 'index',
       download: 'https://apod.nasa.gov/apod/archivepix.html',
       parse: {
         selector: 'body > b > a',
@@ -51,27 +46,19 @@ const config = {
         limit: 10
       },
     },
-    post: {
+    {
+      name: 'post',
       download: 'https://apod.nasa.gov/apod/{{ value }}',
       parse: {
         selector: 'img[src^="image"]',
         attribute: 'src'
       }
     },
-    image: {
+    {
+      name: 'image',
       download: 'https://apod.nasa.gov/apod/{{ value }}'
     }
-  },
-  // describe how they work together
-  run: {
-    scraper: 'index',
-    forEach: {
-      scraper: 'post',
-      forEach: {
-        scraper: 'image'
-      }
-    }
-  }
+  ]
 }
 
 const options = {
@@ -87,13 +74,14 @@ const options = {
 const params = {
   folder: './downloads'
 }
-```
 
-After declaring your settings, the usage of the library is very simple. There is a way to start the scraper, listen to events, emit events back to the scraper, and query the scraped data.
+// Outside of defining configuration objects, the api is very simple. You have the ability to:
+// - start the scraper
+// - listen for events from the scraper
+// - emit events back to the scraper (like 'stop')
+// - query the scraped data
 
-```javascript
 const { scraper } = require('scrape-pages')
-
 // create an executable scraper and a querier
 const { start, query } = scrape(config, options, params)
 // begin scraping here
@@ -102,7 +90,7 @@ const { on, emit } = await start()
 on('image:compete', id => console.log('COMPLETED image', id))
 on('done', () => {
   const result = query({ scrapers: ['images'] })
-  // result = [[{ filename: 'img1.jpg' }, { filename: 'img2.jpg' }, ...]]
+  // result is [[{ filename: 'img1.jpg' }, { filename: 'img2.jpg' }, ...]]
 })
 ```
 
@@ -110,7 +98,9 @@ For more real world examples, visit the [examples](examples) directory
 
 ## Documentation
 
-The scraper instance created from a config object is meant to be reusable and cached. It only knows about the config object. `scraper.run` can be called multiple times, and, as long as different folders are provided, each run will work independently. `scraper.run` returns **emitter**
+The compiled scraper created from a `config` object is meant to be reusable. You may choose to tweak the cache
+settings on the `options` object to run the scraper multiple times and only re-download certain parts. If
+given a different output folder in the `params` object, it will run completely fresh.
 
 ### scrape
 
@@ -176,3 +166,4 @@ Hopefully, this means that users can agree on common configs for different sites
 Generally, if you could scrape the page without executing javascript in a headless browser,
 this package should be able to scrape what you wish. However, it is important to note that if you are doing high volume production level scraping, it is always better to write
 your own scraper code.
+
