@@ -20,12 +20,8 @@ export abstract class AbstractParser {
   protected selector: string
   protected attribute: string
 
-  public constructor(
-    scraperName: ScraperName,
-    parseConfig: ParseConfig | undefined,
-    settings: ScrapeSettings,
-    tools: Tools
-  ) {
+  public constructor(parseConfig: ParseConfig | undefined, settings: ScrapeSettings, tools: Tools) {
+    const scraperName = settings.config.name
     Object.assign(this, { scraperName, parseConfig, ...settings, tools })
 
     this.postProcess = this.getPostProcessing(parseConfig)

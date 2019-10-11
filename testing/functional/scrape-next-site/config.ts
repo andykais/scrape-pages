@@ -20,7 +20,6 @@ export const config: ConfigInit = {
           }
         ]
       ],
-      // TODO flatten this
       branch: [
         [
           {

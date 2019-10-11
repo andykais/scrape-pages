@@ -98,25 +98,6 @@ export type ConfigPositionInfo = {
 }
 export type FlatConfig = FMap<ScraperName, ConfigPositionInfo>
 
-export interface ScrapeConfigInit {
-  download?: DownloadConfigInit
-  parse?: ParseConfigInit
-  incrementUntil?: Incrementers
-}
-export interface ScrapeConfig {
-  download?: DownloadConfig
-  parse?: ParseConfig
-  incrementUntil: Incrementers
-}
-interface StructureInit {
-  scraper: ScraperName
-  forEach?: StructureInit | StructureInit[]
-  forNext?: StructureInit | StructureInit[]
-}
-export interface Structure extends StructureInit {
-  forEach: Structure[]
-  forNext: Structure[]
-}
 interface ScraperInit {
   name: string
   download?: DownloadConfigInit

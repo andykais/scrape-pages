@@ -6,7 +6,7 @@ import {
   DownloadConfig,
   ParseConfigInit,
   ParseConfig,
-  ScrapeConfig,
+  Scraper,
   ConfigInit,
   RegexCleanupInit,
   Config
@@ -16,7 +16,7 @@ import { typecheckConfig } from '../../util/typechecking.runtime'
 const reservedWords = ['value', 'index']
 
 const defaults: {
-  definition: Pick<ScrapeConfig, 'incrementUntil'>
+  definition: Pick<Scraper, 'incrementUntil'>
   download: Pick<DownloadConfig, 'method' | 'headerTemplates' | 'protocol' | 'read' | 'write'>
   parse: Pick<ParseConfig, 'format'>
 } = {

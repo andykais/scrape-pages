@@ -28,9 +28,10 @@ class ScrapeStep {
   private downloader: DownloaderClass
   private parser: ParserClass
 
-  public constructor(scraperName: ScraperName, settings: ScrapeSettings, tools: Tools) {
-    const downloader = downloaderClassFactory(scraperName, settings, tools)
-    const parser = parserClassFactory(scraperName, settings, tools)
+  public constructor(settings: ScrapeSettings, tools: Tools) {
+    const scraperName = settings.config.name
+    const downloader = downloaderClassFactory(settings, tools)
+    const parser = parserClassFactory(settings, tools)
 
     const scraperLogger = tools.logger.scraper(scraperName)!
 

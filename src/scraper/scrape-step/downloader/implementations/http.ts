@@ -11,7 +11,7 @@ import { compileTemplate } from '../../../../util/handlebars'
 import { URL } from 'url'
 import * as Fetch from 'node-fetch'
 import { ScrapeSettings } from '../../../../settings'
-import { ScraperName, DownloadConfig } from '../../../../settings/config/types'
+import { DownloadConfig } from '../../../../settings/config/types'
 import { Tools } from '../../../../tools'
 
 type Headers = { [header: string]: string }
@@ -36,14 +36,8 @@ export class Downloader extends AbstractDownloader<DownloadData> {
   private fetcher: FetchFunction
   private scraperEmitter: ReturnType<Tools['emitter']['scraper']>
 
-  public constructor(
-    scraperName: ScraperName,
-    downloadConfig: DownloadConfig,
-    settings: ScrapeSettings,
-    tools: Tools
-  ) {
-    super(scraperName, downloadConfig, settings, tools)
-    this.downloadConfig = downloadConfig // must be set on again on child classes https://github.com/babel/babel/issues/9439
+  public constructor(downloadConfig: DownloadConfig, settings: ScrapeSettings, tools: Tools) {
+    super(downloadConfig, settings, tools)
 
     const { read, write, urlTemplate, headerTemplates } = downloadConfig
     // set templates

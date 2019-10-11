@@ -4,24 +4,19 @@ import { Parser as JsonParser } from './implementations/json'
 import { Parser as IdentityParser } from './implementations/identity'
 // type imports
 import { ScrapeSettings } from '../../../settings'
-import { ScraperName } from '../../../settings/config/types'
 import { Tools } from '../../../tools'
 
-export const parserClassFactory = (
-  scraperName: ScraperName,
-  settings: ScrapeSettings,
-  tools: Tools
-) => {
+export const parserClassFactory = (settings: ScrapeSettings, tools: Tools) => {
   const { parse } = settings.config
 
   if (!parse) {
-    return new IdentityParser(scraperName, parse, settings, tools)
+    return new IdentityParser(parse, settings, tools)
   } else if (HtmlParser.isHtmlParseConfig(parse)) {
-    return new HtmlParser(scraperName, parse, settings, tools)
+    return new HtmlParser(parse, settings, tools)
   } else if (XmlParser.isXmlParseConfig(parse)) {
-    return new XmlParser(scraperName, parse, settings, tools)
+    return new XmlParser(parse, settings, tools)
   } else if (JsonParser.isJsonParseConfig(parse)) {
-    return new JsonParser(scraperName, parse, settings, tools)
+    return new JsonParser(parse, settings, tools)
   }
 }
 export type ParserClass = HtmlParser | JsonParser | IdentityParser

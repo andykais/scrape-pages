@@ -3,7 +3,6 @@ import { AbstractParser } from '../abstract'
 // type imports
 import { ScrapeSettings } from '../../../../settings'
 import {
-  ScraperName,
   ParseConfigInterface,
   ParseConfigHtml,
   ParseConfigXml
@@ -18,13 +17,12 @@ export class Parser extends AbstractParser {
   private parser: (value: string) => string[]
 
   public constructor(
-    scraperName: ScraperName,
     parseConfig: ParseConfigHtml | ParseConfigXml,
     settings: ScrapeSettings,
     tools: Tools,
     cheerioFlags: {} = {}
   ) {
-    super(scraperName, parseConfig, settings, tools)
+    super(parseConfig, settings, tools)
     this.parseConfig = parseConfig // must be set on again on child classes https://github.com/babel/babel/issues/9439
     this.parser = this.parseConfig.attribute
       ? this.selectAttrVals(this.parseConfig.attribute)

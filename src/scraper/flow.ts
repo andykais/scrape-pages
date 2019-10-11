@@ -8,7 +8,7 @@ import { FetchError, ResponseError } from '../util/errors'
 import { Tools } from '../tools'
 import { ParsedValue } from './scrape-step'
 import { Settings } from '../settings'
-import { FlowStep, ScrapeConfig } from '../settings/config/types'
+import { FlowStep, Scraper } from '../settings/config/types'
 
 type DownloadParseBoolean = (parsedValues: ParsedValue[], incrementIndex: number) => boolean
 
@@ -28,7 +28,7 @@ const catchDownloadError = (e: Error) => {
 }
 const throwAnyError = (e: Error) => Rx.throwError(e)
 
-const chooseIncrementEvaluator = ({ incrementUntil }: ScrapeConfig): DownloadParseBoolean => {
+const chooseIncrementEvaluator = ({ incrementUntil }: Scraper): DownloadParseBoolean => {
   switch (incrementUntil) {
     case 'empty-parse':
       return incrementUntilEmptyParse
@@ -38,7 +38,7 @@ const chooseIncrementEvaluator = ({ incrementUntil }: ScrapeConfig): DownloadPar
       return incrementUntilNumericIndex(incrementUntil)
   }
 }
-const chooseIgnoreError = ({ incrementUntil }: ScrapeConfig) => {
+const chooseIgnoreError = ({ incrementUntil }: Scraper) => {
   switch (incrementUntil) {
     case 'failed-download':
       return catchDownloadError
@@ -57,8 +57,7 @@ const setupFlowPipeline = (settings: Settings, tools: Tools) => (
     const options = settings.flatOptions.getOrThrow(config.name)
     const params = settings.flatParams.getOrThrow(config.name)
 
-    // TODO remove scraperName arg now that its redundant
-    const scraper = new ScrapeStep(config.name, { config, options, params }, tools)
+    const scraper = new ScrapeStep({ config, options, params }, tools)
     const branch = flowStep.branch.map(setupFlowPipeline(settings, tools))
     const recurse = flowStep.recurse.map(setupFlowPipeline(settings, tools))
 
@@ -70,7 +69,6 @@ const setupFlowPipeline = (settings: Settings, tools: Tools) => (
 
     // TODO encode/classify/contractify the value,index relationship?
     return Rx.pipe(
-      // ops.tap(x => console.log(config.name, x)),
       ops.takeWhile(() => !outsideCommands.stop), // itd be nice to use an Rx.fromEvent, but something funky is happeneing here
       ops.flatMap(parentValue =>
         RxCustom.whileLoop(scraper.downloadParseFunction, okToIncrement, parentValue)
@@ -93,8 +91,6 @@ const setupFlowPipeline = (settings: Settings, tools: Tools) => (
           )
         )
       ),
-      // Important distinction! new data flow now. We flow right,diagonal AND NOW down.
-      // down data flows from any branches above into it
       ops.catchError(wrapError(`scraper '${scraper.scraperName}'`)),
       // branching step
       ops.flatMap(([parsedValues]) => {
@@ -102,10 +98,7 @@ const setupFlowPipeline = (settings: Settings, tools: Tools) => (
           Rx.from(parsedValues).pipe(branchPipeline)
         )
         return branchesSource.length ? Rx.merge(...branchesSource) : Rx.from(parsedValues)
-        // I dont think this is a good choice. theres way more variation in the returned stuff
-        // return Rx.merge(branchesSource, Rx.of(parsedValues))
-        //
-        // this one is the easiest to test. It would mean data only flows DOWN and RIGHT, not left-diagonal
+        // the old fashioned way data flew. Only DOWN and RIGHT, not this mergin left-diagonal
         // return Rx.merge(Rx.of(parsedValues), Rx.merge(...branchesSource).pipe(ops.filter(x=>false)))
       })
       // ops.mergeAll()
