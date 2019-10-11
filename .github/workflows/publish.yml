@@ -2,7 +2,7 @@ name: NPM Publish
 
 on:
   release:
-    types: [published, created]
+    types: [published]
 
 jobs:
   test:
@@ -27,9 +27,10 @@ jobs:
       env:
         NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
         GITHUB_TOKEN: ${{ secrets.github_token }}
-        TAG: ${{ github.ref }}
+        TAG: ${{ github.event.release.tag_name }}
       run: |
         npm version --no-git-tag-version $TAG
+        npm run build
         cd lib
         echo '//registry.npmjs.org/:_authToken=${NPM_AUTH_TOKEN}' > .npmrc
         npm publish
