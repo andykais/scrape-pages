@@ -11,11 +11,6 @@ It focuses on readability and reusability with a tiny api footprint.
 [![license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/andykais/scrape-pages/blob/master/LICENSE)
 [![Coverage Status](https://coveralls.io/repos/github/andykais/scrape-pages/badge.svg?branch=master)](https://coveralls.io/github/andykais/scrape-pages?branch=master)
 
-<h3>
-<a href="#documentation">Documentation</a> | <a href="https://scrape-pages.js.org">Playground</a>
-</h3>
-
-
 <sub>
 :warning: This project is under active development. Expect bugs and frequent api changes.
 
@@ -95,6 +90,10 @@ on('done', () => {
 ```
 
 For more real world examples, visit the [examples](examples) directory
+
+## Playground
+A playground exists at https://scrape-pages.js.org to help visualize scraper flows. It is also a useful way to
+share a `config` object with others.
 
 ## Documentation
 
