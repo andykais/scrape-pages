@@ -41,6 +41,7 @@
     "handlebars": "^4.4.3",
     "jsonata": "^1.7.0",
     "node-fetch": "^2.5.0",
+    "readline-sync": "^1.4.10",
     "rxjs": "^6.5.2",
     "typescript-is": "^0.12.6",
     "verror": "^1.10.0"
@@ -73,7 +74,6 @@
     "pre-push": "^0.1.1",
     "prettier": "^1.17.1",
     "raw-loader": "^3.1.0",
-    "readline-sync": "^1.4.10",
     "shx": "^0.3.2",
     "ts-loader": "^6.2.0",
     "typescript": "^3.6.4",
