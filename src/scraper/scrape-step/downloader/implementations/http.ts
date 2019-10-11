@@ -77,7 +77,7 @@ export class Downloader extends AbstractDownloader<DownloadData> {
 
   private downloadToFileAndMemory: FetchFunction = async (downloadId, [url, fetchOptions]) => {
     const downloadFolder = path.resolve(this.params.folder, downloadId.toString())
-    const filename = path.resolve(downloadFolder, sanitizeFilename(url))
+    const filename = path.resolve(downloadFolder, downloadId.toString() + path.extname(url))
 
     const response = await fetch(url, fetchOptions)
     if (!response.ok) throw new ResponseError(response, url)
@@ -103,7 +103,7 @@ export class Downloader extends AbstractDownloader<DownloadData> {
   }
   private downloadToFileOnly: FetchFunction = async (downloadId, [url, fetchOptions]) => {
     const downloadFolder = path.resolve(this.params.folder, downloadId.toString())
-    const filename = path.resolve(downloadFolder, sanitizeFilename(url))
+    const filename = path.resolve(downloadFolder, downloadId.toString() + path.extname(url))
 
     const response = await fetch(url, fetchOptions)
     if (!response.ok) throw new ResponseError(response, url)
