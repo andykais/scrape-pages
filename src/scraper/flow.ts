@@ -62,7 +62,8 @@ const setupFlowPipeline = (settings: Settings, tools: Tools) => (
     const recurse = flowStep.recurse.map(setupFlowPipeline(settings, tools))
 
     const outsideCommands = { stop: false }
-    tools.emitter.scraper(config.name).on.stop(() => (outsideCommands.stop = true))
+    tools.emitter.scraper(config.name).on('stop', () => (outsideCommands.stop = true))
+    // tools.emitter.scraper(config.name).on.stop(() => (outsideCommands.stop = true))
 
     const okToIncrement = chooseIncrementEvaluator(scraper.config)
     const ignoreFetchError = chooseIgnoreError(scraper.config)

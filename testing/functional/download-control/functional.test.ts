@@ -22,9 +22,9 @@ describe(__filename, () => {
     step('first pass should fetch all downloads since nothing is in cache', async () => {
       const { start, query } = scrape(config, { cache: true }, params)
       const siteMock = await NockFolderMock.create(resourceFolder, resourceUrl)
-      const { on } = await start()
-      const { counts } = useRequestStatsRecorder(config, on)
-      await new Promise(resolve => on('done', resolve))
+      const emitter = await start()
+      const { counts } = useRequestStatsRecorder(config, emitter)
+      await new Promise(resolve => emitter.on('done', resolve))
       siteMock.done()
       expect(counts.index.queued).to.equal(1)
       expect(counts.index.complete).to.equal(1)
@@ -40,9 +40,9 @@ describe(__filename, () => {
       expect(resultPre).to.equalQueryResult(expected[JSON.stringify(queryArgs)])
 
       const siteMock = await NockFolderMock.create(resourceFolder, resourceUrl)
-      const { on } = await start()
-      const { counts } = useRequestStatsRecorder(config, on)
-      await new Promise(resolve => on('done', resolve))
+      const emitter = await start()
+      const { counts } = useRequestStatsRecorder(config, emitter)
+      await new Promise(resolve => emitter.on('done', resolve))
       siteMock.done()
       expect(counts.index.queued).to.equal(0)
       expect(counts.index.complete).to.equal(1)
@@ -59,9 +59,9 @@ describe(__filename, () => {
         { ...params, cleanFolder: false }
       )
       const siteMock = await NockFolderMock.create(resourceFolder, resourceUrl)
-      const { on } = await start()
-      const { counts } = useRequestStatsRecorder(config, on)
-      await new Promise(resolve => on('done', resolve))
+      const emitter = await start()
+      const { counts } = useRequestStatsRecorder(config, emitter)
+      await new Promise(resolve => emitter.on('done', resolve))
       siteMock.done()
       expect(counts.index.queued).to.equal(1)
       expect(counts.index.complete).to.equal(1)
@@ -95,11 +95,11 @@ describe(__filename, () => {
     describe(`emit('stop:<scraper>')`, () => {
       it('should only stop the postTitle scraper', async () => {
         const { start, query } = scrape(configBranching, options, params)
-        const { on, emit } = await start()
-        const { counts } = useRequestStatsRecorder(configBranching, on)
+        const emitter = await start()
+        const { counts } = useRequestStatsRecorder(configBranching, emitter)
         // TODO stop is still fickle on continuous runs...sometimes postTitle queues get through
-        on('index:queued', () => emit('stop:postTitle'))
-        await new Promise(resolve => on('done', resolve))
+        emitter.on('index:queued', () => emitter.emit('stop:postTitle'))
+        await new Promise(resolve => emitter.on('done', resolve))
 
         expect(counts.index.queued).to.equal(1)
         expect(counts.postTitle.queued).to.equal(0)
@@ -125,10 +125,10 @@ describe(__filename, () => {
         .reply(500)
 
       const { start } = scrape(config, options, params)
-      const { on } = await start()
-      const { counts } = useRequestStatsRecorder(config, on)
+      const emitter = await start()
+      const { counts } = useRequestStatsRecorder(config, emitter)
       await new Promise((resolve, reject) => {
-        on('error', (e: Error) => {
+        emitter.on('error', (e: Error) => {
           expect(e).to.be.instanceof(Error)
           expect(e.name).to.equal('ResponseError')
           expect(e.message).to.include(
@@ -138,7 +138,7 @@ describe(__filename, () => {
           expect(counts['will-fail'].complete).to.equal(0)
           resolve()
         })
-        on('done', () => reject(`scraper should have emitted 'error' not 'done'`))
+        emitter.on('done', () => reject(`scraper should have emitted 'error' not 'done'`))
       })
     })
   })

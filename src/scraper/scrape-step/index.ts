@@ -78,7 +78,7 @@ class ScrapeStep {
     })()
     this.tools.emitter
       .scraper(this.scraperName)
-      .emit.completed({ id: downloadId, filename, mimeType, byteLength })
+      .emit('complete', { id: downloadId, filename, mimeType, byteLength })
     return store.qs.selectParsedValues(downloadId)
   }
 }

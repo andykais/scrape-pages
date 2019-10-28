@@ -6,90 +6,57 @@ import { Settings } from '../settings'
 import { ScraperName } from '../settings/config/types'
 
 type DownloadInfo = { id: number; filename?: string; mimeType?: string; byteLength?: number }
+
 class ScraperEmitter {
-  /** listenable by user */
-  public listenable = {
-    QUEUED: 'queued',
-    PROGRESS: 'progress',
-    COMPLETE: 'complete'
-  }
-  /** emittable by user */
-  public emittable = {
-    STOP: 'stop'
-  }
-  public emit = {
-    queued: (id: number) => {
-      this.emitter.emit(`${this.name}:${this.listenable.QUEUED}`, id)
-    },
-    progress: (id: number, progress: number) => {
-      this.emitter.emit(`${this.name}:${this.listenable.PROGRESS}`, id, progress)
-    },
-    completed: (downloadInfo: DownloadInfo) => {
-      this.emitter.emit(`${this.name}:${this.listenable.COMPLETE}`, downloadInfo)
-    }
-  }
-  public on = {
-    stop: (callback: () => void) => {
-      this.emitter.on(`${this.emittable.STOP}:${this.name}`, callback)
-    }
+  public constructor(private scraperName: string, private emitter: EventEmitter) {}
+
+  public listenerCount(event: 'queued' | 'progress' | 'complete') {
+    return this.emitter.listenerCount(event)
   }
 
-  private emitter: EventEmitter
-  private name: string
-
-  public constructor(name: string, emitter: EventEmitter) {
-    this.emitter = emitter
-    this.name = name
+  public emit(event: 'queued', downloadId: number): boolean
+  public emit(event: 'progress', downloadId: number, progress: number): boolean
+  public emit(event: 'complete', downloadInfo: DownloadInfo): boolean
+  public emit(event: string, ...args: any[]): boolean {
+    return this.emitter.emit(`${this.scraperName}:${event}`, ...args)
   }
 
-  public hasListenerFor = (eventName: string) =>
-    this.emitter.listenerCount(`${this.name}:${eventName}`) !== 0
+  public on(event: 'stop', listener: () => void): this
+  public on(event: string, listener: (...args: any[]) => void) {
+    this.emitter.on(`${event}:${this.scraperName}`, listener)
+    return this
+  }
 }
 
-type EmitterOn = (event: string, callback: (...args: any[]) => void) => void
-type EmitterEmit = (event: string, ...emittedValues: any[]) => void
-
 class Emitter {
-  /** listenable by user */
-  public static listenable = {
-    DONE: 'done',
-    ERROR: 'error'
-  }
-  /** emittable by user */
-  public static emittable = {
-    STOP: 'stop',
-    USE_RATE_LIMITER: 'useRateLimiter'
-  }
-  public emitter: EventEmitter
-
-  /** used internally (verbs are reversed) */
-  public emit = {
-    done: () => {
-      this.emitter.emit(Emitter.listenable.DONE)
-    },
-    error: (error: Error) => {
-      this.emitter.emit(Emitter.listenable.ERROR, error)
-    }
-  }
-  /** used internally (verbs are reversed) */
-  public on = {
-    stop: (callback: () => void) => {
-      this.emitter.on(Emitter.emittable.STOP, callback)
-    }
-  }
-  private scrapers: FMap<ScraperName, ScraperEmitter>
+  private emitter: EventEmitter
+  private scrapers: FMap<string, ScraperEmitter>
 
   public constructor({ flatConfig }: Settings) {
     this.emitter = new EventEmitter()
-
+    this.emitter.on = this.emitter.on.bind(this.emitter)
+    this.emitter.emit = this.emitter.emit.bind(this.emitter)
     this.scrapers = flatConfig.map((_, name) => new ScraperEmitter(name, this.emitter))
   }
-  public scraper = (name: ScraperName) => this.scrapers.getOrThrow(name)
-  public getBoundOn = (): EmitterOn => this.emitter.on.bind(this.emitter)
-  public getBoundEmit = (): EmitterEmit => this.emitter.emit.bind(this.emitter)
-  public getRxEventStream = (eventName: string) => Rx.fromEvent(this.emitter, eventName)
 
-  private hasListenerFor = (eventName: string): boolean =>
-    this.emitter.listenerCount(eventName) !== 0
+  // get different emitters
+  public scraper = (scraper: string) => this.scrapers.getOrThrow(scraper)
+  public getBaseEmitter = () => this.emitter
+  public getRxEventStream(eventName: 'stop' | 'useRateLimiter') {
+    return Rx.fromEvent(this.emitter, eventName)
+  }
+
+  public emit(event: 'done'): boolean
+  public emit(event: 'error', error: Error): boolean
+  public emit(event: string | symbol, ...args: any[]) {
+    return this.emitter.emit(event, ...args)
+  }
+
+  public on(event: 'stop', listener: () => void): this
+  public on(event: string | symbol, listener: (...args: any[]) => void) {
+    this.emitter.on(event, listener)
+    return this
+  }
 }
+
 export { Emitter }

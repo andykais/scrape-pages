@@ -11,7 +11,21 @@
     "no-unreachable": "error",
     "@typescript-eslint/no-unused-vars": ["error", { "varsIgnorePattern": "^_" }],
     "@typescript-eslint/explicit-member-accessibility": "error",
-    "@typescript-eslint/member-ordering": "error",
+    "@typescript-eslint/member-ordering": [
+      "error",
+      {
+        "default": [
+          "static-field",
+          "instance-field",
+          "abstract-field",
+
+          "constructor",
+          "static-method",
+          "instance-method",
+          "abstract-method"
+        ]
+      }
+    ],
     "no-only-tests/no-only-tests": "error"
   }
 }

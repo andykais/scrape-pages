@@ -60,5 +60,5 @@ export abstract class AbstractParser {
     return (values: string[]) => values
   }
 
-  protected abstract parse: (value?: string) => ParserValues
+  protected abstract parse(value?: string): ParserValues
 }

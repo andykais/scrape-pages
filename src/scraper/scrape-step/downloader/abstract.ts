@@ -56,7 +56,8 @@ export abstract class AbstractDownloader<DownloadData> {
         return cachedDownload
       }
     }
-    emitter.scraper(this.scraperName).emit.queued(downloadParams.downloadId)
+    emitter.scraper(this.scraperName).emit('queued', downloadParams.downloadId)
+    // emitter.scraper(this.scraperName).emit.queued(downloadParams.downloadId)
 
     const { downloadValue, filename, mimeType, byteLength } = await this.retrieve(
       downloadParams.downloadId,

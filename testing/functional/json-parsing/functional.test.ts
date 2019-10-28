@@ -37,6 +37,7 @@ describe(__filename, () => {
     const { start, query } = scrape(configParseJsonTwice, options, params)
     before(async () => {
       const siteMock = await NockFolderMock.create(resourceFolder, resourceUrl)
+
       const { on } = await start()
       await new Promise(resolve => on('done', resolve))
       siteMock.done()

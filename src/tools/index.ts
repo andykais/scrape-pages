@@ -18,7 +18,7 @@ export const initTools = (settings: Settings): Tools => {
   const emitter = new Emitter(settings)
   const logger = new Logger(settings)
   const rateLimiterEventStream = emitter
-    .getRxEventStream(Emitter.emittable.USE_RATE_LIMITER)
+    .getRxEventStream('useRateLimiter')
     .pipe(ops.map(toggle => !!toggle))
   const queue = new Queue(settings, rateLimiterEventStream)
 
