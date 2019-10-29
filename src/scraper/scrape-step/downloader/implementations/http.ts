@@ -131,6 +131,7 @@ export class Downloader extends AbstractDownloader<DownloadData> {
     if (!response.ok) throw new ResponseError(response, url)
     this.emitDownloadProgress(downloadId, response)
     const downloadValue = await response.text()
+    console.log({ downloadValue })
     const byteLength = Buffer.byteLength(downloadValue)
     return {
       downloadValue,

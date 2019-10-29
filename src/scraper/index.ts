@@ -2,6 +2,8 @@ import * as path from 'path'
 import { initTools } from '../tools'
 import { mkdirp, rmrf, exists, read, writeFile } from '../util/fs'
 import { getSettings } from '../settings'
+import { Emitter } from '../tools/emitter'
+import { Queue } from '../tools/queue'
 import { Logger } from '../tools/logger'
 import { Store } from '../tools/store'
 import { compileProgram } from './flow'
@@ -35,51 +37,104 @@ class ScraperProgram {
   public constructor(private settings: Settings, public query: QueryFn) {}
 
   public start = async () => {
-    await this.initFolders()
-    await this.writeMetadata()
-    // const { emitter, logger } = initStaticTools(this.settings)
-    // const { queue, store } = initIoTools(this.settings)
-    const tools = initTools(this.settings)
-    const { emitter, queue, logger } = tools
+    const emitter = new Emitter(this.settings)
 
-    logger.debug({ inspected: this.settings.config }, 'config')
-    logger.debug({ inspected: this.settings.flatConfig }, 'flatConfig')
-    logger.debug({ inspected: this.settings.flatOptions }, 'flatOptions')
-    logger.debug({ inspected: this.settings.flatParams }, 'flatParams')
+    await new Promise(resolve => setTimeout(resolve, 100))
 
-    // create the observable
-    const program = compileProgram(this.settings, tools)
+    // program starts detached so we can get the emitters synchronously
+    new Promise(async resolve => {
+      try {
+        await this.initFolders()
+        await this.writeMetadata()
 
-    // start running the observable
-    // setTimeout is necessary so that any listeners setup after start() is called are setup before downloads begin
-    let subscription: ReturnType<typeof program.subscribe>
-    setTimeout(() => {
-      subscription = program.subscribe({
-        error: function(error: Error) {
-          emitter.emit('error', error)
-          this.unsubscribe()
+        const logger = new Logger(this.settings)
+        const store = new Store(this.settings)
+        const queue = new Queue(this.settings, emitter.getRxEventStream('useRateLimiter'))
+        // console.log('query early')
+        // console.log(this.query({ scrapers: ['slow'] }))
+
+        const tools = { emitter, logger, store, queue }
+        // create the observable
+        const program = compileProgram(this.settings, tools)
+
+        let subscription: ReturnType<typeof program.subscribe>
+        setTimeout(() => {
+          subscription = program.subscribe({
+            error: function(error: Error) {
+              emitter.emit('error', error)
+              this.unsubscribe()
+              queue.closeQueue()
+            },
+            complete: () => {
+              queue.closeQueue()
+              emitter.emit('done')
+              logger.info('Done!')
+            }
+          })
+        }, 0)
+
+        emitter.on('stop', () => {
+          logger.info('Exiting manually.')
           queue.closeQueue()
-        },
-        complete: () => {
-          queue.closeQueue()
+          // necessary so we can listen to 'stop' event right away, but wait to cancel the observable until after it is started
+          subscription.unsubscribe()
           emitter.emit('done')
-          logger.info('Done!')
-        }
-      })
-    }, 0)
-    emitter.on('stop', () => {
-      logger.info('Exiting manually.')
-      queue.closeQueue()
-      // necessary so we can listen to 'stop' event right away, but wait to cancel the observable until after it is started
-      setTimeout(() => {
-        subscription.unsubscribe()
-        emitter.emit('done')
-        logger.info(`Done.`)
-      }, 0)
+          logger.info(`Done.`)
+        })
+      } catch (error) {
+        emitter.emit('error', error)
+      }
     })
-
+    // initProgram()
     return emitter.getBaseEmitter()
   }
+
+  // public start = async () => {
+  //   await this.initFolders()
+  //   await this.writeMetadata()
+  //   // const { emitter, logger } = initStaticTools(this.settings)
+  //   // const { queue, store } = initIoTools(this.settings)
+  //   const tools = initTools(this.settings)
+  //   const { emitter, queue, logger } = tools
+
+  //   logger.debug({ inspected: this.settings.config }, 'config')
+  //   logger.debug({ inspected: this.settings.flatConfig }, 'flatConfig')
+  //   logger.debug({ inspected: this.settings.flatOptions }, 'flatOptions')
+  //   logger.debug({ inspected: this.settings.flatParams }, 'flatParams')
+
+  //   // create the observable
+  //   const program = compileProgram(this.settings, tools)
+
+  //   // start running the observable
+  //   // setTimeout is necessary so that any listeners setup after start() is called are setup before downloads begin
+  //   let subscription: ReturnType<typeof program.subscribe>
+  //   setTimeout(() => {
+  //     subscription = program.subscribe({
+  //       error: function(error: Error) {
+  //         emitter.emit('error', error)
+  //         this.unsubscribe()
+  //         queue.closeQueue()
+  //       },
+  //       complete: () => {
+  //         queue.closeQueue()
+  //         emitter.emit('done')
+  //         logger.info('Done!')
+  //       }
+  //     })
+  //   }, 0)
+  //   emitter.on('stop', () => {
+  //     logger.info('Exiting manually.')
+  //     queue.closeQueue()
+  //     // necessary so we can listen to 'stop' event right away, but wait to cancel the observable until after it is started
+  //     setTimeout(() => {
+  //       subscription.unsubscribe()
+  //       emitter.emit('done')
+  //       logger.info(`Done.`)
+  //     }, 0)
+  //   })
+
+  //   return emitter.getBaseEmitter()
+  // }
 
   public analyzeConfig = () => ({
     inputs: this.settings.config.input,

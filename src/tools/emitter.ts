@@ -1,5 +1,6 @@
 import { EventEmitter } from 'events'
 import * as Rx from 'rxjs'
+import * as ops from 'rxjs/operators'
 // type imports
 import { FMap } from '../util/map'
 import { Settings } from '../settings'
@@ -8,6 +9,7 @@ import { ScraperName } from '../settings/config/types'
 type DownloadInfo = { id: number; filename?: string; mimeType?: string; byteLength?: number }
 
 class ScraperEmitter {
+  public stopRequested: boolean = false
   public constructor(private scraperName: string, private emitter: EventEmitter) {}
 
   public listenerCount(event: 'queued' | 'progress' | 'complete') {
@@ -23,7 +25,9 @@ class ScraperEmitter {
 
   public on(event: 'stop', listener: () => void): this
   public on(event: string, listener: (...args: any[]) => void) {
-    this.emitter.on(`${event}:${this.scraperName}`, listener)
+    if (event === 'stop') {
+      this.emitter.on(`${event}:${this.scraperName}`, () => (this.stopRequested = true))
+    } else this.emitter.on(`${event}:${this.scraperName}`, listener)
     return this
   }
 }
@@ -43,7 +47,7 @@ class Emitter {
   public scraper = (scraper: string) => this.scrapers.getOrThrow(scraper)
   public getBaseEmitter = () => this.emitter
   public getRxEventStream(eventName: 'stop' | 'useRateLimiter') {
-    return Rx.fromEvent(this.emitter, eventName)
+    return Rx.fromEvent(this.emitter, eventName).pipe(ops.map(Boolean))
   }
 
   public emit(event: 'done'): boolean

@@ -1,3 +1,4 @@
+import * as nock from 'nock'
 // type imports
 import { Assertion } from 'chai'
 import { Overwrite } from '../src/util/types'
@@ -29,3 +30,7 @@ export const stripResult = (result: QueryResult): StrippedQueryResult =>
       return acc
     }, {})
   )
+
+before(() => {
+  nock.cleanAll()
+})

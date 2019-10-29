@@ -143,7 +143,10 @@ describe(__filename, () => {
     })
   })
 
-  describe('in progress requests', () => {
+  describe.only('in progress requests', () => {
+    afterEach(() => {
+      nock.cleanAll()
+    })
     it('it should show complete = 0 in result', async () => {
       const config = {
         flow: [{ name: 'slow', download: 'https://slow-url.com/a' }]
@@ -151,23 +154,38 @@ describe(__filename, () => {
       nock('https://slow-url.com')
         .get('/a')
         .delayBody(1000)
-        .reply(200)
+        .reply(200, '')
       const { start, query } = scrape(config, options, params)
+      // console.log(query({ scrapers: ['slow'] }))
       const { on } = await start()
+      // console.log(query({ scrapers: ['slow'] }))
+      // console.log('starting')
       const getSlowScraper = query.prepare({ scrapers: ['slow'] })
 
       on('slow:queued', () => {
         const result = getSlowScraper()
+        // const result = query({ scrapers: ['slow'] })
         expect(result.length).to.equal(1)
         expect(result[0]['slow'].length).to.equal(1)
+        console.log(result[0])
         expect(result[0]['slow'][0].complete).to.equal(0) // this is a BIT (1 | 0) column in sqlite
       })
 
       await new Promise(resolve => on('done', resolve))
+      // console.log(query.prepare({ scrapers: ['slow'] })()[0])
+        console.log(query({ scrapers: ['slow'] })[0].downloadData)
+        console.log(getSlowScraper()[0].downloadData)
+        console.log(query({ scrapers: ['slow'] })[0].downloadData)
+      // query({ scrapers: ['slow'], [Symbol.for('query-execution-stepper')]: ['scraper', 'downloadData'] })
       const result = getSlowScraper()
       expect(result.length).to.equal(1)
+      console.log(result.length, result[0])
       expect(result[0]['slow'].length).to.equal(1)
       expect(result[0]['slow'][0].complete).to.equal(1)
     })
   })
 })
+
+// TODO afterEach(() => {
+// nock.cleanAll()
+// })
