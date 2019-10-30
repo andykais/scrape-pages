@@ -21,7 +21,7 @@ describe(__filename, () => {
   afterEach(siteMock.done)
 
   describe('with simple json response', () => {
-    it.only('should get em', async () => {
+    it('should get em', async () => {
       const { start, query } = scrape(config, options, params)
       const { on } = start()
       await new Promise(resolve => on('done', resolve))
