@@ -117,13 +117,14 @@ The `scrape` function returns a promise which yields these utilities (`on`, `emi
 
 Listen for events from the scraper
 
-| event                  | callback arguments | description                                |
-| ---------------------- | ------------------ | ------------------------------------------ |
-| `'done'`               |                    | when the scraper has completed             |
-| `'error'`              | Error              | if the scraper encounters an error         |
-| `'<scraper>:progress'` | download id        | emits progress of download until completed |
-| `'<scraper>:queued'`   | download id        | when a download is queued                  |
-| `'<scraper>:complete'` | download id        | when a download is completed               |
+| event                  | callback arguments | description                                                    |
+| ---------------------- | ------------------ | ------------------------------------------                     |
+| `'initialized'`        |                    | after start(), `initialized` means scraper has begun  scraping |
+| `'done'`               |                    | when the scraper has completed                                 |
+| `'error'`              | Error              | if the scraper encounters an error                             |
+| `'<scraper>:progress'` | download id        | emits progress of download until completed                     |
+| `'<scraper>:queued'`   | download id        | when a download is queued                                      |
+| `'<scraper>:complete'` | download id        | when a download is completed                                   |
 
 #### emit
 

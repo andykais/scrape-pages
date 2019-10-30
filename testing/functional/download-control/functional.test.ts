@@ -82,7 +82,7 @@ describe(__filename, () => {
     describe(`emit('stop')`, () => {
       it(`should stop the whole scraper if triggered before any 'complete' event`, async () => {
         const { start, query } = scrape(config, options, params)
-        const { on, emit } = await start()
+        const { on, emit } = start()
         on('index:queued', () => emit('stop'))
         await new Promise(resolve => on('done', resolve))
 
@@ -95,8 +95,9 @@ describe(__filename, () => {
     describe(`emit('stop:<scraper>')`, () => {
       it('should only stop the postTitle scraper', async () => {
         const { start, query } = scrape(configBranching, options, params)
-        const emitter = await start()
+        const emitter = start()
         const { counts } = useRequestStatsRecorder(configBranching, emitter)
+        // emitter.emit('stop:postTitle')
         // TODO stop is still fickle on continuous runs...sometimes postTitle queues get through
         emitter.on('index:queued', () => emitter.emit('stop:postTitle'))
         await new Promise(resolve => emitter.on('done', resolve))
@@ -143,49 +144,43 @@ describe(__filename, () => {
     })
   })
 
-  describe.only('in progress requests', () => {
-    afterEach(() => {
-      nock.cleanAll()
-    })
+  describe('in progress requests', () => {
     it('it should show complete = 0 in result', async () => {
-      const config = {
-        flow: [{ name: 'slow', download: 'https://slow-url.com/a' }]
-      }
       nock('https://slow-url.com')
         .get('/a')
         .delayBody(1000)
         .reply(200, '')
+
+      const config = {
+        flow: [{ name: 'slow', download: 'https://slow-url.com/a' }]
+      }
+
       const { start, query } = scrape(config, options, params)
-      // console.log(query({ scrapers: ['slow'] }))
-      const { on } = await start()
-      // console.log(query({ scrapers: ['slow'] }))
-      // console.log('starting')
-      const getSlowScraper = query.prepare({ scrapers: ['slow'] })
+      const { on } = start()
+
+      await new Promise(resolve => on('initialized', resolve))
+      const queryStmt = query.prepare({ scrapers: ['slow'] })
 
       on('slow:queued', () => {
-        const result = getSlowScraper()
-        // const result = query({ scrapers: ['slow'] })
+        const result = queryStmt()
         expect(result.length).to.equal(1)
         expect(result[0]['slow'].length).to.equal(1)
-        console.log(result[0])
         expect(result[0]['slow'][0].complete).to.equal(0) // this is a BIT (1 | 0) column in sqlite
       })
 
       await new Promise(resolve => on('done', resolve))
-      // console.log(query.prepare({ scrapers: ['slow'] })()[0])
-        console.log(query({ scrapers: ['slow'] })[0].downloadData)
-        console.log(getSlowScraper()[0].downloadData)
-        console.log(query({ scrapers: ['slow'] })[0].downloadData)
-      // query({ scrapers: ['slow'], [Symbol.for('query-execution-stepper')]: ['scraper', 'downloadData'] })
-      const result = getSlowScraper()
+      const result = queryStmt()
       expect(result.length).to.equal(1)
-      console.log(result.length, result[0])
       expect(result[0]['slow'].length).to.equal(1)
       expect(result[0]['slow'][0].complete).to.equal(1)
     })
+
+    it('should hear a "done" event even if the scraper is empty and we wait on "initialized"', async () => {
+      const config = { flow: [] }
+      const scraper = scrape(config, options, params)
+      const { on } = scraper.start()
+      await new Promise(resolve => on('initialized', resolve))
+      await new Promise(resolve => on('done', resolve))
+    })
   })
 })
-
-// TODO afterEach(() => {
-// nock.cleanAll()
-// })

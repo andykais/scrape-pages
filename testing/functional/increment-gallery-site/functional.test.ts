@@ -47,7 +47,7 @@ describe(__filename, () => {
 
       before(async () => {
         await siteMock.init()
-        const { on } = await start()
+        const { on } = start()
         await new Promise(resolve => on('done', resolve))
         siteMock.done()
       })
@@ -75,7 +75,7 @@ describe(__filename, () => {
 
     before(async () => {
       const siteMock = await NockFolderMock.create(resourceFolder, resourceUrl)
-      const { on } = await start()
+      const { on } = start()
       await new Promise(resolve => on('done', resolve))
       siteMock.done()
     })

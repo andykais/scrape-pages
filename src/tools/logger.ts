@@ -2,6 +2,7 @@ import * as path from 'path'
 import { inspect } from 'util'
 import * as Bunyan from 'bunyan'
 import { tap } from 'rxjs/operators'
+import { ToolBase } from './abstract'
 import * as fs from '../util/fs'
 // type imports
 import { FMap } from '../util/map'
@@ -15,7 +16,7 @@ const serializers = {
     return inspect(object, { showHidden: true, depth: null })
   }
 }
-class Logger {
+class Logger extends ToolBase {
   private static logFilename = 'run.log.0'
   public debug: Bunyan['debug']
   public info: Bunyan['info']
@@ -24,7 +25,10 @@ class Logger {
   private logger: Bunyan
   private scraperLoggers: FMap<ScraperName, Bunyan>
 
-  public constructor({ optionsInit, flatOptions, paramsInit }: Settings) {
+  public constructor(settings: Settings) {
+    super(settings)
+    const { optionsInit, flatOptions, paramsInit } = settings
+
     this.logger = Bunyan.createLogger({
       name: 'root',
       level: optionsInit.logLevel || ('warn' as 'warn'),
@@ -55,6 +59,8 @@ class Logger {
 
   public tap = (name = 'TAP') => tap((...args: any[]) => this.logger.debug({ tap: name, ...args }))
   public scraper = (name: ScraperName) => this.scraperLoggers.getOrThrow(name)
+
+  public cleanup() {}
 }
 
 export type LogLevel = Bunyan.LogLevel

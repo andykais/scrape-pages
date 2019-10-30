@@ -40,7 +40,7 @@ describe(__filename, () => {
 
       before(async () => {
         await siteMock.init()
-        const { on } = await start()
+        const { on } = start()
         await new Promise(resolve => on('done', resolve))
         siteMock.done()
       })

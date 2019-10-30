@@ -31,6 +31,4 @@ export const stripResult = (result: QueryResult): StrippedQueryResult =>
     }, {})
   )
 
-before(() => {
-  nock.cleanAll()
-})
+beforeEach(() => nock.cleanAll())

@@ -75,9 +75,8 @@ class ScrapeStep {
         parsedValues,
         format: this.parser.type
       })
-      console.log('download is marked complete')
     })()
-    console.log('transaction complete')
+
     this.tools.emitter
       .scraper(this.scraperName)
       .emit('complete', { id: downloadId, filename, mimeType, byteLength })

@@ -16,6 +16,13 @@ class UninitializedDatabaseError extends Error {
   }
 }
 
+class InternalLibraryError extends Error {
+  public name = 'InternalLibraryError'
+  public constructor(message: string) {
+    super(message)
+  }
+}
+
 export { FetchError } from 'node-fetch'
 export { TypeGuardError } from 'typescript-is'
-export { ResponseError, UninitializedDatabaseError }
+export { ResponseError, UninitializedDatabaseError, InternalLibraryError }

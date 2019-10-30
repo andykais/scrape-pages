@@ -2,8 +2,6 @@ import * as path from 'path'
 import { initTools } from '../tools'
 import { mkdirp, rmrf, exists, read, writeFile } from '../util/fs'
 import { getSettings } from '../settings'
-import { Emitter } from '../tools/emitter'
-import { Queue } from '../tools/queue'
 import { Logger } from '../tools/logger'
 import { Store } from '../tools/store'
 import { compileProgram } from './flow'
@@ -13,7 +11,6 @@ import { Settings } from '../settings'
 import { ConfigInit } from '../settings/config/types'
 import { OptionsInit } from '../settings/options/types'
 import { ParamsInit } from '../settings/params/types'
-import { ThenArg } from '../util/types'
 
 /**
  * scrape is the entrypoint for this library
@@ -36,57 +33,57 @@ export const scrape = (
 class ScraperProgram {
   public constructor(private settings: Settings, public query: QueryFn) {}
 
-  public start = async () => {
-    const emitter = new Emitter(this.settings)
+  public start = () => {
+    const tools = initTools(this.settings)
+    const { emitter, logger } = tools
 
-    await new Promise(resolve => setTimeout(resolve, 100))
-
-    // program starts detached so we can get the emitters synchronously
-    new Promise(async resolve => {
+      // program starts detached so we can return the emitter synchronously
+    ;(async () => {
       try {
+        emitter.on('stop', () => {
+          logger.info('Exiting manually.')
+          const { emitter, ...internalTools } = tools
+          for (const tool of Object.values(internalTools)) tool.cleanup()
+          emitter.emit('done')
+          emitter.cleanup()
+          logger.info(`Done.`)
+        })
+
         await this.initFolders()
         await this.writeMetadata()
 
-        const logger = new Logger(this.settings)
-        const store = new Store(this.settings)
-        const queue = new Queue(this.settings, emitter.getRxEventStream('useRateLimiter'))
-        // console.log('query early')
-        // console.log(this.query({ scrapers: ['slow'] }))
+        for (const tool of Object.values(tools)) tool.initialize()
+        emitter.emit('initialized')
 
-        const tools = { emitter, logger, store, queue }
-        // create the observable
         const program = compileProgram(this.settings, tools)
 
-        let subscription: ReturnType<typeof program.subscribe>
-        setTimeout(() => {
-          subscription = program.subscribe({
-            error: function(error: Error) {
-              emitter.emit('error', error)
-              this.unsubscribe()
-              queue.closeQueue()
-            },
-            complete: () => {
-              queue.closeQueue()
-              emitter.emit('done')
-              logger.info('Done!')
-            }
-          })
-        }, 0)
+        const subscription = program.subscribe({
+          error: function(error: Error) {
+            emitter.emit('error', error)
+            logger.error(error)
+            this.unsubscribe()
+            for (const tool of Object.values(tools)) tool.cleanup()
+          },
+          complete: () => {
+            const { emitter, ...internalTools } = tools
+            for (const tool of Object.values(internalTools)) tool.cleanup()
 
-        emitter.on('stop', () => {
-          logger.info('Exiting manually.')
-          queue.closeQueue()
-          // necessary so we can listen to 'stop' event right away, but wait to cancel the observable until after it is started
-          subscription.unsubscribe()
-          emitter.emit('done')
-          logger.info(`Done.`)
+            // a nicety so we can await "initialized" and then start listening for "done"
+            setTimeout(() => {
+              emitter.emit('done')
+              emitter.cleanup()
+              logger.info('Done.')
+            }, 0)
+          }
         })
+        emitter.on('stop', subscription.unsubscribe)
       } catch (error) {
         emitter.emit('error', error)
+        logger.error(error)
+        for (const tool of Object.values(tools)) tool.cleanup()
       }
-    })
-    // initProgram()
-    return emitter.getBaseEmitter()
+    })()
+    return tools.emitter.getBaseEmitter()
   }
 
   // public start = async () => {
