@@ -27,20 +27,6 @@ class Logger extends ToolBase {
 
   public constructor(settings: Settings) {
     super(settings)
-    const { optionsInit, flatOptions, paramsInit } = settings
-
-    this.logger = Bunyan.createLogger({
-      name: 'root',
-      level: optionsInit.logLevel || ('warn' as 'warn'),
-      serializers,
-      streams: [{ path: path.resolve(paramsInit.folder, Logger.logFilename) }]
-    })
-    this.scraperLoggers = flatOptions.map((options, name) => this.logger.child({ scraper: name }))
-
-    this.debug = this.logger.debug.bind(this.logger)
-    this.info = this.logger.info.bind(this.logger)
-    this.warn = this.logger.warn.bind(this.logger)
-    this.error = this.logger.error.bind(this.logger)
   }
 
   /**
@@ -60,6 +46,22 @@ class Logger extends ToolBase {
   public tap = (name = 'TAP') => tap((...args: any[]) => this.logger.debug({ tap: name, ...args }))
   public scraper = (name: ScraperName) => this.scraperLoggers.getOrThrow(name)
 
+  public initialize() {
+    const { optionsInit, flatOptions, paramsInit } = this.settings
+
+    this.logger = Bunyan.createLogger({
+      name: 'root',
+      level: optionsInit.logLevel || ('warn' as 'warn'),
+      serializers,
+      streams: [{ path: path.resolve(paramsInit.folder, Logger.logFilename) }]
+    })
+    this.scraperLoggers = flatOptions.map((options, name) => this.logger.child({ scraper: name }))
+
+    this.debug = this.logger.debug.bind(this.logger)
+    this.info = this.logger.info.bind(this.logger)
+    this.warn = this.logger.warn.bind(this.logger)
+    this.error = this.logger.error.bind(this.logger)
+  }
   public cleanup() {}
 }
 
