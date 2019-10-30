@@ -34,8 +34,8 @@ describe(__filename, () => {
   })
 
   describe('with json blob parsed nested', () => {
-    const { start, query } = scrape(configParseJsonTwice, options, params)
     it('should stringify, then parse, then stringify', async () => {
+      const { start, query } = scrape(configParseJsonTwice, options, params)
       const { on } = start()
       await new Promise(resolve => on('done', resolve))
 
@@ -51,8 +51,8 @@ describe(__filename, () => {
   })
 
   describe('with json that needs to be parsed out of a file', () => {
-    const { start, query } = scrape(configParseJsonInsideScript, options, params)
     it('should stringify, then parse, then stringify', async () => {
+      const { start, query } = scrape(configParseJsonInsideScript, options, params)
       const { on } = start()
       await new Promise(resolve => on('done', resolve))
 
