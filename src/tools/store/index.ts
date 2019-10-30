@@ -17,11 +17,11 @@ class Store extends ToolBase {
     super(settings)
   }
 
-  public get qs() {
+  public get qs(): Store['_qs'] {
     this.throwIfUninitialized()
     return this._qs
   }
-  public get transaction() {
+  public get transaction(): Store['_transaction'] {
     this.throwIfUninitialized()
     return this._transaction
   }
@@ -30,12 +30,11 @@ class Store extends ToolBase {
     // initialize sqlite3 database
     this.database = new Database(this.settings.paramsInit.folder)
     this.database.pragma('journal_mode = WAL')
-    // TODO move lower?
-    this._transaction = this.database.transaction.bind(this.database)
     // initialize tables (if they do not exist already)
     createTables(this.settings.flatConfig, this.database)()
     // prepare statements
     this._qs = createStatements(this.settings.flatConfig, this.database)
+    this._transaction = this.database.transaction.bind(this.database)
 
     super.initialize()
   }
