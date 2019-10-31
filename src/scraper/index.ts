@@ -5,7 +5,6 @@ import { ActiveScraperLockError, MismatchedVersionError } from '../util/errors'
 import { getSettings } from '../settings'
 import { Logger } from '../tools/logger'
 import { Store } from '../tools/store'
-import { Database } from '../tools/store/database'
 import { compileProgram } from './flow'
 // type imports
 import { QueryFn } from '../tools/store/querier-entrypoint'

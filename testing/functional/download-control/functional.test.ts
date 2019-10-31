@@ -155,7 +155,7 @@ describe(__filename, () => {
   })
 
   describe('in progress requests', () => {
-    it.only('it should show complete = 0 in result', async () => {
+    it('it should show complete = 0 in result', async () => {
       nock('https://slow-url.com')
         .get('/a')
         .delayBody(500)
@@ -230,7 +230,7 @@ describe(__filename, () => {
       const done2P = new Promise(resolve => emitter2.on('done', resolve))
       emitter2.on('error', e => (error = e))
       await Promise.all([done1P, done2P])
-      expect(error).to.be.null
+      expect(error).to.be.null // eslint-disable-line no-unused-expressions
     })
   })
 })
