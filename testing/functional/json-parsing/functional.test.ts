@@ -26,7 +26,7 @@ describe(__filename, () => {
       const { on } = start()
       await new Promise(resolve => on('done', resolve))
 
-      const result = query({ scrapers: ['apiResponse'] })
+      const result = query(['apiResponse'])
       expect(result.map(r => r['apiResponse'].map(c => c.parsedValue))).to.be.deep.equal([
         ['the', 'quick', 'brown', 'fox']
       ])
@@ -39,7 +39,7 @@ describe(__filename, () => {
       const { on } = start()
       await new Promise(resolve => on('done', resolve))
 
-      const result = query({ scrapers: ['parseContentFromPost'], groupBy: 'parseContentFromPost' })
+      const result = query(['parseContentFromPost'], { groupBy: 'parseContentFromPost' })
       expect(result).to.have.length(4)
       expect(result.map(r => r['parseContentFromPost'].map(c => c.parsedValue))).to.be.deep.equal([
         ['the'],
@@ -56,7 +56,7 @@ describe(__filename, () => {
       const { on } = start()
       await new Promise(resolve => on('done', resolve))
 
-      const result = query({ scrapers: ['jsonInJs'] })
+      const result = query(['jsonInJs'])
       expect(result[0]['jsonInJs']).to.have.length(9)
       expect(result.map(r => r['jsonInJs'].map(c => c.parsedValue))).to.be.deep.equal([
         ['the', 'quick', 'brown', 'fox', 'jumped', 'over', 'the', 'lazy', 'dog']

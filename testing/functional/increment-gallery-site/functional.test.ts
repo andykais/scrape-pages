@@ -8,6 +8,8 @@ import { RUN_OUTPUT_FOLDER, NockFolderMock } from '../../setup'
 import { config, configWithLimit, configMerging } from './config'
 import { expected } from './expected-query-results'
 import { scrape } from '../../../src'
+// type imports
+import { QueryArgs } from '../../../src/tools/store/querier-entrypoint'
 
 const resourceFolder = `${__dirname}/fixtures`
 const resourceUrl = `http://${path.basename(__dirname)}.com`
@@ -53,13 +55,13 @@ describe(__filename, () => {
       })
 
       it('should group each image into a separate slot, in order', () => {
-        const queryArgs = { scrapers: ['image'], groupBy: 'image' }
-        const result = query(queryArgs)
+        const queryArgs: QueryArgs = [['image'], { groupBy: 'image' }]
+        const result = query(...queryArgs)
         expect(result).to.equalQueryResult(expected[JSON.stringify(queryArgs)])
       })
       it('should group tags and images together that were found on the same page', function() {
-        const queryArgs = { scrapers: ['image', 'tag'], groupBy: 'image-page' }
-        const result = query(queryArgs)
+        const queryArgs: QueryArgs = [['image', 'tag'], { groupBy: 'image-page' }]
+        const result = query(...queryArgs)
         expect(result).to.equalQueryResult(expected[JSON.stringify(queryArgs)])
       })
     })
@@ -67,7 +69,7 @@ describe(__filename, () => {
 
   it('calling query() before start() should throw an uninitialized error', async () => {
     const { query } = scrape(config, options, params)
-    expect(() => query({ scrapers: ['image'] })).to.throw(UninitializedDatabaseError)
+    expect(() => query(['image'])).to.throw(UninitializedDatabaseError)
   })
 
   describe('with value limit', () => {
@@ -81,8 +83,8 @@ describe(__filename, () => {
     })
 
     it('should group each image into a separate slot, in order', () => {
-      const queryArgs = { scrapers: ['image'], groupBy: 'image' }
-      const result = query(queryArgs)
+      const queryArgs: QueryArgs = [['image'], { groupBy: 'image' }]
+      const result = query(...queryArgs)
 
       expect(result).to.have.length(2)
       // the first value is parsed from each gallery page
@@ -90,8 +92,8 @@ describe(__filename, () => {
       expect(result).to.equalQueryResult([expected1, expected3])
     })
     it('should group tags and images together that were found on the same page', () => {
-      const queryArgs = { scrapers: ['image', 'tag'], groupBy: 'image-page' }
-      const result = query(queryArgs)
+      const queryArgs: QueryArgs = [['image', 'tag'], { groupBy: 'image-page' }]
+      const result = query(...queryArgs)
 
       expect(result).to.have.length(2)
       const [expected1, _, expected3] = expected[JSON.stringify(queryArgs)]

@@ -1,8 +1,7 @@
-import { existsSync } from '../../util/fs'
-import { UninitializedDatabaseError } from '../../util/errors'
+import { createAssertType } from 'typescript-is'
 import { Database } from './database'
 import { selectOrderedScrapers } from './queries'
-import { typecheckQueryArguments } from '../../util/typechecking.runtime'
+// import { typecheckQueryArguments } from '../../util/typechecking.runtime'
 import { queryExecutionDebugger } from './query-debugger'
 // type imports
 import { DebuggerView } from './query-debugger'
@@ -12,18 +11,18 @@ import { SelectedRow as OrderedScrapersRow } from './queries/select-ordered-scra
 import { ArgumentTypes } from '../../util/types'
 
 export const EXECUTION_DEBUGGER_VIEW = Symbol.for('query-execution-stepper')
-export type QueryArguments = {
-  scrapers: ScraperName[]
-  groupBy?: ScraperName
-  // internal use only
-  [EXECUTION_DEBUGGER_VIEW]?: DebuggerView
-}
+
 type OrderedScraperGroup = { [scraperName: string]: OrderedScrapersRow[] }
+type Options = { groupBy?: ScraperName; [EXECUTION_DEBUGGER_VIEW]?: DebuggerView }
 export type QueryResult = OrderedScraperGroup[]
 export interface QueryFn {
-  prepare: (params: QueryArguments) => () => QueryResult
+  prepare: (scrapers: ScraperName[], options?: Options) => () => QueryResult
   (...args: ArgumentTypes<QueryFn['prepare']>): QueryResult
 }
+export type QueryArgs = ArgumentTypes<QueryFn['prepare']>
+
+const typecheckScrapers = createAssertType<ScraperName[]>()
+const typecheckOptions = createAssertType<Options>()
 
 /**
  * external function for grabbing data back out of the scraper
@@ -34,32 +33,32 @@ const querierFactory = (settings: Settings): QueryFn => {
   const { flatConfig, paramsInit } = settings
   let database: Database
 
-  const prepare: QueryFn['prepare'] = queryArgs => {
-    typecheckQueryArguments(queryArgs)
+  const prepare: QueryFn['prepare'] = (scrapers, options = {}) => {
+    typecheckScrapers(scrapers)
+    typecheckOptions(options)
 
-    let { scrapers, groupBy, [EXECUTION_DEBUGGER_VIEW]: debuggerView } = queryArgs
+    let { groupBy } = options
+    const debuggerView = options[EXECUTION_DEBUGGER_VIEW]
+
     // TODO throw error when scrapers do not exist? This might make it more tedious to reuse some functions in other libs
     scrapers = scrapers.filter(s => flatConfig.has(s))
     groupBy = groupBy && flatConfig.has(groupBy) ? groupBy : undefined
     if (scrapers.length === 0) return () => []
 
-    const databaseFile = Database.getFilePath(paramsInit.folder)
-    if (existsSync(databaseFile)) {
-      // this stateful stuff is necessary so we can give this to the user before creating folders
+    if (!database) {
+      Database.checkIfInitialized(paramsInit.folder)
       database = new Database(paramsInit.folder)
-    } else {
-      throw new UninitializedDatabaseError(databaseFile)
     }
 
     const scrapersInQuery = scrapers.concat(groupBy || [])
 
     const sqlCompiler = selectOrderedScrapers(flatConfig, database)
-    const preparedStmt = sqlCompiler(Array.from(new Set(scrapersInQuery)), false)
+    const stmt = sqlCompiler(Array.from(new Set(scrapersInQuery)), false)
 
     return () => {
       if (debuggerView) queryExecutionDebugger(scrapersInQuery, sqlCompiler, debuggerView)
 
-      const result = preparedStmt()
+      const result = stmt()
 
       const groupedResults = []
       let groupCount = 0
@@ -88,7 +87,7 @@ const querierFactory = (settings: Settings): QueryFn => {
     }
   }
   // create external query function
-  const query: QueryFn = params => prepare(params)()
+  const query: QueryFn = (...args) => prepare(...args)()
   // optionally call the `prepare` function first to get a prepared sqlite statement
   query.prepare = prepare
   return query

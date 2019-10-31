@@ -5,6 +5,8 @@ import { RUN_OUTPUT_FOLDER, NockFolderMock } from '../../setup'
 import { config, configFlattened } from './config'
 import { expected } from './expected-query-results'
 import { scrape } from '../../../src'
+/// type imports
+import { QueryArgs } from '../../../src/tools/store/querier-entrypoint'
 
 const resourceFolder = `${__dirname}/fixtures`
 const resourceUrl = `http://${path.basename(__dirname)}.com`
@@ -46,13 +48,13 @@ describe(__filename, () => {
       })
 
       it('should group each image into a separate slot, in order', () => {
-        const queryArgs = { scrapers: ['image'], groupBy: 'image' }
-        const result = query(queryArgs)
+        const queryArgs: QueryArgs = [['image'], { groupBy: 'image' }]
+        const result = query(...queryArgs)
         expect(result).to.equalQueryResult(expected[JSON.stringify(queryArgs)])
       })
       it('should group tags and images together that were found on the same page', () => {
-        const queryArgs = { scrapers: ['image', 'tag'], groupBy: 'image-page' }
-        const result = query(queryArgs)
+        const queryArgs: QueryArgs = [['image', 'tag'], { groupBy: 'image-page' }]
+        const result = query(...queryArgs)
         expect(result).to.equalQueryResult(expected[JSON.stringify(queryArgs)])
       })
     })

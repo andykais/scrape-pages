@@ -6,6 +6,8 @@ import { RUN_OUTPUT_FOLDER, NockFolderMock, useRequestStatsRecorder } from '../.
 import { config, configBranching } from './config'
 import { expected } from './expected-query-results'
 import { scrape } from '../../../src'
+// type imports
+import { QueryArgs } from '../../../src/tools/store/querier-entrypoint'
 
 const resourceFolder = `${__dirname}/fixtures`
 const resourceUrl = `http://${path.basename(__dirname)}.com`
@@ -18,7 +20,7 @@ const params = {
 
 describe(__filename, () => {
   describe('cache control', () => {
-    const queryArgs = { scrapers: ['postTitle'] }
+    const queryArgs: QueryArgs = [['postTitle']]
     step('first pass should fetch all downloads since nothing is in cache', async () => {
       const { start, query } = scrape(config, { cache: true }, params)
       const siteMock = await NockFolderMock.create(resourceFolder, resourceUrl)
@@ -30,13 +32,13 @@ describe(__filename, () => {
       expect(counts.index.complete).to.equal(1)
       expect(counts.postTitle.queued).to.equal(5)
       expect(counts.postTitle.complete).to.equal(5)
-      const result = query(queryArgs)
+      const result = query(...queryArgs)
       expect(result).to.equalQueryResult(expected[JSON.stringify(queryArgs)])
     })
 
     step('with all scrapers cache: true, no requests should happen', async () => {
       const { start, query } = scrape(config, { cache: true }, { ...params, cleanFolder: false })
-      const resultPre = query(queryArgs)
+      const resultPre = query(...queryArgs)
       expect(resultPre).to.equalQueryResult(expected[JSON.stringify(queryArgs)])
 
       const siteMock = await NockFolderMock.create(resourceFolder, resourceUrl)
@@ -48,7 +50,7 @@ describe(__filename, () => {
       expect(counts.index.complete).to.equal(1)
       expect(counts.postTitle.queued).to.equal(0)
       expect(counts.postTitle.complete).to.equal(5)
-      const result = query(queryArgs)
+      const result = query(...queryArgs)
       expect(result).to.equalQueryResult(expected[JSON.stringify(queryArgs)])
     })
 
@@ -67,7 +69,7 @@ describe(__filename, () => {
       expect(counts.index.complete).to.equal(1)
       expect(counts.postTitle.queued).to.equal(0)
       expect(counts.postTitle.complete).to.equal(5)
-      const result = query(queryArgs)
+      const result = query(...queryArgs)
       expect(result).to.deep.equal(expected[JSON.stringify(queryArgs)])
     })
   })
@@ -86,9 +88,9 @@ describe(__filename, () => {
         on('index:queued', () => emit('stop'))
         await new Promise(resolve => on('done', resolve))
 
-        const resultIndex = query({ scrapers: ['index'] })
+        const resultIndex = query(['index'])
         expect(resultIndex[0]['index'][0].complete).to.equal(0)
-        const result = query({ scrapers: ['postTitle'], groupBy: 'postTitle' })
+        const result = query(['postTitle'], { groupBy: 'postTitle' })
         expect(result.length).to.equal(0)
       })
     })
@@ -106,11 +108,11 @@ describe(__filename, () => {
         expect(counts.postTitle.queued).to.equal(0)
         expect(counts.postTitle_dup.queued).to.equal(5)
 
-        const indexResult = query({ scrapers: ['index'], groupBy: 'index' })
+        const indexResult = query(['index'], { groupBy: 'index' })
         expect(indexResult.length).to.equal(5)
-        const result = query({ scrapers: ['postTitle'], groupBy: 'postTitle' })
+        const result = query(['postTitle'], { groupBy: 'postTitle' })
         expect(result.length).to.equal(0)
-        const branchResult = query({ scrapers: ['postTitle_dup'], groupBy: 'postTitle_dup' })
+        const branchResult = query(['postTitle_dup'], { groupBy: 'postTitle_dup' })
         expect(branchResult.length).to.equal(5)
       })
     })
@@ -159,7 +161,7 @@ describe(__filename, () => {
       const { on } = start()
 
       await new Promise(resolve => on('initialized', resolve))
-      const queryStmt = query.prepare({ scrapers: ['slow'] })
+      const queryStmt = query.prepare(['slow'])
 
       on('slow:queued', () => {
         const result = queryStmt()
