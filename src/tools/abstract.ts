@@ -3,7 +3,7 @@ import { InternalLibraryError } from '../util/errors'
 import { Settings } from '../settings'
 
 export abstract class ToolBase {
-  private isInitialized: boolean = false
+  public isInitialized: boolean = false
 
   public constructor(protected settings: Settings) {}
 

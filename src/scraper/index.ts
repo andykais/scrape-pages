@@ -1,6 +1,7 @@
 import * as path from 'path'
 import { initTools } from '../tools'
 import { mkdirp, rmrf, exists, read, writeFile } from '../util/fs'
+import { ActiveScraperLockError, MismatchedVersionError } from '../util/errors'
 import { getSettings } from '../settings'
 import { Logger } from '../tools/logger'
 import { Store } from '../tools/store'
@@ -41,27 +42,31 @@ class ScraperProgram {
       // program starts detached so we can return the emitter synchronously
     ;(async () => {
       try {
-        emitter.on('stop', () => {
+        emitter.on('stop', async () => {
           logger.info('Exiting manually.')
           const { emitter, ...internalTools } = tools
           for (const tool of Object.values(internalTools)) tool.cleanup()
+          await this.writeMetadata({ scraperActive: false })
           emitter.emit('done')
           emitter.cleanup()
           logger.info(`Done.`)
         })
 
+        await this.ensureSafeFolder()
         await this.initFolders()
+        await this.writeMetadata({ scraperActive: true })
         for (const tool of Object.values(tools)) tool.initialize()
-        await this.writeMetadata(logger)
         emitter.emit('initialized')
+        logger.info('Starting scraper.')
 
         const program = compileProgram(this.settings, tools)
 
         const subscription = program.subscribe({
-          error: function(error: Error) {
+          error: async (error: Error) => {
+            await this.writeMetadata({ scraperActive: false })
             emitter.emit('error', error)
             logger.error(error)
-            this.unsubscribe()
+            subscription.unsubscribe()
             for (const tool of Object.values(tools)) tool.cleanup()
           },
           complete: () => {
@@ -69,7 +74,8 @@ class ScraperProgram {
             for (const tool of Object.values(internalTools)) tool.cleanup()
 
             // a nicety so we can await "initialized" and then start listening for "done"
-            setTimeout(() => {
+            setTimeout(async () => {
+              await this.writeMetadata({ scraperActive: false })
               emitter.emit('done')
               emitter.cleanup()
               logger.info('Done.')
@@ -79,7 +85,7 @@ class ScraperProgram {
         emitter.on('stop', subscription.unsubscribe)
       } catch (error) {
         emitter.emit('error', error)
-        logger.error(error)
+        if (logger.isInitialized) logger.error(error)
         for (const tool of Object.values(tools)) tool.cleanup()
       }
     })()
@@ -90,6 +96,26 @@ class ScraperProgram {
     inputs: this.settings.config.input,
     scraperNames: [...this.settings.flatConfig.keys()]
   })
+
+  private async ensureSafeFolder() {
+    const { folder, forceStart } = this.settings.paramsInit
+    if (forceStart) return
+
+    const metadataFile = path.resolve(folder, 'metadata.json')
+    if (await exists(metadataFile)) {
+      try {
+        const { version: oldVersion, scraperActive } = JSON.parse(await read(metadataFile))
+
+        if (scraperActive) throw new ActiveScraperLockError()
+        else if (oldVersion !== process.env.PACKAGE_VERSION) {
+          throw new MismatchedVersionError(oldVersion, process.env.PACKAGE_VERSION)
+        }
+      } catch (e) {
+        if (e.name === 'SyntaxError') throw new ActiveScraperLockError()
+        else throw e
+      }
+    }
+  }
 
   private initFolders = async () => {
     const { paramsInit, flatParams } = this.settings
@@ -102,28 +128,15 @@ class ScraperProgram {
     await Logger.rotateLogFiles(paramsInit.folder)
   }
 
-  private writeMetadata = async (logger: Logger) => {
+  private async writeMetadata(data: { scraperActive: boolean }) {
     const { paramsInit, optionsInit, configInit } = this.settings
     const metadataFile = path.resolve(paramsInit.folder, 'metadata.json')
-    // const logger = new Logger(this.settings)
-    // logger.initialize()
-    if (await exists(metadataFile)) {
-      const { version: oldVersion } = JSON.parse(await read(metadataFile))
-      if (oldVersion !== process.env.PACKAGE_VERSION) {
-        const logMessage = `This folder was created by an older version of scrape-pages! Old: ${oldVersion}, New: ${process.env.PACKAGE_VERSION}. Consider adding the param 'cleanFolder: true' and starting fresh.`
-        logger.warn(logMessage)
-      }
-    } else if (await exists(Database.getFilePath(paramsInit.folder))) {
-      logger.warn('Starting a scraper in an existing scraper location.')
-    } else {
-      logger.warn('Starting fresh scraper.')
+
+    const metadata = {
+      ...data,
+      version: process.env.PACKAGE_VERSION,
+      settingsInit: { configInit, optionsInit, paramsInit }
     }
-    await writeFile(
-      metadataFile,
-      JSON.stringify({
-        version: process.env.PACKAGE_VERSION,
-        settingsInit: { configInit, optionsInit, paramsInit }
-      })
-    )
+    await writeFile(metadataFile, JSON.stringify(metadata))
   }
 }

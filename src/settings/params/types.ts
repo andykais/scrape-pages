@@ -10,6 +10,7 @@ export interface ParamsInit {
   input?: Input
   folder: string
   cleanFolder?: boolean
+  forceStart?: boolean
 }
-export type ScrapeParams = Required<Omit<ParamsInit, 'cleanFolder'>>
+export type ScrapeParams = Required<Omit<ParamsInit, 'cleanFolder'|'forceStart'>>
 export type FlatParams = FMap<string, ScrapeParams>

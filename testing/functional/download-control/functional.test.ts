@@ -5,7 +5,7 @@ import nock from 'nock'
 import { RUN_OUTPUT_FOLDER, NockFolderMock, useRequestStatsRecorder } from '../../setup'
 import { config, configBranching } from './config'
 import { expected } from './expected-query-results'
-import { scrape } from '../../../src'
+import { scrape, ActiveScraperLockError } from '../../../src'
 // type imports
 import { QueryArgs } from '../../../src/tools/store/querier-entrypoint'
 
@@ -19,6 +19,14 @@ const params = {
 }
 
 describe(__filename, () => {
+  it('should hear a "done" event even if the scraper is empty and we wait on "initialized"', async () => {
+    const config = { flow: [] }
+    const scraper = scrape(config, options, params)
+    const { on } = scraper.start()
+    await new Promise(resolve => on('initialized', resolve))
+    await new Promise(resolve => on('done', resolve))
+  })
+
   describe('cache control', () => {
     const queryArgs: QueryArgs = [['postTitle']]
     step('first pass should fetch all downloads since nothing is in cache', async () => {
@@ -147,10 +155,10 @@ describe(__filename, () => {
   })
 
   describe('in progress requests', () => {
-    it('it should show complete = 0 in result', async () => {
+    it.only('it should show complete = 0 in result', async () => {
       nock('https://slow-url.com')
         .get('/a')
-        .delayBody(1000)
+        .delayBody(500)
         .reply(200, '')
 
       const config = {
@@ -177,12 +185,52 @@ describe(__filename, () => {
       expect(result[0]['slow'][0].complete).to.equal(1)
     })
 
-    it('should hear a "done" event even if the scraper is empty and we wait on "initialized"', async () => {
-      const config = { flow: [] }
-      const scraper = scrape(config, options, params)
-      const { on } = scraper.start()
-      await new Promise(resolve => on('initialized', resolve))
-      await new Promise(resolve => on('done', resolve))
+    it('should prevent two scrapers from running simultaneously', async () => {
+      nock('https://slow-url.com')
+        .get('/a')
+        .times(2)
+        .delayBody(500)
+        .reply(200, '')
+
+      const config = {
+        flow: [{ name: 'slow', download: 'https://slow-url.com/a' }]
+      }
+
+      const scraper1 = scrape(config, options, params)
+      const scraper2 = scrape(config, options, params)
+
+      const emitter1 = scraper1.start()
+      await new Promise(resolve => emitter1.on('initialized', resolve))
+      let error = null
+      const emitter2 = scraper2.start()
+      emitter2.on('error', e => (error = e))
+      await new Promise(resolve => emitter1.on('done', resolve))
+      expect(error).to.be.an.instanceof(ActiveScraperLockError)
+    })
+
+    it('should allow two scrapers to run simultaneously with forceStart: true', async () => {
+      nock('https://slow-url.com')
+        .get('/a')
+        .times(2)
+        .delayBody(500)
+        .reply(200, '')
+
+      const config = {
+        flow: [{ name: 'slow', download: 'https://slow-url.com/a' }]
+      }
+
+      const scraper1 = scrape(config, options, params)
+      const scraper2 = scrape(config, options, { ...params, forceStart: true })
+
+      const emitter1 = scraper1.start()
+      await new Promise(resolve => emitter1.on('initialized', resolve))
+      let error = null
+      const emitter2 = scraper2.start()
+      const done1P = new Promise(resolve => emitter1.on('done', resolve))
+      const done2P = new Promise(resolve => emitter2.on('done', resolve))
+      emitter2.on('error', e => (error = e))
+      await Promise.all([done1P, done2P])
+      expect(error).to.be.null
     })
   })
 })
