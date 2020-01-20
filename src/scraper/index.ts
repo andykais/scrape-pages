@@ -7,6 +7,7 @@ import { Logger } from '../tools/logger'
 import { Store } from '../tools/store'
 import { compileProgram } from './flow'
 // type imports
+import { Tools } from '../tools'
 import { QueryFn } from '../tools/store/querier-entrypoint'
 import { Settings } from '../settings'
 import { ConfigInit } from '../settings/config/types'
@@ -25,70 +26,82 @@ export const scrape = (
   optionsInit: OptionsInit,
   paramsInit: ParamsInit
 ) => {
-  const settings = getSettings(configInit, optionsInit, paramsInit)
-  const query = Store.querierFactory(settings)
+  return new ScraperProgram(configInit, optionsInit, paramsInit)
+  // const settings = getSettings(configInit, optionsInit, paramsInit)
+  // const query = Store.querierFactory(settings)
 
-  return new ScraperProgram(settings, query)
+  // return new ScraperProgram(settings, query)
 }
 
-class ScraperProgram {
-  public constructor(private settings: Settings, public query: QueryFn) {}
+export class ScraperProgram {
+  private settings: Settings
+  private tools: Tools
 
-  public start = () => {
-    const tools = initTools(this.settings)
-    const { emitter, logger } = tools
+  public emitter: Tools['emitter']
 
-      // program starts detached so we can return the emitter synchronously
-    ;(async () => {
-      try {
-        emitter.on('stop', async () => {
-          logger.info('Exiting manually.')
-          const { emitter, ...internalTools } = tools
-          for (const tool of Object.values(internalTools)) tool.cleanup()
+  public query: QueryFn
+
+  public constructor(configInit: ConfigInit, optionsInit: OptionsInit, paramsInit: ParamsInit) {
+    this.settings = getSettings(configInit, optionsInit, paramsInit)
+    this.query = Store.querierFactory(this.settings)
+    this.tools = initTools(this.settings)
+    this.emitter = this.tools.emitter
+  }
+
+  public start = async () => {
+    const { emitter, logger } = this.tools
+
+    try {
+      // TODO this doesnt do anything, lets move it down to the other stop listener
+      emitter.on('stop', async () => {
+        logger.info('Exiting manually.')
+        const { emitter, ...internalTools } = this.tools
+        for (const tool of Object.values(internalTools)) tool.cleanup()
+        await this.writeMetadata({ scraperActive: false })
+        emitter.emit('done')
+        emitter.cleanup()
+        logger.info(`Done.`)
+      })
+
+      await this.ensureSafeFolder()
+      await this.initFolders()
+      await this.writeMetadata({ scraperActive: true })
+      for (const tool of Object.values(this.tools)) tool.initialize()
+
+      const program = compileProgram(this.settings, this.tools)
+
+      emitter.emit('initialized')
+      logger.info('Starting scraper.')
+
+      const subscription = program.subscribe({
+        error: async (error: Error) => {
           await this.writeMetadata({ scraperActive: false })
-          emitter.emit('done')
-          emitter.cleanup()
-          logger.info(`Done.`)
-        })
+          emitter.emit('error', error)
+          logger.error(error)
+          subscription.unsubscribe()
+          for (const tool of Object.values(this.tools)) tool.cleanup()
+        },
+        complete: () => {
+          const { emitter, ...internalTools } = this.tools
+          for (const tool of Object.values(internalTools)) tool.cleanup()
 
-        await this.ensureSafeFolder()
-        await this.initFolders()
-        await this.writeMetadata({ scraperActive: true })
-        for (const tool of Object.values(tools)) tool.initialize()
-        emitter.emit('initialized')
-        logger.info('Starting scraper.')
-
-        const program = compileProgram(this.settings, tools)
-
-        const subscription = program.subscribe({
-          error: async (error: Error) => {
+          // TODO is this necessary anymore?
+          // a nicety so we can await "initialized" and then start listening for "done"
+          setTimeout(async () => {
             await this.writeMetadata({ scraperActive: false })
-            emitter.emit('error', error)
-            logger.error(error)
-            subscription.unsubscribe()
-            for (const tool of Object.values(tools)) tool.cleanup()
-          },
-          complete: () => {
-            const { emitter, ...internalTools } = tools
-            for (const tool of Object.values(internalTools)) tool.cleanup()
-
-            // a nicety so we can await "initialized" and then start listening for "done"
-            setTimeout(async () => {
-              await this.writeMetadata({ scraperActive: false })
-              emitter.emit('done')
-              emitter.cleanup()
-              logger.info('Done.')
-            }, 0)
-          }
-        })
-        emitter.on('stop', subscription.unsubscribe)
-      } catch (error) {
-        emitter.emit('error', error)
-        if (logger.isInitialized) logger.error(error)
-        for (const tool of Object.values(tools)) tool.cleanup()
-      }
-    })()
-    return tools.emitter.getBaseEmitter()
+            emitter.emit('done')
+            emitter.cleanup()
+            logger.info('Done.')
+          }, 0)
+        }
+      })
+      emitter.on('stop', subscription.unsubscribe)
+    } catch (error) {
+      emitter.emit('error', error)
+      if (logger.isInitialized) logger.error(error)
+      for (const tool of Object.values(this.tools)) tool.cleanup()
+    }
+    return this
   }
 
   public analyzeConfig = () => ({
@@ -114,6 +127,20 @@ class ScraperProgram {
         else throw e
       }
     }
+  }
+
+  public emit(event: string | symbol, ...args: any[]) {
+    // ;(this.tools.emitter.emitter.emit as any)(event, ...args)
+    this.tools.emitter.emitter.emit(event, ...args)
+  }
+
+  public on(event: string, listener: (...args: any[]) => void) {
+    this.tools.emitter.emitter.on(event, listener)
+    // this.tools.emitter.on(event, () => {
+    //   console.log('IM IN THE MACHINE, CAN YOU HEAR ME?')
+    // })
+    // ;(this.tools.emitter.emitter.on as any)(event, listener)
+    return this
   }
 
   private initFolders = async () => {

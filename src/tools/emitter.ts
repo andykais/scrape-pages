@@ -35,7 +35,7 @@ class ScraperEmitter {
 
 class Emitter extends ToolBase {
   public stopRequested: boolean = false
-  private emitter: EventEmitter
+  public emitter: EventEmitter
   private scrapers: FMap<string, ScraperEmitter>
 
   public constructor(settings: Settings) {

@@ -87,6 +87,15 @@ on('done', () => {
   const result = query({ scrapers: ['images'] })
   // result is [[{ filename: 'img1.jpg' }, { filename: 'img2.jpg' }, ...]]
 })
+
+const scraper = new ScraperProgram(config, options, params)
+scraper
+  .on('image:complete', id => console.log('COMPLETED image', id))
+  .on('done', () => {
+    const result = scraper.query(['images'])
+    // result is [[{ filename: 'img1.jpg' }, { filename: 'img2.jpg' }, ...]]
+  })
+  .start()
 ```
 
 For more real world examples, visit the [examples](examples) directory
@@ -103,11 +112,11 @@ given a different output folder in the `params` object, it will run completely f
 
 ### scrape
 
-| argument | type          | required | type file                                                      | description                   |
-| -------- | ------------- | -------- | -------------------------------------------------------------- | ----------------------------- |
-| config   | `ConfigInit`  | Yes      | [src/settings/config/types.ts](src/settings/config/types.ts)   | _what_ is being downloaded    |
-| options  | `OptionsInit` | Yes      | [src/settings/options/types.ts](src/settings/options/types.ts) | _how_ something is downloaded |
-| params   | `ParamsInit`  | Yes      | [src/settings/params/types.ts](src/settings/params/types.ts)   | _who_ is being downloaded     |
+| argument | type          | type file                                                      | description                                  |
+| -------- | ------------- | -------------------------------------------------------------- | -----------------------------                |
+| config   | `ConfigInit`  | [src/settings/config/types.ts](src/settings/config/types.ts)   | Pages that are being downloaded & parsed |
+| options  | `OptionsInit` | [src/settings/options/types.ts](src/settings/options/types.ts) | Knobs to tweak download behavior
+| params   | `ParamsInit`  | [src/settings/params/types.ts](src/settings/params/types.ts)   | Inputs values and output file locations
 
 ### scraper
 

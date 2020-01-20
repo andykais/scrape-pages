@@ -5,6 +5,73 @@ import { Overwrite } from '../src/util/types'
 import { SelectedRow as OrderedScrapersRow } from '../src/tools/store/queries/select-ordered-scrapers'
 import { QueryResult } from '../src/tools/store/querier-entrypoint'
 
+type EventCountExpected = {
+  [eventName: string]: number
+}
+type EventCountActual = EventCountExpected
+
+Assertion.addMethod('haveEvent', async function(
+  event: string,
+  expectedCount: number,
+  checkAfterPromise: Promise<any>
+) {
+  const emitterLikeObject = this._obj // (duck typing)
+
+  let count = 0
+  emitterLikeObject.on(event, () => {
+    count++
+  })
+
+  await checkAfterPromise
+
+  const errorMsg = `event '${event}' had ${event} expected at ${expectedCount}, but actually recorded ${count}`
+  new Assertion(count).to.be.equal(expectedCount, errorMsg)
+})
+
+Assertion.addMethod('haveEvents', async function(
+  eventCountExpected: EventCountExpected,
+  checkAfterPromise: Promise<any>
+) {
+  const emitterLikeObject = this._obj
+
+  const eventCountExpectedArray = Object.entries(eventCountExpected)
+
+  const count: EventCountActual = {}
+  for (const [event] of eventCountExpectedArray) {
+    count[event] = 0
+  }
+  for (const [event] of eventCountExpectedArray) {
+    emitterLikeObject.on(event, () => {
+      count[event]++
+    })
+  }
+
+  await checkAfterPromise
+
+  for (const [event, expectedCount] of eventCountExpectedArray) {
+    const errorMsg = `event '${event}' had ${event} expected at ${expectedCount}, but actually recorded ${count[event]}`
+    new Assertion(count[event]).to.be.equal(expectedCount, errorMsg)
+  }
+
+  // for (const [event, count] of Object.entries(eventCountExpected)) {
+  //   emitterLikeObject.on(event, () => {
+  //
+  // either of these work!
+  //     counter[event] = (counter[event] || 0) + 1
+
+  // or me!
+  // //       if (counter[event] === undefined) {
+  // //         counter[event] = 1
+  // //       } else {
+  // //         counter[event]++
+  // //       }
+  //   })
+  // }
+
+  //   const actualResult = this._obj
+  //   new Assertion().to.be.deep.equal()
+})
+
 Assertion.addMethod('equalQueryResult', function(expectedResult) {
   const actualResult = this._obj
   new Assertion(stripResult(actualResult)).to.be.deep.equal(stripResult(expectedResult))

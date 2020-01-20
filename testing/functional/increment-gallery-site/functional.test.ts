@@ -7,7 +7,7 @@ import { expect } from 'chai'
 import { RUN_OUTPUT_FOLDER, NockFolderMock } from '../../setup'
 import { config, configWithLimit, configMerging } from './config'
 import { expected } from './expected-query-results'
-import { scrape } from '../../../src'
+import { ScraperProgram } from '../../../src'
 // type imports
 import { QueryArgs } from '../../../src/tools/store/querier-entrypoint'
 
@@ -28,63 +28,60 @@ describe(__filename, () => {
   const testables = [
     {
       name: 'normal',
-      scraper: scrape(config, options, params),
+      scraper: new ScraperProgram(config, options, params),
       siteMock: new NockFolderMock(resourceFolder, resourceUrl)
     },
     {
       name: 'psuedo delayed',
-      scraper: scrape(config, options, params),
+      scraper: new ScraperProgram(config, options, params),
       siteMock: new NockFolderMock(resourceFolder, resourceUrl, { randomSeed: 2 })
     },
     {
       name: 'flattened config',
-      scraper: scrape(configMerging, options, params),
+      scraper: new ScraperProgram(configMerging, options, params),
       siteMock: new NockFolderMock(resourceFolder, resourceUrl)
     }
   ]
 
   testables.forEach(({ name, scraper, siteMock }) => {
     describe(`with ${name} scraper`, () => {
-      const { start, query } = scraper
 
       before(async () => {
         await siteMock.init()
-        const { on } = start()
-        await new Promise(resolve => on('done', resolve))
+        await new Promise(resolve => scraper.on('done', resolve).start())
         siteMock.done()
       })
 
       it('should group each image into a separate slot, in order', () => {
         const queryArgs: QueryArgs = [['image'], { groupBy: 'image' }]
-        const result = query(...queryArgs)
+        const result = scraper.query(...queryArgs)
         expect(result).to.equalQueryResult(expected[JSON.stringify(queryArgs)])
       })
       it('should group tags and images together that were found on the same page', function() {
         const queryArgs: QueryArgs = [['image', 'tag'], { groupBy: 'image-page' }]
-        const result = query(...queryArgs)
+        const result = scraper.query(...queryArgs)
         expect(result).to.equalQueryResult(expected[JSON.stringify(queryArgs)])
       })
     })
   })
 
   it('calling query() before start() should throw an uninitialized error', async () => {
-    const { query } = scrape(config, options, params)
-    expect(() => query(['image'])).to.throw(UninitializedDatabaseError)
+    const scraper = new ScraperProgram(config, options, params)
+    expect(() => scraper.query(['image'])).to.throw(UninitializedDatabaseError)
   })
 
   describe('with value limit', () => {
-    const { start, query } = scrape(configWithLimit, options, params)
+    const scraper = new ScraperProgram(configWithLimit, options, params)
 
     before(async () => {
       const siteMock = await NockFolderMock.create(resourceFolder, resourceUrl)
-      const { on } = start()
-      await new Promise(resolve => on('done', resolve))
+      await new Promise(resolve => scraper.on('done', resolve).start())
       siteMock.done()
     })
 
     it('should group each image into a separate slot, in order', () => {
       const queryArgs: QueryArgs = [['image'], { groupBy: 'image' }]
-      const result = query(...queryArgs)
+      const result = scraper.query(...queryArgs)
 
       expect(result).to.have.length(2)
       // the first value is parsed from each gallery page
@@ -93,7 +90,7 @@ describe(__filename, () => {
     })
     it('should group tags and images together that were found on the same page', () => {
       const queryArgs: QueryArgs = [['image', 'tag'], { groupBy: 'image-page' }]
-      const result = query(...queryArgs)
+      const result = scraper.query(...queryArgs)
 
       expect(result).to.have.length(2)
       const [expected1, _, expected3] = expected[JSON.stringify(queryArgs)]
