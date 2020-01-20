@@ -57,7 +57,7 @@ jobs:
 
     - run: npm ci --no-audit
     - run: npm run build
-    - run ./testing/packaging/setup.sh
+    - run: ./testing/packaging/setup.sh
 
 ##############################
 #       NPM Publish          #
