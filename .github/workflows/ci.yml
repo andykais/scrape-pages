@@ -45,6 +45,21 @@ jobs:
         github-token: ${{ secrets.github_token }}
 
 ##############################
+#     Test Package Usage     #
+##############################
+    - uses: actions/checkout@v1
+      with:
+        fetch-depth: 1
+
+    - uses: actions/setup-node@v1
+      with:
+        node-version: 8
+
+    - run: npm ci --no-audit
+    - run: npm run build
+    - run ./testing/packaging/setup.sh
+
+##############################
 #       NPM Publish          #
 ##############################
     - name: npm publish
