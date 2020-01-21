@@ -1,4 +1,8 @@
 import * as Fetch from 'node-fetch'
+import { VError } from 'verror'
+import { inspect } from 'util'
+// type imports
+import * as VErrorType from 'verror'
 
 class ActiveScraperLockError extends Error {
   public name = 'ActiveScraperLockError'
@@ -39,6 +43,54 @@ class InternalLibraryError extends Error {
   public constructor(message: string) {
     super(message)
   }
+}
+
+export class ReadableError extends Error {
+  _errorOriginal: Error | VErrorType
+  _originalStack: string
+
+  constructor(e: Error | VErrorType) {
+    super(e.message)
+    this.name = e.name
+    console.log(e.message)
+    this._errorOriginal = e
+    // this.stack = new Error().stack || ''
+  }
+  [inspect.custom](depth: number, options: {}) {
+    console.log('inspcet')
+
+    return ''
+
+  }
+  get stack() {
+    console.log('hello')
+    // let stack = ''
+    // for (const message of this.stack.split(/\n/)) {
+    //   stack += message
+    //   console.log({ message })
+    // }
+
+    return ''
+  }
+
+  set stack(stack) {
+    this._originalStack = stack
+  }
+
+  toString() {
+    console.log('me')
+    return ''
+  }
+}
+export function inspectError(e: Error | VErrorType): Error | VErrorType {
+  const err = new ReadableError(e)
+  // console.log(e.toString())
+  return err
+  // if (e instanceof VError) {
+  //   const causeError = e.cause()
+  //   if (causeError) return inspectError(causeError)
+  //   else return e
+  // } else return e
 }
 
 export { FetchError } from 'node-fetch'

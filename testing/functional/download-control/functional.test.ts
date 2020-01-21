@@ -28,11 +28,13 @@ describe(__filename, () => {
   })
 
   describe('cache control', () => {
+    const siteMock = new NockFolderMock(resourceFolder, resourceUrl)
+    beforeEach(siteMock.init)
+    afterEach(siteMock.done)
+
     const queryArgs: QueryArgs = [['postTitle']]
     step('first pass should fetch all downloads since nothing is in cache', async () => {
       const scraper = new ScraperProgram(config, { cache: true }, params)
-      const siteMock = await NockFolderMock.create(resourceFolder, resourceUrl)
-
 
       const testCompletedPromise = new Promise(resolve => scraper.on('done', resolve))
       expect(scraper).to.haveEvent('index:queued', 1, testCompletedPromise)
@@ -43,15 +45,6 @@ describe(__filename, () => {
       scraper.start()
       await testCompletedPromise
 
-
-      // const emitter = scraper.emitter
-      // const { counts } = useRequestStatsRecorder(config, emitter)
-      // await new Promise(resolve => scraper.on('done', resolve))
-      // siteMock.done()
-      // expect(counts.index.queued).to.equal(1)
-      // expect(counts.index.complete).to.equal(1)
-      // expect(counts.postTitle.queued).to.equal(5)
-      // expect(counts.postTitle.complete).to.equal(5)
       const result = scraper.query(...queryArgs)
       expect(result).to.equalQueryResult(expected[JSON.stringify(queryArgs)])
     })
@@ -61,38 +54,15 @@ describe(__filename, () => {
       const resultPre = scraper.query(...queryArgs)
       expect(resultPre).to.equalQueryResult(expected[JSON.stringify(queryArgs)])
 
-      const siteMock = await NockFolderMock.create(resourceFolder, resourceUrl)
-
-
       const testCompletePromise = new Promise(resolve => scraper.on('done', resolve))
       expect(scraper).to.haveEvent('index:queued', 0, testCompletePromise)
       expect(scraper).to.haveEvent('index:complete', 1, testCompletePromise)
       expect(scraper).to.haveEvent('postTitle:queued', 0, testCompletePromise)
       expect(scraper).to.haveEvent('postTitle:complete', 5, testCompletePromise)
+
       scraper.start()
       await testCompletePromise
 
-
-
-//       const emitter = scraper.emitter
-
-//       expect(emitter).to.haveEvents(
-//         {
-//           'index:queued': 0,
-//           'index:complete': 0,
-//           'postTitle:queued': 0,
-//           'postTitle:complete': 5
-//         },
-//         await new Promise(resolve => scraper.on('done', resolve))
-//       )
-
-//       const { counts } = useRequestStatsRecorder(config, emitter)
-//       await new Promise(resolve => scraper.on('done', resolve))
-//       siteMock.done()
-//       expect(counts.index.queued).to.equal(0)
-//       expect(counts.index.complete).to.equal(1)
-//       expect(counts.postTitle.queued).to.equal(0)
-//       expect(counts.postTitle.complete).to.equal(5)
       const result = scraper.query(...queryArgs)
       expect(result).to.equalQueryResult(expected[JSON.stringify(queryArgs)])
     })
@@ -103,9 +73,6 @@ describe(__filename, () => {
         { logLevel: 'info', cache: true, optionsEach: { index: { cache: false } } },
         { ...params, cleanFolder: false }
       )
-      const siteMock = await NockFolderMock.create(resourceFolder, resourceUrl)
-
-
 
       const testCompletedPromise = new Promise(resolve => scraper.on('done', resolve))
 
@@ -114,16 +81,9 @@ describe(__filename, () => {
       expect(scraper).to.haveEvent('postTitle:queued', 0, testCompletedPromise)
       expect(scraper).to.haveEvent('postTitle:complete', 5, testCompletedPromise)
 
+      scraper.start()
+      await testCompletedPromise
 
-
-      // const emitter = scraper.emitter
-      // const { counts } = useRequestStatsRecorder(config, emitter)
-      // await new Promise(resolve => scraper.on('done', resolve))
-      // siteMock.done()
-      // expect(counts.index.queued).to.equal(1)
-      // expect(counts.index.complete).to.equal(1)
-      // expect(counts.postTitle.queued).to.equal(0)
-      // expect(counts.postTitle.complete).to.equal(5)
       const result = scraper.query(...queryArgs)
       expect(result).to.deep.equal(expected[JSON.stringify(queryArgs)])
     })
@@ -154,7 +114,6 @@ describe(__filename, () => {
         const scraper = new ScraperProgram(configBranching, options, params)
         const emitter = scraper.emitter
 
-
         scraper.on('index:queued', () => scraper.emit('stop:postTitle'))
 
         const testCompletePromise = new Promise(resolve => scraper.on('done', resolve))
@@ -163,8 +122,6 @@ describe(__filename, () => {
         expect(scraper).to.haveEvent('postTitle_dup:queued', 5, testCompletePromise)
         scraper.start()
         await testCompletePromise
-
-
 
         // const { counts } = useRequestStatsRecorder(configBranching, emitter)
         // // emitter.emit('stop:postTitle')
@@ -217,6 +174,24 @@ describe(__filename, () => {
     })
   })
 
+  describe('throw up errors to emitter', () => {
+    it.only('should not affect the scraper', async () => {
+      const scraper = new ScraperProgram(config, options, params)
+
+      const testCompletedPromise = new Promise(resolve => scraper.on('done', resolve))
+      expect(process).to.haveEvents('unhandledRejection', 1, testCompletedPromise)
+
+      scraper.on('index:queued', () => {
+        throw new Error('WEE')
+      })
+      process.on('unhandledRejection', () => {
+
+      })
+
+      scraper.start()
+      await new Promise(resolve => scraper.on('done', resolve))
+    })
+  })
   describe('in progress requests', () => {
     it('it should show complete = 0 in result', async () => {
       nock('https://slow-url.com')
@@ -231,7 +206,7 @@ describe(__filename, () => {
       const scraper = new ScraperProgram(config, options, params)
 
       scraper.start()
-      await new Promise(resolve => scraper.on('initialized', resolve))
+      // await new Promise(resolve => scraper.on('initialized', resolve))
       const queryStmt = scraper.query.prepare(['slow'])
 
       scraper.on('slow:queued', () => {

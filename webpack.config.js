@@ -21,12 +21,16 @@ module.exports = (env, { mode = 'development' } = {}) => ({
   },
   mode,
   devtool: 'source-map',
+
   entry: sourceFiles,
   output: {
     path: path.resolve(__dirname, 'lib'),
     filename: '[name].js',
     library: 'scrape-pages',
-    libraryTarget: 'umd'
+    libraryTarget: 'umd',
+    // devtoolModuleFilenameTemplate: '[]webpack:[resource-path]',
+    devtoolModuleFilenameTemplate: 'webpack:[resource-path]',
+    devtoolFallbackModuleFilenameTemplate: '[absolute-resource-path]'
   },
   resolve: {
     extensions: ['.ts']

@@ -14,24 +14,17 @@ import { ConfigInit } from '../settings/config/types'
 import { OptionsInit } from '../settings/options/types'
 import { ParamsInit } from '../settings/params/types'
 
-/**
- * scrape is the entrypoint for this library
- *
- * @param configInit 'what' is going to be scraped (the actual urls and parse strings)
- * @param optionsInit 'how' is the site going to be scraped (mostly how downloads should behave)
- * @param paramsInit 'who' is going to be scraped (settings specific to each run)
- */
-export const scrape = (
-  configInit: ConfigInit,
-  optionsInit: OptionsInit,
-  paramsInit: ParamsInit
-) => {
-  return new ScraperProgram(configInit, optionsInit, paramsInit)
-  // const settings = getSettings(configInit, optionsInit, paramsInit)
-  // const query = Store.querierFactory(settings)
+// export const scrape = (
+//   configInit: ConfigInit,
+//   optionsInit: OptionsInit,
+//   paramsInit: ParamsInit
+// ) => {
+//   return new ScraperProgram(configInit, optionsInit, paramsInit)
+//   // const settings = getSettings(configInit, optionsInit, paramsInit)
+//   // const query = Store.querierFactory(settings)
 
-  // return new ScraperProgram(settings, query)
-}
+//   // return new ScraperProgram(settings, query)
+// }
 
 export class ScraperProgram {
   private settings: Settings
@@ -41,6 +34,13 @@ export class ScraperProgram {
 
   public query: QueryFn
 
+  /**
+   * instantiate a scraper
+   *
+   * @param configInit 'what' is going to be scraped (the actual urls and parse strings)
+   * @param optionsInit 'how' is the site going to be scraped (mostly how downloads should behave)
+   * @param paramsInit 'who' is going to be scraped (settings specific to each run)
+   */
   public constructor(configInit: ConfigInit, optionsInit: OptionsInit, paramsInit: ParamsInit) {
     this.settings = getSettings(configInit, optionsInit, paramsInit)
     this.query = Store.querierFactory(this.settings)
@@ -68,6 +68,7 @@ export class ScraperProgram {
       await this.writeMetadata({ scraperActive: true })
       for (const tool of Object.values(this.tools)) tool.initialize()
 
+        throw new Error('me')
       const program = compileProgram(this.settings, this.tools)
 
       emitter.emit('initialized')
@@ -141,6 +142,9 @@ export class ScraperProgram {
     // })
     // ;(this.tools.emitter.emitter.on as any)(event, listener)
     return this
+  }
+  public removeAllListeners() {
+    this.tools.emitter.cleanup()
   }
 
   private initFolders = async () => {

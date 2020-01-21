@@ -2,10 +2,13 @@ import { EventEmitter } from 'events'
 import * as Rx from 'rxjs'
 import * as ops from 'rxjs/operators'
 import { ToolBase } from './abstract'
+import { inspectError } from '../util/errors'
 // type imports
 import { FMap } from '../util/map'
 import { Settings } from '../settings'
 import { ScraperName } from '../settings/config/types'
+
+import { VError } from 'verror'
 
 type DownloadInfo = { id: number; filename?: string; mimeType?: string; byteLength?: number }
 
@@ -23,7 +26,16 @@ class ScraperEmitter {
   public emit(event: 'progress', downloadId: number, progress: number): boolean
   public emit(event: 'complete', downloadInfo: DownloadInfo): boolean
   public emit(event: string, ...args: any[]): boolean {
-    return this.emitter.emit(`${this.scraperName}:${event}`, ...args)
+    try {
+      return this.emitter.emit(`${this.scraperName}:${event}`, ...args)
+    } catch (e) {
+      // In this case we really do have an unhandled promise rejection
+      // Im not handling an external error. It shouldnt end up here
+      const inspectedError = inspectError(e)
+      // console.log(inspectedError)
+      Promise.reject(inspectedError)
+      return false
+    }
   }
 
   public on(event: 'stop', listener: () => void): this
@@ -59,8 +71,15 @@ class Emitter extends ToolBase {
   public emit(event: 'initialized'): boolean
   public emit(event: 'done'): boolean
   public emit(event: 'error', error: Error): boolean
-  public emit(event: string | symbol, ...args: any[]) {
-    return this.emitter.emit(event, ...args)
+  public emit(event: string | symbol, ...args: any[]): boolean {
+    try {
+      return this.emitter.emit(event, ...args)
+    } catch (e) {
+      // In this case we really do have an unhandled promise rejection
+      // Im not handling an external error. It shouldnt end up here
+      Promise.reject(e)
+      return false
+    }
   }
 
   public on(event: 'stop', listener: () => void): this
