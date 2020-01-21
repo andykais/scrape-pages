@@ -4,7 +4,7 @@ class ActiveScraperLockError extends Error {
   public name = 'ActiveScraperLockError'
   public constructor() {
     super(
-      `Another scraper is actively running. You should not run two scrapers simultaneously, though you can use params.forceRun to do so.`
+      `Another scraper is actively running or a scraper has not exited in this folder properly. You should not run two scrapers simultaneously, though you can use params.forceStart to do so.`
     )
   }
 }
