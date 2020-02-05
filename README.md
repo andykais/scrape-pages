@@ -76,18 +76,6 @@ const params = {
 // - emit events back to the scraper (like 'stop')
 // - query the scraped data
 
-const { scraper } = require('scrape-pages')
-// create an executable scraper and a querier
-const { start, query } = scrape(config, options, params)
-// begin scraping here
-const { on, emit } = await start()
-// listen to events
-on('image:compete', id => console.log('COMPLETED image', id))
-on('done', () => {
-  const result = query({ scrapers: ['images'] })
-  // result is [[{ filename: 'img1.jpg' }, { filename: 'img2.jpg' }, ...]]
-})
-
 const scraper = new ScraperProgram(config, options, params)
 scraper
   .on('image:complete', id => console.log('COMPLETED image', id))

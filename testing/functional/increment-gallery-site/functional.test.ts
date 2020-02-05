@@ -45,7 +45,6 @@ describe(__filename, () => {
 
   testables.forEach(({ name, scraper, siteMock }) => {
     describe(`with ${name} scraper`, () => {
-
       before(async () => {
         await siteMock.init()
         await new Promise(resolve => scraper.on('done', resolve).start())
