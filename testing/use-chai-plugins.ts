@@ -10,23 +10,42 @@ type EventCountExpected = {
 }
 type EventCountActual = EventCountExpected
 
-Assertion.addMethod('haveEvent', async function(
-  event: string,
-  expectedCount: number,
-  checkAfterPromise: Promise<any>
-) {
-  const emitterLikeObject = this._obj // (duck typing)
-
-  let count = 0
-  emitterLikeObject.on(event, () => {
-    count++
+type EmitterLike = { onAny(listener: (event: string, ...args: any[]) => void): EmitterLike }
+type EventCounts = { [event: string]: number }
+export function recordEvents(emitterLike: EmitterLike) {
+  const eventCounts: EventCounts = {}
+  emitterLike.onAny(event => {
+    eventCounts[event] = eventCounts[event] || 0
+    eventCounts[event]++
   })
 
-  await checkAfterPromise
+  return eventCounts
+}
+Assertion.addMethod('haveEvent', function(event: string, expectedCount: number) {
+  const eventCounts: EventCounts = this._obj
+  const count = eventCounts[event] || 0
 
-  const errorMsg = `event '${event}' had ${event} expected at ${expectedCount}, but actually recorded ${count}`
-  new Assertion(count).to.be.equal(expectedCount, errorMsg)
+  // const errorMsg = `expected event '${event}' to occur ${expectedCount} time(s) but actually ocurred ${count}`
+  // new Assertion(count).to.be.equal(expectedCount, errorMsg)
+  new Assertion(count).to.be.equal(expectedCount,  `event '${event}' occurrences`)
 })
+// Assertion.addMethod('haveEvent', async function(
+//   event: string,
+//   expectedCount: number,
+//   checkAfterPromise: Promise<any>
+// ) {
+//   const emitterLikeObject = this._obj // (duck typing)
+
+//   let count = 0
+//   emitterLikeObject.on(event, () => {
+//     count++
+//   })
+
+//   await checkAfterPromise
+
+//   const errorMsg = `event '${event}' had ${event} expected at ${expectedCount}, but actually recorded ${count}`
+//   new Assertion(count).to.be.equal(expectedCount, errorMsg)
+// })
 
 Assertion.addMethod('haveEvents', async function(
   eventCountExpected: EventCountExpected,
@@ -98,4 +117,5 @@ export const stripResult = (result: QueryResult): StrippedQueryResult =>
     }, {})
   )
 
+// TODO check for unhandled/uncaughtexcepitons
 beforeEach(() => nock.cleanAll())

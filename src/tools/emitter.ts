@@ -12,6 +12,25 @@ import { VError } from 'verror'
 
 type DownloadInfo = { id: number; filename?: string; mimeType?: string; byteLength?: number }
 
+type OnAnyListener = (event: string, ...args: any[]) => void
+class EventEmitterOnAny extends EventEmitter {
+  onAnyListeners: OnAnyListener[] = []
+
+  emit(event: string, ...args: any[]) {
+    for (const listener of this.onAnyListeners) {
+      listener(event, ...args)
+    }
+    return super.emit(event, ...args)
+  }
+  // note: this only works locally
+  onAny(listener: OnAnyListener) {
+    this.onAnyListeners.push(listener)
+  }
+  removeAllOnAnyListeners() {
+    this.onAnyListeners = []
+  }
+}
+
 class ScraperEmitter {
   public stopRequested: boolean = false
   public constructor(private scraperName: ScraperName, private emitter: EventEmitter) {
@@ -31,9 +50,7 @@ class ScraperEmitter {
     } catch (e) {
       // In this case we really do have an unhandled promise rejection
       // Im not handling an external error. It shouldnt end up here
-      const inspectedError = inspectError(e)
-      // console.log(inspectedError)
-      Promise.reject(inspectedError)
+      Promise.reject(e)
       return false
     }
   }
@@ -47,13 +64,13 @@ class ScraperEmitter {
 
 class Emitter extends ToolBase {
   public stopRequested: boolean = false
-  public emitter: EventEmitter
+  public emitter: EventEmitterOnAny
   private scrapers: FMap<string, ScraperEmitter>
 
   public constructor(settings: Settings) {
     super(settings)
 
-    this.emitter = new EventEmitter()
+    this.emitter = new EventEmitterOnAny()
     this.emitter.on = this.emitter.on.bind(this.emitter)
     this.emitter.emit = this.emitter.emit.bind(this.emitter)
     this.scrapers = settings.flatConfig.map((_, name) => new ScraperEmitter(name, this.emitter))
@@ -71,7 +88,7 @@ class Emitter extends ToolBase {
   public emit(event: 'initialized'): boolean
   public emit(event: 'done'): boolean
   public emit(event: 'error', error: Error): boolean
-  public emit(event: string | symbol, ...args: any[]): boolean {
+  public emit(event: string, ...args: any[]): boolean {
     try {
       return this.emitter.emit(event, ...args)
     } catch (e) {
