@@ -2,31 +2,27 @@ import { EventEmitter } from 'events'
 import * as Rx from 'rxjs'
 import * as ops from 'rxjs/operators'
 import { ToolBase } from './abstract'
-import { inspectError } from '../util/errors'
 // type imports
 import { FMap } from '../util/map'
 import { Settings } from '../settings'
 import { ScraperName } from '../settings/config/types'
 
-import { VError } from 'verror'
-
 type DownloadInfo = { id: number; filename?: string; mimeType?: string; byteLength?: number }
 
 type OnAnyListener = (event: string, ...args: any[]) => void
 class EventEmitterOnAny extends EventEmitter {
-  onAnyListeners: OnAnyListener[] = []
+  private onAnyListeners: OnAnyListener[] = []
 
-  emit(event: string, ...args: any[]) {
+  public emit(event: string, ...args: any[]) {
     for (const listener of this.onAnyListeners) {
       listener(event, ...args)
     }
     return super.emit(event, ...args)
   }
-  // note: this only works locally
-  onAny(listener: OnAnyListener) {
+  public onAny(listener: OnAnyListener) {
     this.onAnyListeners.push(listener)
   }
-  removeAllOnAnyListeners() {
+  public removeAllOnAnyListeners() {
     this.onAnyListeners = []
   }
 }

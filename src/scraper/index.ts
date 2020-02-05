@@ -114,7 +114,7 @@ export class ScraperProgram extends ToolBase {
     return new Promise((resolve, reject) => this.on('done', resolve).on('error', reject))
   }
 
-  private async cleanup(error?: Error) {
+  protected async cleanup(error?: Error) {
     try {
       if (error) {
         this.tools.emitter.emit('error', error)

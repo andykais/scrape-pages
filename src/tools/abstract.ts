@@ -17,5 +17,5 @@ export abstract class ToolBase {
     }
   }
 
-  public abstract cleanup(): void
+  protected abstract cleanup(): void
 }
