@@ -42,16 +42,17 @@ type StrippedQueryResultRow = Overwrite<
 >
 type StrippedQueryResult = { [scraper: string]: StrippedQueryResultRow[] }[]
 // were dealing with unpredictable insert order, so we just want to check if the keys exist or not
+// note that this doesnt mean order is not tested, just that the ids (which are internal) could be different
 export const stripResult = (result: QueryResult): StrippedQueryResult =>
   result.map(g =>
-    Object.keys(g).reduce((acc: StrippedQueryResult[0], scraperName) => {
+    Object.keys(g).reduce((acc, scraperName) => {
       acc[scraperName] = g[scraperName].map(r => ({
         ...r,
         filename: typeof r.filename === 'string' ? true : false,
         id: typeof r.id === 'number' ? true : false
       }))
       return acc
-    }, {})
+    }, {} as StrippedQueryResult[0])
   )
 
 beforeEach(() => {
