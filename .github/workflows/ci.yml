@@ -47,15 +47,8 @@ jobs:
 ##############################
 #     Test Package Usage     #
 ##############################
-    - uses: actions/checkout@v1
-      with:
-        fetch-depth: 1
-
-    - uses: actions/setup-node@v1
-      with:
-        node-version: 8
-
     - run: npm ci --no-audit
+      if: matrix.os == 'ubuntu-latest' && matrix.node-version == '8'
     - run: npm run build
     - run: ./testing/packaging/setup.sh
 

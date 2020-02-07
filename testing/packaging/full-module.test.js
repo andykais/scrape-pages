@@ -1,5 +1,5 @@
 const http = require('http')
-const { scrape } = require('scrape-pages')
+const { ScraperProgram } = require('scrape-pages')
 
 process.on('unhandledRejection', e => {
   console.error(e)
@@ -44,20 +44,21 @@ const params = {
 server.listen(8001, async () => {
   console.log('Server started on port 8001.')
 
-  const scraper = scrape(config, options, params)
-  const emitter = await scraper.start()
+  console.log('Scraper instantiated.')
+  const scraper = new ScraperProgram(config, options, params)
 
-  await new Promise(resolve => {
-    emitter.on('done', () => {
-      const result = scraper.query(['value'])
-      if (JSON.stringify(result) === JSON.stringify(EXPECTED_RESULT)) {
-        console.log('Success! The scraper appears to function.')
-      } else {
-        throw new Error('Scraper result did not match the expected')
-      }
-      resolve()
-    })
-  })
+  console.log('Starting scraper')
+  scraper.start()
+
+  console.log('Waiting for scraper to complete.')
+  await scraper.getCompletionPromise()
+
+  const result = scraper.query(['value'])
+  if (JSON.stringify(result) === JSON.stringify(EXPECTED_RESULT)) {
+    console.log('Success! The scraper appears to function and return real values.')
+  } else {
+    throw new Error('Scraper result did not match the expected')
+  }
 
   server.close()
   console.log('Server closed.')
