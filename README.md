@@ -76,17 +76,14 @@ const params = {
 // - emit events back to the scraper (like 'stop')
 // - query the scraped data
 
-const { scraper } = require('scrape-pages')
-// create an executable scraper and a querier
-const { start, query } = scrape(config, options, params)
-// begin scraping here
-const { on, emit } = await start()
-// listen to events
-on('image:compete', id => console.log('COMPLETED image', id))
-on('done', () => {
-  const result = query({ scrapers: ['images'] })
-  // result is [[{ filename: 'img1.jpg' }, { filename: 'img2.jpg' }, ...]]
-})
+const scraper = new ScraperProgram(config, options, params)
+scraper
+  .on('image:complete', id => console.log('COMPLETED image', id))
+  .on('done', () => {
+    const result = scraper.query(['images'])
+    // result is [[{ filename: 'img1.jpg' }, { filename: 'img2.jpg' }, ...]]
+  })
+  .start()
 ```
 
 For more real world examples, visit the [examples](examples) directory
@@ -103,11 +100,11 @@ given a different output folder in the `params` object, it will run completely f
 
 ### scrape
 
-| argument | type          | required | type file                                                      | description                   |
-| -------- | ------------- | -------- | -------------------------------------------------------------- | ----------------------------- |
-| config   | `ConfigInit`  | Yes      | [src/settings/config/types.ts](src/settings/config/types.ts)   | _what_ is being downloaded    |
-| options  | `OptionsInit` | Yes      | [src/settings/options/types.ts](src/settings/options/types.ts) | _how_ something is downloaded |
-| params   | `ParamsInit`  | Yes      | [src/settings/params/types.ts](src/settings/params/types.ts)   | _who_ is being downloaded     |
+| argument | type          | type file                                                      | description                                  |
+| -------- | ------------- | -------------------------------------------------------------- | -----------------------------                |
+| config   | `ConfigInit`  | [src/settings/config/types.ts](src/settings/config/types.ts)   | Pages that are being downloaded & parsed |
+| options  | `OptionsInit` | [src/settings/options/types.ts](src/settings/options/types.ts) | Knobs to tweak download behavior
+| params   | `ParamsInit`  | [src/settings/params/types.ts](src/settings/params/types.ts)   | Inputs values and output file locations
 
 ### scraper
 
@@ -117,13 +114,14 @@ The `scrape` function returns a promise which yields these utilities (`on`, `emi
 
 Listen for events from the scraper
 
-| event                  | callback arguments | description                                |
-| ---------------------- | ------------------ | ------------------------------------------ |
-| `'done'`               |                    | when the scraper has completed             |
-| `'error'`              | Error              | if the scraper encounters an error         |
-| `'<scraper>:progress'` | download id        | emits progress of download until completed |
-| `'<scraper>:queued'`   | download id        | when a download is queued                  |
-| `'<scraper>:complete'` | download id        | when a download is completed               |
+| event                  | callback arguments | description                                                    |
+| ---------------------- | ------------------ | ------------------------------------------                     |
+| `'initialized'`        |                    | after start(), `initialized` means scraper has begun  scraping |
+| `'done'`               |                    | when the scraper has completed                                 |
+| `'error'`              | Error              | if the scraper encounters an error                             |
+| `'<scraper>:progress'` | download id        | emits progress of download until completed                     |
+| `'<scraper>:queued'`   | download id        | when a download is queued                                      |
+| `'<scraper>:complete'` | download id        | when a download is completed                                   |
 
 #### emit
 

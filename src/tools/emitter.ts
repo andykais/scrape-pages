@@ -1,95 +1,109 @@
 import { EventEmitter } from 'events'
 import * as Rx from 'rxjs'
+import * as ops from 'rxjs/operators'
+import { ToolBase } from './abstract'
 // type imports
 import { FMap } from '../util/map'
 import { Settings } from '../settings'
 import { ScraperName } from '../settings/config/types'
 
 type DownloadInfo = { id: number; filename?: string; mimeType?: string; byteLength?: number }
+
+type OnAnyListener = (event: string, ...args: any[]) => void
+class EventEmitterOnAny extends EventEmitter {
+  private onAnyListeners: OnAnyListener[] = []
+
+  public emit(event: string, ...args: any[]) {
+    for (const listener of this.onAnyListeners) {
+      listener(event, ...args)
+    }
+    return super.emit(event, ...args)
+  }
+  public onAny(listener: OnAnyListener) {
+    this.onAnyListeners.push(listener)
+  }
+  public removeAllOnAnyListeners() {
+    this.onAnyListeners = []
+  }
+}
+
 class ScraperEmitter {
-  /** listenable by user */
-  public listenable = {
-    QUEUED: 'queued',
-    PROGRESS: 'progress',
-    COMPLETE: 'complete'
+  public stopRequested: boolean = false
+  public constructor(private scraperName: ScraperName, private emitter: EventEmitter) {
+    this.on('stop', () => (this.stopRequested = true))
   }
-  /** emittable by user */
-  public emittable = {
-    STOP: 'stop'
+
+  public listenerCount(event: 'queued' | 'progress' | 'complete') {
+    return this.emitter.listenerCount(event)
   }
-  public emit = {
-    queued: (id: number) => {
-      this.emitter.emit(`${this.name}:${this.listenable.QUEUED}`, id)
-    },
-    progress: (id: number, progress: number) => {
-      this.emitter.emit(`${this.name}:${this.listenable.PROGRESS}`, id, progress)
-    },
-    completed: (downloadInfo: DownloadInfo) => {
-      this.emitter.emit(`${this.name}:${this.listenable.COMPLETE}`, downloadInfo)
-    }
-  }
-  public on = {
-    stop: (callback: () => void) => {
-      this.emitter.on(`${this.emittable.STOP}:${this.name}`, callback)
+
+  public emit(event: 'queued', downloadId: number): boolean
+  public emit(event: 'progress', downloadId: number, progress: number): boolean
+  public emit(event: 'complete', downloadInfo: DownloadInfo): boolean
+  public emit(event: string, ...args: any[]): boolean {
+    try {
+      return this.emitter.emit(`${this.scraperName}:${event}`, ...args)
+    } catch (e) {
+      // In this case we really do have an unhandled promise rejection
+      // Im not handling an external error. It shouldnt end up here
+      Promise.reject(e)
+      return false
     }
   }
 
-  private emitter: EventEmitter
-  private name: string
-
-  public constructor(name: string, emitter: EventEmitter) {
-    this.emitter = emitter
-    this.name = name
+  public on(event: 'stop', listener: () => void): this
+  public on(event: string, listener: (...args: any[]) => void) {
+    this.emitter.on(`${event}:${this.scraperName}`, listener)
+    return this
   }
-
-  public hasListenerFor = (eventName: string) =>
-    this.emitter.listenerCount(`${this.name}:${eventName}`) !== 0
 }
 
-type EmitterOn = (event: string, callback: (...args: any[]) => void) => void
-type EmitterEmit = (event: string, ...emittedValues: any[]) => void
+class Emitter extends ToolBase {
+  public stopRequested: boolean = false
+  public emitter: EventEmitterOnAny
+  private scrapers: FMap<string, ScraperEmitter>
 
-class Emitter {
-  /** listenable by user */
-  public static listenable = {
-    DONE: 'done',
-    ERROR: 'error'
-  }
-  /** emittable by user */
-  public static emittable = {
-    STOP: 'stop',
-    USE_RATE_LIMITER: 'useRateLimiter'
-  }
-  public emitter: EventEmitter
+  public constructor(settings: Settings) {
+    super(settings)
 
-  /** used internally (verbs are reversed) */
-  public emit = {
-    done: () => {
-      this.emitter.emit(Emitter.listenable.DONE)
-    },
-    error: (error: Error) => {
-      this.emitter.emit(Emitter.listenable.ERROR, error)
+    this.emitter = new EventEmitterOnAny()
+    this.emitter.on = this.emitter.on.bind(this.emitter)
+    this.emitter.emit = this.emitter.emit.bind(this.emitter)
+    this.scrapers = settings.flatConfig.map((_, name) => new ScraperEmitter(name, this.emitter))
+
+    this.on('stop', () => (this.stopRequested = true))
+  }
+
+  // get different emitters
+  public scraper = (scraper: string) => this.scrapers.getOrThrow(scraper)
+  public getBaseEmitter = () => this.emitter
+  public getRxEventStream(eventName: 'stop' | 'useRateLimiter') {
+    return Rx.fromEvent(this.emitter, eventName).pipe(ops.map(Boolean))
+  }
+
+  public emit(event: 'initialized'): boolean
+  public emit(event: 'done'): boolean
+  public emit(event: 'error', error: Error): boolean
+  public emit(event: string, ...args: any[]): boolean {
+    try {
+      return this.emitter.emit(event, ...args)
+    } catch (e) {
+      // In this case we really do have an unhandled promise rejection
+      // Im not handling an external error. It shouldnt end up here
+      Promise.reject(e)
+      return false
     }
   }
-  /** used internally (verbs are reversed) */
-  public on = {
-    stop: (callback: () => void) => {
-      this.emitter.on(Emitter.emittable.STOP, callback)
-    }
+
+  public on(event: 'stop', listener: () => void): this
+  public on(event: string | symbol, listener: (...args: any[]) => void) {
+    this.emitter.on(event, listener)
+    return this
   }
-  private scrapers: FMap<ScraperName, ScraperEmitter>
 
-  public constructor({ flatConfig }: Settings) {
-    this.emitter = new EventEmitter()
-
-    this.scrapers = flatConfig.map((_, name) => new ScraperEmitter(name, this.emitter))
+  public cleanup() {
+    this.emitter.removeAllListeners()
   }
-  public scraper = (name: ScraperName) => this.scrapers.getOrThrow(name)
-  public getBoundOn = (): EmitterOn => this.emitter.on.bind(this.emitter)
-  public getBoundEmit = (): EmitterEmit => this.emitter.emit.bind(this.emitter)
-  public getRxEventStream = (eventName: string) => Rx.fromEvent(this.emitter, eventName)
-
-  private hasListenerFor = (eventName: string): boolean =>
-    this.emitter.listenerCount(eventName) !== 0
 }
+
 export { Emitter }

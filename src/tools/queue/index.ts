@@ -1,5 +1,6 @@
 import * as Rx from 'rxjs'
 import * as ops from 'rxjs/operators'
+import { ToolBase } from '../abstract'
 import { rateLimitToggle } from '../../util/rxjs/operators'
 import { PriorityQueue } from './priority-queue'
 // type imports
@@ -7,14 +8,17 @@ import { Task } from '../../util/rxjs/operators/conditional-rate-limiter'
 import { Settings } from '../../settings'
 
 type ErrorCallback = (error?: Error, value?: any) => void
-class Queue {
+class Queue extends ToolBase {
   private isOpen: boolean
   private enqueueSubject: Rx.Subject<any>
   // private taskObservable: Rx.Observable<{}>
   private queuePromise: Promise<any>
   private queue: PriorityQueue<Task>
 
-  public constructor({ optionsInit, flatOptions }: Settings, toggler: Rx.Observable<boolean>) {
+  public constructor(settings: Settings, toggler: Rx.Observable<boolean>) {
+    super(settings)
+    const { optionsInit, flatOptions } = settings
+
     const { maxConcurrent = 1, rateLimit } = optionsInit
 
     const priorities = new Set([...flatOptions.values()].map(options => options.downloadPriority))
@@ -56,7 +60,15 @@ class Queue {
     })
   }
 
-  // called add(task) anywhere after this method is called will throw an error
+  /**
+   * cleanup
+   *
+   * calling add(task) anywhere after this method is called will throw an error
+   */
+  public cleanup() {
+    this.isOpen = false
+    this.enqueueSubject.complete()
+  }
   public closeQueue() {
     this.isOpen = false
     this.enqueueSubject.complete()

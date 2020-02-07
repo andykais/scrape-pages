@@ -70,9 +70,11 @@ export class Downloader extends AbstractDownloader<DownloadData> {
   }
 
   public retrieve = (downloadId: number, downloadData: DownloadData) =>
-    this.tools.queue.add(() => {
-      this.scraperEmitter.emit.progress(downloadId, 0)
-      return this.fetcher(downloadId, downloadData)
+    this.tools.queue.add(async () => {
+      this.scraperEmitter.emit('progress', downloadId, 0)
+      const downloadEntry = await this.fetcher(downloadId, downloadData)
+      this.scraperEmitter.emit('progress', downloadId, 0)
+      return downloadEntry
     }, this.options.downloadPriority)
 
   private downloadToFileAndMemory: FetchFunction = async (downloadId, [url, fetchOptions]) => {
@@ -145,14 +147,16 @@ export class Downloader extends AbstractDownloader<DownloadData> {
   }
 
   private emitDownloadProgress = (downloadId: number, response: Fetch.Response) => {
-    if (this.scraperEmitter.hasListenerFor(this.scraperEmitter.listenable.PROGRESS)) {
+    if (this.scraperEmitter.listenerCount('progress')) {
       const contentLength = parseInt(response.headers.get('content-length') || '0')
       let bytesLength = 0
       response.body.on('data', chunk => {
-        bytesLength += chunk.length
-        // emitting Infinity signals that content-length was zero
-        const progress = bytesLength / contentLength
-        this.scraperEmitter.emit.progress(downloadId, progress)
+        if (contentLength === 0) this.scraperEmitter.emit('progress', downloadId, NaN)
+        else {
+          bytesLength += chunk.length
+          const progress = bytesLength / contentLength
+          this.scraperEmitter.emit('progress', downloadId, progress)
+        }
       })
     }
   }

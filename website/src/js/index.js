@@ -1,7 +1,7 @@
 import { initDiagram, updateDiagram } from './dag'
 import defaultConfig from './default-config'
 import { getConfigFromUrl, setUrlToConfig } from './history'
-import normalize from 'scrape-pages/normalize-config'
+import { normalizeConfig as normalize } from 'scrape-pages/settings/config/normalize'
 
 import '../css/index.css'
 

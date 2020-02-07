@@ -6,5 +6,6 @@ declare module '*.sql' {
 declare module Chai {
   interface TypeComparison {
     equalQueryResult(expectedResult: any): Assertion
+    haveEvent(event: string, expectedCount: number): Assertion
   }
 }

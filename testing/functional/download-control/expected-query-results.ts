@@ -1,7 +1,7 @@
 import { QueryResult } from '../../../src/tools/store/querier-entrypoint'
 
 export const expected: { [queryStr: string]: QueryResult } = {
-  '{"scrapers":["postTitle"]}': [
+  '[["postTitle"]]': [
     {
       postTitle: [
         {

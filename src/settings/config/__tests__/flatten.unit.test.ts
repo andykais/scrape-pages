@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 import { FMap } from '../../../util/map'
-import { FlatConfig } from '../types'
+import { FlatConfig, ConfigPositionInfo } from '../types'
 import { normalizeConfig, flattenConfig } from '../'
 import * as testingConfigs from '../../../../testing/resources/testing-configs'
 
@@ -10,7 +10,7 @@ describe(__filename, () => {
   it('matches expected flat config', () => {
     const fullConfig = normalizeConfig(galleryPostImgTag)
     const configForPieces = fullConfig as any
-    const flatConfigGuess: FlatConfig = FMap.fromObject({
+    const flatConfigGuess: FlatConfig = FMap.fromObject<ConfigPositionInfo>({
       gallery: {
         depth: 0,
         horizontalIndex: 0,

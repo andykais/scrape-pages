@@ -1,7 +1,7 @@
 import { QueryResult } from '../../../src/tools/store/querier-entrypoint'
 
 export const expected: { [queryStr: string]: QueryResult } = {
-  '{"scrapers":["image"],"groupBy":"image"}': [
+  '[["image"],{"groupBy":"image"}]': [
     {
       image: [
         {
@@ -63,7 +63,7 @@ export const expected: { [queryStr: string]: QueryResult } = {
       ]
     }
   ],
-  '{"scrapers":["image","tag"],"groupBy":"image-page"}': [
+  '[["image","tag"],{"groupBy":"image-page"}]': [
     {
       image: [
         {

@@ -45,6 +45,14 @@ jobs:
         github-token: ${{ secrets.github_token }}
 
 ##############################
+#     Test Package Usage     #
+##############################
+    - run: npm ci --no-audit
+      if: matrix.os == 'ubuntu-latest' && matrix.node-version == '8'
+    - run: npm run build
+    - run: ./testing/packaging/setup.sh
+
+##############################
 #       NPM Publish          #
 ##############################
     - name: npm publish

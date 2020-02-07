@@ -16,10 +16,8 @@ const incrementUntilEmptyParse: DownloadParseBoolean = parsedValues => !!parsedV
 const incrementUntilNumericIndex = (incrementUntil: number): DownloadParseBoolean => (
   parsedValues,
   incrementIndex
-) => {
-  // console.log(incrementUntil, incrementIndex, { eval: incrementUntil >= incrementIndex })
-  return incrementUntil >= incrementIndex
-}
+) => incrementUntil >= incrementIndex
+
 const incrementAlways = () => true
 
 const catchDownloadError = (e: Error) => {
@@ -47,6 +45,12 @@ const chooseIgnoreError = ({ incrementUntil }: Scraper) => {
   }
 }
 
+const stopWasRequestedFn = (config: Scraper, tools: Tools) => {
+  const { emitter } = tools
+  const scraperEmitter = emitter.scraper(config.name)
+  return () => emitter.stopRequested || scraperEmitter.stopRequested
+}
+
 type ScraperPipeline = Rx.UnaryFunction<Rx.Observable<ParsedValue>, Rx.Observable<ParsedValue>>
 const setupFlowPipeline = (settings: Settings, tools: Tools) => (
   flow: FlowStep[]
@@ -61,19 +65,19 @@ const setupFlowPipeline = (settings: Settings, tools: Tools) => (
     const branch = flowStep.branch.map(setupFlowPipeline(settings, tools))
     const recurse = flowStep.recurse.map(setupFlowPipeline(settings, tools))
 
-    const outsideCommands = { stop: false }
-    tools.emitter.scraper(config.name).on.stop(() => (outsideCommands.stop = true))
-
     const okToIncrement = chooseIncrementEvaluator(scraper.config)
     const ignoreFetchError = chooseIgnoreError(scraper.config)
+    const stopWasRequested = stopWasRequestedFn(scraper.config, tools)
 
     // TODO encode/classify/contractify the value,index relationship?
     return Rx.pipe(
-      ops.takeWhile(() => !outsideCommands.stop), // itd be nice to use an Rx.fromEvent, but something funky is happeneing here
+      ops.takeWhile(() => !stopWasRequested()),
+      // ops.takeWhile(() => !tools.emitter.scraper(config.name).stopRequested), // itd be nice to use an Rx.fromEvent, but something funky is happeneing here
       ops.flatMap(parentValue =>
         RxCustom.whileLoop(scraper.downloadParseFunction, okToIncrement, parentValue)
       ),
-      ops.takeWhile(() => !outsideCommands.stop),
+      ops.takeWhile(() => !stopWasRequested()),
+      // ops.takeWhile(() => !tools.emitter.scraper(config.name).stopRequested),
       ops.map((parsedValues, index): [ParsedValue[], number] => [parsedValues, index]),
       ops.catchError(ignoreFetchError),
       // recursion step

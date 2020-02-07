@@ -7,6 +7,7 @@ type Statement = (params: { cacheId: Voidable<number>; downloadId: number }) => 
 export const query: CreateQuery<Statement> = (flatConfig, database) => {
   const statement = database.prepare(SQL_TEMPLATE)
   return ({ cacheId, downloadId }) => {
+    // TODO verify statement.run(...).changes === 1
     statement.run(cacheId, downloadId)
   }
 }

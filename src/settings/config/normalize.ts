@@ -115,7 +115,6 @@ const normalizeScraper = (scraperInit: t.ScraperInit): t.Scraper => {
   try {
     validateSlug(scraperInit.name)
   } catch (e) {
-    // console.log(e)
     throw new VError({ name: e.name, cause: e }, 'For a scraper name')
   }
 
