@@ -4,7 +4,7 @@ import { expect } from 'chai'
 import { RUN_OUTPUT_FOLDER, NockFolderMock } from '../../setup'
 import { config, configFlattened } from './config'
 import { expected } from './expected-query-results'
-import { scrape } from '../../../src'
+import { ScraperProgram } from '../../../src'
 /// type imports
 import { QueryArgs } from '../../../src/tools/store/querier-entrypoint'
 
@@ -21,40 +21,39 @@ describe(__filename, () => {
   const testables = [
     {
       name: 'normal',
-      scraper: scrape(config, options, params),
+      scraper: new ScraperProgram(config, options, params),
       siteMock: new NockFolderMock(resourceFolder, resourceUrl)
     },
     {
       name: 'psuedo delayed',
-      scraper: scrape(config, options, params),
+      scraper: new ScraperProgram(config, options, params),
       siteMock: new NockFolderMock(resourceFolder, resourceUrl, { randomSeed: 2 })
     },
     {
       name: 'flattened config',
-      scraper: scrape(configFlattened, options, params),
+      scraper: new ScraperProgram(configFlattened, options, params),
       siteMock: new NockFolderMock(resourceFolder, resourceUrl)
     }
   ]
 
   testables.forEach(({ name, scraper, siteMock }) => {
     describe(`with ${name} scraper`, () => {
-      const { start, query } = scraper
+      // const { start, query } = scraper
 
       before(async () => {
         await siteMock.init()
-        const { on } = start()
-        await new Promise(resolve => on('done', resolve))
+        await new Promise(resolve => scraper.on('done', resolve).start())
         siteMock.done()
       })
 
       it('should group each image into a separate slot, in order', () => {
         const queryArgs: QueryArgs = [['image'], { groupBy: 'image' }]
-        const result = query(...queryArgs)
+        const result = scraper.query(...queryArgs)
         expect(result).to.equalQueryResult(expected[JSON.stringify(queryArgs)])
       })
       it('should group tags and images together that were found on the same page', () => {
         const queryArgs: QueryArgs = [['image', 'tag'], { groupBy: 'image-page' }]
-        const result = query(...queryArgs)
+        const result = scraper.query(...queryArgs)
         expect(result).to.equalQueryResult(expected[JSON.stringify(queryArgs)])
       })
     })

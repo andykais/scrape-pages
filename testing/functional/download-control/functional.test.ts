@@ -1,11 +1,13 @@
 import * as path from 'path'
+import * as fs from '../../../src/util/fs'
+import { UninitializedDatabaseError } from '../../../src/util/errors'
 
 import { expect } from 'chai'
 import nock from 'nock'
-import { RUN_OUTPUT_FOLDER, NockFolderMock, useRequestStatsRecorder } from '../../setup'
+import { RUN_OUTPUT_FOLDER, NockFolderMock, recordEvents } from '../../setup'
 import { config, configBranching } from './config'
 import { expected } from './expected-query-results'
-import { scrape, ActiveScraperLockError } from '../../../src'
+import { ScraperProgram, ActiveScraperLockError } from '../../../src'
 // type imports
 import { QueryArgs } from '../../../src/tools/store/querier-entrypoint'
 
@@ -19,108 +21,130 @@ const params = {
 }
 
 describe(__filename, () => {
-  it('should hear a "done" event even if the scraper is empty and we wait on "initialized"', async () => {
+  // this may not be necessary
+  it.skip('should hear a "done" event even if the scraper is empty and we wait on "initialized"', async () => {
     const config = { flow: [] }
-    const scraper = scrape(config, options, params)
-    const { on } = scraper.start()
-    await new Promise(resolve => on('initialized', resolve))
-    await new Promise(resolve => on('done', resolve))
+    const scraper = new ScraperProgram(config, options, params)
+    await new Promise(resolve => scraper.on('initialized', resolve))
+    await new Promise(resolve => scraper.on('done', resolve))
   })
 
   describe('cache control', () => {
+    const siteMock = new NockFolderMock(resourceFolder, resourceUrl)
+    beforeEach(siteMock.init)
+    afterEach(siteMock.done)
+
     const queryArgs: QueryArgs = [['postTitle']]
     step('first pass should fetch all downloads since nothing is in cache', async () => {
-      const { start, query } = scrape(config, { cache: true }, params)
-      const siteMock = await NockFolderMock.create(resourceFolder, resourceUrl)
-      const emitter = await start()
-      const { counts } = useRequestStatsRecorder(config, emitter)
-      await new Promise(resolve => emitter.on('done', resolve))
-      siteMock.done()
-      expect(counts.index.queued).to.equal(1)
-      expect(counts.index.complete).to.equal(1)
-      expect(counts.postTitle.queued).to.equal(5)
-      expect(counts.postTitle.complete).to.equal(5)
-      const result = query(...queryArgs)
+      const scraper = new ScraperProgram(config, { cache: true }, params)
+      const events = recordEvents(scraper)
+
+      scraper.start()
+      await scraper.getCompletionPromise()
+
+      expect(events).to.haveEvent('index:queued', 1)
+      expect(events).to.haveEvent('index:complete', 1)
+      expect(events).to.haveEvent('postTitle:queued', 5)
+      expect(events).to.haveEvent('postTitle:complete', 5)
+
+      const result = scraper.query(...queryArgs)
       expect(result).to.equalQueryResult(expected[JSON.stringify(queryArgs)])
     })
 
     step('with all scrapers cache: true, no requests should happen', async () => {
-      const { start, query } = scrape(config, { cache: true }, { ...params, cleanFolder: false })
-      const resultPre = query(...queryArgs)
+      const scraper = new ScraperProgram(config, { cache: true }, { ...params, cleanFolder: false })
+      const resultPre = scraper.query(...queryArgs)
       expect(resultPre).to.equalQueryResult(expected[JSON.stringify(queryArgs)])
 
-      const siteMock = await NockFolderMock.create(resourceFolder, resourceUrl)
-      const emitter = await start()
-      const { counts } = useRequestStatsRecorder(config, emitter)
-      await new Promise(resolve => emitter.on('done', resolve))
-      siteMock.done()
-      expect(counts.index.queued).to.equal(0)
-      expect(counts.index.complete).to.equal(1)
-      expect(counts.postTitle.queued).to.equal(0)
-      expect(counts.postTitle.complete).to.equal(5)
-      const result = query(...queryArgs)
+      const events = recordEvents(scraper)
+
+      scraper.start()
+      await scraper.getCompletionPromise()
+
+      expect(events).to.haveEvent('index:queued', 0)
+      expect(events).to.haveEvent('index:complete', 1)
+      expect(events).to.haveEvent('postTitle:queued', 0)
+      expect(events).to.haveEvent('postTitle:complete', 5)
+
+      const result = scraper.query(...queryArgs)
       expect(result).to.equalQueryResult(expected[JSON.stringify(queryArgs)])
     })
 
     step('should make requests for scrapers with cache turned off', async () => {
-      const { start, query } = scrape(
+      const scraper = new ScraperProgram(
         config,
         { logLevel: 'info', cache: true, optionsEach: { index: { cache: false } } },
         { ...params, cleanFolder: false }
       )
-      const siteMock = await NockFolderMock.create(resourceFolder, resourceUrl)
-      const emitter = await start()
-      const { counts } = useRequestStatsRecorder(config, emitter)
-      await new Promise(resolve => emitter.on('done', resolve))
-      siteMock.done()
-      expect(counts.index.queued).to.equal(1)
-      expect(counts.index.complete).to.equal(1)
-      expect(counts.postTitle.queued).to.equal(0)
-      expect(counts.postTitle.complete).to.equal(5)
-      const result = query(...queryArgs)
+      const events = recordEvents(scraper)
+
+      scraper.start()
+      await scraper.getCompletionPromise()
+
+      expect(events).to.haveEvent('index:queued', 1)
+      expect(events).to.haveEvent('index:complete', 1)
+      expect(events).to.haveEvent('postTitle:queued', 0)
+      expect(events).to.haveEvent('postTitle:complete', 5)
+
+      const result = scraper.query(...queryArgs)
       expect(result).to.deep.equal(expected[JSON.stringify(queryArgs)])
     })
   })
 
-  describe('emit stop event', () => {
+  describe('stopping the scraper', () => {
     // nock sends an instant reply, this is not realistic and harder to test, so a delay is added
     const siteMock = new NockFolderMock(resourceFolder, resourceUrl, { delay: 200 })
 
-    beforeEach(siteMock.init)
+    beforeEach(async () => {
+      await fs.rmrf(params.folder)
+      await siteMock.init()
+    })
     afterEach(siteMock.done)
 
-    describe(`emit('stop')`, () => {
-      it(`should stop the whole scraper if triggered before any 'complete' event`, async () => {
-        const { start, query } = scrape(config, options, params)
-        const { on, emit } = start()
-        on('index:queued', () => emit('stop'))
-        await new Promise(resolve => on('done', resolve))
+    describe('with stop()', () => {
+      it('should stop the whole scraper', async () => {
+        const scraper = new ScraperProgram(config, options, params)
+        const events = recordEvents(scraper)
 
-        const resultIndex = query(['index'])
-        expect(resultIndex[0]['index'][0].complete).to.equal(0)
-        const result = query(['postTitle'], { groupBy: 'postTitle' })
+        await scraper.start()
+        // TODO this test currently breaks if stop() is called before awaiting start (this is fixed w/ fetch abort)
+        scraper.stop()
+        await new Promise((resolve, reject) => scraper.on('done', resolve).on('error', reject))
+
+        expect(events).to.haveEvent('done', 1)
+        expect(events).to.haveEvent('index:complete', 0)
+
+        const result = scraper.query(['postTitle'], { groupBy: 'postTitle' })
         expect(result.length).to.equal(0)
       })
     })
-    describe(`emit('stop:<scraper>')`, () => {
-      it('should only stop the postTitle scraper', async () => {
-        const { start, query } = scrape(configBranching, options, params)
-        const emitter = start()
-        const { counts } = useRequestStatsRecorder(configBranching, emitter)
-        // emitter.emit('stop:postTitle')
-        // TODO stop is still fickle on continuous runs...sometimes postTitle queues get through
-        emitter.on('index:queued', () => emitter.emit('stop:postTitle'))
-        await new Promise(resolve => emitter.on('done', resolve))
 
-        expect(counts.index.queued).to.equal(1)
-        expect(counts.postTitle.queued).to.equal(0)
-        expect(counts.postTitle_dup.queued).to.equal(5)
+    describe('with stopScraper()', () => {
+      it('should stop the named scraper only', async function() {
+        const scraper = new ScraperProgram(configBranching, options, params)
+        await siteMock.init()
 
-        const indexResult = query(['index'], { groupBy: 'index' })
+        const events = recordEvents(scraper)
+
+        scraper.on('index:queued', () => scraper.stopScraper('postTitle'))
+
+        await Promise.all([
+          scraper.start(),
+          new Promise((resolve, reject) => scraper.on('done', resolve).on('error', reject))
+        ])
+
+        expect(events).to.haveEvent('index:queued', 1)
+        expect(events).to.haveEvent('index:complete', 1)
+        expect(events).to.haveEvent('postTitle:queued', 0)
+        expect(events).to.haveEvent('postTitle:complete', 0)
+        expect(events).to.haveEvent('postTitle_dup:queued', 5)
+        expect(events).to.haveEvent('postTitle_dup:complete', 5)
+
+        const indexResult = scraper.query(['index'], { groupBy: 'index' })
         expect(indexResult.length).to.equal(5)
-        const result = query(['postTitle'], { groupBy: 'postTitle' })
+        const result = scraper.query(['postTitle'], { groupBy: 'postTitle' })
         expect(result.length).to.equal(0)
-        const branchResult = query(['postTitle_dup'], { groupBy: 'postTitle_dup' })
+        const branchResult = scraper.query(['postTitle_dup'], { groupBy: 'postTitle_dup' })
         expect(branchResult.length).to.equal(5)
       })
     })
@@ -135,25 +159,50 @@ describe(__filename, () => {
         .get('/a/b/c')
         .reply(500)
 
-      const { start } = scrape(config, options, params)
-      const emitter = await start()
-      const { counts } = useRequestStatsRecorder(config, emitter)
-      await new Promise((resolve, reject) => {
-        emitter.on('error', (e: Error) => {
-          expect(e).to.be.instanceof(Error)
-          expect(e.name).to.equal('ResponseError')
-          expect(e.message).to.include(
-            `scraper 'will-fail': Request "https://non-existent.com/a/b/c" failed.`
-          )
-          expect(counts['will-fail'].queued).to.equal(1)
-          expect(counts['will-fail'].complete).to.equal(0)
-          resolve()
-        })
-        emitter.on('done', () => reject(`scraper should have emitted 'error' not 'done'`))
-      })
+      const scraper = new ScraperProgram(config, options, params)
+      const events = recordEvents(scraper)
+
+      scraper.start()
+
+      try {
+        await scraper.getCompletionPromise()
+        throw new Error(`scraper should have emitted 'error' not 'done'`)
+      } catch (e) {
+        expect(e).to.be.instanceof(Error)
+        expect(e.name).to.equal('ResponseError')
+        expect(e.message).to.include(
+          `scraper 'will-fail': Request "https://non-existent.com/a/b/c" failed.`
+        )
+      }
+
+      expect(events).to.haveEvent('will-fail:queued', 1)
+      expect(events).to.haveEvent('will-fail:complete', 0)
     })
   })
 
+  describe('throw up errors to emitter', () => {
+    const siteMock = new NockFolderMock(resourceFolder, resourceUrl)
+    beforeEach(siteMock.init)
+    afterEach(siteMock.done)
+    afterEach(() => process.removeAllListeners('unhandledRejection'))
+
+    it('should not affect the scraper', async () => {
+      const scraper = new ScraperProgram(config, options, params)
+
+      let unhandledRejection: any
+      process.on('unhandledRejection', error => (unhandledRejection = error))
+
+      const errorMsg = 'Im a nasty bug!'
+      scraper.on('index:queued', () => {
+        throw new Error(errorMsg)
+      })
+      scraper.start()
+      await scraper.getCompletionPromise()
+
+      expect(unhandledRejection).to.be.instanceof(Error)
+      expect(unhandledRejection!.message).to.equal(errorMsg)
+    })
+  })
   describe('in progress requests', () => {
     it('it should show complete = 0 in result', async () => {
       nock('https://slow-url.com')
@@ -165,20 +214,19 @@ describe(__filename, () => {
         flow: [{ name: 'slow', download: 'https://slow-url.com/a' }]
       }
 
-      const { start, query } = scrape(config, options, params)
-      const { on } = start()
+      const scraper = new ScraperProgram(config, options, params)
 
-      await new Promise(resolve => on('initialized', resolve))
-      const queryStmt = query.prepare(['slow'])
+      await scraper.start()
+      const queryStmt = scraper.query.prepare(['slow'])
 
-      on('slow:queued', () => {
+      scraper.on('slow:queued', () => {
         const result = queryStmt()
         expect(result.length).to.equal(1)
         expect(result[0]['slow'].length).to.equal(1)
         expect(result[0]['slow'][0].complete).to.equal(0) // this is a BIT (1 | 0) column in sqlite
       })
 
-      await new Promise(resolve => on('done', resolve))
+      await scraper.getCompletionPromise()
       const result = queryStmt()
       expect(result.length).to.equal(1)
       expect(result[0]['slow'].length).to.equal(1)
@@ -196,16 +244,24 @@ describe(__filename, () => {
         flow: [{ name: 'slow', download: 'https://slow-url.com/a' }]
       }
 
-      const scraper1 = scrape(config, options, params)
-      const scraper2 = scrape(config, options, params)
+      const scraper1 = new ScraperProgram(config, options, params)
+      const scraper2 = new ScraperProgram(config, options, params)
 
-      const emitter1 = scraper1.start()
-      await new Promise(resolve => emitter1.on('initialized', resolve))
-      let error = null
-      const emitter2 = scraper2.start()
-      emitter2.on('error', e => (error = e))
-      await new Promise(resolve => emitter1.on('done', resolve))
-      expect(error).to.be.an.instanceof(ActiveScraperLockError)
+      const scraper1CompletionPromise = scraper1.getCompletionPromise()
+      const scraper2CompletionPromise = scraper2.getCompletionPromise()
+
+      scraper1.start()
+      scraper1.on('initialized', () => {
+        scraper2.start()
+      })
+
+      try {
+        await scraper2CompletionPromise
+        throw new Error('expected scraper2 to error because of another actively running scraper')
+      } catch (error) {
+        expect(error).to.be.a.instanceof(ActiveScraperLockError)
+      }
+      await scraper1CompletionPromise
     })
 
     it('should allow two scrapers to run simultaneously with forceStart: true', async () => {
@@ -219,18 +275,44 @@ describe(__filename, () => {
         flow: [{ name: 'slow', download: 'https://slow-url.com/a' }]
       }
 
-      const scraper1 = scrape(config, options, params)
-      const scraper2 = scrape(config, options, { ...params, forceStart: true })
+      const scraper1 = new ScraperProgram(config, options, params)
+      const scraper2 = new ScraperProgram(config, options, { ...params, forceStart: true })
 
-      const emitter1 = scraper1.start()
-      await new Promise(resolve => emitter1.on('initialized', resolve))
-      let error = null
-      const emitter2 = scraper2.start()
-      const done1P = new Promise(resolve => emitter1.on('done', resolve))
-      const done2P = new Promise(resolve => emitter2.on('done', resolve))
-      emitter2.on('error', e => (error = e))
-      await Promise.all([done1P, done2P])
-      expect(error).to.be.null // eslint-disable-line no-unused-expressions
+      const events1 = recordEvents(scraper1)
+      const events2 = recordEvents(scraper2)
+
+      scraper1.start()
+      await new Promise(resolve => scraper1.on('initialized', resolve))
+      scraper2.start()
+
+      await Promise.all([scraper1.getCompletionPromise(), scraper2.getCompletionPromise()])
+
+      expect(events1).to.haveEvent('done', 1)
+      expect(events1).to.haveEvent('error', 0)
+
+      expect(events2).to.haveEvent('done', 1)
+      expect(events2).to.haveEvent('error', 0)
+    })
+  })
+  describe('querying from a separate class instance', () => {
+    const siteMock = new NockFolderMock(resourceFolder, resourceUrl)
+    beforeEach(async () => {
+      await fs.rmrf(params.folder)
+      await siteMock.init()
+    })
+    afterEach(siteMock.done)
+
+    it('should return the same result as the scraping class instance', async () => {
+      const scraperBase = new ScraperProgram(config, options, params)
+      const scraperQueryOnly = new ScraperProgram(config, options, params)
+
+      expect(() => scraperQueryOnly.query(['postTitle'])).to.throw(UninitializedDatabaseError)
+
+      await scraperBase.start()
+      await new Promise(resolve => scraperBase.on('done', resolve))
+
+      const result = scraperQueryOnly.query(['postTitle'])
+      expect(result).to.deep.equal(expected[JSON.stringify([['postTitle']])])
     })
   })
 })

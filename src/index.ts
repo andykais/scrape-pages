@@ -1,4 +1,4 @@
-export { scrape } from './scraper'
+export { ScraperProgram } from './scraper'
 
 export * from './util/errors'
 

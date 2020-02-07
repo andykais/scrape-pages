@@ -7,95 +7,128 @@ import { Logger } from '../tools/logger'
 import { Store } from '../tools/store'
 import { compileProgram } from './flow'
 // type imports
+import * as Rx from 'rxjs'
+import { Tools } from '../tools'
+import { ToolBase } from '../tools/abstract'
 import { QueryFn } from '../tools/store/querier-entrypoint'
 import { Settings } from '../settings'
 import { ConfigInit } from '../settings/config/types'
 import { OptionsInit } from '../settings/options/types'
 import { ParamsInit } from '../settings/params/types'
 
-/**
- * scrape is the entrypoint for this library
- *
- * @param configInit 'what' is going to be scraped (the actual urls and parse strings)
- * @param optionsInit 'how' is the site going to be scraped (mostly how downloads should behave)
- * @param paramsInit 'who' is going to be scraped (settings specific to each run)
- */
-export const scrape = (
-  configInit: ConfigInit,
-  optionsInit: OptionsInit,
-  paramsInit: ParamsInit
-) => {
-  const settings = getSettings(configInit, optionsInit, paramsInit)
-  const query = Store.querierFactory(settings)
+export class ScraperProgram extends ToolBase {
+  public query: QueryFn
+  protected settings: Settings
+  private tools: Tools
+  private programSubscription: Rx.Subscription
 
-  return new ScraperProgram(settings, query)
-}
-
-class ScraperProgram {
-  public constructor(private settings: Settings, public query: QueryFn) {}
-
-  public start = () => {
-    const tools = initTools(this.settings)
-    const { emitter, logger } = tools
-
-      // program starts detached so we can return the emitter synchronously
-    ;(async () => {
-      try {
-        emitter.on('stop', async () => {
-          logger.info('Exiting manually.')
-          const { emitter, ...internalTools } = tools
-          for (const tool of Object.values(internalTools)) tool.cleanup()
-          await this.writeMetadata({ scraperActive: false })
-          emitter.emit('done')
-          emitter.cleanup()
-          logger.info(`Done.`)
-        })
-
-        await this.ensureSafeFolder()
-        await this.initFolders()
-        await this.writeMetadata({ scraperActive: true })
-        for (const tool of Object.values(tools)) tool.initialize()
-        emitter.emit('initialized')
-        logger.info('Starting scraper.')
-
-        const program = compileProgram(this.settings, tools)
-
-        const subscription = program.subscribe({
-          error: async (error: Error) => {
-            await this.writeMetadata({ scraperActive: false })
-            emitter.emit('error', error)
-            logger.error(error)
-            subscription.unsubscribe()
-            for (const tool of Object.values(tools)) tool.cleanup()
-          },
-          complete: () => {
-            const { emitter, ...internalTools } = tools
-            for (const tool of Object.values(internalTools)) tool.cleanup()
-
-            // a nicety so we can await "initialized" and then start listening for "done"
-            setTimeout(async () => {
-              await this.writeMetadata({ scraperActive: false })
-              emitter.emit('done')
-              emitter.cleanup()
-              logger.info('Done.')
-            }, 0)
-          }
-        })
-        emitter.on('stop', subscription.unsubscribe)
-      } catch (error) {
-        emitter.emit('error', error)
-        if (logger.isInitialized) logger.error(error)
-        for (const tool of Object.values(tools)) tool.cleanup()
-      }
-    })()
-    return tools.emitter.getBaseEmitter()
+  /**
+   * Instantiate a scraper
+   *
+   * @param configInit 'what' is going to be scraped (the actual urls and parse strings)
+   * @param optionsInit 'how' is the site going to be scraped (mostly how downloads should behave)
+   * @param paramsInit 'who' is going to be scraped (settings specific to each run)
+   */
+  public constructor(configInit: ConfigInit, optionsInit: OptionsInit, paramsInit: ParamsInit) {
+    super(getSettings(configInit, optionsInit, paramsInit))
+    this.query = Store.querierFactory(this.settings)
+    this.tools = initTools(this.settings)
   }
 
-  public analyzeConfig = () => ({
-    inputs: this.settings.config.input,
-    scraperNames: [...this.settings.flatConfig.keys()]
-  })
+  /**
+   * Start the scraper. This function initializes the scraper program and kicks it off. You cannot call the
+   * other methods on this class until start() has completed.
+   */
+  public start = async () => {
+    // TODO add a scraperActive stateful var. If start is called when that value is true, then throw an error
+    try {
+      await this.ensureSafeFolder()
+      await this.initFolders()
+      await this.writeMetadata({ scraperActive: true })
 
+      for (const tool of Object.values(this.tools)) tool.initialize()
+
+      const program = compileProgram(this.settings, this.tools)
+
+      this.tools.emitter.emit('initialized')
+      this.tools.logger.info('Starting scraper.')
+      this.initialize()
+
+      this.programSubscription = program.subscribe({
+        error: async (error: Error) => {
+          await this.cleanup(error)
+        },
+        complete: () => {
+          // TODO is this necessary anymore?
+          // a nicety so we can await "initialized" and then start listening for "done"
+          setTimeout(async () => {
+            this.tools.logger.info('Program completed successfully.')
+            await this.cleanup()
+          }, 0)
+        }
+      })
+    } catch (error) {
+      this.cleanup(error)
+    }
+  }
+
+  public stop = () => {
+    // TODO add abort controller to node-fetch (see https://github.com/node-fetch/node-fetch#request-cancellation-with-abortsignal)
+    this.throwIfUninitialized()
+    this.tools.logger.info('Exiting manually.')
+    this.tools.emitter.emitter.emit('stop')
+    this.cleanup()
+  }
+  public stopScraper = (scraperName: string) => {
+    this.throwIfUninitialized()
+    this.tools.emitter.emitter.emit(`stop:${scraperName}`)
+  }
+  public useRateLimiter = (toggle: boolean) => {
+    this.throwIfUninitialized()
+    this.tools.emitter.emitter.emit('useRateLimiter', toggle)
+  }
+  public on(event: string, listener: (...args: any[]) => void) {
+    this.tools.emitter.emitter.on(event, listener)
+    return this
+  }
+  public onAny(listener: (event: string, ...args: any[]) => void) {
+    this.tools.emitter.emitter.onAny(listener)
+    return this
+  }
+
+  public getCompletionPromise = () => {
+    // TODO handle the case where it completed before this method was called
+    // E.g. add state to the emitter events somewhere
+    return new Promise((resolve, reject) => this.on('done', resolve).on('error', reject))
+  }
+
+  protected async cleanup(error?: Error) {
+    try {
+      if (error) {
+        this.tools.emitter.emit('error', error)
+        if (this.tools.logger.isInitialized) this.tools.logger.error(error)
+      }
+      if (this.programSubscription) this.programSubscription.unsubscribe()
+      await this.writeMetadata({ scraperActive: false })
+      this.tools.queue.cleanup()
+      this.tools.store.cleanup()
+      if (!error) {
+        this.tools.emitter.emit('done')
+        this.tools.logger.info(`Done.`)
+      }
+      this.tools.emitter.cleanup()
+      this.tools.logger.cleanup()
+    } catch (error) {
+      this.tools.emitter.emit('error', error)
+      this.tools.logger.error(error)
+    }
+  }
+  private communicationCleanup() {
+    this.tools.emitter.cleanup()
+    this.tools.logger.cleanup()
+  }
+
+  /** internal */
   private async ensureSafeFolder() {
     const { folder, forceStart } = this.settings.paramsInit
     if (forceStart) return
@@ -116,6 +149,7 @@ class ScraperProgram {
     }
   }
 
+  /** internal */
   private initFolders = async () => {
     const { paramsInit, flatParams } = this.settings
     // remove folders if specified
@@ -127,15 +161,19 @@ class ScraperProgram {
     await Logger.rotateLogFiles(paramsInit.folder)
   }
 
-  private async writeMetadata(data: { scraperActive: boolean }) {
-    const { paramsInit, optionsInit, configInit } = this.settings
-    const metadataFile = path.resolve(paramsInit.folder, 'metadata.json')
-
+  /** internal */
+  private async writeMetadata({ scraperActive }: { scraperActive: boolean }) {
+    const metadataFile = path.resolve(this.settings.paramsInit.folder, 'metadata.json')
     const metadata = {
-      ...data,
+      scraperActive,
       version: process.env.PACKAGE_VERSION,
-      settingsInit: { configInit, optionsInit, paramsInit }
+      settingsInit: {
+        configInit: this.settings.configInit,
+        optionsInit: this.settings.optionsInit,
+        paramsInit: this.settings.paramsInit
+      }
     }
+
     await writeFile(metadataFile, JSON.stringify(metadata))
   }
 }

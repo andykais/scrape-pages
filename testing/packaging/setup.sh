@@ -22,6 +22,8 @@ function npm_install_local_package() {
 project_root=$PWD
 build_folder=$PWD/lib
 tmp_folder=/tmp/scrape-pages-full-packaging-test
+
+npm run build
 rm -rf $tmp_folder
 mkdir -p $tmp_folder
 cd $tmp_folder
