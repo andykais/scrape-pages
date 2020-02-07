@@ -28,7 +28,6 @@ module.exports = (env, { mode = 'development' } = {}) => ({
     filename: '[name].js',
     library: 'scrape-pages',
     libraryTarget: 'umd',
-    // devtoolModuleFilenameTemplate: '[]webpack:[resource-path]',
     devtoolModuleFilenameTemplate: 'webpack:[resource-path]',
     devtoolFallbackModuleFilenameTemplate: '[absolute-resource-path]'
   },
