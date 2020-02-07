@@ -1,0 +1,34 @@
+{
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "project": "./tsconfig.json",
+    "sourceType": "module"
+  },
+  "plugins": ["@typescript-eslint", "no-only-tests", "import"],
+  "rules": {
+    "no-unused-expressions": "error",
+    "no-console": "warn",
+    "no-unreachable": "error",
+    "@typescript-eslint/no-unused-vars": ["error", { "varsIgnorePattern": "^_" }],
+    "@typescript-eslint/explicit-member-accessibility": "error",
+    "@typescript-eslint/member-ordering": [
+      "error",
+      {
+        "default": [
+          "static-field",
+          "instance-field",
+          "abstract-field",
+
+          "constructor",
+          "static-method",
+          "instance-method",
+          "abstract-method"
+        ]
+      }
+    ],
+    "no-only-tests/no-only-tests": "error",
+    "import/no-default-export": "error",
+    "import/group-exports": "error",
+    "import/exports-last": "error"
+  }
+}

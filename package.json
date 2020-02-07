@@ -1,0 +1,56 @@
+{
+  "name": "scrape-pages",
+  "version": "3.5.0",
+  "description": "generalized scraping using a single config object for any site that can be scraped without a headless browser",
+  "main": "index.js",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "typecheck:watch": "tsc --noEmit --watch",
+    "lint": "eslint --ignore-path .gitignore '**/*.ts'",
+    "build": "webpack --mode=production",
+    "build:watch": "webpack --watch",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com/andykais/scrape-pages.git"
+  },
+  "keywords": [
+    "crawler",
+    "emitter",
+    "http",
+    "scraper"
+  ],
+  "author": "Andrew Kaiser",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/nearley": "^2.11.1",
+    "@types/node": "^13.7.0",
+    "@typescript-eslint/eslint-plugin": "^2.19.0",
+    "@typescript-eslint/parser": "^2.19.0",
+    "eslint": "^6.8.0",
+    "eslint-plugin-import": "^2.20.1",
+    "eslint-plugin-no-only-tests": "^2.4.0",
+    "nearley-loader": "^2.0.0",
+    "readline-sync": "^1.4.10",
+    "ts-loader": "^6.2.1",
+    "typescript": "^3.7.5",
+    "webpack": "^4.41.5",
+    "webpack-cli": "^3.3.10",
+    "webpack-node-externals": "^1.7.2"
+  },
+  "dependencies": {
+    "better-sqlite3": "^5.4.3",
+    "bunyan": "^1.8.12",
+    "cheerio": "^1.0.0-rc.3",
+    "handlebars": "^4.7.3",
+    "jsonata": "^1.8.1",
+    "nearley": "^2.19.1",
+    "node-fetch": "^2.6.0",
+    "rxjs": "^6.5.4",
+    "typescript-is": "^0.13.1"
+  },
+  "engines": {
+    "node": ">=8.0"
+  }
+}
