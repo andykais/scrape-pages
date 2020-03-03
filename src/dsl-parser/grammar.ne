@@ -20,7 +20,7 @@
     return {
       inputs: preProgram
         .filter(({ command }) => command === 'INPUT')
-        .map(({ params }) => params.tagSlug),
+        .map(({ params }) => params.slug),
       program: program
     }
   }
@@ -102,9 +102,9 @@
     return args
   }
 
-  function extractInput([command, _, tagSlug]) {
+  function extractInput([command, _, slug]) {
     return {
-      tagSlug
+      slug
     }
   }
 
@@ -120,8 +120,8 @@
     return { selector, ...kwargs }
   }
 
-  function extractTag([_, ws, tagSlug]) {
-    return { tagSlug }
+  function extractTag([_, ws, slug]) {
+    return { slug }
   }
 
   function extractQuoted([_quote, [inQuotes]]) {

@@ -25,15 +25,15 @@ interface ParseCommand {
 interface TagCommand {
   command: 'TAG'
   params: {
-    tagSlug: string
+    slug: string
   }
 }
 
-type Commands = RequestCommand | ParseCommand | TagCommand
+type Command = RequestCommand | ParseCommand | TagCommand
 
 interface InitOperation {
   operator: 'init'
-  commands: Commands[]
+  commands: Command[]
 }
 interface UntilOperation {
   operator: 'until'
@@ -41,18 +41,31 @@ interface UntilOperation {
 }
 interface MapOperation {
   operator: 'map'
-  commands: Commands[]
+  commands: Command[]
+}
+interface ReduceOperation {
+  operator: 'reduce'
+  commands: Command[]
+}
+interface LoopOperation {
+  operator: 'loop'
+  commands: Command[]
+}
+interface CatchOperation {
+  operator: 'catch'
+  commands: Command[]
 }
 interface BranchOperation {
   operator: 'branch'
-  programs: Operations[][]
+  programs: Program[]
 }
 
-type Operations = InitOperation | UntilOperation | MapOperation | BranchOperation
+type Operation = InitOperation | UntilOperation | MapOperation | BranchOperation
+type Program = Operation[]
 
 interface Instructions {
   inputs: Slug[]
-  program: Operations[]
+  program: Program
 }
 
-export { Instructions }
+export { Instructions, Program, Operation, Command, Expression }

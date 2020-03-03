@@ -22,13 +22,13 @@ const syntaxCoverageInstruction: Instructions = {
           command: 'PARSE',
           params: { selector: 'span > a', ATTR: 'href', MAX: 10 }
         },
-        { command: 'TAG', params: { tagSlug: 'test' } }
+        { command: 'TAG', params: { slug: 'test' } }
       ]
     },
     { operator: 'until', expression: '{{value}} == x || ({{index}} <= 2)' },
     {
       operator: 'map',
-      commands: [{ command: 'TAG', params: { tagSlug: 'nother' } }]
+      commands: [{ command: 'TAG', params: { slug: 'nother' } }]
     },
     {
       operator: 'branch',
@@ -60,7 +60,7 @@ const syntaxCoverageInstruction: Instructions = {
         [
           {
             operator: 'init',
-            commands: [{ command: 'TAG', params: { tagSlug: 'ne' } }]
+            commands: [{ command: 'TAG', params: { slug: 'ne' } }]
           }
         ]
       ]
