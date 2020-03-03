@@ -1,4 +1,5 @@
 const path = require('path')
+const typescriptIsTransformer = require('typescript-is/lib/transform-inline/transformer').default
 const nodeExternals = require('webpack-node-externals')
 
 module.exports = {
@@ -32,10 +33,15 @@ module.exports = {
     rules: [
       {
         test: /\.ts$/,
-        loader: 'ts-loader'
+        loader: 'ts-loader',
+        options: {
+          getCustomTransformers: program => ({
+            before: [typescriptIsTransformer(program)]
+          })
+        }
       },
       {
-        test: path.resolve(__dirname, 'src/dsl-parser/grammar.ne.js'),
+        test: path.resolve(__dirname, 'src/dsl-parser/grammar.ne'),
         loader: 'nearley-loader'
       }
     ]

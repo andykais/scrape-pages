@@ -1,54 +1,245 @@
+@{%
+  const filteredLines = {null: true, 'COMMENT': true}
+
+  const extractWhitespace = () => null
+  const extractComment = () => 'COMMENT'
+  const extractIdentity = d => d[0]
+
+  const extractInlineCommand = (command, commandExtractor) => d => {
+    return {
+      command,
+      params: commandExtractor(d)
+    }
+  }
+
+  const extractJsonCommand = (command) => d => {
+    return []
+  }
+
+  function formatMain([{ preProgram, program, postProgram }]) {
+    return {
+      inputs: preProgram
+        .filter(({ command }) => command === 'INPUT')
+        .map(({ params }) => params.tagSlug),
+      scrape: program
+    }
+  }
+  function extractMain([preProgram, program, postProgram]) {
+    // Why is this being ran multiple times?
+    return {
+      preProgram,
+      program,
+      postProgram
+    }
+  }
+
+  function extractPreProgram([preProgram]) {
+    return preProgram
+      .map(line => line[0])
+      .filter(line => !filteredLines[line])
+  }
+  function extractPostProgram(args) {
+    return []
+  }
+
+  function extractProgramDotFlow([ formattedProgram, ws, [ dotFn ], steps ]) {
+    const operator = dotFn.slice(1)
+    if (Array.isArray(formattedProgram)) {
+      return [...formattedProgram, { operator, steps }]
+    } else {
+      return [formattedProgram, { operator, steps }]
+    }
+  }
+  function extractProgramFlow([ steps ]) {
+    return {
+      operator: 'init',
+      steps
+    }
+  }
+  function extractProgramBranch([formattedProgram, ws, command, programs]) {
+    return [...formattedProgram, { operator: 'branch', programs }]
+  }
+
+  function extractProgramList(args) {
+    const program = args.slice(1, -1)
+    return program
+  }
+
+  function extractProgramListRecurse(args) {
+    const [head, comma, ws, program] = args
+    return [...head, [program]]
+  }
+
+  function extractFlow(args) {
+    const steps = args[1] || [] // an empty init block will be null
+    return (steps || [])
+      .filter(item => !filteredLines[item])
+  }
+  function extractExpressionBlock([paren, expr]) {
+    return expr
+  }
+  function extractFlowSteps([ head, ...tail ]) {
+    return [...head, ...tail]
+      .filter(item => !filteredLines[item])
+  }
+  function extractFlowStep([command]) {
+    return command
+  }
+
+  function extractKwargs([kwargs]) {
+    const args = {}
+    for (const [[[ key ], _, [ value ]]] of kwargs) {
+      args[key] = value
+    }
+    return args
+  }
+
+  function extractInput([command, _, tagSlug]) {
+    return {
+      tagSlug
+    }
+  }
+
+  function extractRequest([[method], _, [url], ...kwargs]) {
+      return {
+        method,
+        url,
+        ...extractKwargs(kwargs)
+      }
+  }
+
+  function extractParse([command, _, selector, kwargs]) {
+    return { selector, ...kwargs }
+  }
+
+  function extractTag([_, ws, tagSlug]) {
+    return { tagSlug }
+  }
+
+  function extractQuoted([_quote, [inQuotes]]) {
+    return inQuotes
+  }
+
+  function extractBooleanLogicTree([leftExpr, _1, [operator], _2, rightExpr]) {
+      return `${leftExpr} ${operator} ${rightExpr}`
+  }
+  function extractBooleanLogicTreeNested([leftExpr, _1, [operator], _2, _3, _4, rightExpr]) {
+    return `${leftExpr} ${operator} (${rightExpr})`
+  }
+  function extractBooleanExpr([leftExpr, _1, operator, _2, rightExpr]) {
+    return `${leftExpr} ${operator} ${rightExpr}`
+  }
+
+  // PRIMITIVES
+  function extractStringTemplate([string]) {
+    return string.join('')
+  }
+  // we will throw an error if names like "value" or "index" are used later
+  const invalidSlugs = ['true', 'false']
+  function extractSlug([slug], l, reject) {
+    if (invalidSlugs.includes(slug.join(''))) return reject
+    else return slug.join('')
+  }
+  const extractNumber = text => parseInt(extractText(text))
+  function extractText([text]) {
+    return text.join('')
+  }
+%}
+
 # this grammar dont give a toot about json keys matching keyword arguments right now.
 # Leave that to the next stage of parsing.
 # Maybe in the future we can get more comprehensive macros (https://github.com/kach/nearley/issues/493)
 
 # MACROS
-inQuotes[X]     -> "'" $X "'" {% quoted => quoted[1][0].join('') %}
-KeywordArg[Key, Value] -> _ $Key "=" $Value
-jsonKeyVal[Key, Value]   -> "\"" Key "\"" ws ":" ws Value
-jsonCommand[Command]     -> "{" ws jsonKeyVal["command", Command] ws "," ws jsonKeyVal["params", object] ws "}"
+InQuotes[X]               -> "'" $X "'"                                               {% extractQuoted %}
+KeywordArg[Key, Value]    -> _ $Key "=" $Value                                        {% d=> d.slice(1) %}
+jsonKeyVal[Key, Value]    -> "\"" $Key "\"" ws ":" ws $Value
+jsonCommand[Command]      -> "{" ws jsonKeyVal["command", $Command] ws "," ws jsonKeyVal["params", object] ws "}"
 
 
 # MAIN
-Main            -> (Comment | nl_ | Input):* Program (Comment | nl_):*
+FormattedMain             -> Main                                                     {% formatMain %}
+Main                      -> PreProgram Program PostProgram                           {% extractMain %}
 
-Program         -> FirstBlock
-                 | Program DotBlock
+PreProgram                -> (Comment | Input | nl_):*                                {% extractPreProgram %}
+#PreProgram                -> nl_ (Comment | Input)                                    {% extractPreProgram %}
+#| PreProgram nl_ (Comment | Input) nl_                     {% extractPreProgramRecurse %}
 
-FirstBlock      -> Flow
+PostProgram               -> (Comment | nl_):*                                        {% extractPostProgram %}
 
-DotBlock        -> "." ("map" | "reduce" | "loop" | "catch") Flow
-                 | ".branch(" FlowList ")"
-                 | ".until(" _star BooleanLogic _star ")"
+Program                   -> Flow                                                     {% extractProgramFlow %}
+                           | Program "\n":? (".map" | ".reduce" | ".loop" | ".catch") Flow   {% extractProgramDotFlow %}
+                           | Program "\n":? (".until") ExpressionBlock                       {% extractProgramDotFlow %}
+                           | Program "\n":? ".branch(" ProgramList ")"                       {% extractProgramBranch %}
+                           #| Program ".until(" _ BooleanLogic _ ")"
+
+ProgramList               -> ws Program ws                                            {% extractProgramList %}
+                           | ProgramList "," ws Program ws                            {% extractProgramListRecurse %}
+
 
 # Various flows
-FlowList        -> ws Flow ws
-                 | FlowList "," ws Flow ws
-Flow            -> "(" FlowSteps:? ws ")"
-FlowSteps       -> ws FlowStep
-                 | FlowSteps ws FlowStep
-FlowStep        -> Request | Parse | Comment | Tag
+Flow                      -> "(" FlowSteps:? ws ")"                                   {% extractFlow %}
+ExpressionBlock           -> "(" BooleanLogicTree ")"                                 {% extractExpressionBlock %}
+FlowSteps                 -> ws FlowStep
+                           | FlowSteps ws FlowStep                                    {% extractFlowSteps %}
+FlowStep                  -> Request                                                  {% extractFlowStep %}
+                           | Parse                                                    {% extractFlowStep %}
+                           | Comment                                                  {% extractFlowStep %}
+                           | Tag                                                      {% extractFlowStep %}
 
 
 # COMMANDS
-Input           -> "INPUT" _ inQuotes[Slug]
+Input                     -> "INPUT" _ InQuotes[Slug]                                 {% extractInlineCommand("INPUT", extractInput) %}
 
-Tag             -> "TAG" _ inQuotes[Slug]
+Tag                       -> "TAG" _ InQuotes[Slug]                                   {% extractInlineCommand("TAG", extractTag) %}
 
-Request         -> HttpVerb _ Url
-                    (KeywordArg["READ", Boolean]
-                    | KeywordArg["WRITE", Boolean]):* nl
-                    | jsonCommand[HttpVerb] nl
+Request                   -> HttpVerb _ Url
+                              (KeywordArg["READ", Boolean]
+                              | KeywordArg["WRITE", Boolean]):* nl                    {% extractInlineCommand("DOWNLOAD", extractRequest) %}
+                              | jsonCommand[HttpVerb] nl                              {% extractJsonCommand("DOWNLOAD") %}
 
-HttpVerb        -> "GET" | "POST" | "PUT" | "DELETE"
-Url             -> StringTemplate
+HttpVerb                  -> "GET" | "POST" | "PUT" | "DELETE"
+Url                       -> StringTemplate
 
-Parse           -> "PARSE" _ Selector
-                    (KeywordArg["ATTR", Attribute]
-                    | KeywordArg["MAX", Number]):* nl
-                    | jsonCommand["PARSE"] nl
-Selector        -> StringTemplate
-Attribute       -> StringTemplate
+Parse                     -> "PARSE" _ Selector ParseKeywords                         {% extractInlineCommand("PARSE", extractParse) %}
+                           | jsonCommand["PARSE"] nl                                  {% extractJsonCommand("PARSE") %}
+ParseKeywords             -> (KeywordArg["ATTR", Attribute]
+                           | KeywordArg["MAX", Number]):*                             {% extractKwargs %}
+Selector                  -> StringTemplate                                           {% extractIdentity %}
+Attribute                 -> StringTemplate                                           {% extractIdentity %}
+
+
+
+# PRIMITIVES
+BooleanLogicTree          -> BooleanExpr                                              {% d => d[0] %}
+                           | BooleanLogicTree _ BooleanOperator _ BooleanExpr         {% extractBooleanLogicTree %}
+                           | BooleanLogicTree _ BooleanOperator _ "(" _star BooleanLogicTree _star ")" {% extractBooleanLogicTreeNested %}
+BooleanExpr               -> Any _ Operator _ Any                                     {% extractBooleanExpr %}
+Operator                  -> "==" | ">" | ">=" | "<" | "<="
+BooleanOperator           -> "||" | "&&"
+
+BooleanLogic              -> Any _ "==" _ Any                                         {% d => "BooleanLogic" %}
+StringTemplate            -> InQuotes[[^'\n\r]:*]                                     {% extractText %}
+Slug                      -> [a-zA-Z0-9-]:+                                           {% extractSlug %}
+Number                    -> [0-9]:+                                                  {% extractNumber %}
+Boolean                   -> "true"                                                   {% d => true %}
+                           | "false"                                                  {% d => false %}
+Any                       -> StringTemplate | Number                                  {% d => d[0] %}
+
+
+# COMMENTS
+Comment                   -> "#" [^\n\r]:* nl                                         {% extractComment %}
+
+
+# Whitespace. The important thing here is that the postprocessor
+# is a null-returning function. This is a memory efficiency trick.
+ws                        -> [\s]:*                                                   {% extractWhitespace %}
+_s                        -> [\s]:+                                                   {% extractWhitespace %}
+_                         -> " ":+                                                    {% extractWhitespace %}
+_star                     -> " ":*                                                    {% extractWhitespace %}
+nl                        -> [\r\n]                                                   {% extractWhitespace %}
+nl_                       -> [\r\n] " ":*                                             {% extractWhitespace %}
+
 
 # COMMANDS JSON
 # TODO use javascript templated literals to create a macro to combine this and the command string
@@ -96,30 +287,4 @@ function extractArray(d) {
 
     return output;
 }
-
-
 %}
-
-
-
-# PRIMITIVES
-BooleanLogic    -> Any _ "==" _ Any
-StringTemplate  -> inQuotes[[^'\n\r]:*]
-Slug            -> [a-zA-Z0-9-]:+
-Number          -> [0-9]:+
-Boolean         -> "true" | "false"
-Any             -> StringTemplate | Number | Boolean | Slug
-
-
-# COMMENTS
-Comment         -> "#" [^\n\r]:* nl {% () => "COMMENT" %}
-
-
-# Whitespace. The important thing here is that the postprocessor
-# is a null-returning function. This is a memory efficiency trick.
-ws              -> [\s]:* {% () => null %}
-_s              -> [\s]:+ {% () => null %}
-_               -> " ":+ {% () => null %}
-_star               -> " ":* {% () => null %}
-nl              -> [\r\n] {% () => 'nl'%}
-nl_             -> [\r\n] " ":* {% () => 'nl'%}

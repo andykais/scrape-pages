@@ -4,11 +4,13 @@ import * as grammar from './grammar.ne'
 const parser = new nearley.Parser(nearley.Grammar.fromCompiled(grammar.default))
 
 function dslParser(input: string) {
-  const result = parser.feed(input)
+  parser.feed(input)
 
-  return result
+  if (parser.results.length !== 1) {
+    throw new Error('Grammar parsed incorrectly')
+  } else {
+    return parser.results[0]
+  }
 }
 
-export {
-  dslParser
-}
+export { dslParser }
