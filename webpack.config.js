@@ -23,7 +23,7 @@ module.exports = {
   },
 
   resolve: {
-    extensions: ['.ts'],
+    extensions: ['.ts', '.js'],
     alias: {
       'scrape-pages': path.resolve(__dirname, 'src')
     }
@@ -32,7 +32,8 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.ts$/,
+        test: /\.ts$|.js$/,
+        exclude: /node_modules/,
         loader: 'ts-loader',
         options: {
           getCustomTransformers: program => ({

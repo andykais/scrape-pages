@@ -1,6 +1,7 @@
+import { expect } from 'chai'
 import { dslParser } from '../'
-
-import { inspect } from 'util'
+import { syntaxCoverageInstruction } from './fixtures/expected-parse-results'
+import { typecheckInstructions } from 'scrape-pages/types/runtime-typechecking'
 
 const instructions = `
 INPUT 'hi'
@@ -12,12 +13,10 @@ INPUT 'hi'
   PARSE 'span > a' ATTR='href' MAX=10
   TAG 'test'
 )
-.until('{{value}}' == 'x')
+.until('{{value}}' == 'x' || ('{{index}}' <= 2))
 .map(
   TAG 'nother'
-
-#.until('true' == 'true' || ('true' == 'true' || 1 < 2))
-#.until('true' == 'true' || 'true' == 'true')
+  # a comment
 ).branch(
 (
   GET 'me'
@@ -32,9 +31,15 @@ INPUT 'hi'
 `
 
 describe(__filename, () => {
-  it('basic', () => {
-    const out = dslParser(instructions)
-    console.log(inspect(out, { depth: null, colors: true }))
-    // console.log(JSON.stringify(out, null, 2))
+  describe('instruction set covering all syntax', () => {
+    it('should match expected output', () => {
+      const parsedInstructions = dslParser(instructions)
+      expect(parsedInstructions).to.be.deep.equal(syntaxCoverageInstruction)
+    })
+
+    it('should match the Instruction type', () => {
+      const parsedInstructions = dslParser(instructions)
+      expect(() => typecheckInstructions(parsedInstructions)).to.not.throw()
+    })
   })
 })

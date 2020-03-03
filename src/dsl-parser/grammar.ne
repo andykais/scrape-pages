@@ -21,7 +21,7 @@
       inputs: preProgram
         .filter(({ command }) => command === 'INPUT')
         .map(({ params }) => params.tagSlug),
-      scrape: program
+      program: program
     }
   }
   function extractMain([preProgram, program, postProgram]) {
@@ -42,18 +42,26 @@
     return []
   }
 
-  function extractProgramDotFlow([ formattedProgram, ws, [ dotFn ], steps ]) {
+  function extractProgramDotFlow([ formattedProgram, ws, [ dotFn ], commands ]) {
     const operator = dotFn.slice(1)
     if (Array.isArray(formattedProgram)) {
-      return [...formattedProgram, { operator, steps }]
+      return [...formattedProgram, { operator, commands }]
     } else {
-      return [formattedProgram, { operator, steps }]
+      return [formattedProgram, { operator, commands }]
     }
   }
-  function extractProgramFlow([ steps ]) {
+  function extractProgramExpressionFlow([formattedProgram, ws, [ dotFn ], expression ]) {
+    const operator = dotFn.slice(1)
+    if (Array.isArray(formattedProgram)) {
+      return [...formattedProgram, { operator, expression }]
+    } else {
+      return [formattedProgram, { operator, expression }]
+    }
+  }
+  function extractProgramFlow([ commands ]) {
     return {
       operator: 'init',
-      steps
+      commands
     }
   }
   function extractProgramBranch([formattedProgram, ws, command, programs]) {
@@ -71,8 +79,8 @@
   }
 
   function extractFlow(args) {
-    const steps = args[1] || [] // an empty init block will be null
-    return (steps || [])
+    const commands = args[1] || [] // an empty init block will be null
+    return (commands || [])
       .filter(item => !filteredLines[item])
   }
   function extractExpressionBlock([paren, expr]) {
@@ -162,15 +170,13 @@ FormattedMain             -> Main                                               
 Main                      -> PreProgram Program PostProgram                           {% extractMain %}
 
 PreProgram                -> (Comment | Input | nl_):*                                {% extractPreProgram %}
-#PreProgram                -> nl_ (Comment | Input)                                    {% extractPreProgram %}
-#| PreProgram nl_ (Comment | Input) nl_                     {% extractPreProgramRecurse %}
 
 PostProgram               -> (Comment | nl_):*                                        {% extractPostProgram %}
 
-Program                   -> Flow                                                     {% extractProgramFlow %}
-                           | Program "\n":? (".map" | ".reduce" | ".loop" | ".catch") Flow   {% extractProgramDotFlow %}
-                           | Program "\n":? (".until") ExpressionBlock                       {% extractProgramDotFlow %}
-                           | Program "\n":? ".branch(" ProgramList ")"                       {% extractProgramBranch %}
+Program                   -> Flow                                                           {% extractProgramFlow %}
+                           | Program "\n":? (".map" | ".reduce" | ".loop" | ".catch") Flow  {% extractProgramDotFlow %}
+                           | Program "\n":? (".until") ExpressionBlock                      {% extractProgramExpressionFlow %}
+                           | Program "\n":? ".branch(" ProgramList ")"                      {% extractProgramBranch %}
                            #| Program ".until(" _ BooleanLogic _ ")"
 
 ProgramList               -> ws Program ws                                            {% extractProgramList %}
@@ -179,7 +185,7 @@ ProgramList               -> ws Program ws                                      
 
 # Various flows
 Flow                      -> "(" FlowSteps:? ws ")"                                   {% extractFlow %}
-ExpressionBlock           -> "(" BooleanLogicTree ")"                                 {% extractExpressionBlock %}
+ExpressionBlock           -> "(" LogicTree ")"                                        {% extractExpressionBlock %}
 FlowSteps                 -> ws FlowStep
                            | FlowSteps ws FlowStep                                    {% extractFlowSteps %}
 FlowStep                  -> Request                                                  {% extractFlowStep %}
@@ -195,8 +201,10 @@ Tag                       -> "TAG" _ InQuotes[Slug]                             
 
 Request                   -> HttpVerb _ Url
                               (KeywordArg["READ", Boolean]
-                              | KeywordArg["WRITE", Boolean]):* nl                    {% extractInlineCommand("DOWNLOAD", extractRequest) %}
-                              | jsonCommand[HttpVerb] nl                              {% extractJsonCommand("DOWNLOAD") %}
+                              | KeywordArg["CACHE", Boolean]
+                              | KeywordArg["PRIORITY", Number]
+                              | KeywordArg["WRITE", Boolean]):* nl                    {% extractInlineCommand("REQUEST", extractRequest) %}
+                              | jsonCommand[HttpVerb] nl                              {% extractJsonCommand("REQUEST") %}
 
 HttpVerb                  -> "GET" | "POST" | "PUT" | "DELETE"
 Url                       -> StringTemplate
@@ -211,14 +219,13 @@ Attribute                 -> StringTemplate                                     
 
 
 # PRIMITIVES
-BooleanLogicTree          -> BooleanExpr                                              {% d => d[0] %}
-                           | BooleanLogicTree _ BooleanOperator _ BooleanExpr         {% extractBooleanLogicTree %}
-                           | BooleanLogicTree _ BooleanOperator _ "(" _star BooleanLogicTree _star ")" {% extractBooleanLogicTreeNested %}
-BooleanExpr               -> Any _ Operator _ Any                                     {% extractBooleanExpr %}
-Operator                  -> "==" | ">" | ">=" | "<" | "<="
-BooleanOperator           -> "||" | "&&"
+LogicTree                 -> BooleanExpr                                              {% d => d[0] %}
+                           | LogicTree _ LogicOperator _ BooleanExpr                  {% extractBooleanLogicTree %}
+                           | LogicTree _ LogicOperator _ "(" _star LogicTree _star ")"{% extractBooleanLogicTreeNested %}
+BooleanExpr               -> Any _ ComparisonOperator _ Any                           {% extractBooleanExpr %}
+ComparisonOperator        -> "==" | ">" | ">=" | "<" | "<="
+LogicOperator             -> "||" | "&&"
 
-BooleanLogic              -> Any _ "==" _ Any                                         {% d => "BooleanLogic" %}
 StringTemplate            -> InQuotes[[^'\n\r]:*]                                     {% extractText %}
 Slug                      -> [a-zA-Z0-9-]:+                                           {% extractSlug %}
 Number                    -> [0-9]:+                                                  {% extractNumber %}

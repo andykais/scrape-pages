@@ -1,9 +1,7 @@
 {
   "compilerOptions": {
     "outDir": "build",
-    "incremental": true,
     "lib": ["es2017"],
-    "tsBuildInfoFile": "../node_modules/.cache/tsconfig.buildinfo",
     "sourceMap": true,
     "noImplicitAny": true,
     "strictNullChecks": true,
@@ -15,8 +13,11 @@
     "moduleResolution": "node",
     "target": "es2017",
     "resolveJsonModule": true,
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "baseUrl": "src",
+    "paths": {
+      "scrape-pages/*": ["*"]
+    }
   },
   "include": ["src/**/*.ts", "test/**/*.ts"]
 }
-
