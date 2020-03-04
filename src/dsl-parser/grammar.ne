@@ -199,6 +199,7 @@ Input                     -> "INPUT" _ InQuotes[Slug]                           
 
 Tag                       -> "TAG" _ InQuotes[Slug]                                   {% extractInlineCommand("TAG", extractTag) %}
 
+# TODO _potentially_ we make keyword args just generic bois and leave the actual arg parsing to typescript-is
 Request                   -> HttpVerb _ Url
                               (KeywordArg["READ", Boolean]
                               | KeywordArg["CACHE", Boolean]

@@ -13,3 +13,5 @@ class Compiler {
     return this.instantiateProgram(this.settings.instructions.program)
   }
 }
+
+export { Compiler }

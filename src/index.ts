@@ -1,1 +1,1 @@
-export { ScraperProgram } from './scraper-program'
+export { ScraperProgram } from './runtime/scraper-program'
