@@ -55,10 +55,13 @@ interface CatchOperation {
   operator: 'catch'
   commands: Command[]
 }
+// TODO rename this to merge (its closer to what it is)
 interface BranchOperation {
   operator: 'branch'
   programs: Program[]
 }
+
+// TODO add leaf operation
 
 type Operation = InitOperation | UntilOperation | MapOperation | BranchOperation
 type Program = Operation[]

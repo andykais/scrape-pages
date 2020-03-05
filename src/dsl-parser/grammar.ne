@@ -3,18 +3,6 @@
 
   const extractWhitespace = () => null
   const extractComment = () => 'COMMENT'
-  const extractIdentity = d => d[0]
-
-  //const extractInlineCommand = (command, commandExtractor) => d => {
-  //  return {
-  //    command,
-  //    params: commandExtractor(d)
-  //  }
-  //}
-
-  //const extractJsonCommand = (command) => d => {
-  //  return []
-  //}
 
   function formatMain([{ preProgram, program, postProgram }]) {
     return {
@@ -33,7 +21,7 @@
 
   function extractPreProgram([preProgram]) {
     return preProgram
-      .map(line => line[0])
+      .map(id)
       .filter(line => !filteredLines[line])
   }
   function extractPostProgram(args) {
@@ -50,6 +38,7 @@
   }
   function extractProgramExpressionFlow([formattedProgram, ws, [ dotFn ], expression ]) {
     const operator = dotFn.slice(1)
+    return [...formattedProgram, { operator, expression }]
     if (Array.isArray(formattedProgram)) {
       return [...formattedProgram, { operator, expression }]
     } else {
@@ -57,10 +46,10 @@
     }
   }
   function extractProgramFlow([ commands ]) {
-    return {
+    return [{
       operator: 'init',
       commands
-    }
+    }]
   }
   function extractProgramBranch([formattedProgram, ws, command, programs]) {
     return [...formattedProgram, { operator: 'branch', programs }]
@@ -73,7 +62,7 @@
 
   function extractProgramListRecurse(args) {
     const [head, comma, ws, program] = args
-    return [...head, [program]]
+    return [...head, program]
   }
 
   function extractFlow(args) {
@@ -105,37 +94,9 @@
     }
     return kwargs
   }
-  //function extractKwargs([kwargs]) {
-  //  const args = {}
-  //  for (const [[[ key ], _, [ value ]]] of kwargs) {
-  //    args[key] = value
-  //  }
-  //  return args
-  //}
   function extractKwarg([key, eq, [value]]) {
     return { [key]: value }
   }
-  //function extractInput([command, _, slug]) {
-  //  return {
-  //    slug
-  //  }
-  //}
-
-//  function extractRequest([[method], _, [url], ...kwargs]) {
-//      return {
-//        method,
-//        url,
-//        ...extractKwargs(kwargs)
-//      }
-//  }
-//
-//  function extractParse([command, _, selector, kwargs]) {
-//    return { selector, ...kwargs }
-//  }
-//
-//  function extractTag([_, ws, slug]) {
-//    return { slug }
-//  }
 
   function extractQuoted([_quote, [inQuotes]]) {
     return inQuotes
@@ -161,7 +122,13 @@
     if (invalidSlugs.includes(slug.join(''))) return reject
     else return slug.join('')
   }
-  const extractNumber = text => parseInt(extractText(text))
+  const extractNumber = ([minus, text]) => {
+    if (minus) {
+      return -parseInt(text.join(''))
+    } else {
+      return parseInt(text.join(''))
+    }
+  }
   function extractText([text]) {
     return text.join('')
   }
@@ -182,7 +149,7 @@ jsonCommand[Command]      -> "{" ws jsonKeyVal["command", $Command] ws "," ws js
 FormattedMain             -> Main                                                     {% formatMain %}
 Main                      -> PreProgram Program PostProgram                           {% extractMain %}
 
-PreProgram                -> (Comment | Input | nl_):*                                {% extractPreProgram %}
+PreProgram                -> (Comment | Command | nl_):*                                {% extractPreProgram %}
 
 PostProgram               -> (Comment | nl_):*                                        {% extractPostProgram %}
 
@@ -218,30 +185,8 @@ KeywordSlug               -> [A-Z]:+                                            
 
 Input                     -> "INPUT" _ InQuotes[Slug]                                 {% extractInlineCommand %}
 
-# Tag                       -> "TAG" _ InQuotes[Slug]                                   {% extractInlineCommand("TAG", extractTag) %}
-
-# # TODO _potentially_ we make keyword args just generic bois and leave the actual arg parsing to typescript-is
-# Request                   -> HttpVerb _ Url
-#                               (KeywordArg["READ", Boolean]
-#                               | KeywordArg["CACHE", Boolean]
-#                               | KeywordArg["PRIORITY", Number]
-#                               | KeywordArg["WRITE", Boolean]):* nl                    {% extractInlineCommand("REQUEST", extractRequest) %}
-#                               | jsonCommand[HttpVerb] nl                              {% extractJsonCommand("REQUEST") %}
-
-# HttpVerb                  -> "GET" | "POST" | "PUT" | "DELETE"
-# Url                       -> StringTemplate
-
-# Parse                     -> "PARSE" _ Selector ParseKeywords                         {% extractInlineCommand("PARSE", extractParse) %}
-#                            | jsonCommand["PARSE"] nl                                  {% extractJsonCommand("PARSE") %}
-# ParseKeywords             -> (KeywordArg["ATTR", Attribute]
-#                            | KeywordArg["MAX", Number]):*                             {% extractKwargs %}
-# Selector                  -> StringTemplate                                           {% extractIdentity %}
-# Attribute                 -> StringTemplate                                           {% extractIdentity %}
-
-
-
 # PRIMITIVES
-LogicTree                 -> BooleanExpr                                              {% d => d[0] %}
+LogicTree                 -> BooleanExpr                                              {% id %}
                            | LogicTree _ LogicOperator _ BooleanExpr                  {% extractBooleanLogicTree %}
                            | LogicTree _ LogicOperator _ "(" _star LogicTree _star ")"{% extractBooleanLogicTreeNested %}
 BooleanExpr               -> Any _ ComparisonOperator _ Any                           {% extractBooleanExpr %}
@@ -250,10 +195,10 @@ LogicOperator             -> "||" | "&&"
 
 StringTemplate            -> InQuotes[[^'\n\r]:*]                                     {% extractText %}
 Slug                      -> [a-zA-Z0-9-]:+                                           {% extractSlug %}
-Number                    -> [0-9]:+                                                  {% extractNumber %}
+Number                    -> "-":? [0-9]:+                                                  {% extractNumber %}
 Boolean                   -> "true"                                                   {% d => true %}
                            | "false"                                                  {% d => false %}
-Any                       -> StringTemplate | Number                                  {% d => d[0] %}
+Any                       -> StringTemplate | Number                                  {% id %}
 
 
 # COMMENTS
@@ -291,7 +236,7 @@ value ->
 
 space -> [\s]:+
 number -> "-":? [0-9]:+
-string -> "\"" [^\"]:* "\"" # /"(?:\\["bfnrt\/\\]|\\u[a-fA-F0-9]{4}|[^"\\])*"/,
+string -> "\"" [^\"\n\r]:* "\"" # /"(?:\\["bfnrt\/\\]|\\u[a-fA-F0-9]{4}|[^"\\])*"/,
 
 @{%
 function extractObject(d) {

@@ -31,7 +31,7 @@ function postProcessCommands(commands: any[]) {
       case 'REGEX':
         return processRawCommandAndRenameArg('REPLACE', rawCommand)
       default:
-        throw new Error(`Unknown command '${rawCommand.command}'`)
+        throw new Error(`Unknown command '${rawCommand.command}' in the program`)
     }
   })
   return commands
@@ -43,6 +43,7 @@ function postProcessPrograms(programs: i.Program[]): i.Program[] {
   return programs.map(postProcessProgram)
 }
 function postProcessProgram(program: i.Program): any {
+  // console.log({ program })
   return program.map((operation: any) => {
     switch (operation.operator) {
       case 'init':
@@ -72,14 +73,27 @@ function postProcessProgram(program: i.Program): any {
   })
 }
 
+function postProcessPreProgram(preProgram: DslCommand[]) {
+  const inputs = []
+  for (const rawCommand of preProgram) {
+    switch(rawCommand.command) {
+      case 'INPUT':
+        inputs.push(rawCommand.arg)
+        break
+      default:
+        throw new Error(`Uknown command '${rawCommand.command}' in the pre program.`)
+    }
+  }
+
+  return { inputs }
+}
+
 function postProcess(result: any) {
-  const inputs = (result.preProgram as DslCommand[])
-    .filter(command => command.command === 'INPUT')
-    .map(command => command.arg)
+  const preProgram = postProcessPreProgram(result.preProgram)
   const program = postProcessProgram(result.program)
 
   return {
-    inputs,
+    ...preProgram,
     program
   }
 }

@@ -9,7 +9,7 @@ INPUT 'hi'
 (
   HTTP 'https://google.com' METHOD='GET' WRITE=true
 
-  # GET 'https://google.com' WRITE=true
+  # another comment
 
   HTTP 'https://wikipedia.com' WRITE=true READ=true
   PARSE 'span > a' ATTR='href' MAX=10
@@ -47,14 +47,14 @@ const instructionsWithLeaves = `
 
 describe(__filename, () => {
   describe('instruction set covering all syntax', () => {
-    it('should match expected output', () => {
+    it.only('should match expected output', () => {
       const parsedInstructions = dslParser(instructions)
       expect(parsedInstructions).to.be.deep.equal(syntaxCoverageInstruction)
     })
 
     it('should match the Instruction type', () => {
       const parsedInstructions = dslParser(instructions)
-      // expect(() => typecheckInstructions(parsedInstructions)).to.not.throw()
+      expect(() => typecheckInstructions(parsedInstructions)).to.not.throw()
     })
   })
 })
