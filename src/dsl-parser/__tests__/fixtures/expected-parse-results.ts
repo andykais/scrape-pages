@@ -6,29 +6,28 @@ const syntaxCoverageInstruction: Instructions = {
       operator: 'init',
       commands: [
         {
-          command: 'REQUEST',
-          params: { method: 'GET', url: 'https://google.com', WRITE: true }
+          command: 'HTTP',
+          params: { METHOD: 'GET', URL: 'https://google.com', WRITE: true }
         },
         {
-          command: 'REQUEST',
+          command: 'HTTP',
           params: {
-            method: 'GET',
-            url: 'https://wikipedia.com',
+            URL: 'https://wikipedia.com',
             WRITE: true,
             READ: true
           }
         },
         {
           command: 'PARSE',
-          params: { selector: 'span > a', ATTR: 'href', MAX: 10 }
+          params: { SELECTOR: 'span > a', ATTR: 'href', MAX: 10 }
         },
-        { command: 'TAG', params: { slug: 'test' } }
+        { command: 'TAG', params: { SLUG: 'test' } }
       ]
     },
     { operator: 'until', expression: '{{value}} == x || ({{index}} <= 2)' },
     {
       operator: 'map',
-      commands: [{ command: 'TAG', params: { slug: 'nother' } }]
+      commands: [{ command: 'TAG', params: { SLUG: 'nother' } }]
     },
     {
       operator: 'branch',
@@ -38,12 +37,12 @@ const syntaxCoverageInstruction: Instructions = {
             operator: 'init',
             commands: [
               {
-                command: 'REQUEST',
-                params: { method: 'GET', url: 'me' }
+                command: 'HTTP',
+                params: { METHOD: 'PUT', URL: 'me' }
               },
               {
-                command: 'REQUEST',
-                params: { method: 'GET', url: 'me' }
+                command: 'HTTP',
+                params: { URL: 'me' }
               }
             ]
           },
@@ -51,8 +50,8 @@ const syntaxCoverageInstruction: Instructions = {
             operator: 'map',
             commands: [
               {
-                command: 'REQUEST',
-                params: { method: 'GET', url: 'you' }
+                command: 'HTTP',
+                params: { URL: 'you' }
               }
             ]
           }
@@ -60,7 +59,7 @@ const syntaxCoverageInstruction: Instructions = {
         [
           {
             operator: 'init',
-            commands: [{ command: 'TAG', params: { slug: 'ne' } }]
+            commands: [{ command: 'TAG', params: { SLUG: 'ne' } }]
           }
         ]
       ]

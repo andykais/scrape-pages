@@ -1,11 +1,11 @@
 type Slug = string
 type Expression = string
 
-interface RequestCommand {
-  command: 'REQUEST'
+interface HttpCommand {
+  command: 'HTTP'
   params: {
-    method: 'GET' | 'PUT' | 'POST' | 'DELETE'
-    url: string
+    METHOD?: 'GET' | 'PUT' | 'POST' | 'DELETE'
+    URL: string
     READ?: boolean
     WRITE?: boolean
     CACHE?: boolean
@@ -16,7 +16,7 @@ interface RequestCommand {
 interface ParseCommand {
   command: 'PARSE'
   params: {
-    selector: string
+    SELECTOR: string
     ATTR?: string
     MAX?: number
   }
@@ -25,11 +25,11 @@ interface ParseCommand {
 interface TagCommand {
   command: 'TAG'
   params: {
-    slug: string
+    SLUG: string
   }
 }
 
-type Command = RequestCommand | ParseCommand | TagCommand
+type Command = HttpCommand | ParseCommand | TagCommand
 
 interface InitOperation {
   operator: 'init'
@@ -68,4 +68,21 @@ interface Instructions {
   program: Program
 }
 
-export { Instructions, Program, Operation, Command, Expression }
+export {
+  Instructions,
+  Program,
+  Operation,
+  Command,
+  Expression,
+  InitOperation,
+  UntilOperation,
+  MapOperation,
+  ReduceOperation,
+  LoopOperation,
+  CatchOperation,
+  BranchOperation,
+  HttpCommand, // TODO rename HttpCommand
+  ParseCommand,
+  TagCommand,
+  // TODO RegexCommand
+}

@@ -5,23 +5,21 @@
   const extractComment = () => 'COMMENT'
   const extractIdentity = d => d[0]
 
-  const extractInlineCommand = (command, commandExtractor) => d => {
-    return {
-      command,
-      params: commandExtractor(d)
-    }
-  }
+  //const extractInlineCommand = (command, commandExtractor) => d => {
+  //  return {
+  //    command,
+  //    params: commandExtractor(d)
+  //  }
+  //}
 
-  const extractJsonCommand = (command) => d => {
-    return []
-  }
+  //const extractJsonCommand = (command) => d => {
+  //  return []
+  //}
 
   function formatMain([{ preProgram, program, postProgram }]) {
     return {
-      inputs: preProgram
-        .filter(({ command }) => command === 'INPUT')
-        .map(({ params }) => params.slug),
-      program: program
+      preProgram,
+      program
     }
   }
   function extractMain([preProgram, program, postProgram]) {
@@ -93,36 +91,51 @@
   function extractFlowStep([command]) {
     return command
   }
-
-  function extractKwargs([kwargs]) {
-    const args = {}
-    for (const [[[ key ], _, [ value ]]] of kwargs) {
-      args[key] = value
-    }
+  function extractJsonCommand(args) {
+    // TODO
     return args
   }
-
-  function extractInput([command, _, slug]) {
-    return {
-      slug
+  function extractInlineCommand([command, ws, arg, kwargs]) {
+    return { command, arg, kwargs }
+  }
+  function extractKwargs([args]) {
+    const kwargs = {}
+    for (const [ws, keyValuePair] of args) {
+      Object.assign(kwargs, keyValuePair)
     }
+    return kwargs
   }
+  //function extractKwargs([kwargs]) {
+  //  const args = {}
+  //  for (const [[[ key ], _, [ value ]]] of kwargs) {
+  //    args[key] = value
+  //  }
+  //  return args
+  //}
+  function extractKwarg([key, eq, [value]]) {
+    return { [key]: value }
+  }
+  //function extractInput([command, _, slug]) {
+  //  return {
+  //    slug
+  //  }
+  //}
 
-  function extractRequest([[method], _, [url], ...kwargs]) {
-      return {
-        method,
-        url,
-        ...extractKwargs(kwargs)
-      }
-  }
-
-  function extractParse([command, _, selector, kwargs]) {
-    return { selector, ...kwargs }
-  }
-
-  function extractTag([_, ws, slug]) {
-    return { slug }
-  }
+//  function extractRequest([[method], _, [url], ...kwargs]) {
+//      return {
+//        method,
+//        url,
+//        ...extractKwargs(kwargs)
+//      }
+//  }
+//
+//  function extractParse([command, _, selector, kwargs]) {
+//    return { selector, ...kwargs }
+//  }
+//
+//  function extractTag([_, ws, slug]) {
+//    return { slug }
+//  }
 
   function extractQuoted([_quote, [inQuotes]]) {
     return inQuotes
@@ -177,7 +190,6 @@ Program                   -> Flow                                               
                            | Program "\n":? (".map" | ".reduce" | ".loop" | ".catch") Flow  {% extractProgramDotFlow %}
                            | Program "\n":? (".until") ExpressionBlock                      {% extractProgramExpressionFlow %}
                            | Program "\n":? ".branch(" ProgramList ")"                      {% extractProgramBranch %}
-                           #| Program ".until(" _ BooleanLogic _ ")"
 
 ProgramList               -> ws Program ws                                            {% extractProgramList %}
                            | ProgramList "," ws Program ws                            {% extractProgramListRecurse %}
@@ -188,34 +200,43 @@ Flow                      -> "(" FlowSteps:? ws ")"                             
 ExpressionBlock           -> "(" LogicTree ")"                                        {% extractExpressionBlock %}
 FlowSteps                 -> ws FlowStep
                            | FlowSteps ws FlowStep                                    {% extractFlowSteps %}
-FlowStep                  -> Request                                                  {% extractFlowStep %}
-                           | Parse                                                    {% extractFlowStep %}
+FlowStep                  -> JsonCommand                                              {% extractFlowStep %}
+                           | Command                                                  {% extractFlowStep %}
                            | Comment                                                  {% extractFlowStep %}
-                           | Tag                                                      {% extractFlowStep %}
+# FlowStep                  -> Request                                                  {% extractFlowStep %}
+#                            | Parse                                                    {% extractFlowStep %}
+#                            | Comment                                                  {% extractFlowStep %}
+#                            | Tag                                                      {% extractFlowStep %}
 
 
 # COMMANDS
-Input                     -> "INPUT" _ InQuotes[Slug]                                 {% extractInlineCommand("INPUT", extractInput) %}
+JsonCommand               -> "{" ws jsonKeyVal["command", KeywordSlug] ws "," ws jsonKeyVal["params", object] ws "}"
+Command                   -> KeywordSlug _ StringTemplate KeywordArgs                 {% extractInlineCommand %}
+KeywordArgs               -> (_ KeywordArg):*                                         {% extractKwargs %}
+KeywordArg                -> KeywordSlug "=" (StringTemplate | Boolean | Number)      {% extractKwarg %}
+KeywordSlug               -> [A-Z]:+                                                  {% extractSlug %}
 
-Tag                       -> "TAG" _ InQuotes[Slug]                                   {% extractInlineCommand("TAG", extractTag) %}
+Input                     -> "INPUT" _ InQuotes[Slug]                                 {% extractInlineCommand %}
 
-# TODO _potentially_ we make keyword args just generic bois and leave the actual arg parsing to typescript-is
-Request                   -> HttpVerb _ Url
-                              (KeywordArg["READ", Boolean]
-                              | KeywordArg["CACHE", Boolean]
-                              | KeywordArg["PRIORITY", Number]
-                              | KeywordArg["WRITE", Boolean]):* nl                    {% extractInlineCommand("REQUEST", extractRequest) %}
-                              | jsonCommand[HttpVerb] nl                              {% extractJsonCommand("REQUEST") %}
+# Tag                       -> "TAG" _ InQuotes[Slug]                                   {% extractInlineCommand("TAG", extractTag) %}
 
-HttpVerb                  -> "GET" | "POST" | "PUT" | "DELETE"
-Url                       -> StringTemplate
+# # TODO _potentially_ we make keyword args just generic bois and leave the actual arg parsing to typescript-is
+# Request                   -> HttpVerb _ Url
+#                               (KeywordArg["READ", Boolean]
+#                               | KeywordArg["CACHE", Boolean]
+#                               | KeywordArg["PRIORITY", Number]
+#                               | KeywordArg["WRITE", Boolean]):* nl                    {% extractInlineCommand("REQUEST", extractRequest) %}
+#                               | jsonCommand[HttpVerb] nl                              {% extractJsonCommand("REQUEST") %}
 
-Parse                     -> "PARSE" _ Selector ParseKeywords                         {% extractInlineCommand("PARSE", extractParse) %}
-                           | jsonCommand["PARSE"] nl                                  {% extractJsonCommand("PARSE") %}
-ParseKeywords             -> (KeywordArg["ATTR", Attribute]
-                           | KeywordArg["MAX", Number]):*                             {% extractKwargs %}
-Selector                  -> StringTemplate                                           {% extractIdentity %}
-Attribute                 -> StringTemplate                                           {% extractIdentity %}
+# HttpVerb                  -> "GET" | "POST" | "PUT" | "DELETE"
+# Url                       -> StringTemplate
+
+# Parse                     -> "PARSE" _ Selector ParseKeywords                         {% extractInlineCommand("PARSE", extractParse) %}
+#                            | jsonCommand["PARSE"] nl                                  {% extractJsonCommand("PARSE") %}
+# ParseKeywords             -> (KeywordArg["ATTR", Attribute]
+#                            | KeywordArg["MAX", Number]):*                             {% extractKwargs %}
+# Selector                  -> StringTemplate                                           {% extractIdentity %}
+# Attribute                 -> StringTemplate                                           {% extractIdentity %}
 
 
 
@@ -245,7 +266,9 @@ ws                        -> [\s]:*                                             
 _s                        -> [\s]:+                                                   {% extractWhitespace %}
 _                         -> " ":+                                                    {% extractWhitespace %}
 _star                     -> " ":*                                                    {% extractWhitespace %}
+# __                        -> " ":*
 nl                        -> [\r\n]                                                   {% extractWhitespace %}
+# nl?                       -> [\r\n]:?
 nl_                       -> [\r\n] " ":*                                             {% extractWhitespace %}
 
 

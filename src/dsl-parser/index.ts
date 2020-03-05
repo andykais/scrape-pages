@@ -1,6 +1,7 @@
 import * as nearley from 'nearley'
 import * as grammar from './grammar.ne'
-// import { Instructions } from 'scrape-pages/types/instructions'
+import { postProcess } from './post-process'
+// type imports
 import { Instructions } from '../types/instructions'
 
 function dslParser(input: string): Instructions {
@@ -9,9 +10,10 @@ function dslParser(input: string): Instructions {
   const results = parser.finish()
 
   if (results.length !== 1) {
-    throw new Error('Grammar parsed incorrectly')
+    throw new Error('Grammar parsed ambiguously')
   } else {
-    return results[0]
+    const [ast] = results
+    return postProcess(ast)
   }
 }
 
