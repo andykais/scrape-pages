@@ -1,5 +1,5 @@
 interface Options {
-  requests: {
+  network?: {
     maxConcurrent?: number
     rateLimit?: {
       ratePerMs: number
@@ -7,9 +7,9 @@ interface Options {
     }
   }
   inputs?: { [inputSlug: string]: string }
-  folder: string
-  cleanFolder?: boolean
-  forceStart?: boolean
+  // folder: string
+  // cleanFolder?: boolean
+  // forceStart?: boolean
 }
 
 export { Options }

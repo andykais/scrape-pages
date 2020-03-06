@@ -14,9 +14,11 @@
     "target": "es2017",
     "resolveJsonModule": true,
     "esModuleInterop": true,
-    "baseUrl": "src",
+    "baseUrl": ".",
     "paths": {
-      "scrape-pages/*": ["*"]
+      "@scrape-pages": ["src/index"],
+      "@scrape-pages/*": ["src/*"],
+      "@test/*": ["test/*"]
     }
   },
   "include": ["src/**/*.ts", "test/**/*.ts"]

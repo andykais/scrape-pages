@@ -1,6 +1,6 @@
 import * as Rx from 'rxjs'
 import * as ops from 'rxjs/operators'
-import { Settings, Tools, Stream } from 'scrape-pages/types/internal'
+import { Settings, Tools, Stream } from '@scrape-pages/types/internal'
 
 abstract class BaseCommand {
   constructor(private settings: Settings, private tools: Tools) {}

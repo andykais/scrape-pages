@@ -1,4 +1,4 @@
-import { Instructions } from 'scrape-pages/types/instructions'
+import { Instructions } from '@scrape-pages/types/instructions'
 const syntaxCoverageInstruction: Instructions = {
   inputs: ['hi'],
   program: [

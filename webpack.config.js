@@ -25,7 +25,8 @@ module.exports = {
   resolve: {
     extensions: ['.ts', '.js'],
     alias: {
-      'scrape-pages': path.resolve(__dirname, 'src')
+      '@scrape-pages': path.resolve(__dirname, 'src'),
+      '@test': path.resolve(__dirname, 'test')
     }
   },
 

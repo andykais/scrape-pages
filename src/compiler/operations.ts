@@ -1,12 +1,12 @@
 import * as Rx from 'rxjs'
 import * as ops from 'rxjs/operators'
 // type imports
-import * as i from 'scrape-pages/types/instructions'
-import { Stream } from 'scrape-pages/types/internal'
+import * as i from '@scrape-pages/types/instructions'
+import { Stream } from '@scrape-pages/types/internal'
 import { Compiler } from './'
 
 /**
- * loop
+ * @name loop
  * @argument pipeTo an rxjs operation that typically creates many outputs for a single input
  * @argument iterateFn the result of this function is what is passed to the pipeTo operation
  * @description creates an infinite loop that waits until all the values from pipeTo stop before reaching the top of the loop

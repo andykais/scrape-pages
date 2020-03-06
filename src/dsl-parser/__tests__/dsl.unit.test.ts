@@ -1,7 +1,7 @@
 import { expect } from 'chai'
 import { dslParser } from '../'
 import { syntaxCoverageInstruction } from './fixtures/expected-parse-results'
-import { typecheckInstructions } from 'scrape-pages/types/runtime-typechecking'
+import { typecheckInstructions } from '@scrape-pages/types/runtime-typechecking'
 
 const instructions = `
 # hi
