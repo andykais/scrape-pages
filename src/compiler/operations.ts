@@ -5,8 +5,14 @@ import * as i from 'scrape-pages/types/instructions'
 import { Stream } from 'scrape-pages/types/internal'
 import { Compiler } from './'
 
-// note that this observable has no observer.complete()
-// it runs indefidently until either an error or an unsubscribe
+/**
+ * loop
+ * @argument pipeTo an rxjs operation that typically creates many outputs for a single input
+ * @argument iterateFn the result of this function is what is passed to the pipeTo operation
+ * @description creates an infinite loop that waits until all the values from pipeTo stop before reaching the top of the loop
+ *
+ * note that this observable has no observer.complete(), it runs indefidently until either an error or an unsubscribe
+ */
 function loop(
   pipeTo: Stream.Operation,
   iterateFn: (index: number) => Stream.Payload
