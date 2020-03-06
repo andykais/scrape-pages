@@ -29,6 +29,7 @@
     "@types/mocha": "^7.0.1",
     "@types/nearley": "^2.11.1",
     "@types/node": "^13.7.7",
+    "@types/seamless-immutable": "^7.1.11",
     "@typescript-eslint/eslint-plugin": "^2.22.0",
     "@typescript-eslint/parser": "^2.22.0",
     "chai": "^4.2.0",
@@ -54,6 +55,7 @@
     "nearley": "^2.19.1",
     "node-fetch": "^2.6.0",
     "rxjs": "^6.5.4",
+    "seamless-immutable": "^7.1.4",
     "typescript-is": "^0.14.1"
   },
   "engines": {

@@ -7,12 +7,14 @@ dependencies:
   nearley: 2.19.1
   node-fetch: 2.6.0
   rxjs: 6.5.4
+  seamless-immutable: 7.1.4
   typescript-is: 0.14.1_typescript@3.8.3
 devDependencies:
   '@types/chai': 4.2.10
   '@types/mocha': 7.0.1
   '@types/nearley': 2.11.1
   '@types/node': 13.7.7
+  '@types/seamless-immutable': 7.1.11
   '@typescript-eslint/eslint-plugin': 2.22.0_5fc37458f7af86d127d807b1f2a4d108
   '@typescript-eslint/parser': 2.22.0_eslint@6.8.0+typescript@3.8.3
   chai: 4.2.0
@@ -111,6 +113,10 @@ packages:
   /@types/node/13.7.7:
     resolution:
       integrity: sha512-Uo4chgKbnPNlxQwoFmYIwctkQVkMMmsAoGGU4JKwLuvBefF0pCq4FybNSnfkfRCpC7ZW7kttcC/TrRtAJsvGtg==
+  /@types/seamless-immutable/7.1.11:
+    dev: true
+    resolution:
+      integrity: sha512-U8Mp+Q6P5ZxG6KDRwWduQl822MnsnBtOq/Lb4HQB9Tzi8t1nr7PLqq88I4kTwEDHO95hcH8y8KhGvxWPIS6QoQ==
   /@typescript-eslint/eslint-plugin/2.22.0_5fc37458f7af86d127d807b1f2a4d108:
     dependencies:
       '@typescript-eslint/experimental-utils': 2.22.0_eslint@6.8.0+typescript@3.8.3
@@ -3948,6 +3954,10 @@ packages:
       node: '>= 4'
     resolution:
       integrity: sha512-i27Mic4KovM/lnGsy8whRCHhc7VicJajAjTrYg11K9zfZXnYIt4k5F+kZkwjnrhKzLic/HLU4j11mjsz2G/75g==
+  /seamless-immutable/7.1.4:
+    dev: false
+    resolution:
+      integrity: sha512-XiUO1QP4ki4E2PHegiGAlu6r82o5A+6tRh7IkGGTVg/h+UoeX4nFBeCGPOhb4CYjvkqsfm/TUtvOMYC1xmV30A==
   /semver/5.7.1:
     hasBin: true
     resolution:
@@ -4894,6 +4904,7 @@ specifiers:
   '@types/mocha': ^7.0.1
   '@types/nearley': ^2.11.1
   '@types/node': ^13.7.7
+  '@types/seamless-immutable': ^7.1.11
   '@typescript-eslint/eslint-plugin': ^2.22.0
   '@typescript-eslint/parser': ^2.22.0
   better-sqlite3: ^6.0.1
@@ -4912,6 +4923,7 @@ specifiers:
   node-fetch: ^2.6.0
   readline-sync: ^1.4.10
   rxjs: ^6.5.4
+  seamless-immutable: ^7.1.4
   ts-loader: ^6.2.1
   typescript: ^3.8.3
   typescript-is: ^0.14.1

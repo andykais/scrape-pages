@@ -17,6 +17,15 @@ class ScraperProgram {
     const compiler = new Compiler(settings, tools)
     const program = compiler.compile()
   }
+
+  static fromFolder(folder: string, options?: Options) {
+    // TODO we should only reuse scraper folders if the instructions are the same. Debugging changed state is
+    // a nightmare. Changing options is ok though
+    //
+    // this might also make it worth separating the instructions options from the runner options.
+    // E.g. its ok to override the rateLimit or the input but its not good to override the folder or cleanFolder
+    // return new ScraperProgram()
+  }
 }
 
 export { ScraperProgram }

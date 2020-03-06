@@ -18,7 +18,7 @@ class Compiler {
     const operations = program.map(operation => {
       switch(operation.operator) {
         case 'init':
-          return instructionOps.getInitOperator(this, operation)
+          return instructionOps.mapCommands(this, operation)
       }
     })
     return Rx.pipe()
