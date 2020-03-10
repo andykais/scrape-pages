@@ -28,3 +28,11 @@ ${originStack}`
     })
   }
 }
+
+class InternalError extends Error {
+  constructor(message: string) {
+    super(message)
+  }
+}
+
+export { ContextualError, InternalError }

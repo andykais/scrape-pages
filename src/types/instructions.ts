@@ -62,8 +62,19 @@ interface BranchOperation {
 }
 
 // TODO add leaf operation
+// interface LeafOperation {
+//   commands: Command[]
+// }
 
-type Operation = InitOperation | UntilOperation | MapOperation | BranchOperation
+type Operation =
+  | InitOperation
+  | UntilOperation
+  | MapOperation
+  | ReduceOperation
+  | LoopOperation
+  | CatchOperation
+  | BranchOperation
+
 type Program = Operation[]
 
 interface Instructions {
@@ -84,8 +95,8 @@ export {
   LoopOperation,
   CatchOperation,
   BranchOperation,
-  HttpCommand, // TODO rename HttpCommand
+  HttpCommand,
   ParseCommand,
-  TagCommand,
+  TagCommand
   // TODO RegexCommand
 }

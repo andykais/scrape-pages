@@ -1,5 +1,5 @@
 import * as path from 'path'
-import { findFiles } from '@scrape-pages/util/fs'
+import * as fs from '@scrape-pages/util/fs'
 import nock from 'nock'
 
 class SeedPsuedoRandom {
@@ -12,19 +12,18 @@ class SeedPsuedoRandom {
   public nextFloat = () => (this.next() - 1) / 2147483646
 }
 
-type Options = {
+type HttpMockOptions = {
   randomSeed?: number
   delay?: number
 }
 class HttpFolderMock {
-  private mockEndpointsFolder: string
-  private baseUrl: string
-  private options: Options
   private interceptors?: nock.Interceptor[]
 
-  public constructor(mockEndpointsFolder: string, baseUrl: string, options: Options = {}) {
-    Object.assign(this, { mockEndpointsFolder, baseUrl, options })
-  }
+  public constructor(
+    private mockEndpointsFolder: string,
+    private baseUrl: string,
+    private options: HttpMockOptions = {}
+  ) {}
 
   // public static create = async (
   //   mockEndpointsFolder: string,
@@ -36,12 +35,16 @@ class HttpFolderMock {
   //   return siteMock
   // }
 
+  // TODO is it worthwhile to add a http debug log?
+  // HTTP_MOCK_DEBUG=true npm run test:watch
+  // nock: GET http://looping/page/1
+  // nock: GET http://looping/page/2
   public init = async () => {
     const scope = nock(this.baseUrl)
     const random = this.options.randomSeed && new SeedPsuedoRandom(this.options.randomSeed)
     const delay = this.options.delay || 0
 
-    const files = await findFiles(this.mockEndpointsFolder)
+    const files = await fs.findFiles(this.mockEndpointsFolder)
 
     this.interceptors = files.map(file => {
       const relativePath = path.relative(this.mockEndpointsFolder, file)
@@ -60,3 +63,5 @@ class HttpFolderMock {
 }
 
 export { HttpFolderMock }
+// type exports
+export { HttpMockOptions }

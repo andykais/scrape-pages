@@ -14,6 +14,19 @@ const [mkdir, readdir, stat, unlink, rmdir, rename, access, readFile, writeFile]
   fs.writeFile
 ].map(promisify)
 
+const mkdirp = async (folder: string) => {
+  try {
+    await mkdir(folder)
+  } catch (e) {
+    if (e.code === 'ENOENT') {
+      await mkdirp(path.dirname(folder))
+      await mkdirp(folder)
+    } else if (e.code !== 'EEXIST') {
+      throw e
+    }
+  }
+}
+
 async function rmrf(folder: string) {
   try {
     const files = await readdir(folder)
@@ -58,6 +71,7 @@ export {
   writeFile,
   rmdir,
   // custom file ops
+  mkdirp,
   rmrf,
   findFiles
 }

@@ -1,21 +1,20 @@
 import * as Rx from 'rxjs'
+import Immutable from 'seamless-immutable'
+import * as tools from '@scrape-pages/runtime/tools'
 import { Instructions } from './instructions'
 import { Options } from './options'
-import Immutable from 'seamless-immutable'
 
 interface Settings {
   instructions: Instructions
   options: Options
 }
 
-interface Tools {}
+type Tools = {
+  store: tools.Store
+  queue: tools.Queue
+}
 
 type Value = string
-// TODO find out if we are passing ids around. I think we still are
-interface StoredValue {
-  value: string
-  id: number
-}
 
 namespace Stream {
   export interface Data {
@@ -29,8 +28,8 @@ namespace Stream {
     Rx.Observable<Payload>,
     Rx.Observable<Payload>
   >
+  export type Observable = Rx.Observable<Payload>
 }
 
-// type RxOperation = Rx.UnaryFunction<StoredValue, StoredValue>
 
 export { Settings, Tools, Stream }

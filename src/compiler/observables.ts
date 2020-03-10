@@ -1,9 +1,7 @@
 import * as Rx from 'rxjs'
 import * as ops from 'rxjs/operators'
 // type imports
-import * as i from '@scrape-pages/types/instructions'
 import { Stream } from '@scrape-pages/types/internal'
-import { Compiler } from './'
 
 /**
  * @name loop
@@ -51,25 +49,4 @@ function loop(
   })
 }
 
-// lets write a few of these to find out what can be abstracted
-function mapCommands(compiler: Compiler, operation: { commands: i.Command[] }): Stream.Operation {
-  const commands: Stream.Operation[] = operation.commands
-    .map(compiler.instantiateCommand)
-    .map(command => ops.flatMap(command.stream)) // TODO reset payload index to zero?
-
-  return Rx.pipe.apply(Rx, commands)
-}
-
-// when output from commands completes, restart the loop
-function loopCommands(compiler: Compiler, operation: { commands: i.Command[] }): Stream.Operation {
-  const commandsOperation = mapCommands(compiler, operation)
-
-  // prettier-ignore
-  return ops.flatMap((payload: Stream.Payload) => loop(
-      commandsOperation,
-      index => payload.set('index', index)
-    )
-  )
-}
-
-export { mapCommands }
+export { loop }

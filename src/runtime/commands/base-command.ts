@@ -1,9 +1,15 @@
 import * as Rx from 'rxjs'
 import * as ops from 'rxjs/operators'
+import { RuntimeBase } from '@scrape-pages/runtime/runtime-base'
+// type imports
 import { Settings, Tools, Stream } from '@scrape-pages/types/internal'
+import * as I from '@scrape-pages/types/instructions'
 
-abstract class BaseCommand {
-  constructor(private settings: Settings, private tools: Tools) {}
+abstract class BaseCommand extends RuntimeBase {
+  constructor(private settings: Settings, private tools: Tools, private command: I.Command) {
+    super('Command')
+    super.name = this.constructor.name
+  }
 
   abstract stream(payload: Stream.Payload): string[]
 
