@@ -18,7 +18,7 @@ abstract class BaseCommand extends RuntimeBase {
 
     // TODO this is good, lets build the store first
     // type ValueWithId = { value: string; id: number }
-    // const valuesWithIds: ValueWithId[] = this.tools.store.qs.insertValuesBatch(payload, values)
+    // const valuesWithIds: ValueWithId[] = this.tools.store.qs.insertValuesBatch(payload, values, this.command.params.LABEL)
     // Rx.from(valuesWithIds).pipe(ops.map(valueWithId => payload.merge(valueWithId)))
 
     return Rx.of(payload)

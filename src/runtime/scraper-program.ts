@@ -11,19 +11,20 @@ import { Options } from '@scrape-pages/types/options'
 import { Settings, Tools, Stream } from '@scrape-pages/types/internal'
 
 class ScraperProgramRuntime extends RuntimeBase {
-  private tools: Tools
-  private program: Stream.Observable
+  public tools: Tools
+  public program: Stream.Observable
   private commands: commands.BaseCommand[]
+
   constructor(private settings: Settings, apiEmitter: EventEmitter) {
     super('ScraperProgramRuntime')
 
     const store = new tools.Store()
     const queue = new tools.Queue()
-
+    const notify = new tools.Notify(apiEmitter)
 
     const compiler = new Compiler(settings)
     const runtimes = compiler.compile()
-    this.tools = { store, queue }
+    this.tools = { store, queue, notify }
     this.program = runtimes.program
     this.commands = runtimes.commands
   }
@@ -56,18 +57,6 @@ class ScraperProgram extends EventEmitter {
 
     this.on('stop', this.stop)
     this.on('useRateLimiter', this.toggleRateLimiter)
-
-    // Events:
-    //
-    // initialized
-    // done
-    // error
-    //
-    // request:queued
-    // request:progress
-    // request:completed
-    //
-    // <tag>:saved
   }
 
   /**
@@ -77,7 +66,8 @@ class ScraperProgram extends EventEmitter {
   public async start(folder: string) {
     await fs.mkdirp(folder)
     await this.writeMetadata({ state: 'ACTIVE' })
-    this.runtime.initialize()
+    await this.runtime.initialize()
+    this.runtime.tools.notify.initialized()
   }
 
   /**
@@ -91,7 +81,9 @@ class ScraperProgram extends EventEmitter {
    * @name onAny
    * @description listen for any event
    */
-  public async onAny(listener: (event: string, data: any) => void) {}
+  public async onAny(listener: (event: string, data: any) => void) {
+    this.runtime.tools.notify.registerOnAny(listener)
+  }
 
   public stop = () => {
     this.runtime.mustBeInitialized()

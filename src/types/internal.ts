@@ -12,11 +12,11 @@ interface Settings {
 type Tools = {
   store: tools.Store
   queue: tools.Queue
+  notify: tools.Notify
 }
 
-type Value = string
-
 namespace Stream {
+  export type Id = number
   export interface Data {
     id: number
     value: string

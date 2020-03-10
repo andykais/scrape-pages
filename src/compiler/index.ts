@@ -31,13 +31,12 @@ class Compiler {
   private instantiateCommand = (command: Command) => {
     const instantiatedCommand = (() => {
       switch (command.command) {
-        case 'HTTP':
+        case 'FETCH':
           return new commands.HttpCommand(this.settings, this.tools, command)
         case 'PARSE':
           return new commands.ParseCommand(this.settings, this.tools, command)
-        // TODO REGEX, TAG
-        default:
-          throw new InternalError(`unknown command ${command.command}`)
+        case 'REPLACE':
+          return new commands.ReplaceCommand(this.settings, this.tools, command)
       }
     })()
 

@@ -1,9 +1,58 @@
 type Slug = string
 type Expression = string
 
+// const instructions = `
+// (
+//   HTTP 'http://gallery/page/{{'+' 1 indeex}}.html' LABEL='gallery'
+//   PARSE 'li > a' ATTR='href'
+//   HTTP 'http://gallery{{ value }}'
+// ).branch(
+//   (
+//     PARSE '#tags > li' LABEL='tag'
+//   ),
+//   (
+//     PARSE 'img' ATTR='src'
+//     HTTP 'http://gallery{{ value }}' READ=false WRITE=true LABEL='image'
+//   )
+// )
+// `
+
+// const instructionsJson = `
+// (
+//   FETCH 'http://json-parsing/api-response.json'
+//   PARSE 'posts[type="post"].content' FORMAT='json'
+//   REPLACE '\n$' WITH=''
+// )
+// `
+
+// const instructionsRecurse = `
+// (
+//   FETCH 'http://recurse-next/index.html'
+// ).recurse(
+//   PARSE '#batch-id'
+//   FETCH 'http://recurse-next/batch-id-page/id-{{ value }}.html'
+// ).branch(
+//   (
+//     PARSE 'li > a' ATTR='href'
+//   ),
+//   (
+//     FETCH 'http://recurse-next{{ value }}'
+//   ).branch(
+//     (
+//       PARSE '#tags > li'
+//     ),
+//     (
+//       PARSE 'img' ATTR='src'
+//       FETCH 'http://recurse-next{{ value }}' READ=false WRITE=false
+//     )
+//   )
+// )
+// `
+
 interface HttpCommand {
-  command: 'HTTP'
+  command: 'FETCH'
   params: {
+    LABEL?: string
     METHOD?: 'GET' | 'PUT' | 'POST' | 'DELETE'
     URL: string
     READ?: boolean
@@ -16,20 +65,23 @@ interface HttpCommand {
 interface ParseCommand {
   command: 'PARSE'
   params: {
+    LABEL?: string
     SELECTOR: string
     ATTR?: string
     MAX?: number
   }
 }
 
-interface TagCommand {
-  command: 'TAG'
+interface TextReplaceCommand {
+  command: 'REPLACE'
   params: {
-    SLUG: string
+    LABEL?: string
+    SELECTOR: string
+    WITH?: string
   }
 }
 
-type Command = HttpCommand | ParseCommand | TagCommand
+type Command = HttpCommand | ParseCommand | TextReplaceCommand
 
 interface InitOperation {
   operator: 'init'
@@ -97,6 +149,6 @@ export {
   BranchOperation,
   HttpCommand,
   ParseCommand,
-  TagCommand
+  TextReplaceCommand,
   // TODO RegexCommand
 }

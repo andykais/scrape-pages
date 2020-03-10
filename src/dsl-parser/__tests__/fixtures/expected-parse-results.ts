@@ -6,11 +6,11 @@ const syntaxCoverageInstruction: Instructions = {
       operator: 'init',
       commands: [
         {
-          command: 'HTTP',
+          command: 'FETCH',
           params: { METHOD: 'GET', URL: 'https://google.com', WRITE: true }
         },
         {
-          command: 'HTTP',
+          command: 'FETCH',
           params: {
             URL: 'https://wikipedia.com',
             WRITE: true,
@@ -19,16 +19,11 @@ const syntaxCoverageInstruction: Instructions = {
         },
         {
           command: 'PARSE',
-          params: { SELECTOR: 'span > a', ATTR: 'href', MAX: 10 }
-        },
-        { command: 'TAG', params: { SLUG: 'test' } }
+          params: { SELECTOR: 'span > a', ATTR: 'href', MAX: 10, LABEL: 'test' }
+        }
       ]
     },
     { operator: 'until', expression: '{{value}} == x || ({{index}} <= 2)' },
-    {
-      operator: 'map',
-      commands: [{ command: 'TAG', params: { SLUG: 'nother' } }]
-    },
     {
       operator: 'branch',
       programs: [
@@ -37,11 +32,11 @@ const syntaxCoverageInstruction: Instructions = {
             operator: 'init',
             commands: [
               {
-                command: 'HTTP',
+                command: 'FETCH',
                 params: { METHOD: 'PUT', URL: 'me' }
               },
               {
-                command: 'HTTP',
+                command: 'FETCH',
                 params: { URL: 'me' }
               }
             ]
@@ -50,16 +45,10 @@ const syntaxCoverageInstruction: Instructions = {
             operator: 'map',
             commands: [
               {
-                command: 'HTTP',
+                command: 'FETCH',
                 params: { URL: 'you' }
               }
             ]
-          }
-        ],
-        [
-          {
-            operator: 'init',
-            commands: [{ command: 'TAG', params: { SLUG: 'ne' } }]
           }
         ]
       ]
@@ -67,4 +56,4 @@ const syntaxCoverageInstruction: Instructions = {
   ]
 }
 
-export { syntaxCoverageInstruction  }
+export { syntaxCoverageInstruction }

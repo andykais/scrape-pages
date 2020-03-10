@@ -7,27 +7,22 @@ const instructions = `
 # hi
 INPUT 'hi'
 (
-  HTTP 'https://google.com' METHOD='GET' WRITE=true
+  FETCH 'https://google.com' METHOD='GET' WRITE=true
 
   # another comment
 
-  HTTP 'https://wikipedia.com' WRITE=true READ=true
-  PARSE 'span > a' ATTR='href' MAX=10
-  TAG 'test'
+  FETCH 'https://wikipedia.com' WRITE=true READ=true
+  PARSE 'span > a' ATTR='href' MAX=10 LABEL='test'
 )
 .until('{{value}}' == 'x' || ('{{index}}' <= 2))
 .map(
-  TAG 'nother'
-  # a comment
+  # comment
 ).branch(
 (
-  HTTP 'me' METHOD='PUT'
-  HTTP 'me'
+  FETCH 'me' METHOD='PUT'
+  FETCH 'me'
 ).map(
-  HTTP 'you'
-),
-(
- TAG 'ne'
+  FETCH 'you'
 )
 )
 `

@@ -18,4 +18,10 @@ class ExpressionEvaluator {
   }
 }
 
+class BooleanExpressionEvaluator extends ExpressionEvaluator {
+  eval(payload: Stream.Payload) {
+    return Boolean(super.eval(payload))
+  }
+}
+
 export { ExpressionEvaluator }
