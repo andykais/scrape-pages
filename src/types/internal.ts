@@ -29,6 +29,7 @@ namespace Stream {
     Rx.Observable<Payload>
   >
   export type Observable = Rx.Observable<Payload>
+  export type Subscriber = Rx.Subscription
 }
 
 

@@ -32,7 +32,7 @@ class Compiler {
     const instantiatedCommand = (() => {
       switch (command.command) {
         case 'FETCH':
-          return new commands.HttpCommand(this.settings, this.tools, command)
+          return new commands.FetchCommand(this.settings, this.tools, command)
         case 'PARSE':
           return new commands.ParseCommand(this.settings, this.tools, command)
         case 'REPLACE':

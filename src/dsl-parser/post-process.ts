@@ -22,13 +22,11 @@ function processRawCommandAndRenameArg(renameArgAs: string, rawCommand: DslComma
 function postProcessCommands(commands: any[]) {
   return commands.map((rawCommand: DslCommand) => {
     switch (rawCommand.command) {
-      case 'HTTP':
+      case 'FETCH':
         return processRawCommandAndRenameArg('URL', rawCommand)
       case 'PARSE':
         return processRawCommandAndRenameArg('SELECTOR', rawCommand)
-      case 'TAG':
-        return processRawCommandAndRenameArg('SLUG', rawCommand)
-      case 'REGEX':
+      case 'REPLACE':
         return processRawCommandAndRenameArg('REPLACE', rawCommand)
       default:
         throw new Error(`Unknown command '${rawCommand.command}' in the program`)
@@ -43,7 +41,6 @@ function postProcessPrograms(programs: i.Program[]): i.Program[] {
   return programs.map(postProcessProgram)
 }
 function postProcessProgram(program: i.Program): any {
-  // console.log({ program })
   return program.map((operation: any) => {
     switch (operation.operator) {
       case 'init':

@@ -8,7 +8,7 @@ abstract class RuntimeBase {
     if (!this[INITIALIZED])
       throw new Error(`${this.name} must be initialized before calling this method.`)
   }
-  public abstract async cleanup(): Promise<void>
+  public abstract async cleanup(...args: any[]): Promise<void>
 }
 
 export { RuntimeBase }

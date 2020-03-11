@@ -5,6 +5,7 @@ interface Options {
       ratePerMs: number
       limit: number
     }
+    cache?: boolean
   }
   inputs?: { [inputSlug: string]: string }
   // folder: string

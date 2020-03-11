@@ -12,8 +12,9 @@
     "build": "run-s clean compile",
     "build:watch": "webpack --watch",
     "test": "run-s clean typecheck test:unit test:functional lint format:check",
-    "test:watch": "mochapack --watch {src,test}/**/*.test.ts",
-    "test:unit": "mochapack --interactive=false src/**/*.unit.test.ts"
+    "test:watch": "mochapack '{test,src}/**/*.test.ts' --watch",
+    "test:s": "mochapack '**/*functional.test.ts'",
+    "test:unit": "mochapack --interactive=false 'src/**/*.unit.test.ts'"
   },
   "repository": {
     "type": "git",
@@ -39,7 +40,7 @@
     "eslint": "^6.8.0",
     "eslint-plugin-import": "^2.20.1",
     "eslint-plugin-no-only-tests": "^2.4.0",
-    "mocha": "7.0.1",
+    "mocha": "^7.1.0",
     "mochapack": "^1.1.13",
     "nearley-loader": "^2.0.0",
     "nock": "^12.0.2",
@@ -48,7 +49,7 @@
     "shx": "^0.3.2",
     "ts-loader": "^6.2.1",
     "typescript": "^3.8.3",
-    "webpack": "^4.42.0",
+    "webpack": "~4.42.0",
     "webpack-cli": "^3.3.11",
     "webpack-node-externals": "^1.7.2"
   },

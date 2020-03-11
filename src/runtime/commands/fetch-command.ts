@@ -8,7 +8,7 @@ import * as I from '@scrape-pages/types/instructions'
 // check for matching in-flight request
 // if none, check for matching request in database
 // if none, add it to the queue
-class HttpCommand extends BaseCommand {
+class FetchCommand extends BaseCommand {
 
   constructor(settings: Settings, tools: Tools, command: I.HttpCommand) {
     super(settings, tools, command)
@@ -24,4 +24,4 @@ class HttpCommand extends BaseCommand {
   }
 }
 
-export { HttpCommand }
+export { FetchCommand }

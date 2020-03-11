@@ -2,6 +2,14 @@ const path = require('path')
 const typescriptIsTransformer = require('typescript-is/lib/transform-inline/transformer').default
 const nodeExternals = require('webpack-node-externals')
 
+// const glob = require('glob')
+// const sourceFiles = glob
+//   .sync('./src/**/*.ts', { ignore: './src/**/*.test.ts' })
+//   .reduce((acc, file) => {
+//     acc[file.replace(/^\.\/src\/(.*?)\.ts$/, (_, filename) => filename)] = file
+//     return acc
+//   }, {})
+
 module.exports = {
   mode: 'development',
   devtool: 'source-map',
@@ -15,6 +23,7 @@ module.exports = {
   entry: {
     index: './src/index.ts'
   },
+  // entry: sourceFiles,
   output: {
     path: path.resolve(__dirname, 'build'),
     filename: '[name].js',
@@ -23,7 +32,7 @@ module.exports = {
   },
 
   resolve: {
-    extensions: ['.ts', '.js'],
+    extensions: ['.ts'],
     alias: {
       '@scrape-pages': path.resolve(__dirname, 'src'),
       '@test': path.resolve(__dirname, 'test')
@@ -43,9 +52,14 @@ module.exports = {
         }
       },
       {
-        test: path.resolve(__dirname, 'src/dsl-parser/grammar.ne'),
+        test: /\.ne$/,
+        // test: path.resolve(__dirname, 'src/dsl-parser/grammar.ne'),
         loader: 'nearley-loader'
       }
     ]
-  }
+  },
+  optimization: {
+    minimize: false
+  },
+  externals: [nodeExternals()]
 }

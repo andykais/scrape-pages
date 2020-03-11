@@ -13,6 +13,7 @@ import { Settings, Tools, Stream } from '@scrape-pages/types/internal'
 class ScraperProgramRuntime extends RuntimeBase {
   public tools: Tools
   public program: Stream.Observable
+  public subscription: Stream.Subscriber
   private commands: commands.BaseCommand[]
 
   constructor(private settings: Settings, apiEmitter: EventEmitter) {
@@ -33,6 +34,7 @@ class ScraperProgramRuntime extends RuntimeBase {
     for (const tool of Object.values(this.tools)) await tool.initialize()
   }
   public async cleanup() {
+    if (this.subscription) this.subscription.unsubscribe()
     for (const command of this.commands) await command.cleanup()
     for (const tool of Object.values(this.tools)) await tool.cleanup()
   }
@@ -64,10 +66,29 @@ class ScraperProgram extends EventEmitter {
    * @description begin scraping and write results to disk
    */
   public async start(folder: string) {
-    await fs.mkdirp(folder)
-    await this.writeMetadata({ state: 'ACTIVE' })
-    await this.runtime.initialize()
-    this.runtime.tools.notify.initialized()
+    // TODO only let start be called once? Maybe? Maybe we can reuse a class?
+    try {
+      await fs.mkdirp(folder)
+      await this.writeMetadata({ state: 'ACTIVE' })
+      await this.runtime.initialize()
+      this.runtime.subscription = this.runtime.program.subscribe({
+        error: async (error: Error) => {
+          this.emit('error', error)
+          await this.writeMetadata({ state: 'ERRORED' })
+          await this.runtime.cleanup()
+        },
+        complete: async () => {
+          this.emit('done')
+          await this.writeMetadata({ state: 'COMPLETED' })
+          await this.runtime.cleanup()
+        }
+      })
+      this.runtime.tools.notify.initialized()
+    } catch (error) {
+      this.emit('error', error)
+      await this.writeMetadata({ state: 'ERRORED' })
+      await this.runtime.cleanup()
+    }
   }
 
   /**
@@ -87,6 +108,8 @@ class ScraperProgram extends EventEmitter {
 
   public stop = () => {
     this.runtime.mustBeInitialized()
+    // lets double check that this is all it takes. We may need some state in there when observables fall short
+    this.runtime.cleanup()
   }
   public stopCommand(label: string) {
     this.runtime.mustBeInitialized()
@@ -97,32 +120,12 @@ class ScraperProgram extends EventEmitter {
     this.runtime.mustBeInitialized()
   }
 
-  public getTags() {
-    // return this.instructionsAnalysis.tags
-  }
-
   /**
    * @name toPromise
    * @description convienience method returns a promise that resolves on the 'done' event
    */
   public toPromise(): Promise<void> {
     return Promise.resolve()
-  }
-
-  /**
-   * @name fromFolder
-   * @description reuse an existing scraper folder
-   */
-  public static fromFolder(folder: string, options?: Options) {
-    // check if the metadata of the scraper in that folder is COMPLETED. If not, we cannot start
-    // const scraper = new ScraperProgram('', {})
-    // scraper.fromExistingFolder = true
-    // TODO we should only reuse scraper folders if the instructions are the same. Debugging changed state is
-    // a nightmare. Changing options is ok though
-    //
-    // this might also make it worth separating the instructions options from the runner options.
-    // E.g. its ok to override the rateLimit or the input but its not good to override the folder or cleanFolder
-    // return new ScraperProgram()
   }
 
   private async initFolder() {
