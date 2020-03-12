@@ -3,6 +3,8 @@ import * as ops from 'rxjs/operators'
 // type imports
 import { Stream } from '@scrape-pages/types/internal'
 
+const SENSIBLE_MAX_EMPTY_LOOPS = 100
+
 /**
  * @name loop
  * @argument pipeTo an rxjs operation that typically creates many outputs for a single input
@@ -19,12 +21,14 @@ function loop(
   return new Rx.Observable(observer => {
     let subscribed = true
     let sourceSubscriber: Rx.Subscription | null = null
+    let consecutiveEmtpyPipes = 0
     observer.add(() => {
       subscribed = false
       if (sourceSubscriber) sourceSubscriber.unsubscribe()
     })
     ;(async () => {
       try {
+        let calledNext = false
         for (let index = 0; subscribed; index++) {
           const source = Rx.of(iterateFn(index)).pipe(pipeTo)
 
@@ -32,11 +36,18 @@ function loop(
             sourceSubscriber = source.subscribe({
               next(v) {
                 observer.next(v)
+                calledNext = true
               },
               error(error) {
                 reject(error)
               },
               complete() {
+                if (!calledNext) consecutiveEmtpyPipes++
+                else consecutiveEmtpyPipes = 0
+                if (consecutiveEmtpyPipes > SENSIBLE_MAX_EMPTY_LOOPS)
+                  throw new Error(
+                    `.loop() made ${SENSIBLE_MAX_EMPTY_LOOPS} iterations with no output. Consider refactoring the loop to contain some output.`
+                  )
                 resolve()
               }
             })

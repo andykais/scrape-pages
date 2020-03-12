@@ -15,7 +15,9 @@ abstract class BaseCommand extends RuntimeBase {
     else this.LABEL = 'placeholder' // TODO randomly generate a non-clashing string label
   }
 
-  abstract async stream(payload: Stream.Payload): Promise<string[]>
+  // were pushing the responsibility of db writes up here because fetch is very different than parse & regex
+  // fetch is different specifically because we need the id before we have a value to save the file in a non-clashing name ${id}.${ext}
+  abstract async stream(payload: Stream.Payload): Stream.Payload[]
 
   callStream = (payload: Stream.Payload) => {
     const values = this.stream(payload)
@@ -25,7 +27,7 @@ abstract class BaseCommand extends RuntimeBase {
     // const valuesWithIds: ValueWithId[] = this.tools.store.qs.insertValuesBatch(payload, values, this.command.params.LABEL)
     // Rx.from(valuesWithIds).pipe(ops.map(valueWithId => payload.merge(valueWithId)))
 
-    return Rx.of(payload)
+    return Rx.from(values)
   }
 }
 
