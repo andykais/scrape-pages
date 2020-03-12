@@ -14,11 +14,10 @@ import { Settings, Tools, Stream } from '@scrape-pages/types/internal'
 
 class Compiler {
   private initialPayload: Stream.Payload
-  public tools: Tools
   public commands: commands.BaseCommand[]
   public program: Stream.Observable
 
-  public constructor(private settings: Settings) {
+  public constructor(private settings: Settings, private tools: Tools) {
     this.initialPayload = Immutable({
       value: '',
       index: 0,
@@ -49,7 +48,7 @@ class Compiler {
   private mapCommands(operation: { commands: I.Command[] }): Stream.Operation {
     const commands: Stream.Operation[] = operation.commands
       .map(this.instantiateCommand)
-      .map(command => ops.flatMap(command.callStream)) // TODO reset payload index to zero?
+      .map(command => ops.flatMap(command.callStream)) // TODO reset payload index to zero? Nope!
     return Rx.pipe.apply(Rx, commands)
   }
 
@@ -92,6 +91,17 @@ class Compiler {
           throw new InternalError(`unknown operation '${operation.operator}'`)
       }
     })
+
+    console.log(operations.length)
+    // const [init, loop, until] = operations
+    // return Rx.pipe(
+    //   init,
+    //   ops.tap(() => console.log('init')),
+    //   loop,
+    //   ops.tap(() => console.log('loop')),
+    //   until,
+    //   ops.tap(() => console.log('until'))
+    // )
     return Rx.pipe.apply(Rx, operations)
   }
 

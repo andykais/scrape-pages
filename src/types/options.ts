@@ -1,8 +1,8 @@
 interface Options {
-  network?: {
-    maxConcurrent?: number
+  fetch?: {
+    maxConcurrency?: number
     rateLimit?: {
-      ratePerMs: number
+      interval: number
       limit: number
     }
     cache?: boolean

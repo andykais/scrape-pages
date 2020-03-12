@@ -9,8 +9,8 @@ const testEnv = new FunctionalTestSetup(TEST_NAME, __dirname)
 // if you want the loop to happen per each input, put it in a branch!
 const instructions = `
 ().loop(
-  FETCH '${testEnv.mockHost}/pages/{{index}}'
-).until('{{ index }}' == 2)
+  FETCH '${testEnv.mockHost}/gallery/page/{{"+" index 1}}.html'
+).until('{{ index }}' == 1)
 `
 const options = {}
 

@@ -1,4 +1,7 @@
 import { EventEmitter } from 'events'
+import * as Rx from 'rxjs'
+import * as ops from 'rxjs/operators'
+import * as RxCustom from '@scrape-pages/compiler/observables'
 import { dslParser } from '@scrape-pages/dsl-parser'
 import { Compiler } from '@scrape-pages/compiler'
 import * as fs from '@scrape-pages/util/fs'
@@ -12,7 +15,8 @@ import { Settings, Tools, Stream } from '@scrape-pages/types/internal'
 
 class ScraperProgramRuntime extends RuntimeBase {
   public tools: Tools
-  public program: Stream.Observable
+  public observables: Rx.Observable<any>
+  private program: Stream.Observable
   public subscription: Stream.Subscriber
   private commands: commands.BaseCommand[]
 
@@ -20,14 +24,20 @@ class ScraperProgramRuntime extends RuntimeBase {
     super('ScraperProgramRuntime')
 
     const store = new tools.Store()
-    const queue = new tools.Queue()
+    const queue = new tools.Queue(settings)
     const notify = new tools.Notify(apiEmitter)
-
-    const compiler = new Compiler(settings)
-    const runtimes = compiler.compile()
     this.tools = { store, queue, notify }
+
+    const compiler = new Compiler(settings, this.tools)
+    const runtimes = compiler.compile()
     this.program = runtimes.program
     this.commands = runtimes.commands
+    this.observables = RxCustom.any(queue.scheduler, this.program)
+    // const completedMarker = Symbol.for('COMPLETE')
+    // this.observables = Rx.merge(
+    //   queue.scheduler.pipe(ops.filter(() => false)),
+    //   Rx.concat(this.program.pipe(ops.filter(() => false)), Rx.of(completedMarker))
+    // ).pipe(ops.takeWhile(v => v !== completedMarker))
   }
   public async initialize(folder: string) {
     for (const command of this.commands) await command.initialize(folder)
@@ -71,7 +81,7 @@ class ScraperProgram extends EventEmitter {
       await fs.mkdirp(folder)
       await this.writeMetadata({ state: 'ACTIVE' })
       await this.runtime.initialize(folder)
-      this.runtime.subscription = this.runtime.program.subscribe({
+      this.runtime.subscription = this.runtime.observables.subscribe({
         error: async (error: Error) => {
           this.emit('error', error)
           await this.writeMetadata({ state: 'ERRORED' })

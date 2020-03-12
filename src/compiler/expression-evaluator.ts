@@ -18,12 +18,10 @@ class ExpressionEvaluator {
   }
 
   eval(payload: Stream.Payload) {
-    const inputs = payload.inputs
-    const value = payload.value
-    const index = payload.index
-    const javascriptEvalStr = this.template({ ...inputs, value, index })
+    const javascriptEvalStr = this.template(payload)
 
     const result = eval(javascriptEvalStr)
+    console.log(payload, { result })
     return result
     // const cacheKey = `index:${payload.index}-value:${payload.value}`
   }
@@ -31,6 +29,7 @@ class ExpressionEvaluator {
 
 class BooleanExpressionEvaluator extends ExpressionEvaluator {
   eval(payload: Stream.Payload) {
+    console.log('until eval', Boolean(super.eval(payload)))
     return Boolean(super.eval(payload))
   }
 }

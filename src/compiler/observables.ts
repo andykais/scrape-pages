@@ -14,6 +14,7 @@ const SENSIBLE_MAX_EMPTY_LOOPS = 100
  * note that this observable has no observer.complete(), it runs indefidently until either an error or an unsubscribe
  * also note, if the pipeTo function does not return anything (e.g. PARSE '') then this loop will run indefinitely, and very fast.
  */
+// can I use exhaustMap here???
 function loop(
   pipeTo: Stream.Operation,
   iterateFn: (index: number) => Stream.Payload
@@ -35,6 +36,7 @@ function loop(
           await new Promise((resolve, reject) => {
             sourceSubscriber = source.subscribe({
               next(v) {
+                console.log('next please')
                 observer.next(v)
                 calledNext = true
               },
@@ -42,6 +44,7 @@ function loop(
                 reject(error)
               },
               complete() {
+                console.log('complete please')
                 if (!calledNext) consecutiveEmtpyPipes++
                 else consecutiveEmtpyPipes = 0
                 if (consecutiveEmtpyPipes > SENSIBLE_MAX_EMPTY_LOOPS)
@@ -61,4 +64,21 @@ function loop(
   })
 }
 
-export { loop }
+/**
+ * @name any
+ * @argument observables observables that will be waited on.
+ * @description this functions a lot like merge except that the observable it creates completes after the first observable completes. It is analogous to Promise.any
+ */
+function any(...observables: Rx.Observable<any>[]) {
+  return new Rx.Observable(observer => {
+    if (observables.length === 0) {
+      observer.complete()
+    } else {
+      for (const observable of observables) {
+        observable.subscribe(observer)
+      }
+    }
+  })
+}
+
+export { loop, any }

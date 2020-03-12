@@ -1,5 +1,6 @@
 type Slug = string
 type Expression = string
+type Template = string
 
 // const instructions = `
 // (
@@ -54,11 +55,12 @@ interface HttpCommand {
   params: {
     LABEL?: string
     METHOD?: 'GET' | 'PUT' | 'POST' | 'DELETE'
-    URL: string
+    URL: Template
+    HEADERS?: { [headerName: string]: Template }
     READ?: boolean
     WRITE?: boolean
     CACHE?: boolean
-    PRIORITY?: boolean
+    PRIORITY?: number
   }
 }
 

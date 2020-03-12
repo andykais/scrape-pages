@@ -17,9 +17,9 @@ abstract class BaseCommand extends RuntimeBase {
 
   // were pushing the responsibility of db writes up here because fetch is very different than parse & regex
   // fetch is different specifically because we need the id before we have a value to save the file in a non-clashing name ${id}.${ext}
-  abstract async stream(payload: Stream.Payload): Stream.Payload[]
+  abstract async stream(payload: Stream.Payload): Promise<Stream.Payload[]>
 
-  callStream = (payload: Stream.Payload) => {
+  callStream = (payload: Stream.Payload): Stream.Observable => {
     const values = this.stream(payload)
 
     // TODO this is good, lets build the store first
@@ -27,7 +27,7 @@ abstract class BaseCommand extends RuntimeBase {
     // const valuesWithIds: ValueWithId[] = this.tools.store.qs.insertValuesBatch(payload, values, this.command.params.LABEL)
     // Rx.from(valuesWithIds).pipe(ops.map(valueWithId => payload.merge(valueWithId)))
 
-    return Rx.from(values)
+    return Rx.from(values).pipe(ops.flatMap(promise => promise))
   }
 }
 
