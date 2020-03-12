@@ -10,6 +10,7 @@ import { Stream } from '@scrape-pages/types/internal'
  * @description creates an infinite loop that waits until all the values from pipeTo stop before reaching the top of the loop
  *
  * note that this observable has no observer.complete(), it runs indefidently until either an error or an unsubscribe
+ * also note, if the pipeTo function does not return anything (e.g. PARSE '') then this loop will run indefinitely, and very fast.
  */
 function loop(
   pipeTo: Stream.Operation,

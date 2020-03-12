@@ -1,3 +1,5 @@
+import * as Fetch from 'node-fetch'
+
 /**
  * This boi wraps any error and disguises itself as that error
  */
@@ -35,4 +37,11 @@ class InternalError extends Error {
   }
 }
 
-export { ContextualError, InternalError }
+class ResponseError extends Error {
+  public name = 'ResponseError'
+  public constructor(response: Fetch.Response, url: string) {
+    super(`Request "${url}" failed. Received status ${response.status}`)
+  }
+}
+
+export { ContextualError, InternalError, ResponseError }

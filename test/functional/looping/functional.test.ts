@@ -6,10 +6,12 @@ import { ScraperProgram } from '@scrape-pages'
 const TEST_NAME = 'looping'
 const testEnv = new FunctionalTestSetup(TEST_NAME, __dirname)
 
+// if you want the loop to happen per each input, put it in a branch!
 const instructions = `
 ().loop(
-  HTTP '${testEnv.mockHost}/pages/{{index}}'
-)`
+  FETCH '${testEnv.mockHost}/pages/{{index}}'
+).until('{{ index }}' == 2)
+`
 const options = {}
 
 describe(__filename, () => {

@@ -18,16 +18,14 @@ class Notify extends RuntimeBase {
 
   public registerOnAny(listener: (event: string, data: any) => void) {}
 
+  // TODO add labels in here
   public commandQueued(command: CommandNames, id: Stream.Id) {
     this.emitter.emit(`${command}:queued`, { id })
   }
-  public commandProgress(command: CommandNames, id: Stream.Id, progress: number) {
+  public commandProgress(command: CommandNames, id: Stream.Id, progress: number, url: string) {
     this.emitter.emit(`${command}:progress`, { id, progress })
   }
-  public commandSucceeded(
-    command: CommandNames,
-    info: { id: Stream.Id; filename: string; mimeType: string; byteLength: number }
-  ) {
+  public commandSucceeded(command: CommandNames, info: { id: Stream.Id }) {
     this.emitter.emit(`${command}:saved`, info)
   }
 

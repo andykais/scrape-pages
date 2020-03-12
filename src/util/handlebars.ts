@@ -7,7 +7,15 @@ Handlebars.registerHelper('-', (x: number, y: number) => x - y)
 Handlebars.registerHelper('*', (x: number, y: number) => x * y)
 Handlebars.registerHelper('/', (x: number, y: number) => x / y)
 
-export const compileTemplate = (templateStr: string) => {
+type Template = HandlebarsTemplateDelegate<any>
+function compileTemplate(templateStr: string): Template {
   const template = Handlebars.compile(templateStr, { noEscape: true })
-  return (data: {} = {}) => template(data)
+  return template
+  // return (data: {} = {}) => template(data)
+}
+
+export {
+  compileTemplate,
+  // type exports
+  Template
 }

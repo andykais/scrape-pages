@@ -40,9 +40,21 @@ const instructionsWithLeaves = `
 )
 `
 
+const instructionsNext = `
+(
+  FETCH 'http://recurse-next/index.html'
+).recurse(
+  PARSE '#batch-id'
+  FETCH 'http://recurse-next/batch-page/id-{{ value }}.html'
+).branch(
+
+)
+
+`
+
 describe(__filename, () => {
   describe('instruction set covering all syntax', () => {
-    it.only('should match expected output', () => {
+    it('should match expected output', () => {
       const parsedInstructions = dslParser(instructions)
       expect(parsedInstructions).to.be.deep.equal(syntaxCoverageInstruction)
     })

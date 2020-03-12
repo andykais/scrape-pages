@@ -6,14 +6,18 @@ import { Settings, Tools, Stream } from '@scrape-pages/types/internal'
 import * as I from '@scrape-pages/types/instructions'
 
 abstract class BaseCommand extends RuntimeBase {
-  constructor(private settings: Settings, private tools: Tools, private command: I.Command) {
+  protected LABEL: string
+
+  constructor(protected settings: Settings, protected tools: Tools, protected command: I.Command) {
     super('Command')
     super.name = this.constructor.name
+    if (this.command.params.LABEL) this.LABEL = this.command.params.LABEL
+    else this.LABEL = 'placeholder' // TODO randomly generate a non-clashing string label
   }
 
-  abstract stream(payload: Stream.Payload): string[]
+  abstract async stream(payload: Stream.Payload): Promise<string[]>
 
-  callStream(payload: Stream.Payload) {
+  callStream = (payload: Stream.Payload) => {
     const values = this.stream(payload)
 
     // TODO this is good, lets build the store first

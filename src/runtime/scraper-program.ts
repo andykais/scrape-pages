@@ -29,9 +29,9 @@ class ScraperProgramRuntime extends RuntimeBase {
     this.program = runtimes.program
     this.commands = runtimes.commands
   }
-  public async initialize() {
-    for (const command of this.commands) await command.initialize()
-    for (const tool of Object.values(this.tools)) await tool.initialize()
+  public async initialize(folder: string) {
+    for (const command of this.commands) await command.initialize(folder)
+    for (const tool of Object.values(this.tools)) await tool.initialize(folder)
   }
   public async cleanup() {
     if (this.subscription) this.subscription.unsubscribe()
@@ -70,7 +70,7 @@ class ScraperProgram extends EventEmitter {
     try {
       await fs.mkdirp(folder)
       await this.writeMetadata({ state: 'ACTIVE' })
-      await this.runtime.initialize()
+      await this.runtime.initialize(folder)
       this.runtime.subscription = this.runtime.program.subscribe({
         error: async (error: Error) => {
           this.emit('error', error)
@@ -125,7 +125,10 @@ class ScraperProgram extends EventEmitter {
    * @description convienience method returns a promise that resolves on the 'done' event
    */
   public toPromise(): Promise<void> {
-    return Promise.resolve()
+    return new Promise((resolve, reject) => {
+      this.on('done', resolve)
+      this.on('error', reject)
+    })
   }
 
   private async initFolder() {

@@ -14,7 +14,7 @@ class Store extends RuntimeBase {
     throw new Error('unimplemented')
   }
 
-  async initialize() {}
+  async initialize(folder: string) {}
   async cleanup() {}
 }
 

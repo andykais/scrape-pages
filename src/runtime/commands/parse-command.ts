@@ -9,7 +9,7 @@ class ParseCommand extends BaseCommand {
   }
 
   stream(payload: Stream.Payload) {
-    return []
+    return Promise.resolve([])
   }
 
   async initialize() {}

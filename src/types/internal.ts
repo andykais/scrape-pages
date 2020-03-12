@@ -17,6 +17,7 @@ type Tools = {
 
 namespace Stream {
   export type Id = number
+  export type DownloadInfo = { bytes: number; filename: string | null }
   export interface Data {
     id: number
     value: string
@@ -24,13 +25,9 @@ namespace Stream {
     inputs: { [slug: string]: string }
   }
   export type Payload = Immutable.ImmutableObject<Data>
-  export type Operation = Rx.UnaryFunction<
-    Rx.Observable<Payload>,
-    Rx.Observable<Payload>
-  >
+  export type Operation = Rx.UnaryFunction<Rx.Observable<Payload>, Rx.Observable<Payload>>
   export type Observable = Rx.Observable<Payload>
   export type Subscriber = Rx.Subscription
 }
-
 
 export { Settings, Tools, Stream }

@@ -13,7 +13,6 @@
     "build:watch": "webpack --watch",
     "test": "run-s clean typecheck test:unit test:functional lint format:check",
     "test:watch": "mochapack '{test,src}/**/*.test.ts' --watch",
-    "test:s": "mochapack '**/*functional.test.ts'",
     "test:unit": "mochapack --interactive=false 'src/**/*.unit.test.ts'"
   },
   "repository": {
@@ -33,6 +32,7 @@
     "@types/mocha": "^7.0.1",
     "@types/nearley": "^2.11.1",
     "@types/node": "^13.7.7",
+    "@types/node-fetch": "^2.5.5",
     "@types/seamless-immutable": "^7.1.11",
     "@typescript-eslint/eslint-plugin": "^2.22.0",
     "@typescript-eslint/parser": "^2.22.0",

@@ -1,11 +1,12 @@
 import { RuntimeBase } from '@scrape-pages/runtime/runtime-base'
 
+type Task<T> = () => Promise<T>
 class Queue extends RuntimeBase {
   public constructor() {
     super('Queue')
   }
 
-  public add = () => {
+  public enqueue = <T>(task: Task<T>): Promise<T> => {
     throw new Error('unimplemented')
   }
   public toggleRateLimiter = () => {
