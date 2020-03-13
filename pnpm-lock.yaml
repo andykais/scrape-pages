@@ -10,6 +10,7 @@ dependencies:
   seamless-immutable: 7.1.4
   typescript-is: 0.14.3_typescript@3.8.3
 devDependencies:
+  '@types/better-sqlite3': 5.4.0
   '@types/chai': 4.2.10
   '@types/mocha': 7.0.2
   '@types/nearley': 2.11.1
@@ -74,6 +75,12 @@ packages:
       node: '>= 8'
     resolution:
       integrity: sha512-1V9XOY4rDW0rehzbrcqAmHnz8e7SKvX27gh8Gt2WgB0+pdzdiLV83p72kZPU+jvMbS1qU5mauP2iOvO8rhmurQ==
+  /@types/better-sqlite3/5.4.0:
+    dependencies:
+      '@types/integer': 1.0.0
+    dev: true
+    resolution:
+      integrity: sha512-nzm7lJ7l3jBmGUbtkL8cdOMhPkN6Pw2IM+b0V7iIKba+YKiLrjkIy7vVLsBIVnd7+lgzBzrHsXZxCaFTcmw5Ow==
   /@types/chai/4.2.10:
     dev: true
     resolution:
@@ -98,6 +105,10 @@ packages:
     dev: true
     resolution:
       integrity: sha512-1Bh06cbWJUHMC97acuD6UMG29nMt0Aqz1vF3guLfG+kHHJhy3AyohZFFxYk2f7Q1SQIrNwvncxAE0N/9s70F2w==
+  /@types/integer/1.0.0:
+    dev: true
+    resolution:
+      integrity: sha512-3viiRKLoSP2Qr78nMoQjkDc0fan4BgmpOyV1+1gKjE8wWXo3QQ78WItO6f9WuBf3qe3ymDYhM65oqHTOZ0rFxw==
   /@types/json-schema/7.0.4:
     dev: true
     resolution:
@@ -5095,6 +5106,7 @@ packages:
     resolution:
       integrity: sha512-ssa5JuRjMeZEUjg7bEL99AwpitxU/zWGAGpdj0di41pOEmJti8NR6kyUIJBkR78DTYNPZOU08luUo0GTHuB+ow==
 specifiers:
+  '@types/better-sqlite3': ^5.4.0
   '@types/chai': ^4.2.10
   '@types/mocha': ^7.0.1
   '@types/nearley': ^2.11.1

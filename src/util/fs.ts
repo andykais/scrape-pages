@@ -14,7 +14,7 @@ const [mkdir, readdir, stat, unlink, rmdir, rename, access, readFile, writeFile]
   fs.writeFile
 ].map(promisify)
 
-const mkdirp = async (folder: string) => {
+async function mkdirp(folder: string) {
   try {
     await mkdir(folder)
   } catch (e) {
@@ -62,7 +62,10 @@ async function findFiles(folder: string): Promise<string[]> {
   return endpointFiles
 }
 
+const existsSync = fs.existsSync
+
 export {
+  existsSync,
   // promisified
   readdir,
   stat,

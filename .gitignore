@@ -6,3 +6,6 @@ node_modules
 
 # build files
 build
+
+# testing temp files
+test/functional/.run-output

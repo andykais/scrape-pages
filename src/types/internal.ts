@@ -1,5 +1,6 @@
 import * as Rx from 'rxjs'
 import Immutable from 'seamless-immutable'
+import Sqlite3 from 'better-sqlite3'
 import * as tools from '@scrape-pages/runtime/tools'
 import { Instructions } from './instructions'
 import { Options } from './options'
@@ -14,6 +15,8 @@ type Tools = {
   queue: tools.Queue
   notify: tools.Notify
 }
+
+type Database = Sqlite3.Database
 
 namespace Stream {
   export type Id = number
@@ -30,4 +33,4 @@ namespace Stream {
   export type Subscriber = Rx.Subscription
 }
 
-export { Settings, Tools, Stream }
+export { Settings, Tools, Stream, Database }

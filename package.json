@@ -28,6 +28,7 @@
   "author": "Andrew Kaiser",
   "license": "MIT",
   "devDependencies": {
+    "@types/better-sqlite3": "^5.4.0",
     "@types/chai": "^4.2.10",
     "@types/mocha": "^7.0.1",
     "@types/nearley": "^2.11.1",

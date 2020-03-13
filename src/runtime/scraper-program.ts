@@ -42,6 +42,7 @@ class ScraperProgramRuntime extends RuntimeBase {
   public async initialize(folder: string) {
     for (const command of this.commands) await command.initialize(folder)
     for (const tool of Object.values(this.tools)) await tool.initialize(folder)
+    super.initialize(folder)
   }
   public async cleanup() {
     if (this.subscription) this.subscription.unsubscribe()
