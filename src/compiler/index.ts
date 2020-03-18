@@ -14,13 +14,14 @@ import { Settings, Tools, Stream } from '@scrape-pages/types/internal'
 
 class Compiler {
   private initialPayload: Stream.Payload
-  public commands: commands.BaseCommand[]
+  public commands: commands.AnyCommand[]
   public program: Stream.Observable
 
   public constructor(private settings: Settings, private tools: Tools) {
     this.initialPayload = Immutable({
       value: '',
-      index: 0,
+      operatorIndex: 0,
+      valueIndex: 0,
       id: -1,
       inputs: this.settings.options.inputs || {}
     })
@@ -58,7 +59,7 @@ class Compiler {
     // prettier-ignore
     return ops.flatMap((payload: Stream.Payload) => RxCustom.loop(
       commandsOperation,
-      index => payload.set('index', index)
+      index => payload.set('operatorIndex', index)
     ))
   }
 
@@ -92,16 +93,6 @@ class Compiler {
       }
     })
 
-    console.log(operations.length)
-    // const [init, loop, until] = operations
-    // return Rx.pipe(
-    //   init,
-    //   ops.tap(() => console.log('init')),
-    //   loop,
-    //   ops.tap(() => console.log('loop')),
-    //   until,
-    //   ops.tap(() => console.log('until'))
-    // )
     return Rx.pipe.apply(Rx, operations)
   }
 

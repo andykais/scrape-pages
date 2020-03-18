@@ -4,14 +4,24 @@ import * as fs from '@scrape-pages/util/fs'
 import { FMap } from '@scrape-pages/util/map'
 import { RuntimeBase } from '@scrape-pages/runtime/runtime-base'
 import * as queries from './queries'
+import { QuerierApi } from './query-api'
+// type imports
+// import { QueryInterface } from './query-api'
+import { Settings, Querier } from '@scrape-pages/types/internal'
 
 class Store extends RuntimeBase {
   private database: Sqlite3.Database
   private _qs: queries.Queries
   public _transaction: Sqlite3.Transaction
 
-  public constructor() {
+  public query: Querier.Interface
+
+  public constructor(private settings: Settings) {
     super('Store')
+    const queryApi = new QuerierApi(this, this.settings)
+    const query: Querier.Interface = (labels, options) => queryApi.prepare(labels, options)()
+    query.prepare = queryApi.prepare
+    this.query = query
   }
 
   public get qs() {
@@ -23,14 +33,13 @@ class Store extends RuntimeBase {
     return this._transaction
   }
 
-  public async initialize(folder: string) {
-    this.database = new Sqlite3(Store.getSqliteFile(folder))
+  public async initialize() {
+    this.database = new Sqlite3(Store.getSqliteFile(this.settings.folder))
     this.database.pragma('journal_mode = WAL')
 
     this._qs = queries.createStatements(this.database)
     this._transaction = this.database.transaction.bind(this.database)
-
-    this._qs.createTables()
+    super.initialize()
   }
   public async cleanup() {}
 

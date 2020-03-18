@@ -1,21 +1,11 @@
 import { createAssertType } from 'typescript-is'
 // import { Instructions } from './instructions.ts'
 import { Instructions } from './instructions'
+import { Querier } from './internal'
 
 const typecheckInstructions = createAssertType<Instructions>()
 
-// import { N } from './instructions'
+const typecheckQueryApiLabels = createAssertType<Querier.Labels>()
+const typecheckQueryApiOptions = createAssertType<Querier.QueryApiOptions>()
 
-// type N = number
-// const checkNumber = createAssertType<N>()
-// try {
-//   checkNumber('1')
-//   console.log('no prob')
-// } catch(e) {
-//   console.log(e.message)
-// }
-
-
-export {
-  typecheckInstructions
-}
+export { typecheckInstructions, typecheckQueryApiLabels, typecheckQueryApiOptions }

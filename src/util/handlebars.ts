@@ -12,7 +12,12 @@ type Template = (payload: Stream.Payload) => string
 function compileTemplate(templateStr: string) {
   const template = Handlebars.compile(templateStr, { noEscape: true })
   // TODO remove id from payload?
-  return (payload: Stream.Payload) => template(payload)
+  return (payload: Stream.Payload) => {
+    const index = payload.operatorIndex
+    const value = payload.value
+    const inputs = payload.inputs
+    return template({ ...inputs, index, value })
+  }
 }
 
 export {

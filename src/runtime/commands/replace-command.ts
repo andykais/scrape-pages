@@ -3,9 +3,12 @@ import { BaseCommand } from './base-command'
 import { Settings, Tools, Stream } from '@scrape-pages/types/internal'
 import * as I from '@scrape-pages/types/instructions'
 
-class ReplaceCommand extends BaseCommand {
+class ReplaceCommand extends BaseCommand<I.TextReplaceCommand, typeof ReplaceCommand.DEFAULT_PARAMS> {
+  private static DEFAULT_PARAMS = {
+    WITH: ''
+  }
   constructor(settings: Settings, tools: Tools, command: I.TextReplaceCommand) {
-    super(settings, tools, command)
+    super(settings, tools, command, ReplaceCommand.DEFAULT_PARAMS)
   }
 
   stream(payload: Stream.Payload) {

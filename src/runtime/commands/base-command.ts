@@ -2,17 +2,32 @@ import * as Rx from 'rxjs'
 import * as ops from 'rxjs/operators'
 import { RuntimeBase } from '@scrape-pages/runtime/runtime-base'
 // type imports
-import { Settings, Tools, Stream } from '@scrape-pages/types/internal'
+import { TypeUtils, Settings, Tools, Stream } from '@scrape-pages/types/internal'
 import * as I from '@scrape-pages/types/instructions'
 
-abstract class BaseCommand extends RuntimeBase {
-  protected LABEL: string
+type OrUndefined<T> = { [K in keyof T]: T[K] | undefined }
+type RequiredField<T> = OrUndefined<Required<T>>
+type ParamDefaultsGeneric<T> = Omit<RequiredField<Pick<T, TypeUtils.OptionalKeys<T>>>, 'LABEL'>
 
-  constructor(protected settings: Settings, protected tools: Tools, protected command: I.Command) {
+type Merge<A extends object, B extends object> = { [K in keyof A & keyof B]: A[K] | B[K] }
+
+abstract class BaseCommand<
+  Command extends I.Command,
+  ParamDefaults extends ParamDefaultsGeneric<I.Command['params']>
+> extends RuntimeBase {
+  protected commandId: Stream.Id
+  protected params: Merge<Required<Command['params']>, ParamDefaults & { LABEL: undefined }>
+
+  constructor(
+    protected settings: Settings,
+    protected tools: Tools,
+    protected command: Command,
+    // defaultParams is a wider type than ParamDefaults because we cannot trust ParamDefaults to enforce the proper types
+    defaultParams: ParamDefaultsGeneric<Command['params']>
+  ) {
     super('Command')
     super.name = this.constructor.name
-    if (this.command.params.LABEL) this.LABEL = this.command.params.LABEL
-    else this.LABEL = 'placeholder' // TODO randomly generate a non-clashing string label
+    this.params = { LABEL: undefined, ...defaultParams, ...(this.command.params as any) }
   }
 
   // were pushing the responsibility of db writes up here because fetch is very different than parse & regex
@@ -29,6 +44,17 @@ abstract class BaseCommand extends RuntimeBase {
 
     return Rx.from(values).pipe(ops.flatMap(promise => promise))
   }
+
+  async initialize() {
+    this.commandId = this.tools.store.qs.insertCommand(this.command.params.LABEL)
+    super.initialize()
+  }
 }
 
-export { BaseCommand }
+type AnyCommand = BaseCommand<I.Command, I.Command['params']>
+
+export {
+  BaseCommand,
+  // type exports
+  AnyCommand
+}

@@ -20,14 +20,21 @@ type ReadInfo = { bytes: number; value: string; filename: null }
 type WriteInfo = { bytes: number; value: null; filename: string }
 type DownloadInfoWithValue = Stream.DownloadInfo & { value: string }
 
-class FetchCommand extends BaseCommand {
-  protected command: I.HttpCommand
+class FetchCommand extends BaseCommand<I.HttpCommand, typeof FetchCommand.DEFAULT_PARAMS> {
+  private static DEFAULT_PARAMS = {
+    METHOD: 'GET' as 'GET',
+    HEADERS: {},
+    READ: true,
+    WRITE: false,
+    CACHE: false,
+    PRIORITY: -1
+  }
   private folder: string
   private urlTemplate: templates.Template
   private headerTemplates: FMap<string, templates.Template>
 
   constructor(settings: Settings, tools: Tools, command: I.HttpCommand) {
-    super(settings, tools, command)
+    super(settings, tools, command, FetchCommand.DEFAULT_PARAMS)
     const { URL, HEADERS = {} } = command.params
     this.urlTemplate = templates.compileTemplate(URL)
     this.headerTemplates = FMap.fromObject(HEADERS).map(templates.compileTemplate)
@@ -37,13 +44,16 @@ class FetchCommand extends BaseCommand {
     // check cache or write to cache (transactional)
     // write queued command output to db (we need this because we need an id inside here)
     // create url, create headers
-    const { PRIORITY = -1 } = this.command.params
+    const { LABEL, PRIORITY } = this.params
+    // const { LABEL, PRIORITY } = this.params
     const url = this.urlTemplate(payload)
     const headers = this.headerTemplates.map(template => template(payload)).toObject()
-    const id = -1 // TODO add database initial write
-    // TODO add atomic caching and database caching of this.fetch
+    const id = this.tools.store.qs.insertIncompleteValue(this.commandId, payload, 0)
     const task = () => this.fetch(url, headers, id)
-    const { bytes, value } = await this.tools.queue.push(task, PRIORITY)
+    const cacheId = undefined // TODO add atomic caching and database caching of this.fetch
+    const { bytes, filename, value } = await this.tools.queue.push(task, PRIORITY)
+    const newPayload = payload.merge({ value, id })
+    this.tools.store.qs.updateValue(cacheId, newPayload)
     this.tools.notify.commandSucceeded(this.command.command, { id })
     // write completed to db
     return [payload.set('value', 'wee')]
@@ -54,7 +64,7 @@ class FetchCommand extends BaseCommand {
     headers: { [headerName: string]: string },
     id: number
   ): Promise<DownloadInfoWithValue> {
-    const { READ, WRITE, METHOD } = this.command.params
+    const { READ, WRITE, METHOD } = this.params
 
     const response = await fetch(url, { method: METHOD, headers: headers })
     if (!response.ok) throw new ResponseError(response, url)
@@ -85,7 +95,7 @@ class FetchCommand extends BaseCommand {
     const buffer: Buffer = await new Promise((resolve, reject) => {
       response.body.on('error', error => reject(error))
       response.body.on('data', chunk => buffers.push(chunk))
-      response.body.on('close', () => resolve(Buffer.concat(buffers)))
+      response.body.on('end', () => resolve(Buffer.concat(buffers)))
     })
     const value = buffer.toString()
     const bytes = Buffer.byteLength(value)
@@ -105,12 +115,12 @@ class FetchCommand extends BaseCommand {
     return { filename, bytes: dest.bytesWritten, value: null }
   }
 
-  async initialize(folder: string) {
-    this.folder = path.resolve(folder, this.LABEL)
-
+  async initialize() {
     if (this.command.params.WRITE) {
       await fs.mkdirp(this.folder)
     }
+    super.initialize()
+    this.folder = path.resolve(this.settings.folder, this.commandId.toString())
   }
   async cleanup() {
     // cancel in-flight requests here

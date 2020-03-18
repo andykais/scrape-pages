@@ -69,6 +69,7 @@ interface ParseCommand {
   params: {
     LABEL?: string
     SELECTOR: string
+    FORMAT?: 'html' | 'xml' | 'json'
     ATTR?: string
     MAX?: number
   }

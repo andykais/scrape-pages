@@ -36,7 +36,6 @@ function loop(
           await new Promise((resolve, reject) => {
             sourceSubscriber = source.subscribe({
               next(v) {
-                console.log('next please')
                 observer.next(v)
                 calledNext = true
               },
@@ -44,7 +43,6 @@ function loop(
                 reject(error)
               },
               complete() {
-                console.log('complete please')
                 if (!calledNext) consecutiveEmtpyPipes++
                 else consecutiveEmtpyPipes = 0
                 if (consecutiveEmtpyPipes > SENSIBLE_MAX_EMPTY_LOOPS)
