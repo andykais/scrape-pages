@@ -1,10 +1,11 @@
 import { Sqlite3 } from '@scrape-pages/types/internal'
 import { CreateTables } from './create-tables'
-import { InsertIncompleteValue } from './insert-incomplete-value'
 import { InsertCommand } from './insert-command'
-import { InsertValue } from './insert-value'
 import { UpdateValue } from './update-value'
 import { SelectOrderedLabeledValues } from './select-ordered-labeled-values'
+import { InsertValue } from './insert-value'
+import { InsertQueuedNetworkRequest } from './insert-queued-network-request'
+import { UpdateNetworkRequestStatus } from './update-network-request-status'
 
 type Queries = ReturnType<typeof createStatements>
 function createStatements(database: Sqlite3.Database) {
@@ -12,10 +13,12 @@ function createStatements(database: Sqlite3.Database) {
   createTables.call()
 
   return {
-    insertIncompleteValue: new InsertIncompleteValue(database).call,
     insertCommand: new InsertCommand(database).call,
-    updateValue: new UpdateValue(database).call,
-    selectOrderedLabeledValues: new SelectOrderedLabeledValues(database).call
+    // updateValue: new UpdateValue(database).call,
+    selectOrderedLabeledValues: new SelectOrderedLabeledValues(database).call,
+    insertValue: new InsertValue(database).call,
+    insertQueuedNetworkRequest: new InsertQueuedNetworkRequest(database).call,
+    updateNetworkRequestStatus: new UpdateNetworkRequestStatus(database).call
   }
 }
 

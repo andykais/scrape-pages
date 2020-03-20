@@ -30,6 +30,7 @@
   "devDependencies": {
     "@types/better-sqlite3": "^5.4.0",
     "@types/chai": "^4.2.10",
+    "@types/cheerio": "^0.22.16",
     "@types/mocha": "^7.0.1",
     "@types/nearley": "^2.11.1",
     "@types/node": "^13.7.7",

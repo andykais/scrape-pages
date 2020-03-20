@@ -14,27 +14,27 @@ function findLowestDepth(instructions: Instructions, labels: string[]) {
 const template = (labels: string[], instructions: Instructions) => sql`
 WITH cte as (
   SELECT
-    commands.id as commandId,
-    crawlerTree.complete,
     crawlerTree.value,
     crawlerTree.parentTreeId,
     crawlerTree.operatorIndex,
     crawlerTree.valueIndex,
     0 as recurseDepth,
+    crawlerTree.networkRequestId,
+    commands.id as commandId,
     commands.label
   FROM commands
   INNER JOIN crawlerTree ON crawlerTree.commandId = commands.id
   WHERE commands.label in (${getSelectedLabelsSql(labels)}) -- TODO can I swap the order here?
   UNION ALL
   SELECT
-    parentEntries.id as commandId,
+    cte.value,
     parentEntries.parentTreeId,
     parentEntries.operatorIndex,
     parentEntries.valueIndex,
     cte.recurseDepth + 1,
-    cte.label,
-    cte.complete,
-    cte.value
+    cte.networkRequestId,
+    cte.commandId,
+    cte.label
   FROM cte
   INNER JOIN crawlerTree as parentEntries
   ON ${getWaitingJoinsSql(instructions, labels)} = parentEntries.id
@@ -45,11 +45,14 @@ WITH cte as (
     operatorIndex
 )
 SELECT
-  cte.commandId,
+  cte.label, -- TODO this should probably be a INNER JOIN instead of something we carry down
   cte.label,
   cte.value,
-  cte.complete
+  networkRequests.filename,
+  networkRequests.byteLength,
+  networkRequests.status
 FROM cte
+LEFT JOIN networkRequests ON cte.networkRequestId = networkRequests.id
 -- WHERE recurseDepth = ${findLowestDepth(instructions, labels).toString()}
 ORDER BY
   recurseDepth,
@@ -64,10 +67,12 @@ type SelectedRow = {
   // downloadData: string | null
   // filename: string | null
   // byteLength: string | null
-  complete: number
+  // status: string
 }
 
 class SelectOrderedLabeledValues extends Query {
+  // TODO maybe we accept commandIds instead of labels?
+  // TODO we want to pass in some sort of flattened structure that describes the commands
   public call = (instructions: Instructions, labels: string[]) => {
     const templateStr = template(labels, instructions)
     const statement = this.database.prepare(template(labels, instructions))

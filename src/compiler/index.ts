@@ -75,7 +75,7 @@ class Compiler {
   }
 
   // compile program
-  private compileFlow(program: Program): Stream.Operation {
+  private compileFlow = (program: Program): Stream.Operation => {
     const operations: Stream.Operation[] = program.map(operation => {
       switch (operation.operator) {
         case 'init':

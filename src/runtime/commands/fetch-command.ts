@@ -29,7 +29,7 @@ class FetchCommand extends BaseCommand<I.HttpCommand, typeof FetchCommand.DEFAUL
     CACHE: false,
     PRIORITY: -1
   }
-  private folder: string
+  private writeFolder: string
   private urlTemplate: templates.Template
   private headerTemplates: FMap<string, templates.Template>
 
@@ -48,15 +48,19 @@ class FetchCommand extends BaseCommand<I.HttpCommand, typeof FetchCommand.DEFAUL
     // const { LABEL, PRIORITY } = this.params
     const url = this.urlTemplate(payload)
     const headers = this.headerTemplates.map(template => template(payload)).toObject()
-    const id = this.tools.store.qs.insertIncompleteValue(this.commandId, payload, 0)
-    const task = () => this.fetch(url, headers, id)
-    const cacheId = undefined // TODO add atomic caching and database caching of this.fetch
+    const requestId = this.tools.store.qs.insertQueuedNetworkRequest(this.commandId, '')
+    const task = () => this.fetch(url, headers, requestId)
+    // const cacheId = undefined // TODO add in memory caching and database caching of this.fetch
     const { bytes, filename, value } = await this.tools.queue.push(task, PRIORITY)
+    // insert completed value
+    // TODO this can move to the base command now (because the only queued stuff is the network rows)
+    const id = this.tools.store.qs.insertValue(this.commandId, payload, 0, value, requestId)
     const newPayload = payload.merge({ value, id })
-    this.tools.store.qs.updateValue(cacheId, newPayload)
+    // TODO wrap this in a try/catch and write a FAILED status
+    this.tools.store.qs.updateNetworkRequestStatus(requestId, value, filename, bytes, 'COMPLETE')
     this.tools.notify.commandSucceeded(this.command.command, { id })
     // write completed to db
-    return [payload.set('value', 'wee')]
+    return [newPayload]
   }
 
   private async fetch(
@@ -103,7 +107,7 @@ class FetchCommand extends BaseCommand<I.HttpCommand, typeof FetchCommand.DEFAUL
   }
 
   private async write(response: Fetch.Response, url: string, id: number): Promise<WriteInfo> {
-    const filename = path.resolve(this.folder, id.toString() + path.extname(url))
+    const filename = path.resolve(this.writeFolder, id.toString() + path.extname(url))
     const dest = createWriteStream(filename)
 
     await new Promise((resolve, reject) => {
@@ -116,11 +120,11 @@ class FetchCommand extends BaseCommand<I.HttpCommand, typeof FetchCommand.DEFAUL
   }
 
   async initialize() {
-    if (this.command.params.WRITE) {
-      await fs.mkdirp(this.folder)
-    }
     super.initialize()
-    this.folder = path.resolve(this.settings.folder, this.commandId.toString())
+    this.writeFolder = path.resolve(this.settings.folder, this.commandId.toString())
+    if (this.command.params.WRITE) {
+      await fs.mkdirp(this.writeFolder)
+    }
   }
   async cleanup() {
     // cancel in-flight requests here

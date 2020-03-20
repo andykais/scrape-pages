@@ -6,7 +6,7 @@ class RuntimeBase {
   public async initialize(): Promise<void> {
     this[INITIALIZED] = true
   }
-  protected isInitialized = () => this[INITIALIZED]
+  public isInitialized = () => this[INITIALIZED]
   public mustBeInitialized() {
     if (!this[INITIALIZED])
       throw new Error(`${this.name} must be initialized before calling this method.`)

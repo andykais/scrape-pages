@@ -7,28 +7,33 @@ INSERT INTO crawlerTree (
   parentTreeId,
   operatorIndex,
   valueIndex,
-  value
-  complete
-) VALUES (?, ?, ?, ?, ?, 1)
+  value,
+  networkRequestId
+) VALUES (?, ?, ?, ?, ?, ?)
 `
 
 class InsertValue extends Query {
   protected static template = template
   protected statement: Sqlite3.Statement
 
-  public call = (downloadId: number, parentPayload: Stream.Payload, valueIndex: number) => {
-    console.log({
-      downloadId,
-      parentPayload,
-      valueIndex
-    })
+  public call = (
+    commandId: number,
+    parentPayload: Stream.Payload,
+    valueIndex: number,
+    value: string,
+    requestId?: number
+  ) => {
+    // -1 is special because it comes from the 'fake' initialValue
+    const parentId = parentPayload.id === -1 ? null : parentPayload.id
     const info = this.statement.run(
-      downloadId,
-      parentPayload.id,
+      commandId,
+      parentId,
       parentPayload.operatorIndex,
-      valueIndex
+      valueIndex,
+      value,
+      requestId
     )
-    return info.lastInsertRowid
+    return info.lastInsertRowid as number
   }
 }
 

@@ -19,31 +19,29 @@ CREATE TABLE crawlerTree (
   parentTreeId INT,
   operatorIndex INT NOT NULL, -- index that represents either a .reduce() or .loop() index
   valueIndex INT NOT NULL, -- index that represents the index of a value in a command output
-  value TEXT, -- it is only empty while an incomplete command is in progress
-  cacheId INT,
-  complete BIT DEFAULT (0) NOT NULL,
+  value TEXT NOT NULL, -- it is only empty while an incomplete command is in progress
+  networkRequestId INT,
   FOREIGN KEY (parentTreeId) REFERENCES crawlerTree(id),
-  FOREIGN KEY (cacheId) REFERENCES networkCache(id),
+  FOREIGN KEY (networkRequestId) REFERENCES networkRequests(id),
   FOREIGN KEY (commandId) REFERENCES commands(id)
 );
 
 -- this table is only written to when cache:true
-CREATE TABLE networkCache (
+CREATE TABLE networkRequests (
   id INTEGER PRIMARY KEY NOT NULL,
-  commandId INT NOT NULL,
-  protocol TEXT NOT NULL,
-  downloadData TEXT NOT NULL,
-  downloadValue TEXT NOT NULL,
+  commandId INT NOT NULL, -- this exists purely for debugging...I think
+  requestParams TEXT NOT NULL,
+  responseValue TEXT,
   mimeType TEXT,
   filename TEXT,
   byteLength TEXT,
-  failed BIT DEFAULT (0) NOT NULL
+  status BIT NOT NULL --  QUEUED:0, COMPLETE:1, FAILED:2
 );
 
 -- TODO use these indexes?
 CREATE UNIQUE INDEX IF NOT EXISTS crawlerValueId ON crawlerTree(id);
 CREATE        INDEX IF NOT EXISTS indexes ON crawlerTree(commandId);
-CREATE UNIQUE INDEX IF NOT EXISTS indexes ON networkCache(downloadData);
+CREATE UNIQUE INDEX IF NOT EXISTS indexes ON networkRequests(requestParams);
 
 COMMIT;
 `

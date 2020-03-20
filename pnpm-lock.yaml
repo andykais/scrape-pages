@@ -12,6 +12,7 @@ dependencies:
 devDependencies:
   '@types/better-sqlite3': 5.4.0
   '@types/chai': 4.2.10
+  '@types/cheerio': 0.22.16
   '@types/mocha': 7.0.2
   '@types/nearley': 2.11.1
   '@types/node': 13.9.0
@@ -85,6 +86,12 @@ packages:
     dev: true
     resolution:
       integrity: sha512-TlWWgb21+0LdkuFqEqfmy7NEgfB/7Jjux15fWQAh3P93gbmXuwTM/vxEdzW89APIcI2BgKR48yjeAkdeH+4qvQ==
+  /@types/cheerio/0.22.16:
+    dependencies:
+      '@types/node': 13.9.0
+    dev: true
+    resolution:
+      integrity: sha512-bSbnU/D4yzFdzLpp3+rcDj0aQQMIRUBNJU7azPxdqMpnexjUSvGJyDuOBQBHeOZh1mMKgsJm6Dy+LLh80Ew4tQ==
   /@types/color-name/1.1.1:
     dev: true
     resolution:
@@ -5108,6 +5115,7 @@ packages:
 specifiers:
   '@types/better-sqlite3': ^5.4.0
   '@types/chai': ^4.2.10
+  '@types/cheerio': ^0.22.16
   '@types/mocha': ^7.0.1
   '@types/nearley': ^2.11.1
   '@types/node': ^13.7.7
