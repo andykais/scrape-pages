@@ -1,7 +1,7 @@
 const once = <V>(fn: (...args: any[]) => V) => (...args: any[]): V => {
   let calledOnce = false
   let result: V
-  if (calledOnce) {
+  if (!calledOnce) {
     result = fn(...args)
     calledOnce = true
   }

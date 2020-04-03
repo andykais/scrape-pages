@@ -47,7 +47,7 @@ module.exports = {
         loader: 'ts-loader',
         options: {
           getCustomTransformers: program => ({
-            before: [typescriptIsTransformer(program)]
+            before: [typescriptIsTransformer(program, { ignoreFunctions: true, ignoreMethods: true, disallowSuperfluousObjectProperties: true })]
           })
         }
       },

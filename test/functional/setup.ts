@@ -16,13 +16,13 @@ class FunctionalTestSetup {
     this.mockFolder = `${testDirname}/fixtures`
   }
 
-  beforeEachCommon = async () => {
+  beforeEach = async () => {
     await rmrf(this.outputFolder)
     this.siteMock = new HttpFolderMock(this.mockFolder, this.mockHost)
     await this.siteMock.init()
   }
 
-  afterEachCommon = () => {
+  afterEach = () => {
     this.siteMock.done()
   }
 

@@ -53,6 +53,9 @@ class ScraperProgram extends EventEmitter {
   private fromExistingFolder: boolean
   private runtime: ScraperProgramRuntime
   private folder: string
+  // we only track completes, if an error is emitted without anyone watching for it, we get an uncaught
+  // exception. This is better
+  private completed: boolean
   /**
    * @name query
    * @description query for tagged items in the database
@@ -64,7 +67,8 @@ class ScraperProgram extends EventEmitter {
   public constructor(input: string | Instructions, folder: string, options: Options) {
     super()
     // if its a string, compile it using the dsl-parser
-    const instructions = typeof input === 'string' ? dslParser(input) : input
+    const instructions =
+      typeof input === 'string' ? dslParser(input) : JSON.parse(JSON.stringify(input))
     // TODO validate that tag & input slugs do not equal 'value', 'index', 'request'
     const settings: Settings = { instructions, folder, options }
     this.runtime = new ScraperProgramRuntime(settings, this)
@@ -73,6 +77,7 @@ class ScraperProgram extends EventEmitter {
 
     this.on('stop', this.stop)
     this.on('useRateLimiter', this.toggleRateLimiter)
+    this.on('done', () => (this.completed = true))
   }
 
   /**
@@ -132,6 +137,7 @@ class ScraperProgram extends EventEmitter {
    * @description convienience method returns a promise that resolves on the 'done' event
    */
   public toPromise(): Promise<void> {
+    if (this.completed) return Promise.resolve()
     return new Promise((resolve, reject) => {
       this.on('done', resolve)
       this.on('error', reject)

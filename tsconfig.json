@@ -14,12 +14,19 @@
     "target": "es2017",
     "resolveJsonModule": true,
     "esModuleInterop": true,
+    "stripInternal": true,
     "baseUrl": ".",
     "paths": {
       "@scrape-pages": ["src/index"],
       "@scrape-pages/*": ["src/*"],
       "@test/*": ["test/*"]
-    }
+    },
+    "plugins": [
+      {
+        "ignoreFunctions": true,
+        "ignoreMethods": true
+      }
+    ]
   },
   "include": ["src/**/*.ts", "test/**/*.ts"]
 }

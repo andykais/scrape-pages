@@ -2,6 +2,7 @@
 import { FunctionalTestSetup } from '@test/functional/setup'
 
 import { ScraperProgram } from '@scrape-pages'
+import { queryExecutionDebugger } from '@test/query-debugger'
 
 const TEST_NAME = 'looping'
 const testEnv = new FunctionalTestSetup(TEST_NAME, __dirname)
@@ -10,10 +11,10 @@ const testEnv = new FunctionalTestSetup(TEST_NAME, __dirname)
 // it might be difficult to say "loop 5 times and ignore request failures"
 const instructions = `
 ().loop(
-  FETCH '${testEnv.mockHost}/gallery/page/{{"+" index 1}}.html'
+  FETCH '${testEnv.mockHost}/gallery/page/{{"+" index 1}}.html' LABEL='gallery-get'
+).until('{{ index }}' == 2).map(
   PARSE 'li > a' ATTR='href' LABEL='gallery'
-).until('{{ index }}' == 1).map(
-  FETCH '${testEnv.mockHost}{{ value }}'
+  FETCH '${testEnv.mockHost}{{ value }}' LABEL='post'
 ).branch(
   (
     PARSE '#tags > li' LABEL='tag'
@@ -27,15 +28,33 @@ const instructions = `
 const options = {}
 
 describe(__filename, () => {
-  beforeEach(testEnv.beforeEachCommon)
-  afterEach(testEnv.afterEachCommon)
+  beforeEach(testEnv.beforeEach)
+  afterEach(testEnv.afterEach)
 
-  it('should run an instruction set', async () => {
+  it('should be able to init a scraper twice', async () => {
     const scraper = new ScraperProgram(instructions, testEnv.outputFolder, options)
     scraper.start(testEnv.outputFolder)
     await scraper.toPromise()
-    const result = scraper.query(['tag', 'image'], { groupBy: 'gallery' })
-    const { inspect } = require('util')
-    console.log(inspect(result, { depth: null, colors: true }))
+
+    await scraper.start(testEnv.outputFolder)
+    scraper.stop()
+    await scraper.toPromise()
+
+    const scraper2 = new ScraperProgram(instructions, testEnv.outputFolder, options)
+    const result = scraper2.query(['tag'])
+  })
+  it('should run an instruction set', async function(...args: any[]) {
+    const scraper = new ScraperProgram(instructions, testEnv.outputFolder, options)
+    scraper.start(testEnv.outputFolder)
+    await scraper.toPromise()
+    const result = scraper.query(['image', 'tag', 'post'], {
+      inspector: queryExecutionDebugger(
+        ['label', 'currentCommandLabel', 'requestParams', 'value', 'recurseDepth'],
+        this
+      )
+    })
+    // console.log(result)
+    // const { inspect } = require('util')
+    // console.log(inspect(result, { depth: null, colors: true }))
   })
 })

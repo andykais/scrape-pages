@@ -3,8 +3,10 @@ import { sql, Query } from './query-base'
 const template = sql`
 BEGIN TRANSACTION;
 
--- We delete the tree each time. Because adding more cache logic is a pain and rewalking the tree is cheap.
+-- We delete the tree each time we start the scraper because adding more cache logic is a pain and rewalking the tree is cheap.
 -- downloadCache remains 'cached' though, so we do not reuse bandwidth unnecessarily
+-- We also delete commands. It means technically you could completely change the instructions and this would chug along fine. The only thing that is reused is the cache
+DROP TABLE IF EXISTS commands;
 DROP TABLE IF EXISTS crawlerTree;
 
 CREATE TABLE commands (
@@ -27,7 +29,7 @@ CREATE TABLE crawlerTree (
 );
 
 -- this table is only written to when cache:true
-CREATE TABLE networkRequests (
+CREATE TABLE IF NOT EXISTS networkRequests (
   id INTEGER PRIMARY KEY NOT NULL,
   commandId INT NOT NULL, -- this exists purely for debugging...I think
   requestParams TEXT NOT NULL,
@@ -39,6 +41,7 @@ CREATE TABLE networkRequests (
 );
 
 -- TODO use these indexes?
+CREATE UNIQUE INDEX IF NOT EXISTS commandLabel   ON commands(label);
 CREATE UNIQUE INDEX IF NOT EXISTS crawlerValueId ON crawlerTree(id);
 CREATE        INDEX IF NOT EXISTS indexes ON crawlerTree(commandId);
 CREATE UNIQUE INDEX IF NOT EXISTS indexes ON networkRequests(requestParams);

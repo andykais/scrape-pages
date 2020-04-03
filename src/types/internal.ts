@@ -4,7 +4,10 @@ import BetterSqlite3 from 'better-sqlite3'
 import * as tools from '@scrape-pages/runtime/tools'
 import { Instructions } from './instructions'
 import { Options } from './options'
-import { SelectedRow as OrderedValuesRow } from '@scrape-pages/runtime/tools/store-tool/queries/select-ordered-labeled-values'
+import {
+  SelectedRow as OrderedValuesRow,
+  SelectedRowWithDebug as OrderedValuesRowWithDebug
+} from '@scrape-pages/runtime/tools/store-tool/queries/select-ordered-labeled-values'
 
 interface Settings {
   instructions: Instructions
@@ -20,7 +23,7 @@ type Tools = {
 
 namespace TypeUtils {
   export type ArgumentTypes<F extends Function> = F extends (...args: infer A) => any ? A : never
-  export type OptionalKeys<T> = { [k in keyof T]-?: undefined extends T[k] ? k : never }[keyof T];
+  export type OptionalKeys<T> = { [k in keyof T]-?: undefined extends T[k] ? k : never }[keyof T]
 }
 
 namespace Sqlite3 {
@@ -29,17 +32,15 @@ namespace Sqlite3 {
 }
 
 namespace Querier {
-  export type DebuggerInspector = (
-    database: tools.Store,
-    instructions: Instructions,
-    labels: string[]
-  ) => void
+  export type DebuggerInspector = (rows: QueryResultWithDebug) => void
 
   export type Labels = string[]
-  export type QueryApiOptions = { groupBy?: string; debugger?: DebuggerInspector }
+  // IF so desired, multi-level grouping could be accomplished. Though its hard to know if that adds value
+  export type QueryApiOptions = { groupBy?: string; inspector?: DebuggerInspector }
 
   export type OrderedValuesGroup = { [scraperName: string]: OrderedValuesRow[] }
   export type QueryResult = OrderedValuesGroup[]
+  export type QueryResultWithDebug = OrderedValuesRowWithDebug[]
   /**
    * scraper querying interface.
    */

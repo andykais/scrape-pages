@@ -33,10 +33,13 @@ class Store extends RuntimeBase {
     return this._transaction
   }
 
-  public async initialize() {
+  public async initialize({ initializeTables = true } = {}) {
     this.database = new Sqlite3(Store.getSqliteFile(this.settings.folder))
     this.database.pragma('journal_mode = WAL')
 
+    if (initializeTables) {
+      queries.initializeTables(this.database)
+    }
     this._qs = queries.createStatements(this.database)
     this._transaction = this.database.transaction.bind(this.database)
     super.initialize()

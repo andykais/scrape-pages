@@ -52,6 +52,8 @@ type Template = string
 
 interface HttpCommand {
   command: 'FETCH'
+  /** @internal */
+  databaseId?: number
   params: {
     LABEL?: string
     METHOD?: 'GET' | 'PUT' | 'POST' | 'DELETE'
@@ -66,6 +68,8 @@ interface HttpCommand {
 
 interface ParseCommand {
   command: 'PARSE'
+  /** @internal */
+  databaseId?: number
   params: {
     LABEL?: string
     SELECTOR: string
@@ -77,6 +81,8 @@ interface ParseCommand {
 
 interface TextReplaceCommand {
   command: 'REPLACE'
+  /** @internal */
+  databaseId?: number
   params: {
     LABEL?: string
     SELECTOR: string

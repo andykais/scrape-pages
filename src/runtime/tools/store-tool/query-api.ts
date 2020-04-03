@@ -9,11 +9,17 @@ import * as typechecking from '@scrape-pages/types/runtime-typechecking'
 import { Querier } from '@scrape-pages/types/internal'
 
 class QuerierApi {
+  // I believe I also need the command instances (with depths)
   public constructor(private database: Store, private settings: Settings) {}
 
   public prepare: Querier.Interface['prepare'] = (labels, options = {}) => {
+    // separating out functions from serializable properties.
+    // TODO report on the prior issue: https://github.com/woutervh-/typescript-is/issues/50
+    const { inspector, ...typecheckableOptions } = options
     typechecking.typecheckQueryApiLabels(labels)
-    typechecking.typecheckQueryApiOptions(options)
+    typechecking.typecheckQueryApiOptions(typecheckableOptions)
+
+    const { instructions } = this.settings
 
     // we initialize the database from inside this folder so we can use the querier without giving it an initialize function the user needs to call
     // we reuse the store created by ScraperProgram, so this should always be true
@@ -22,11 +28,15 @@ class QuerierApi {
     labels = labels.filter(label => true)
 
     const includeGroupByRow = options.groupBy && labels.includes(options.groupBy)
-    const allLabels = options.groupBy ? labels.concat(options.groupBy) : labels
-    const stmt = this.database.qs.selectOrderedLabeledValues(this.settings.instructions, allLabels)
+    const selectedLabels = options.groupBy ? labels.concat(options.groupBy) : labels
+    const commandLabels = this.database.qs.selectCommands() // itd be nice if we could call this from selectOrderedLabeledValues directly
+    const stmt = this.database.qs.selectOrderedLabeledValues(instructions, selectedLabels, commandLabels, false)
 
-    return (): Querier.QueryResult => {
-      if (options.debugger) options.debugger(this.database, this.settings.instructions, allLabels)
+    return () => {
+      if (options.inspector) {
+        const debugStmt = this.database.qs.selectOrderedLabeledValues(instructions, selectedLabels, commandLabels, true)
+        options.inspector(debugStmt())
+      }
 
       const rows = stmt()
       const result: Querier.QueryResult = []
@@ -35,7 +45,8 @@ class QuerierApi {
       for (const row of rows) {
         const isGroupByRow = row.label === options.groupBy
         if (includeGroupByRow || !isGroupByRow) {
-          group[row.label].push(row)
+          if (row.label in group) group[row.label].push(row)
+          else group[row.label] = [row]
           pushedValuesInGroup = true
         }
         if (isGroupByRow) {
@@ -53,7 +64,7 @@ class QuerierApi {
   private initialize = () => {
     if (Store.databaseIsInitialized(this.settings.folder)) {
       // we could already be initialized if .start() was called on this same runtime instance
-      if (!this.database.isInitialized) this.database.initialize()
+      if (!this.database.isInitialized()) this.database.initialize({ initializeTables: false })
     } else {
       // prettier-ignore
       throw new Error(`There is no database at '${this.settings.folder}'. The scraper must be ran at least once bfore querying from the database.`)

@@ -44,14 +44,19 @@ class FetchCommand extends BaseCommand<I.HttpCommand, typeof FetchCommand.DEFAUL
     // check cache or write to cache (transactional)
     // write queued command output to db (we need this because we need an id inside here)
     // create url, create headers
-    const { LABEL, PRIORITY } = this.params
+    const { LABEL, PRIORITY, METHOD } = this.params
     // const { LABEL, PRIORITY } = this.params
     const url = this.urlTemplate(payload)
     const headers = this.headerTemplates.map(template => template(payload)).toObject()
-    const requestId = this.tools.store.qs.insertQueuedNetworkRequest(this.commandId, '')
-    const task = () => this.fetch(url, headers, requestId)
+    const requestParams = { url, headers, method: METHOD }
+    const requestId = this.tools.store.qs.insertQueuedNetworkRequest(
+      this.commandId,
+      JSON.stringify(requestParams)
+    )
+    const task = () => this.fetch(requestParams, requestId)
     // const cacheId = undefined // TODO add in memory caching and database caching of this.fetch
     const { bytes, filename, value } = await this.tools.queue.push(task, PRIORITY)
+
     // insert completed value
     // TODO this can move to the base command now (because the only queued stuff is the network rows)
     const id = this.tools.store.qs.insertValue(this.commandId, payload, 0, value, requestId)
@@ -64,13 +69,16 @@ class FetchCommand extends BaseCommand<I.HttpCommand, typeof FetchCommand.DEFAUL
   }
 
   private async fetch(
-    url: string,
-    headers: { [headerName: string]: string },
+    { url, headers, method }: {
+      url: string
+      headers: { [headerName: string]: string }
+      method: string
+    },
     id: number
   ): Promise<DownloadInfoWithValue> {
     const { READ, WRITE, METHOD } = this.params
 
-    const response = await fetch(url, { method: METHOD, headers: headers })
+    const response = await fetch(url, { method, headers })
     if (!response.ok) throw new ResponseError(response, url)
 
     // if progress listeners, add progress emitter
@@ -121,6 +129,7 @@ class FetchCommand extends BaseCommand<I.HttpCommand, typeof FetchCommand.DEFAUL
 
   async initialize() {
     super.initialize()
+    console.log(this.commandId)
     this.writeFolder = path.resolve(this.settings.folder, this.commandId.toString())
     if (this.command.params.WRITE) {
       await fs.mkdirp(this.writeFolder)

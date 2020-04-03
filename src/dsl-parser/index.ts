@@ -9,7 +9,10 @@ function dslParser(input: string): Instructions {
   parser.feed(input)
   const results = parser.finish()
 
-  if (results.length !== 1) {
+  console.log(results)
+  if (results.length === 0) {
+    throw new Error('Grammar parsed incorrectly')
+  } else if (results.length !== 1) {
     throw new Error('Grammar parsed ambiguously')
   } else {
     const [ast] = results

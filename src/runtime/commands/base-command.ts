@@ -47,6 +47,8 @@ abstract class BaseCommand<
 
   async initialize() {
     this.commandId = this.tools.store.qs.insertCommand(this.command.params.LABEL)
+    // look, I dont like this as much as the next guy, but were already here. Its a waste to be immutable just for the sake of it
+    this.command.databaseId = this.commandId
     super.initialize()
   }
 }
