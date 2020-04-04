@@ -9,7 +9,6 @@ function dslParser(input: string): Instructions {
   parser.feed(input)
   const results = parser.finish()
 
-  console.log(results)
   if (results.length === 0) {
     throw new Error('Grammar parsed incorrectly')
   } else if (results.length !== 1) {

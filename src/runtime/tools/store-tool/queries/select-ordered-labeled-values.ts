@@ -7,13 +7,41 @@ import { SelectedRow as CommandLabelRow } from './select-commands'
 function getSelectedLabelsSql(labels: string[]) {
   return labels.map(s => `'${s}'`).join(',')
 }
-function getWaitingJoinsSql(
+
+function getSelectedCommandIdsSql(labels: string[], commands: CommandLabelRow[]) {
+  return commands
+    .filter(c => c.label && labels.includes(c.label))
+    .map(c => c.id)
+    .join(',')
+}
+
+function findFurthestDistanceTraveled(program: I.Program): number {
+  let distanceTraveled = 0
+  const operationsWithWrites = program.filter(p => p.operator !== 'until')
+  for (const operation of operationsWithWrites) {
+    switch (operation.operator) {
+      case 'init':
+      case 'map':
+      case 'loop':
+        distanceTraveled += operation.commands.length
+        break
+      case 'branch':
+        distanceTraveled += operation.programs.reduce(
+          (distance, program) => distance + findFurthestDistanceTraveled(program),
+          0
+        )
+        break
+      default:
+        throw new errors.InternalError(`unknown operation '${operation.operator}'`)
+    }
+  }
+  return distanceTraveled
+}
+function walkInstructions(
   instructions: Instructions,
   commandLabels: CommandLabelRow[],
   labels: string[]
 ) {
-  if (labels.length < 2) return `cte.parentTreeId`
-
   function findLongestLevelTraversal(commandId: number, program: I.Program): [boolean, number] {
     let levelsTraversed = 0
     const operationsWithWrites = program.filter(p => p.operator !== 'until')
@@ -38,16 +66,18 @@ function getWaitingJoinsSql(
           break
         case 'branch':
           // let m = 0
+          let maxDistanceDown = 0
           for (const program of operation.programs) {
             const [commandFound, n] = findLongestLevelTraversal(commandId, program)
             // if (n === -1)
             if (commandFound) return [commandFound, levelsTraversed + n]
-            else levelsTraversed += n
+            else maxDistanceDown = Math.max(maxDistanceDown, n)
             // otherwise Im not sure. We need to figure out branching
           }
+          levelsTraversed += maxDistanceDown
           break
         default:
-          throw new Error(`unknown operation '${operation.operator}'`)
+          throw new errors.InternalError(`unknown operation '${operation.operator}'`)
       }
     }
     return [false, levelsTraversed]
@@ -62,38 +92,39 @@ function getWaitingJoinsSql(
       return { id, maxLevelsTraversed }
     })
 
-  // for (const { id, maxLevelsTraversed } of maxLevelTraversalPerCommand) {
-  //   if (maxLevelsTraversed === -1)
-  //     throw new errors.InternalError(`could not find id ${id} in instructions`)
-  // }
-
-  console.log(maxLevelTraversalPerCommand.map(c => ({ maxLevelsTraversed: c.maxLevelsTraversed, ...commandLabels.find(l => l.id === c.id)})))
-  // console.log(maxLevelTraversalPerCommand)
-
-  const maxLevelsTraversal = Math.max(...maxLevelTraversalPerCommand.map(m => m.maxLevelsTraversed))
+  const maxDistanceFromTop = Math.max(...maxLevelTraversalPerCommand.map(m => m.maxLevelsTraversed))
+  const furthestDistanceTraveled = maxDistanceFromTop //  - 1
 
   const caseJoins = maxLevelTraversalPerCommand
-    .filter(m => m.maxLevelsTraversed !== maxLevelsTraversal) // the deepest depth doesnt need to wait on anybody
+    .filter(m => m.maxLevelsTraversed !== maxDistanceFromTop) // the deepest depth doesnt need to wait on anybody
+    // .filter(m => m.maxLevelsTraversed !== maxDistanceFromTop - 1) // lowest and second lowest commands do not need to wait since they are side by side after the initial select
     .map(m => {
-      const recurseDepthWhenOtherCommandsMeetIt = maxLevelsTraversal - m.maxLevelsTraversed - 1
-      // prettier-ignore
-      return `cte.commandId = ${m.id} AND cte.recurseDepth < ${recurseDepthWhenOtherCommandsMeetIt}`
+      const distanceToFurthestSelectedCommand = furthestDistanceTraveled - m.maxLevelsTraversed
+      return `cte.commandId = ${m.id} AND cte.recurseDepth < ${distanceToFurthestSelectedCommand}`
     })
     .join(' OR ')
 
-  if (caseJoins.length === 0) return `cte.parentTreeId`
+  const caseSorts = maxLevelTraversalPerCommand
+    .filter(m => m.maxLevelsTraversed !== maxDistanceFromTop) // the deepest depth doesnt need to wait on anybody
+    .map(m => {
+      const distanceToFurthestSelectedCommand = furthestDistanceTraveled - m.maxLevelsTraversed
+      // prettier-ignore
+      return `cte.commandId = ${m.id} AND cte.recurseDepth < ${distanceToFurthestSelectedCommand}`
+    })
+    .join(' OR ')
 
-  console.log({ caseJoins })
-  return `CASE WHEN ${caseJoins} THEN cte.id ELSE cte.parentTreeId END`
+  const waitingJoinsSql =
+    caseJoins.length === 0
+      ? 'cte.parentTreeId'
+      : `CASE WHEN ${caseJoins} THEN cte.id ELSE cte.parentTreeId END`
+  const waitingSortSql =
+    caseSorts.length === 0 ? '0' : `CASE WHEN ${caseSorts} THEN cte.commandId ELSE 0 END`
 
-  // TODO we need command ids mapped to instructions. Otherwise we cannot resolve two commands with the same label
-  // we will still input a label, but will walk over it like an array and then map each command id individually
-  // count down to the furthest depth you can go (at branches or reduces we will need to resolve "merging" paths)
-  //
-  return `cte.parentTreeId`
-}
-function findLowestDepth(instructions: Instructions, labels: string[]) {
-  return -1
+  return {
+    waitingJoinsSql,
+    waitingSortSql,
+    furthestDistanceTraveled
+  }
 }
 
 const template = (
@@ -104,6 +135,13 @@ const template = (
 ) => {
   const ifDebugMode = (partialSql: string) => (debugMode ? partialSql : '')
   const unlessDebugMode = (partialSql: string) => (debugMode ? '' : partialSql)
+  const { waitingJoinsSql, waitingSortSql, furthestDistanceTraveled } = walkInstructions(
+    instructions,
+    commandLabels,
+    labels
+  )
+  const selectedCommandIdsSql = getSelectedCommandIdsSql(labels, commandLabels)
+
   return sql`
 WITH cte as (
   SELECT
@@ -114,15 +152,14 @@ WITH cte as (
     crawlerTree.valueIndex,
     0 as recurseDepth,
     crawlerTree.networkRequestId,
-    commands.id as commandId,
-    commands.label,
-    commands.id as currentCommandId
+    crawlerTree.commandId,
+    crawlerTree.commandId as currentCommandId,
+    0 as commandSort
     ${ifDebugMode(`
       , commands.label as currentCommandLabel
     `)}
-  FROM commands
-  INNER JOIN crawlerTree ON crawlerTree.commandId = commands.id
-  WHERE commands.label in (${getSelectedLabelsSql(labels)}) -- TODO can I swap the order here?
+  FROM crawlerTree
+  WHERE crawlerTree.commandId in (${selectedCommandIdsSql}) -- TODO can I swap the order here?
   UNION ALL
   SELECT
     parentEntries.id,
@@ -133,51 +170,49 @@ WITH cte as (
     cte.recurseDepth + 1,
     cte.networkRequestId,
     cte.commandId,
-    cte.label,
-    parentEntries.commandId as currentCommandId
+    parentEntries.commandId as currentCommandId,
+    ${waitingSortSql} as commandSort
     ${ifDebugMode(`
       , commands.label as currentCommandLabel
     `)}
   FROM cte
   INNER JOIN crawlerTree as parentEntries
-  ON ${getWaitingJoinsSql(instructions, commandLabels, labels)} = parentEntries.id
+  ON ${waitingJoinsSql} = parentEntries.id
   ${ifDebugMode(`
     INNER JOIN commands ON parentEntries.commandId = commands.id
   `)}
-  -- WHERE recurseDepth < ${findLowestDepth(instructions, labels)}
   ORDER BY
     recurseDepth,
     valueIndex,
-    operatorIndex
+    operatorIndex,
+    commandSort
 )
 SELECT
-  cte.label, -- TODO this should probably be a INNER JOIN instead of something we carry down
-  cte.label,
   cte.value,
+  cte.commandId,
   networkRequests.filename,
   networkRequests.byteLength,
   networkRequests.status,
   networkRequests.requestParams
   ${ifDebugMode(`
-  , recurseDepth, operatorIndex, valueIndex, currentCommandId, currentCommandLabel
+  , commands.label, recurseDepth, operatorIndex, valueIndex, currentCommandLabel
   `)}
 FROM cte
+${ifDebugMode(`
+  INNER JOIN commands ON commands.id = cte.commandId
+`)}
 LEFT JOIN networkRequests ON cte.networkRequestId = networkRequests.id
 ${unlessDebugMode(`
--- WHERE recurseDepth = ${findLowestDepth(instructions, labels)}
+WHERE cte.recurseDepth = ${furthestDistanceTraveled}
 `)}
--- ORDER BY
---   recurseDepth,
---   operatorIndex,
---   valueIndex
 `
 }
 
 type SelectedRow = {
-  label: string
   id: number
   value?: string
-  // downloadData: string | null
+  commandId: number
+  // networkCache columns
   filename: string | null
   byteLength: string | null
   status: string | null
@@ -185,23 +220,19 @@ type SelectedRow = {
 }
 
 type SelectedRowWithDebug = SelectedRow & {
+  label: string
   requestId: number
   recurseDepth: number
   operatorIndex: number
   valueIndex: number
-  currentCommandId: string // TODO replace with label? It can be done in the sql
   currentCommandLabel: string
 }
 
-// NOTE if the instructions change, your 'prepared' query will be out of wack with the current database.
-// So, if the instructions change, you should prepare new queries.
 class SelectOrderedLabeledValues extends Query {
   constructor(database: Query['database']) {
     super(database)
-    // we cannot assign an anonymous function to `call` because it has overloads
     this.call = this.call.bind(this)
   }
-  // TODO we want to pass in some sort of flattened structure that describes the commands
   public call(
     instructions: Instructions,
     labels: string[],
@@ -210,14 +241,10 @@ class SelectOrderedLabeledValues extends Query {
   ): () => SelectedRow[]
   // prettier-ignore
   public call(instructions: Instructions, labels: string[], commandLabels: CommandLabelRow[], debugMode: true): () => SelectedRowWithDebug[]
-  public call(
-    instructions: Instructions,
-    labels: string[],
-    commandLabels: CommandLabelRow[],
-    debugMode: boolean
-  ) {
+  // prettier-ignore
+  public call( instructions: Instructions, labels: string[], commandLabels: CommandLabelRow[], debugMode: boolean) {
+    if (labels.length === 0) return () => []
     const templateStr = template(labels, instructions, commandLabels, debugMode)
-    // console.log(templateStr)
     const statement = this.database.prepare(templateStr)
     return (): SelectedRow[] => statement.all()
   }
@@ -229,64 +256,3 @@ export {
   SelectedRow,
   SelectedRowWithDebug
 }
-
-sql`
-WITH cte AS (
-  SELECT
-    parsedTree.id,
-    downloads.id as downloadId,
-    downloads.cacheId,
-    downloads.complete,
-    parsedValue,
-    parentId,
-    parseIndex,
-    incrementIndex,
-    0 as recurseDepth,
-    downloads.scraper,
-    parsedTree.scraper AS currentScraper
-  FROM downloads
-  LEFT JOIN parsedTree ON parsedTree.downloadId = downloads.id
-  WHERE downloads.scraper in ({{{ selectedScrapers }}})
-  UNION ALL
-  SELECT
-    pTree.id,
-    cte.downloadId,
-    cte.cacheId,
-    cte.complete,
-    cte.parsedValue,
-    pTree.parentId,
-    pTree.parseIndex,
-    pDownloads.incrementIndex,
-    cte.recurseDepth + 1,
-    cte.scraper,
-    pTree.scraper AS currentScraper
-  FROM cte
-  INNER JOIN parsedTree as pTree
-  ON {{{ waitingJoinsSql }}} = pTree.id
-  INNER JOIN downloads as pDownloads
-  ON pTree.downloadId = pDownloads.id
-  WHERE recurseDepth < {{lowestDepth}} -- this may be a problem, or it may be fine. This prevents extra work past what we calculate the maximum amount of work is
-  ORDER BY
-  recurseDepth, -- recurseDepth ensures that we move from the bottom of the tree to the top
-  parseIndex, -- parseIndex orders by appearance on html/json
-  incrementIndex, -- incrementIndex handles 'incrementUntil'
-  parentId -- parentId handles 'scrapeNext'
-)
-SELECT
-  cte.id,
-  cte.scraper,
-  parsedValue,
-  downloadData, filename, byteLength, complete
-{{#if debugMode}}
-  , downloadId, recurseDepth, incrementIndex, parseIndex, currentScraper
-{{/if}}
-FROM cte
-LEFT JOIN downloadCache ON downloadCache.id = cte.cacheId -- grab additional download information outside of ordering
-{{#unless debugMode}}
-  WHERE recurseDepth = {{lowestDepth}}
-{{/unless}}
-ORDER BY
-  recurseDepth,
-  incrementIndex,
-  parseIndex
-`

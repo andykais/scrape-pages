@@ -129,7 +129,6 @@ class FetchCommand extends BaseCommand<I.HttpCommand, typeof FetchCommand.DEFAUL
 
   async initialize() {
     super.initialize()
-    console.log(this.commandId)
     this.writeFolder = path.resolve(this.settings.folder, this.commandId.toString())
     if (this.command.params.WRITE) {
       await fs.mkdirp(this.writeFolder)

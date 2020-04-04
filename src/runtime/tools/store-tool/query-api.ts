@@ -24,35 +24,65 @@ class QuerierApi {
     // we initialize the database from inside this folder so we can use the querier without giving it an initialize function the user needs to call
     // we reuse the store created by ScraperProgram, so this should always be true
     this.initializeOnce()
-    // TODO filter out labels that do not exist
-    labels = labels.filter(label => true)
 
     const includeGroupByRow = options.groupBy && labels.includes(options.groupBy)
-    const selectedLabels = options.groupBy ? labels.concat(options.groupBy) : labels
+
     const commandLabels = this.database.qs.selectCommands() // itd be nice if we could call this from selectOrderedLabeledValues directly
-    const stmt = this.database.qs.selectOrderedLabeledValues(instructions, selectedLabels, commandLabels, false)
+    const selectedLabels = labels
+      .concat(options.groupBy || [])
+      .filter(label => commandLabels.find(c => c.label === label))
+      .filter((label, i, labels) => labels.indexOf(label) === i)
+
+    const groupLabels = selectedLabels.filter(
+      label => label !== options.groupBy && !includeGroupByRow
+    )
+    const idMap = selectedLabels.reduce(
+      (acc, label) => {
+        const { id } = commandLabels.find(c => c.label === label)!
+        acc[id] = label
+        return acc
+      },
+      {} as { [id: number]: string }
+    )
+    const groupByCommand = commandLabels.find(c => c.label === options.groupBy)
+    const groupById = groupByCommand ? groupByCommand.id : undefined
+
+    // const selectedLabels = options.groupBy ? labels.concat(options.groupBy) : labels
+    // const labelsThatExist = labels.filter(label => commandLabels.find(c => c.label === label))
+    const stmt = this.database.qs.selectOrderedLabeledValues(
+      instructions,
+      selectedLabels,
+      commandLabels,
+      false
+    )
 
     return () => {
       if (options.inspector) {
-        const debugStmt = this.database.qs.selectOrderedLabeledValues(instructions, selectedLabels, commandLabels, true)
+        const debugStmt = this.database.qs.selectOrderedLabeledValues(
+          instructions,
+          selectedLabels,
+          commandLabels,
+          true
+        )
         options.inspector(debugStmt())
       }
 
       const rows = stmt()
       const result: Querier.QueryResult = []
       let group: Querier.OrderedValuesGroup = {}
+      for (const label of groupLabels) group[label] = []
       let pushedValuesInGroup = false
       for (const row of rows) {
-        const isGroupByRow = row.label === options.groupBy
+        const isGroupByRow = row.commandId === groupById
         if (includeGroupByRow || !isGroupByRow) {
-          if (row.label in group) group[row.label].push(row)
-          else group[row.label] = [row]
+          group[idMap[row.commandId]].push(row)
           pushedValuesInGroup = true
         }
         if (isGroupByRow) {
-          if (pushedValuesInGroup) result.push(group)
+          // if (pushedValuesInGroup) result.push(group)
+          result.push(group)
           group = {}
-          for (const label of labels) group[label] = []
+          for (const label of groupLabels) group[label] = []
           pushedValuesInGroup = false
         }
       }
