@@ -16,7 +16,6 @@ CREATE TABLE commands (
 
 CREATE TABLE crawlerTree (
   id INTEGER PRIMARY KEY NOT NULL,
-  -- TODO normalize this field into a 'command' table. label is still possibly undefined, but we always have an id, and commands get it when they initialize
   commandId INT NOT NULL,
   parentTreeId INT,
   operatorIndex INT NOT NULL, -- index that represents either a .reduce() or .loop() index

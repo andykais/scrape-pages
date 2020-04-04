@@ -17,13 +17,10 @@ const NetworkRequestStatusEnum = {
   FAILED: 2
 }
 
-
 class UpdateNetworkRequestStatus extends Query {
   protected static template = template
   protected statement: Sqlite3.Statement
 
-  // TODO add insert stuff into the cache because we want to store things like byte length and filename
-  // public call = (cacheId: undefined | number, payload: Stream.Payload) => {
   public call = (
     requestId: number,
     responseValue: string | null,
@@ -32,7 +29,13 @@ class UpdateNetworkRequestStatus extends Query {
     status: 'COMPLETE' | 'FAILED'
   ) => {
     // TODO verify statement.run(...).changes === 1
-    this.statement.run(responseValue, filename, byteLength, NetworkRequestStatusEnum[status], requestId)
+    this.statement.run(
+      responseValue,
+      filename,
+      byteLength,
+      NetworkRequestStatusEnum[status],
+      requestId
+    )
   }
 }
 

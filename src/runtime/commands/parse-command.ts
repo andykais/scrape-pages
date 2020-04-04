@@ -10,28 +10,25 @@ interface ParserEngine {
 }
 
 class CheerioParser implements ParserEngine {
-  public forEach: ParserEngine['forEach']
   private $: CheerioSelector
-  public constructor(private command: I.ParseCommand, private cheerioFlags: {} = {}) {
-    this.forEach = this.command.params.ATTR === undefined ? this.forEachText : this.forEachAttr
-  }
+  public constructor(private command: I.ParseCommand, private cheerioFlags: {} = {}) {}
+
   public load(html: string) {
     this.$ = cheerio.load(html, this.cheerioFlags)
   }
-  private forEachText: ParserEngine['forEach'] = cb => {
+  public forEach: ParserEngine['forEach'] = cb => {
     const { $ } = this
-    const { SELECTOR } = this.command.params
+    const { SELECTOR, ATTR, MAX } = this.command.params
+    // we could also set up an generator here, depending on what is better for jsonata parser
     $(SELECTOR).each(function(i) {
-      cb($(this).text(), i)
-    })
-  }
-  private forEachAttr: ParserEngine['forEach'] = cb => {
-    const { SELECTOR, ATTR } = this.command.params
-    this.$(SELECTOR).attr(ATTR!, (index: any, attributeVal: any) => {
-      if (attributeVal) cb(attributeVal, index)
+      if (MAX !== undefined && i > MAX) return false // this stops cheerio each iteration
+      const node = $(this)
+      if (ATTR === undefined) cb(node.text(), i)
+      else cb(node.attr(ATTR) || '', i) // this is a design decision. We assume you want to know when a selector didnt have an attribute you wanted
     })
   }
 }
+
 class JsonataParser implements ParserEngine {
   constructor(private command: I.ParseCommand) {}
   load(json: string) {
@@ -74,10 +71,8 @@ class ParseCommand extends BaseCommand<I.ParseCommand, typeof ParseCommand.PARAM
 
     this.tools.store.transaction(() => {
       this.parserEngine.forEach((value, i) => {
-        if (this.command.params.MAX === undefined || this.command.params.MAX > i) {
-          const id = this.tools.store.qs.insertValue(this.commandId, payload, i, value)
-          parsedResult.push(payload.merge({ value, valueIndex: i, id }))
-        }
+        const newPayload = this.saveValue(payload, i, value)
+        parsedResult.push(newPayload)
       })
     })()
 

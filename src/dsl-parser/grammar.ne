@@ -218,7 +218,6 @@ nl_                       -> [\r\n] " ":*                                       
 
 
 # COMMANDS JSON
-# TODO use javascript templated literals to create a macro to combine this and the command string
 object -> "{" ws "}" {% function(d) { return {}; } %}
     | "{" ws pair (ws "," ws pair):* ws "}" {% extractObject %}
 array -> "[" ws "]" {% function(d) { return []; } %}

@@ -20,7 +20,7 @@ type ReadInfo = { bytes: number; value: string; filename: null }
 type WriteInfo = { bytes: number; value: null; filename: string }
 type DownloadInfoWithValue = Stream.DownloadInfo & { value: string }
 
-class FetchCommand extends BaseCommand<I.HttpCommand, typeof FetchCommand.DEFAULT_PARAMS> {
+class FetchCommand extends BaseCommand<I.FetchCommand, typeof FetchCommand.DEFAULT_PARAMS> {
   private static DEFAULT_PARAMS = {
     METHOD: 'GET' as 'GET',
     HEADERS: {},
@@ -33,7 +33,7 @@ class FetchCommand extends BaseCommand<I.HttpCommand, typeof FetchCommand.DEFAUL
   private urlTemplate: templates.Template
   private headerTemplates: FMap<string, templates.Template>
 
-  constructor(settings: Settings, tools: Tools, command: I.HttpCommand) {
+  constructor(settings: Settings, tools: Tools, command: I.FetchCommand) {
     super(settings, tools, command, FetchCommand.DEFAULT_PARAMS)
     const { URL, HEADERS = {} } = command.params
     this.urlTemplate = templates.compileTemplate(URL)
@@ -55,21 +55,21 @@ class FetchCommand extends BaseCommand<I.HttpCommand, typeof FetchCommand.DEFAUL
     )
     const task = () => this.fetch(requestParams, requestId)
     // const cacheId = undefined // TODO add in memory caching and database caching of this.fetch
+    // TODO wrap this in a try/catch and write a FAILED status
     const { bytes, filename, value } = await this.tools.queue.push(task, PRIORITY)
 
-    // insert completed value
-    // TODO this can move to the base command now (because the only queued stuff is the network rows)
-    const id = this.tools.store.qs.insertValue(this.commandId, payload, 0, value, requestId)
-    const newPayload = payload.merge({ value, id })
-    // TODO wrap this in a try/catch and write a FAILED status
     this.tools.store.qs.updateNetworkRequestStatus(requestId, value, filename, bytes, 'COMPLETE')
-    this.tools.notify.commandSucceeded(this.command.command, { id })
-    // write completed to db
+    const newPayload = this.saveValue(payload, 0, value, requestId)
+
     return [newPayload]
   }
 
   private async fetch(
-    { url, headers, method }: {
+    {
+      url,
+      headers,
+      method
+    }: {
       url: string
       headers: { [headerName: string]: string }
       method: string
@@ -81,7 +81,7 @@ class FetchCommand extends BaseCommand<I.HttpCommand, typeof FetchCommand.DEFAUL
     const response = await fetch(url, { method, headers })
     if (!response.ok) throw new ResponseError(response, url)
 
-    // if progress listeners, add progress emitter
+    this.notifyProgress(response, id)
 
     if (READ && WRITE) {
       const results = await Promise.all([
@@ -125,6 +125,32 @@ class FetchCommand extends BaseCommand<I.HttpCommand, typeof FetchCommand.DEFAUL
     })
 
     return { filename, bytes: dest.bytesWritten, value: null }
+  }
+
+  private notifyProgress(response: Fetch.Response, id: Stream.Id) {
+    const { command } = this.command
+    const { LABEL } = this.command.params
+    const metadata = { url: response.url }
+    if (this.tools.notify.hasProgressListeners(command)) {
+      try {
+        const contentLength = parseInt(response.headers.get('content-length') || '0')
+        if (contentLength === 0) {
+          this.tools.notify.asyncCommandProgress(command, { id, LABEL, progress: NaN, metadata })
+        } else {
+          let bytes = 0
+          response.body.on('data', chunk => {
+            bytes += chunk.length
+            const progress = bytes / contentLength
+            this.tools.notify.asyncCommandProgress(this.command.command, {
+              id,
+              LABEL,
+              progress,
+              metadata
+            })
+          })
+        }
+      } catch (e) {}
+    }
   }
 
   async initialize() {

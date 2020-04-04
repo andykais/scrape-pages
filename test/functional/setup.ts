@@ -10,9 +10,9 @@ class FunctionalTestSetup {
   public mockHost: string
   private mockFolder: string
   public siteMock: HttpFolderMock
-  constructor(testName: string, testDirname: string) {
+  constructor(testDirname: string) {
     this.outputFolder = path.resolve(RUN_OUTPUT_FOLDER, testDirname)
-    this.mockHost = `http://${testName}`
+    this.mockHost = `http://${path.basename(testDirname)}`
     this.mockFolder = `${testDirname}/fixtures`
   }
 
@@ -33,4 +33,5 @@ class FunctionalTestSetup {
   }
 }
 
+export { assertQueryResultPartial } from './assertions'
 export { FunctionalTestSetup }

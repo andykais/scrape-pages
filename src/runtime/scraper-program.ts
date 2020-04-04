@@ -125,7 +125,6 @@ class ScraperProgram extends EventEmitter {
   }
   public stopCommand(label: string) {
     this.runtime.mustBeInitialized()
-    // TODO we dont have a good way to do this (maybe a LABEL field on all commands?)
     throw new Error('unimplemented')
   }
   public toggleRateLimiter(toggle: boolean) {

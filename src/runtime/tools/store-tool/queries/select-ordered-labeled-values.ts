@@ -50,19 +50,11 @@ function walkInstructions(
 
       switch (operation.operator) {
         case 'init':
+        case 'map':
+        case 'loop':
           const j = operation.commands.findIndex(c => c.databaseId === commandId)
           if (j === -1) levelsTraversed += operation.commands.length
           else return [true, levelsTraversed + j]
-          break
-        case 'map':
-          const k = operation.commands.findIndex(c => c.databaseId === commandId)
-          if (k === -1) levelsTraversed += operation.commands.length
-          else return [true, levelsTraversed + k]
-          break
-        case 'loop':
-          const l = operation.commands.findIndex(c => c.databaseId === commandId)
-          if (l === -1) levelsTraversed += operation.commands.length
-          else return [true, levelsTraversed + l]
           break
         case 'branch':
           // let m = 0
@@ -159,7 +151,7 @@ WITH cte as (
       , commands.label as currentCommandLabel
     `)}
   FROM crawlerTree
-  WHERE crawlerTree.commandId in (${selectedCommandIdsSql}) -- TODO can I swap the order here?
+  WHERE crawlerTree.commandId in (${selectedCommandIdsSql})
   UNION ALL
   SELECT
     parentEntries.id,

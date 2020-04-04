@@ -6,6 +6,8 @@ import { Stream } from '@scrape-pages/types/internal'
 
 type CommandNames = I.Command['command']
 
+type CommandInfo = { id: Stream.Id; LABEL: I.Command['params']['LABEL'] }
+
 class Notify extends RuntimeBase {
   public constructor(private emitter: EventEmitter) {
     super('EmitEvents')
@@ -18,14 +20,17 @@ class Notify extends RuntimeBase {
 
   public registerOnAny(listener: (event: string, data: any) => void) {}
 
-  // TODO add labels in here
-  public commandQueued(command: CommandNames, id: Stream.Id) {
-    this.emitter.emit(`${command}:queued`, { id })
+  public asyncCommandQueued(command: CommandNames, info: CommandInfo) {
+    this.emitter.emit(`${command}:queued`, info)
   }
-  public commandProgress(command: CommandNames, id: Stream.Id, progress: number, url: string) {
-    this.emitter.emit(`${command}:progress`, { id, progress })
+  public asyncCommandProgress(command: CommandNames, info: CommandInfo & { progress: number, metadata: {} }) {
+    this.emitter.emit(`${command}:progress`, info)
   }
-  public commandSucceeded(command: CommandNames, info: { id: Stream.Id }) {
+  public hasProgressListeners(command: CommandNames) {
+    return this.emitter.listenerCount(`${command}:progress`) > 0
+  }
+
+  public commandSucceeded(command: CommandNames, info: CommandInfo) {
     this.emitter.emit(`${command}:saved`, info)
   }
 

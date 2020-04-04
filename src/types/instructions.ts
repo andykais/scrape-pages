@@ -50,7 +50,7 @@ type Template = string
 // )
 // `
 
-interface HttpCommand {
+interface FetchCommand {
   command: 'FETCH'
   /** @internal */
   databaseId?: number
@@ -90,7 +90,7 @@ interface TextReplaceCommand {
   }
 }
 
-type Command = HttpCommand | ParseCommand | TextReplaceCommand
+type Command = FetchCommand | ParseCommand | TextReplaceCommand
 
 interface InitOperation {
   operator: 'init'
@@ -156,8 +156,7 @@ export {
   LoopOperation,
   CatchOperation,
   BranchOperation,
-  HttpCommand,
+  FetchCommand,
   ParseCommand,
-  TextReplaceCommand,
-  // TODO RegexCommand
+  TextReplaceCommand
 }

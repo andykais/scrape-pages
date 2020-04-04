@@ -14,6 +14,7 @@ import { Settings, Tools, Stream } from '@scrape-pages/types/internal'
 
 class Compiler {
   private initialPayload: Stream.Payload
+  private commandIdCounter: number
   public commands: commands.AnyCommand[]
   public program: Stream.Observable
 
@@ -26,11 +27,20 @@ class Compiler {
       inputs: this.settings.options.inputs || {}
     })
     this.commands = []
+    this.commandIdCounter = 0
   }
 
   private compileExpression(expression: Expression) {}
 
   private instantiateCommand = (command: Command) => {
+    // OK this is super hacky. We know that this is a sqlite database with an auto incrementing counter.
+    // We also know that we have synchronous database writes, so we can trust that in order really means in order.
+    // Therefore, it is ok to assume that the ids will be in order of traversal, since we initialize commands
+    // in the same order that we walk over them (see this.commands.push below)
+    // its not very future forward thinking, since we might have a remote scraper in the future, and we dont
+    // need to compile any commands for it.
+    command.databaseId = ++this.commandIdCounter
+
     const instantiatedCommand = (() => {
       switch (command.command) {
         case 'FETCH':
@@ -49,10 +59,12 @@ class Compiler {
   private mapCommands(operation: { commands: I.Command[] }): Stream.Operation {
     const commands: Stream.Operation[] = operation.commands
       .map(this.instantiateCommand)
-      .map(command => ops.flatMap(command.callStream)) // TODO reset payload index to zero? Nope!
+      .map(command => ops.flatMap(command.callStream))
     return Rx.pipe.apply(Rx, commands)
   }
 
+  // a note that the operationIndex gets passed down to whatever command consumes it
+  // Not a problem, but worth calling out
   private compileLoopOperation(operation: { commands: I.Command[] }): Stream.Operation {
     const commandsOperation = this.mapCommands(operation)
 

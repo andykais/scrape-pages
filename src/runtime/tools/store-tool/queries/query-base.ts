@@ -9,7 +9,7 @@ function sql(strings: TemplateStringsArray, ...vars: (string | number)[]) {
   return str
 }
 
-class Query {
+abstract class Query {
   protected static template?: string
   protected statement: Sqlite3.Statement | undefined
 
@@ -19,6 +19,8 @@ class Query {
       this.statement = this.database.prepare(maybeTemplate)
     }
   }
+
+  public abstract call(...args: any[]): any
 }
 
 export { sql, Query }
