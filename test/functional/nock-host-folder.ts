@@ -18,6 +18,7 @@ type HttpMockOptions = {
 }
 class HttpFolderMock {
   private interceptors?: nock.Interceptor[]
+  private debug: boolean = false
 
   public constructor(
     private mockEndpointsFolder: string,
@@ -25,21 +26,7 @@ class HttpFolderMock {
     private options: HttpMockOptions = {}
   ) {}
 
-  // public static create = async (
-  //   mockEndpointsFolder: string,
-  //   baseUrl: string,
-  //   options: Options = {}
-  // ) => {
-  //   const siteMock = new NockFolderMock(mockEndpointsFolder, baseUrl, options)
-  //   await siteMock.init()
-  //   return siteMock
-  // }
-
-  // TODO is it worthwhile to add a http debug log?
-  // HTTP_MOCK_DEBUG=true npm run test:watch
-  // nock: GET http://looping/page/1
-  // nock: GET http://looping/page/2
-  public init = async () => {
+  public init = async (debug: boolean = false) => {
     const scope = nock(this.baseUrl)
     const random = this.options.randomSeed && new SeedPsuedoRandom(this.options.randomSeed)
     const delay = this.options.delay || 0
@@ -51,8 +38,13 @@ class HttpFolderMock {
       const fullPath = path.resolve(this.mockEndpointsFolder, file)
       const interceptor = scope.get(`/${relativePath}`)
       const randomMultiplier = random ? random.nextFloat() : 1
-      interceptor.delay(randomMultiplier * delay).replyWithFile(200, fullPath)
+      const r = interceptor.delay(randomMultiplier * delay).replyWithFile(200, fullPath)
       return interceptor
+    })
+    scope.on('request', req => {
+      if (this.debug) {
+        console.log(req.method, req.path)
+      }
     })
   }
 
@@ -60,6 +52,8 @@ class HttpFolderMock {
     if (this.interceptors) this.interceptors.forEach(nock.removeInterceptor)
     else throw new Error('Must init() endpoints before calling done()')
   }
+
+  public setDebug = (on: boolean) => (this.debug = on)
 }
 
 export { HttpFolderMock }

@@ -10,10 +10,11 @@ class FunctionalTestSetup {
   public mockHost: string
   private mockFolder: string
   public siteMock: HttpFolderMock
-  constructor(testDirname: string) {
+  constructor(testDirectory: string) {
+    const testDirname = path.basename(testDirectory)
     this.outputFolder = path.resolve(RUN_OUTPUT_FOLDER, testDirname)
-    this.mockHost = `http://${path.basename(testDirname)}`
-    this.mockFolder = `${testDirname}/fixtures`
+    this.mockHost = `http://${testDirname}`
+    this.mockFolder = `${testDirectory}/fixtures`
   }
 
   beforeEach = async () => {
