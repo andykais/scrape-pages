@@ -14,7 +14,7 @@ const SENSIBLE_MAX_EMPTY_LOOPS = 100
  * note that this observable has no observer.complete(), it runs indefidently until either an error or an unsubscribe
  * also note, if the pipeTo function does not return anything (e.g. PARSE '') then this loop will run indefinitely, and very fast.
  */
-// can I use exhaustMap here???
+// TODO can I use exhaustMap here???
 function loop(
   pipeTo: Stream.Operation,
   iterateFn: (index: number) => Stream.Payload

@@ -81,6 +81,24 @@ class Compiler {
     return ops.flatMap(payload => Rx.merge(...programs.map(op => Rx.of(payload).pipe(op))))
   }
 
+  private compileReduceOperation(operation: I.ReduceOperation): Stream.Operation {
+    const commandsOperation = this.mapCommands(operation)
+
+    return ops.flatMap(parentPayload =>
+      Rx.of(parentPayload).pipe(
+        ops.expand((payload, i) => {
+          const flattendPayload = payload.merge({ id: parentPayload.id, operatorIndex: i + 1 })
+          return Rx.of(flattendPayload).pipe(commandsOperation)
+        }),
+        // design decision. We are not passing the input out of the function before it goes through reduce.
+        // we could, so long as we have knowledge of parent commands and how many steps are inside the reduce.
+        // the reason we arent including it is because if you _dont_ want that behavior, you cannot code around it currently.
+        ops.filter((_, i) => i !== 0)
+      )
+    )
+    // return ops.expand(payload => Rx.of(payload).pipe(commandsOperation))
+  }
+
   private compileUntilOperation(operation: I.UntilOperation): Stream.Operation {
     const evaluator = new BooleanExpressionEvaluator(operation.expression)
     return ops.takeWhile(payload => !evaluator.eval(payload))
@@ -98,6 +116,8 @@ class Compiler {
           return this.compileLoopOperation(operation)
         case 'branch':
           return this.compileBranchOperation(operation)
+        case 'reduce':
+          return this.compileReduceOperation(operation)
         case 'until':
           return this.compileUntilOperation(operation)
         default:

@@ -1,35 +1,33 @@
 import { expect } from 'chai'
 import { FunctionalTestSetup, assertQueryResultPartial } from '@test/functional/setup'
+import { queryExecutionDebugger } from '@test/query-debugger'
 
 import { ScraperProgram } from '@scrape-pages'
-import { queryExecutionDebugger } from '@test/query-debugger'
 import * as instructions from './instructions'
 
 const testEnv = new FunctionalTestSetup(__dirname)
-
-const options = {}
 
 describe(__filename, () => {
   beforeEach(testEnv.beforeEach)
   afterEach(testEnv.afterEach)
 
   it('should be able to init a scraper twice', async () => {
-    const scraper1 = new ScraperProgram(instructions.simple, testEnv.outputFolder, options)
-    await scraper1.start(testEnv.outputFolder)
+    const scraper1 = new ScraperProgram(instructions.simple, testEnv.outputFolder)
+    await scraper1.start()
     await scraper1.toPromise()
     const result1 = scraper1.query(['tag'])
 
-    // await scraper1.start(testEnv.outputFolder)
+    // await scraper1.start()
     // await scraper1.toPromise()
 
-    const scraper2 = new ScraperProgram(instructions.simple, testEnv.outputFolder, options)
+    const scraper2 = new ScraperProgram(instructions.simple, testEnv.outputFolder)
     const result2 = scraper2.query(['tag'])
 
     expect(result1).to.be.deep.equal(result2)
   })
   it('should run an instruction set', async function(...args: any[]) {
-    const scraper = new ScraperProgram(instructions.simple, testEnv.outputFolder, options)
-    scraper.start(testEnv.outputFolder)
+    const scraper = new ScraperProgram(instructions.simple, testEnv.outputFolder)
+    scraper.start()
     await scraper.toPromise()
     const result = scraper.query(['image', 'tag'], {
       groupBy: 'post'
@@ -76,9 +74,9 @@ describe(__filename, () => {
     ])
   })
   describe('query ordering', () => {
-    it.skip('should order a merging instruction as well', async function() {
-      const scraper = new ScraperProgram(instructions.merging, testEnv.outputFolder, options)
-      scraper.start(testEnv.outputFolder)
+    it('should order a merging instruction as well', async function() {
+      const scraper = new ScraperProgram(instructions.merging, testEnv.outputFolder)
+      scraper.start()
       await scraper.toPromise()
       const result = scraper.query(['image'])
       assertQueryResultPartial(result, [
@@ -96,8 +94,8 @@ describe(__filename, () => {
       ])
     })
     it('should work with image, image-page, tag,', async () => {
-      const scraper = new ScraperProgram(instructions.withEmptyValue, testEnv.outputFolder, options)
-      scraper.start(testEnv.outputFolder)
+      const scraper = new ScraperProgram(instructions.withEmptyValue, testEnv.outputFolder)
+      scraper.start()
       await scraper.toPromise()
       const result = scraper.query(['image', 'image-parse', 'tag'])
       assertQueryResultPartial(result, [
@@ -130,8 +128,8 @@ describe(__filename, () => {
       ])
     })
     it('should handle nonexistent labels', async function() {
-      const scraper = new ScraperProgram(instructions.withEmptyValue, testEnv.outputFolder, options)
-      scraper.start(testEnv.outputFolder)
+      const scraper = new ScraperProgram(instructions.withEmptyValue, testEnv.outputFolder)
+      scraper.start()
       await scraper.toPromise()
       // commands that dont exist never get a field
       assertQueryResultPartial(scraper.query(['nonexistent']), [])
@@ -156,8 +154,8 @@ describe(__filename, () => {
       ])
     })
     it('should work with commands with no values', async function() {
-      const scraper = new ScraperProgram(instructions.withEmptyValue, testEnv.outputFolder, options)
-      scraper.start(testEnv.outputFolder)
+      const scraper = new ScraperProgram(instructions.withEmptyValue, testEnv.outputFolder)
+      scraper.start()
       await scraper.toPromise()
       const result = scraper.query(['image', 'image-parse', 'never-reached'])
       assertQueryResultPartial(result, [

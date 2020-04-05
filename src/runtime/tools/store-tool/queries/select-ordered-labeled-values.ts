@@ -23,6 +23,7 @@ function findFurthestDistanceTraveled(program: I.Program): number {
       case 'init':
       case 'map':
       case 'loop':
+      case 'reduce':
         distanceTraveled += operation.commands.length
         break
       case 'branch':
@@ -37,85 +38,106 @@ function findFurthestDistanceTraveled(program: I.Program): number {
   }
   return distanceTraveled
 }
+const READ_ONLY_OPERATORS = ['until']
+
 function walkInstructions(
   instructions: Instructions,
   commandLabels: CommandLabelRow[],
   labels: string[]
 ) {
-  function findLongestLevelTraversal(commandId: number, program: I.Program): [boolean, number] {
-    let levelsTraversed = 0
-    const operationsWithWrites = program.filter(p => p.operator !== 'until')
-    for (let i = 0; i < operationsWithWrites.length; i++) {
-      const operation = operationsWithWrites[i]
+  const selectedCommandIds = commandLabels
+    .filter(c => c.label && labels.includes(c.label))
+    .map(c => c.id)
 
+  const mergingWaitCases: { currentCommandId: number | null; distanceFromTop: number }[] = []
+  const selectionWaitCases: { commandId: number; distanceFromTop: number }[] = []
+
+  function findFurthestDistanceTraveled(
+    program: I.Program,
+    previousCommand?: I.Command,
+    distanceFromTop: number = 0
+  ): number {
+    let distance = 0
+
+    const operationsWithWrites = program.filter(p => !READ_ONLY_OPERATORS.includes(p.operator))
+
+    let prevCommand: I.Command | undefined
+
+    for (const [i, operation] of operationsWithWrites.entries()) {
       switch (operation.operator) {
         case 'init':
         case 'map':
         case 'loop':
-          const j = operation.commands.findIndex(c => c.databaseId === commandId)
-          if (j === -1) levelsTraversed += operation.commands.length
-          else return [true, levelsTraversed + j]
+        case 'reduce':
+          for (const [j, command] of operation.commands.entries()) {
+            distance++
+            const commandId = command.databaseId!
+            if (selectedCommandIds.includes(commandId)) {
+              selectionWaitCases.push({
+                commandId,
+                distanceFromTop: distanceFromTop + distance
+              })
+            }
+          }
+          prevCommand = operation.commands.length
+            ? operation.commands[operation.commands.length - 1]
+            : prevCommand
           break
         case 'branch':
-          // let m = 0
-          let maxDistanceDown = 0
-          for (const program of operation.programs) {
-            const [commandFound, n] = findLongestLevelTraversal(commandId, program)
-            // if (n === -1)
-            if (commandFound) return [commandFound, levelsTraversed + n]
-            else maxDistanceDown = Math.max(maxDistanceDown, n)
-            // otherwise Im not sure. We need to figure out branching
+          const maxDistances = operation.programs.map(p =>
+            findFurthestDistanceTraveled(p, prevCommand, distance)
+          )
+          const maxBranchDistance = Math.max(...maxDistances)
+
+          // only do this if we have more instructions below that this will merge into
+          if (i < operationsWithWrites.length - 1) {
+            for (const [j, program] of operation.programs.entries()) {
+              const maxDistanceForProgram = maxDistances[j]
+              if (maxDistanceForProgram < maxBranchDistance) {
+                const parentCommandId = prevCommand ? prevCommand.databaseId! : null
+                mergingWaitCases.push({
+                  currentCommandId: parentCommandId,
+                  distanceFromTop: distance
+                })
+              }
+            }
           }
-          levelsTraversed += maxDistanceDown
+          distance += maxBranchDistance
           break
         default:
           throw new errors.InternalError(`unknown operation '${operation.operator}'`)
       }
     }
-    return [false, levelsTraversed]
+    return distance
   }
 
-  const maxLevelTraversalPerCommand = commandLabels
-    .filter(c => c.label && labels.includes(c.label))
-    .map(c => c.id)
-    .map(id => {
-      const [commandFound, maxLevelsTraversed] = findLongestLevelTraversal(id, instructions.program)
-      if (!commandFound) throw new errors.InternalError(`could not find id ${id} in instructions`)
-      return { id, maxLevelsTraversed }
-    })
+  findFurthestDistanceTraveled(instructions.program)
 
-  const maxDistanceFromTop = Math.max(...maxLevelTraversalPerCommand.map(m => m.maxLevelsTraversed))
-  const furthestDistanceTraveled = maxDistanceFromTop //  - 1
+  selectionWaitCases.sort((a, b) => a.distanceFromTop - b.distanceFromTop)
+  const furthestDistance = selectionWaitCases[selectionWaitCases.length - 1].distanceFromTop
 
-  const caseJoins = maxLevelTraversalPerCommand
-    .filter(m => m.maxLevelsTraversed !== maxDistanceFromTop) // the deepest depth doesnt need to wait on anybody
-    // .filter(m => m.maxLevelsTraversed !== maxDistanceFromTop - 1) // lowest and second lowest commands do not need to wait since they are side by side after the initial select
-    .map(m => {
-      const distanceToFurthestSelectedCommand = furthestDistanceTraveled - m.maxLevelsTraversed
-      return `cte.commandId = ${m.id} AND cte.recurseDepth < ${distanceToFurthestSelectedCommand}`
-    })
+  // prettier-ignore
+  const caseWaits = selectionWaitCases
+    .filter(c => c.distanceFromTop !== furthestDistance)
+    .map(c => `cte.commandId = ${c.commandId} AND cte.recurseDepth < ${furthestDistance - c.distanceFromTop}`)
+    .concat(mergingWaitCases
+      .filter(c => c.distanceFromTop < furthestDistance)
+      .map(c => `cte.currentCommandId = ${c.currentCommandId} AND cte.recurseDepth < ${furthestDistance - c.distanceFromTop}`)
+     )
     .join(' OR ')
 
-  const caseSorts = maxLevelTraversalPerCommand
-    .filter(m => m.maxLevelsTraversed !== maxDistanceFromTop) // the deepest depth doesnt need to wait on anybody
-    .map(m => {
-      const distanceToFurthestSelectedCommand = furthestDistanceTraveled - m.maxLevelsTraversed
-      // prettier-ignore
-      return `cte.commandId = ${m.id} AND cte.recurseDepth < ${distanceToFurthestSelectedCommand}`
-    })
+  // prettier-ignore
+  const caseSorts = selectionWaitCases
+    .filter(c => c.distanceFromTop < furthestDistance - 1) // lowest and second lowest selections will compare on the initial select, no need for case ordering
+    .map(c =>`cte.commandId = ${c.commandId} AND cte.recurseDepth < ${furthestDistance - c.distanceFromTop}`)
     .join(' OR ')
-
-  const waitingJoinsSql =
-    caseJoins.length === 0
-      ? 'cte.parentTreeId'
-      : `CASE WHEN ${caseJoins} THEN cte.id ELSE cte.parentTreeId END`
-  const waitingSortSql =
-    caseSorts.length === 0 ? '0' : `CASE WHEN ${caseSorts} THEN cte.commandId ELSE 0 END`
 
   return {
-    waitingJoinsSql,
-    waitingSortSql,
-    furthestDistanceTraveled
+    waitingJoinsSql: caseWaits
+      ? `CASE WHEN ${caseWaits} THEN cte.id ELSE cte.parentTreeId END`
+      : 'cte.parentTreeId',
+    waitingSortSql: caseSorts ? `CASE WHEN ${caseSorts} THEN cte.commandId ELSE 0 END` : '0',
+    furthestDistanceTraveled: furthestDistance - 1
   }
 }
 
@@ -151,6 +173,9 @@ WITH cte as (
       , commands.label as currentCommandLabel
     `)}
   FROM crawlerTree
+  ${ifDebugMode(`
+    INNER JOIN commands ON crawlerTree.commandId = commands.id
+  `)}
   WHERE crawlerTree.commandId in (${selectedCommandIdsSql})
   UNION ALL
   SELECT
@@ -187,7 +212,7 @@ SELECT
   networkRequests.status,
   networkRequests.requestParams
   ${ifDebugMode(`
-  , commands.label, recurseDepth, operatorIndex, valueIndex, currentCommandLabel
+  , commands.label, parentTreeId, recurseDepth, operatorIndex, valueIndex, currentCommandLabel
   `)}
 FROM cte
 ${ifDebugMode(`
@@ -213,6 +238,7 @@ type SelectedRow = {
 
 type SelectedRowWithDebug = SelectedRow & {
   label: string
+  parentTreeId: number
   requestId: number
   recurseDepth: number
   operatorIndex: number

@@ -62,9 +62,9 @@ class ScraperProgram extends EventEmitter {
    */
   public query: Querier.Interface
 
-  public constructor(dslInput: string, folder: string, options: Options)
-  public constructor(instructions: Instructions, folder: string, options: Options)
-  public constructor(input: string | Instructions, folder: string, options: Options) {
+  public constructor(dslInput: string, folder: string, options?: Options)
+  public constructor(instructions: Instructions, folder: string, options?: Options)
+  public constructor(input: string | Instructions, folder: string, options: Options = {}) {
     super()
     // if its a string, compile it using the dsl-parser
     const instructions =
@@ -74,6 +74,7 @@ class ScraperProgram extends EventEmitter {
     this.runtime = new ScraperProgramRuntime(settings, this)
     this.query = this.runtime.tools.store.query
     this.fromExistingFolder = false
+    this.folder = folder
 
     this.on('stop', this.stop)
     this.on('useRateLimiter', this.toggleRateLimiter)
@@ -84,10 +85,10 @@ class ScraperProgram extends EventEmitter {
    * @name start
    * @description begin scraping and write results to disk
    */
-  public async start(folder: string) {
+  public async start() {
     // TODO only let start be called once? Maybe? Maybe we can reuse a class?
     try {
-      await fs.mkdirp(folder)
+      await fs.mkdirp(this.folder)
       await this.writeMetadata({ state: 'ACTIVE' })
       await this.runtime.initialize()
       this.runtime.subscription = this.runtime.observables.subscribe({

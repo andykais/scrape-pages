@@ -9,8 +9,7 @@ class QueryDebugger {
   public constructor(private view: DebuggerView) {}
 }
 
-const queryExecutionDebugger = (view: DebuggerView, mochaContext: Mocha.Context) => (rows: Querier.QueryResultWithDebug) => {
-  mochaContext.timeout(0)
+const queryExecutionDebugger = (view: DebuggerView) => (rows: Querier.QueryResultWithDebug) => {
   readlineSync.question(
     'This is an internal debugging method. It will hault execution until there is input. Press [enter] to continue.',
     { mask: '' }
