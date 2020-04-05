@@ -3,7 +3,7 @@ import { FunctionalTestSetup } from '@test/functional/setup'
 const testEnv = new FunctionalTestSetup(__dirname)
 const host = testEnv.mockHost
 
-// if you want the loop to happen per each input, put it in a branch!
+// if you want the loop to happen per each input, put it in a merge!
 // it might be difficult to say "loop 5 times and ignore request failures"
 const simple = `
 ().loop(
@@ -11,7 +11,7 @@ const simple = `
 ).until('{{ index }}' == 2).map(
   PARSE 'li > a' ATTR='href' LABEL='gallery'
   FETCH '${host}{{ value }}' LABEL='post'
-).branch(
+).merge(
   (
     PARSE '#tags > li' LABEL='tag'
   ),
@@ -25,7 +25,7 @@ const merging = `
 ().loop(
   FETCH '${host}/gallery/page/{{"+" index 1}}.html' LABEL='gallery-get'
 ).until('{{ index }}' == 2)
-.branch(
+.merge(
   (
     PARSE 'img' ATTR='src'
   ),
@@ -34,7 +34,7 @@ const merging = `
     FETCH '${host}{{ value }}' LABEL='post'
     PARSE 'img' ATTR='src'
   )
-).branch(
+).merge(
   (
     FETCH '${host}{{ value }}' READ=false WRITE=true LABEL='image'
   )
@@ -46,7 +46,7 @@ const withEmptyValue = `
 ).until('{{ index }}' == 2).map(
   PARSE 'li > a' ATTR='href' LABEL='gallery'
   FETCH '${host}{{ value }}' LABEL='post'
-).branch(
+).merge(
   (
     PARSE '#tags > li' LABEL='tag'
   ),

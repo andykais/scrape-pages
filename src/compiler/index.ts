@@ -76,7 +76,7 @@ class Compiler {
   }
 
   // compile operations
-  private compileBranchOperation(operation: I.BranchOperation): Stream.Operation {
+  private compileMergeOperation(operation: I.MergeOperation): Stream.Operation {
     const programs = operation.programs.map(this.compileFlow)
     return ops.flatMap(payload => Rx.merge(...programs.map(op => Rx.of(payload).pipe(op))))
   }
@@ -114,8 +114,8 @@ class Compiler {
           return this.mapCommands(operation)
         case 'loop':
           return this.compileLoopOperation(operation)
-        case 'branch':
-          return this.compileBranchOperation(operation)
+        case 'merge':
+          return this.compileMergeOperation(operation)
         case 'reduce':
           return this.compileReduceOperation(operation)
         case 'until':

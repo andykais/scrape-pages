@@ -12,7 +12,7 @@ const simple = `
 ).map(
   PARSE 'li > a' ATTR='href' LABEL='post'
   FETCH '${host}{{value}}' LABEL='post-fetch'
-).branch(
+).merge(
   (
     PARSE 'h2' LABEL='title'
   ),
@@ -27,7 +27,7 @@ const simple = `
 const merging = `
 (
   FETCH '${host}/index.html' LABEL='index'
-).branch(
+).merge(
   (),
   ().reduce(
     PARSE '#batch-id' LABEL='parse-batch-id'
@@ -36,7 +36,7 @@ const merging = `
 ).map(
   PARSE 'li > a' ATTR='href' LABEL='post'
   FETCH '${host}{{value}}' LABEL='post-fetch'
-).branch(
+).merge(
   (
     PARSE 'h2' LABEL='title'
   ),

@@ -17,7 +17,7 @@ INPUT 'hi'
 .until('{{value}}' == 'x' || ('{{index}}' <= 2))
 .map(
   # comment
-).branch(
+).merge(
 (
   FETCH 'me' METHOD='PUT'
   FETCH 'me'
@@ -29,13 +29,13 @@ INPUT 'hi'
 
 const instructionsWithLeaves = `
 (
-  POST 'https://google.com/login'
+  POST 'https://google.com/login' LABEL='login'
 ).leaf(
   GET 'https://google.com/settings'
 ).leaf(
   GET 'https://google.com/photos'
 ).map(
-# I'm working with the https://google.com response
+# I'm working with 'login' value
 
 )
 `
@@ -43,11 +43,9 @@ const instructionsWithLeaves = `
 const instructionsNext = `
 (
   FETCH 'http://recurse-next/index.html'
-).recurse(
+).reduce(
   PARSE '#batch-id'
   FETCH 'http://recurse-next/batch-page/id-{{ value }}.html'
-).branch(
-
 )
 
 `

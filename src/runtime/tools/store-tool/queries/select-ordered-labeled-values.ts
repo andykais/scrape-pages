@@ -26,7 +26,7 @@ function findFurthestDistanceTraveled(program: I.Program): number {
       case 'reduce':
         distanceTraveled += operation.commands.length
         break
-      case 'branch':
+      case 'merge':
         distanceTraveled += operation.programs.reduce(
           (distance, program) => distance + findFurthestDistanceTraveled(program),
           0
@@ -83,17 +83,17 @@ function walkInstructions(
             ? operation.commands[operation.commands.length - 1]
             : prevCommand
           break
-        case 'branch':
+        case 'merge':
           const maxDistances = operation.programs.map(p =>
             findFurthestDistanceTraveled(p, prevCommand, distance)
           )
-          const maxBranchDistance = Math.max(...maxDistances)
+          const maxMergeDistance = Math.max(...maxDistances)
 
           // only do this if we have more instructions below that this will merge into
           if (i < operationsWithWrites.length - 1) {
             for (const [j, program] of operation.programs.entries()) {
               const maxDistanceForProgram = maxDistances[j]
-              if (maxDistanceForProgram < maxBranchDistance) {
+              if (maxDistanceForProgram < maxMergeDistance) {
                 const parentCommandId = prevCommand ? prevCommand.databaseId! : null
                 mergingWaitCases.push({
                   currentCommandId: parentCommandId,
@@ -102,7 +102,7 @@ function walkInstructions(
               }
             }
           }
-          distance += maxBranchDistance
+          distance += maxMergeDistance
           break
         default:
           throw new errors.InternalError(`unknown operation '${operation.operator}'`)

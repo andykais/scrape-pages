@@ -51,8 +51,8 @@
       commands
     }]
   }
-  function extractProgramBranch([formattedProgram, ws, command, programs]) {
-    return [...formattedProgram, { operator: 'branch', programs }]
+  function extractProgramMerge([formattedProgram, ws, command, programs]) {
+    return [...formattedProgram, { operator: 'merge', programs }]
   }
 
   function extractProgramList(args) {
@@ -156,7 +156,7 @@ PostProgram               -> (Comment | nl_):*                                  
 Program                   -> Flow                                                           {% extractProgramFlow %}
                            | Program "\n":? (".map" | ".reduce" | ".loop" | ".catch") Flow  {% extractProgramDotFlow %}
                            | Program "\n":? (".until") ExpressionBlock                      {% extractProgramExpressionFlow %}
-                           | Program "\n":? ".branch(" ProgramList ")"                      {% extractProgramBranch %}
+                           | Program "\n":? ".merge(" ProgramList ")"                      {% extractProgramMerge %}
 
 ProgramList               -> ws Program ws                                            {% extractProgramList %}
                            | ProgramList "," ws Program ws                            {% extractProgramListRecurse %}

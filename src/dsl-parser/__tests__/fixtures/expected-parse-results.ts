@@ -26,7 +26,7 @@ const syntaxCoverageInstruction: Instructions = {
     { operator: 'until', expression: '{{value}} == x || ({{index}} <= 2)' },
     { operator: 'map', commands: [] },
     {
-      operator: 'branch',
+      operator: 'merge',
       programs: [
         [
           {

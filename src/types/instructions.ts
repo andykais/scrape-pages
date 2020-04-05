@@ -2,54 +2,6 @@ type Slug = string
 type Expression = string
 type Template = string
 
-// const instructions = `
-// (
-//   HTTP 'http://gallery/page/{{'+' 1 indeex}}.html' LABEL='gallery'
-//   PARSE 'li > a' ATTR='href'
-//   HTTP 'http://gallery{{ value }}'
-// ).branch(
-//   (
-//     PARSE '#tags > li' LABEL='tag'
-//   ),
-//   (
-//     PARSE 'img' ATTR='src'
-//     HTTP 'http://gallery{{ value }}' READ=false WRITE=true LABEL='image'
-//   )
-// )
-// `
-
-// const instructionsJson = `
-// (
-//   FETCH 'http://json-parsing/api-response.json'
-//   PARSE 'posts[type="post"].content' FORMAT='json'
-//   REPLACE '\n$' WITH=''
-// )
-// `
-
-// const instructionsRecurse = `
-// (
-//   FETCH 'http://recurse-next/index.html'
-// ).recurse(
-//   PARSE '#batch-id'
-//   FETCH 'http://recurse-next/batch-id-page/id-{{ value }}.html'
-// ).branch(
-//   (
-//     PARSE 'li > a' ATTR='href'
-//   ),
-//   (
-//     FETCH 'http://recurse-next{{ value }}'
-//   ).branch(
-//     (
-//       PARSE '#tags > li'
-//     ),
-//     (
-//       PARSE 'img' ATTR='src'
-//       FETCH 'http://recurse-next{{ value }}' READ=false WRITE=false
-//     )
-//   )
-// )
-// `
-
 interface FetchCommand {
   command: 'FETCH'
   /** @internal */
@@ -117,8 +69,8 @@ interface CatchOperation {
   commands: Command[]
 }
 // TODO rename this to merge (its closer to what it is)
-interface BranchOperation {
-  operator: 'branch'
+interface MergeOperation {
+  operator: 'merge'
   programs: Program[]
 }
 
@@ -134,7 +86,7 @@ type Operation =
   | ReduceOperation
   | LoopOperation
   | CatchOperation
-  | BranchOperation
+  | MergeOperation
 
 type Program = Operation[]
 
@@ -155,7 +107,7 @@ export {
   ReduceOperation,
   LoopOperation,
   CatchOperation,
-  BranchOperation,
+  MergeOperation,
   FetchCommand,
   ParseCommand,
   TextReplaceCommand
