@@ -58,22 +58,15 @@ describe(__filename, () => {
         await scraper.toPromise()
         const result = scraper.query(['image', 'tag'], {
           groupBy: 'post',
-          // inspector: testEnv.queryDebugger([
-          //   // 'value',
-          //   // 'requestParams',
-          //   'commandId',
-          //   'parentTreeId',
-          //   'label',
-          //   'currentCommandLabel',
-          //   'recurseDepth'
-          // ])
         })
         // prettier-ignore
         assertQueryResultPartial(result, [
           {
             image: [
+              // { requestParams: '{"url":"http://looping/image/gal-1.jpg","headers":{},"method":"GET"}' },
+              // { requestParams: '{"url":"http://looping/image/the.jpg","headers":{},"method":"GET"}' }
               { requestParams: '{"url":"http://looping/image/gal-1.jpg","headers":{},"method":"GET"}' },
-              { requestParams: '{"url":"http://looping/image/the.jpg","headers":{},"method":"GET"}' }
+              { requestParams: '{"url":"http://looping/image/the.jpg","headers":{},"method":"GET"}' },
             ],
             tag: [{ value: 'one' }, { value: 'two' }]
           },
@@ -83,16 +76,18 @@ describe(__filename, () => {
           },
           {
             image: [
+              { requestParams: '{"url":"http://looping/image/brown.jpg","headers":{},"method":"GET"}' },
               { requestParams: '{"url":"http://looping/image/gal-2.jpg","headers":{},"method":"GET"}' },
-              { requestParams: '{"url":"http://looping/image/brown.jpg","headers":{},"method":"GET"}' }
+              // { requestParams: '{"url":"http://looping/image/gal-2.jpg","headers":{},"method":"GET"}' },
+              // { requestParams: '{"url":"http://looping/image/brown.jpg","headers":{},"method":"GET"}' }
             ],
-            tag: [{ value: 'four' }, { value: 'five' }]
+            tag: [{ value: 'five' }, { value: 'four' }]
           },
           {
             image: [{ requestParams: '{"url":"http://looping/image/fox.jpg","headers":{},"method":"GET"}' }],
-            tag: [{ value: 'three' }, { value: 'four' }, { value: 'five' }]
+            tag: [{ value: 'five' }, { value: 'four' }, { value: 'three' }]
           }
-        ])
+        ], { ignoreOrderInGroups: true })
       })
     })
     describe('with reused labels instructions', () => {

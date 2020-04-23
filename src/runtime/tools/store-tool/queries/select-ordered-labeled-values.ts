@@ -15,29 +15,6 @@ function getSelectedCommandIdsSql(labels: string[], commands: CommandLabelRow[])
     .join(',')
 }
 
-// function findFurthestDistanceTraveled(program: I.Program): number {
-//   let distanceTraveled = 0
-//   const operationsWithWrites = program.filter(p => p.operator !== 'until')
-//   for (const operation of operationsWithWrites) {
-//     switch (operation.operator) {
-//       case 'init':
-//       case 'map':
-//       case 'loop':
-//       case 'reduce':
-//         distanceTraveled += operation.commands.length
-//         break
-//       case 'merge':
-//         distanceTraveled += operation.programs.reduce(
-//           (distance, program) => distance + findFurthestDistanceTraveled(program),
-//           0
-//         )
-//         break
-//       default:
-//         throw new errors.InternalError(`unknown operation '${operation.operator}'`)
-//     }
-//   }
-//   return distanceTraveled
-// }
 const READ_ONLY_OPERATORS = ['until']
 
 function walkInstructions(
@@ -151,7 +128,7 @@ function walkInstructions(
   // prettier-ignore
   const caseSorts = selectionOrderCases
     // .filter(c => c.distanceFromTop < info.furthestDistanceTraveled - 1) // lowest and second lowest selections will compare on the initial select, no need for case ordering
-    .map(c =>`cte.commandId = ${c.commandId} AND cte.recurseDepth = ${c.atRecurseDepth}`)
+    .map(c =>`cte.commandId = ${c.commandId} AND cte.recurseDepth = ${c.atRecurseDepth - 1}`)
     .join(' OR ')
 
   // const caseSorts = `cte.commandId = 4 AND cte.recurseDepth = 2 OR cte.commandId = 6 AND cte.recurseDepth = 2`
@@ -379,6 +356,7 @@ WITH cte as (
   INNER JOIN crawlerTree as parentEntries
   ON ${waitingJoinsSql} = parentEntries.id
   ${ifDebugMode(`INNER JOIN commands ON parentEntries.commandId = commands.id`)}
+  -- TODO add tail cleanup (WHERE recurseDepth >= cte.recurseDepth)
   ORDER BY
     recurseDepth,
     valueIndex,
@@ -399,12 +377,12 @@ SELECT
 FROM cte
 ${ifDebugMode(`INNER JOIN commands ON commands.id = cte.commandId`)}
 LEFT JOIN networkRequests ON cte.networkRequestId = networkRequests.id
-${unlessDebugMode(`WHERE cte.recurseDepth = ${furthestDistanceTraveled}`)} -- I think we proved we dont need this. It was a bug that we did at all
+${unlessDebugMode(`WHERE cte.recurseDepth = ${furthestDistanceTraveled}`)}
   ORDER BY
-    recurseDepth,
-    valueIndex,
-    operatorIndex,
-    commandSort desc
+    recurseDepth
+  -- valueIndex
+  --   -- operatorIndex,
+    -- commandSort desc
 `
 }
 

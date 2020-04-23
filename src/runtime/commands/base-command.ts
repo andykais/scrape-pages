@@ -51,7 +51,8 @@ abstract class BaseCommand<
     const { LABEL } = this.command.params
     const id = this.tools.store.qs.insertValue(this.commandId, parentPayload, valueIndex, value, requestId)
     this.tools.notify.commandSucceeded(this.command.command, { id, LABEL })
-    return parentPayload.merge({ value, id, valueIndex })
+    return parentPayload.merge({ value, id, valueIndex, })
+    // return parentPayload.merge({ value, id, valueIndex, operatorIndex: 0 })
   }
 
   async initialize() {

@@ -11,20 +11,24 @@ describe(__filename, () => {
 
   describe('query ordering', () => {
     describe('with simple instructions', () => {
-      it.only(`query(['image', 'title'], {groupBy: 'post'})`, async () => {
+      it(`query(['image', 'title'], {groupBy: 'post'})`, async () => {
         const scraper = new ScraperProgram(instructions.simple, testEnv.outputFolder)
         await scraper.start()
         await scraper.toPromise()
         const result = scraper.query(['image', 'title'], {groupBy: 'post',
-          inspector: testEnv.queryDebugger([
-            // 'value',
-            // 'requestParams',
-            'commandId',
-            'parentTreeId',
-            'label',
-            'currentCommandLabel',
-            'recurseDepth'
-          ])
+          // inspector: testEnv.queryDebugger([
+          //   // 'value',
+          //   // 'requestParams',
+          //   // 'commandId',
+          //   // 'parentTreeId',
+          //   'valueIndex',
+          //   'operatorIndex',
+          //   'commandSort',
+          //   'label',
+          //   'currentCommandLabel',
+          //   'recurseDepth',
+          //   'value'
+          // ])
         })
         console.log(result)
       })

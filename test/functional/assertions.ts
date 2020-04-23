@@ -25,7 +25,11 @@ import { expect } from 'chai'
 // }
 
 type PartialQueryResult = { [label: string]: { [column: string]: any }[] }[]
-function assertQueryResultPartial(queryResult: any, expectedPartial: PartialQueryResult) {
+function assertQueryResultPartial(
+  queryResult: any,
+  expectedPartial: PartialQueryResult,
+  { ignoreOrderInGroups = false } = {}
+) {
   const resultCopy = JSON.parse(JSON.stringify(queryResult))
   for (const [i, group] of expectedPartial.entries()) {
     if (resultCopy.length <= i) break
@@ -35,8 +39,30 @@ function assertQueryResultPartial(queryResult: any, expectedPartial: PartialQuer
         if (resultCopy[i][label].length <= j) break
         resultCopy[i][label][j] = {}
         for (const [column, value] of Object.entries(row)) {
-          resultCopy[i][label][j][column] = queryResult[i][label][j][column] 
+          resultCopy[i][label][j][column] = queryResult[i][label][j][column]
         }
+      }
+      if (ignoreOrderInGroups) {
+        for (const expectedRow of expectedPartial[i][label]) {
+          const expectedRowIsSorted = expectedPartial[i][label].every(
+            (row, i, group) =>
+            {
+              // if (i !== 0) {
+              //   console.log({ a: group[i - 1],
+              //   b: row})
+              // console.log(JSON.stringify(group[i - 1]).localeCompare(JSON.stringify(row)))
+
+              // }
+              return i === 0 || JSON.stringify(group[i - 1]).localeCompare(JSON.stringify(row)) <= 0
+            }
+          )
+          if (!expectedRowIsSorted) {
+            throw new Error(`The expected array needs to be sorted at expectedPartial[${i}][${label}], sorry`)
+          }
+        }
+        resultCopy[i][label].sort((a: {}, b: {}) =>
+          JSON.stringify(a).localeCompare(JSON.stringify(b))
+        )
       }
     }
   }
