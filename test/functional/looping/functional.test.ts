@@ -58,6 +58,15 @@ describe(__filename, () => {
         await scraper.toPromise()
         const result = scraper.query(['image', 'tag'], {
           groupBy: 'post',
+          // inspector: testEnv.queryDebugger([
+          //   // 'value',
+          //   // 'requestParams',
+          //   'commandId',
+          //   'parentTreeId',
+          //   'label',
+          //   'currentCommandLabel',
+          //   'recurseDepth'
+          // ])
         })
         // prettier-ignore
         assertQueryResultPartial(result, [
@@ -88,11 +97,11 @@ describe(__filename, () => {
             tag: [{ value: 'five' }, { value: 'four' }, { value: 'three' }]
           }
         ], { ignoreOrderInGroups: true })
+        // TODO order merging commands and remove ignoreOrderInGroups (it is doable)
       })
     })
     describe('with reused labels instructions', () => {
       it(`query(['image'])`, async () => {
-        console.log(instructions.reuseLabels)
         const scraper = new ScraperProgram(instructions.reuseLabels, testEnv.outputFolder)
         await scraper.start()
         await scraper.toPromise()

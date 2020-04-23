@@ -15,22 +15,104 @@ describe(__filename, () => {
         const scraper = new ScraperProgram(instructions.simple, testEnv.outputFolder)
         await scraper.start()
         await scraper.toPromise()
-        const result = scraper.query(['image', 'title'], {groupBy: 'post',
-          // inspector: testEnv.queryDebugger([
-          //   // 'value',
-          //   // 'requestParams',
-          //   // 'commandId',
-          //   // 'parentTreeId',
-          //   'valueIndex',
-          //   'operatorIndex',
-          //   'commandSort',
-          //   'label',
-          //   'currentCommandLabel',
-          //   'recurseDepth',
-          //   'value'
-          // ])
-        })
-        console.log(result)
+        const result = scraper.query(['image', 'title'], { groupBy: 'post' })
+        // prettier-ignore
+        assertQueryResultPartial(result, [
+          {
+            image: [
+              { requestParams: '{"url":"http://recursion/image/brown.jpg","headers":{},"method":"GET"}' },
+            ],
+            title: [{ value: 'Brown' }],
+          },
+          {
+            image: [{
+              requestParams: '{"url":"http://recursion/image/fox.jpg","headers":{},"method":"GET"}',
+            }],
+            title: [{ value: 'Fox' }]
+          },
+          {
+            image: [{
+              requestParams: '{"url":"http://recursion/image/jumped.jpg","headers":{},"method":"GET"}',
+            }],
+            title: [{ value: 'Jumped' }]
+          },
+          {
+            image: [{
+              requestParams: '{"url":"http://recursion/image/over.jpg","headers":{},"method":"GET"}',
+            }],
+            title: [{ value: 'Over' }]
+          }
+        ])
+      })
+    })
+    describe.only('with merging instructions', () => {
+      const scraper = new ScraperProgram(instructions.merging, testEnv.outputFolder)
+
+      beforeEach(async () => {
+        await scraper.start()
+        await scraper.toPromise()
+      })
+
+      it(`query(['image', 'title'], {groupBy: 'post'})`, async () => {
+        const result = scraper.query(['image', 'title'], { groupBy: 'post' })
+        // prettier-ignore
+        assertQueryResultPartial(result, [
+          {
+            image: [
+              { requestParams: '{"url":"http://recursion/image/the.jpg","headers":{},"method":"GET"}' },
+            ],
+            title: [{ value: 'The' }],
+          },
+          {
+            image: [
+              { requestParams: '{"url":"http://recursion/image/quick.jpg","headers":{},"method":"GET"}' },
+            ],
+            title: [{ value: 'Quick' }],
+          },
+          {
+            image: [
+              { requestParams: '{"url":"http://recursion/image/brown.jpg","headers":{},"method":"GET"}' },
+            ],
+            title: [{ value: 'Brown' }],
+          },
+          {
+            image: [{
+              requestParams: '{"url":"http://recursion/image/fox.jpg","headers":{},"method":"GET"}',
+            }],
+            title: [{ value: 'Fox' }]
+          },
+          {
+            image: [{
+              requestParams: '{"url":"http://recursion/image/jumped.jpg","headers":{},"method":"GET"}',
+            }],
+            title: [{ value: 'Jumped' }]
+          },
+          {
+            image: [{
+              requestParams: '{"url":"http://recursion/image/over.jpg","headers":{},"method":"GET"}',
+            }],
+            title: [{ value: 'Over' }]
+          }
+        ])
+      })
+
+      it(`query(['image'])`, async () => {
+        const result = scraper.query(['image'])
+        // console.log(result[0])
+
+        // prettier-ignore
+        assertQueryResultPartial(result, [
+          {
+            image: [
+              { requestParams: '{"url":"http://recursion/image/the.jpg","headers":{},"method":"GET"}' },
+              { requestParams: '{"url":"http://recursion/image/quick.jpg","headers":{},"method":"GET"}' },
+              { requestParams: '{"url":"http://recursion/image/brown.jpg","headers":{},"method":"GET"}' },
+              { requestParams: '{"url":"http://recursion/image/fox.jpg","headers":{},"method":"GET"}' },
+              { requestParams: '{"url":"http://recursion/image/jumped.jpg","headers":{},"method":"GET"}' },
+              { requestParams: '{"url":"http://recursion/image/over.jpg","headers":{},"method":"GET"}' }
+            ]
+          }
+        ])
       })
     })
   })
