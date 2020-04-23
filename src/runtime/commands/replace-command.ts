@@ -16,7 +16,6 @@ class ReplaceCommand extends BaseCommand<TextReplaceCommand, typeof ReplaceComma
     return Promise.resolve([])
   }
 
-  async initialize() {}
   async cleanup() {}
 }
 

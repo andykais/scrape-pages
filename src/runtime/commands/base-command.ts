@@ -61,7 +61,7 @@ abstract class BaseCommand<
         `inserted ${commandId} does not match expected command id ${this.commandId}. ${this.params}`
       )
     }
-    super.initialize()
+    await super.initialize()
   }
 }
 

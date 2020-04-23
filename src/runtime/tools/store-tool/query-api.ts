@@ -36,14 +36,14 @@ class QuerierApi {
     const groupLabels = selectedLabels.filter(
       label => label !== options.groupBy && !includeGroupByRow
     )
-    const idMap = selectedLabels.reduce(
-      (acc, label) => {
-        const { id } = commandLabels.find(c => c.label === label)!
-        acc[id] = label
+    type IdMap = { [id: number]: string }
+    const idMap: IdMap = commandLabels
+      .filter(c => c.label && selectedLabels.includes(c.label))
+      .reduce((acc: IdMap, command) => {
+        acc[command.id] = command.label!
         return acc
-      },
-      {} as { [id: number]: string }
-    )
+      }, {})
+
     const groupByCommand = commandLabels.find(c => c.label === options.groupBy)
     const groupById = groupByCommand ? groupByCommand.id : undefined
 

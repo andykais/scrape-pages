@@ -9,6 +9,28 @@ describe(__filename, () => {
   beforeEach(testEnv.beforeEach)
   afterEach(testEnv.afterEach)
 
+  describe('query ordering', () => {
+    describe('with simple instructions', () => {
+      it.only(`query(['image', 'title'], {groupBy: 'post'})`, async () => {
+        const scraper = new ScraperProgram(instructions.simple, testEnv.outputFolder)
+        await scraper.start()
+        await scraper.toPromise()
+        const result = scraper.query(['image', 'title'], {groupBy: 'post',
+          inspector: testEnv.queryDebugger([
+            // 'value',
+            // 'requestParams',
+            'commandId',
+            'parentTreeId',
+            'label',
+            'currentCommandLabel',
+            'recurseDepth'
+          ])
+        })
+        console.log(result)
+      })
+    })
+  })
+
   it('should handle simple instruction', async () => {
     const scraper = new ScraperProgram(instructions.simple, testEnv.outputFolder)
     await scraper.start()

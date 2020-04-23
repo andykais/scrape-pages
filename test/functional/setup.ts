@@ -1,4 +1,5 @@
 import * as path from 'path'
+import '@test/setup'
 import { rmrf } from '@scrape-pages/util/fs'
 import { HttpFolderMock } from './nock-host-folder'
 import { queryExecutionDebugger } from '@test/query-debugger'
@@ -25,7 +26,8 @@ class FunctionalTestSetup {
   // curried so that we can pick up the mocha context but also reference our own `this`
   static beforeEachInternal = (testEnv: FunctionalTestSetup) => {
     return async function() {
-      testEnv.mochaContext = this
+      // console.log(this)
+      testEnv.mochaContext = this.currentTest
       await rmrf(testEnv.outputFolder)
       testEnv.siteMock = new HttpFolderMock(testEnv.mockFolder, testEnv.mockHost)
       await testEnv.siteMock.init()
@@ -34,7 +36,6 @@ class FunctionalTestSetup {
 
   afterEach = () => {
     this.siteMock.done()
-    this.mochaContext.timeout(2000)
   }
 
   async restartHttpMock(options?: HttpMockOptions) {

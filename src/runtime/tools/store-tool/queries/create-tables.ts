@@ -40,8 +40,6 @@ CREATE TABLE IF NOT EXISTS networkRequests (
 );
 
 -- TODO use these indexes?
-CREATE UNIQUE INDEX IF NOT EXISTS commandLabel   ON commands(label);
-CREATE UNIQUE INDEX IF NOT EXISTS crawlerValueId ON crawlerTree(id);
 CREATE        INDEX IF NOT EXISTS indexes ON crawlerTree(commandId);
 CREATE UNIQUE INDEX IF NOT EXISTS indexes ON networkRequests(requestParams);
 

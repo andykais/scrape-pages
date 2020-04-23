@@ -154,7 +154,7 @@ class FetchCommand extends BaseCommand<I.FetchCommand, typeof FetchCommand.DEFAU
   }
 
   async initialize() {
-    super.initialize()
+    await super.initialize()
     this.writeFolder = path.resolve(this.settings.folder, this.commandId.toString())
     if (this.command.params.WRITE) {
       await fs.mkdirp(this.writeFolder)
