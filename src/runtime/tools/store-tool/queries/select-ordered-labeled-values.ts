@@ -35,10 +35,31 @@ type FurthestDistanceTraveled = number
 type Info = { selectedCommands: SelectedCommandInfo[]; furthestDistanceTraveled: number }
 
 class SelectOrderedLabeledValues extends Query {
-  private instructions: Instructions
-  private labels: string[]
-  private commandLabels: CommandLabelRow[]
-  private debugMode: boolean
+  public constructor(database: Query['database']) {
+    super(database)
+    this.call = this.call.bind(this)
+  }
+  // public call: PreparedStatement['prepare'] = (...args: any[]) => {
+  // prettier-ignore
+  public call(instructions: Instructions, labels: string[], commandLabels: CommandLabelRow[], debugMode: false): () => SelectedRow[]
+  // prettier-ignore
+  public call(instructions: Instructions, labels: string[], commandLabels: CommandLabelRow[], debugMode: true): () => SelectedRowWithDebug[]
+  // prettier-ignore
+  public call( instructions: Instructions, labels: string[], commandLabels: CommandLabelRow[], debugMode: boolean) {
+    if (labels.length === 0) return () => []
+
+    const compiler = new QueryCompiler(instructions, labels, commandLabels)
+    const templateVars = compiler.generateSqlFragments()
+
+    const templateStr = template({ ...templateVars, debugMode })
+    if (debugMode) console.log(templateStr)
+    const statement = this.database.prepare(templateStr)
+    // console.log({ statement })
+    return (): SelectedRow[] => statement.all()
+  }
+}
+
+class QueryCompiler {
   private selectedCommandIds: number[]
   // collectInfo stateful vars
   private selectionOrderCases: { commandId: number; atRecurseDepth: number }[]
@@ -48,35 +69,17 @@ class SelectOrderedLabeledValues extends Query {
     stopWaitingAtDistanceFromTop: number
   }[]
 
-  public constructor(database: Query['database']) {
-    super(database)
-    this.call = this.call.bind(this)
-  }
-  // prettier-ignore
-  public call(instructions: Instructions, labels: string[], commandLabels: CommandLabelRow[], debugMode: false): () => SelectedRow[]
-  // prettier-ignore
-  public call(instructions: Instructions, labels: string[], commandLabels: CommandLabelRow[], debugMode: true): () => SelectedRowWithDebug[]
-  // prettier-ignore
-  public call( instructions: Instructions, labels: string[], commandLabels: CommandLabelRow[], debugMode: boolean) {
-    this.instructions = instructions
-    this.labels = labels
-    this.commandLabels = commandLabels
-    this.debugMode = debugMode
+  public constructor(
+    private instructions: Instructions,
+    private labels: string[],
+    private commandLabels: CommandLabelRow[]
+  ) {
     this.selectedCommandIds = commandLabels
       .filter(c => c.label && labels.includes(c.label))
       .map(c => c.id)
-
-    const { selectedCommandIdsSql, waitingJoinsSql, waitingSortSql, furthestDistanceTraveled } = this.generateSqlFragments()
-
-
-    if (labels.length === 0) return () => []
-    const templateStr = template(selectedCommandIdsSql, waitingJoinsSql, waitingSortSql, furthestDistanceTraveled, debugMode)
-    if (debugMode) console.log(templateStr)
-    const statement = this.database.prepare(templateStr)
-    return (): SelectedRow[] => statement.all()
   }
 
-  private generateSqlFragments() {
+  public generateSqlFragments() {
     this.selectionOrderCases = []
     this.selectionWaitCasesV2 = []
     this.mergingWaitCasesV2 = []
@@ -241,20 +244,20 @@ class SelectOrderedLabeledValues extends Query {
   }
 }
 
-export {
-  SelectOrderedLabeledValues,
-  // type exports
-  SelectedRow,
-  SelectedRowWithDebug
-}
-
-const template = (
-  selectedCommandIdsSql: string,
-  waitingJoinsSql: string,
-  waitingSortSql: string,
-  furthestDistanceTraveled: number,
+const template = (templateVars: {
+  selectedCommandIdsSql: string
+  waitingJoinsSql: string
+  waitingSortSql: string
+  furthestDistanceTraveled: number
   debugMode: boolean
-) => {
+}) => {
+  const {
+    selectedCommandIdsSql,
+    waitingJoinsSql,
+    waitingSortSql,
+    furthestDistanceTraveled,
+    debugMode
+  } = templateVars
   const ifDebugMode = (partialSql: string) => (debugMode ? partialSql : '')
   const unlessDebugMode = (partialSql: string) =>
     debugMode ? `-- NO_DEBUG ${partialSql}` : partialSql
@@ -321,4 +324,11 @@ ${unlessDebugMode(`WHERE cte.recurseDepth = ${furthestDistanceTraveled}`)}
   --   -- operatorIndex,
     -- commandSort desc
 `
+}
+
+export {
+  SelectOrderedLabeledValues,
+  // type exports
+  SelectedRow,
+  SelectedRowWithDebug
 }

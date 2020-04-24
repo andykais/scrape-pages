@@ -14,6 +14,7 @@ class FunctionalTestSetup {
   public siteMock: HttpFolderMock
   public beforeEach: () => Promise<void>
   private mochaContext: Mocha.Context
+  private previousTestWasStep: boolean
 
   constructor(testDirectory: string) {
     const testDirname = path.basename(testDirectory)
@@ -21,16 +22,18 @@ class FunctionalTestSetup {
     this.mockHost = `http://${testDirname}`
     this.mockFolder = `${testDirectory}/fixtures`
     this.beforeEach = FunctionalTestSetup.beforeEachInternal(this)
+    this.previousTestWasStep = false
   }
 
   // curried so that we can pick up the mocha context but also reference our own `this`
   static beforeEachInternal = (testEnv: FunctionalTestSetup) => {
     return async function() {
-      // console.log(this)
       testEnv.mochaContext = this.currentTest
+      const isStep = testEnv.mochaContext.body.includes('markRemainingTestsAndSubSuitesAsPending')
       await rmrf(testEnv.outputFolder)
       testEnv.siteMock = new HttpFolderMock(testEnv.mockFolder, testEnv.mockHost)
       await testEnv.siteMock.init()
+      testEnv.previousTestWasStep = isStep
     }
   }
 

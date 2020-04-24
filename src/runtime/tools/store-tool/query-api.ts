@@ -68,7 +68,6 @@ class QuerierApi {
       }
 
       const rows = stmt()
-      console.log(rows.length)
       const result: Querier.QueryResult = []
       let group: Querier.OrderedValuesGroup = {}
       for (const label of groupLabels) group[label] = []
