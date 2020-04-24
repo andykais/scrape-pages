@@ -8,8 +8,9 @@ const testEnv = new FunctionalTestSetup(__dirname)
 describe(__filename, () => {
   describe('query ordering', () => {
     describe('with simple instructions', () => {
-      const scraper = new ScraperProgram(instructions.simple, testEnv.outputFolder)
+      let scraper: ScraperProgram
       before(async function () {
+        scraper = new ScraperProgram(instructions.simple, testEnv.outputFolder)
         await testEnv.beforeEach.bind(this)()
         await scraper.start()
         await scraper.toPromise()
@@ -65,9 +66,10 @@ describe(__filename, () => {
       })
     })
     describe('with merging instructions', async () => {
-      const scraper = new ScraperProgram(instructions.merging, testEnv.outputFolder)
+      let scraper: ScraperProgram
 
       before(async function () {
+        scraper = new ScraperProgram(instructions.merging, testEnv.outputFolder)
         await testEnv.beforeEach.bind(this)()
         await scraper.start()
         await scraper.toPromise()

@@ -39,6 +39,7 @@ interface TextReplaceCommand {
     LABEL?: string
     SELECTOR: string
     WITH?: string
+    FLAGS?: string
   }
 }
 

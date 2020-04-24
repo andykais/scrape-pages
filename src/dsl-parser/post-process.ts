@@ -27,7 +27,7 @@ function postProcessCommands(commands: any[]) {
       case 'PARSE':
         return processRawCommandAndRenameArg('SELECTOR', rawCommand)
       case 'REPLACE':
-        return processRawCommandAndRenameArg('REPLACE', rawCommand)
+        return processRawCommandAndRenameArg('SELECTOR', rawCommand)
       default:
         throw new Error(`Unknown command '${rawCommand.command}' in the program`)
     }

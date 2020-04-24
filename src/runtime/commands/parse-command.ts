@@ -1,4 +1,5 @@
 import cheerio from 'cheerio'
+import jsonata from 'jsonata'
 import { BaseCommand } from './base-command'
 // type imports
 import { Settings, Tools, Stream } from '@scrape-pages/types/internal'
@@ -30,12 +31,23 @@ class CheerioParser implements ParserEngine {
 }
 
 class JsonataParser implements ParserEngine {
-  constructor(private command: I.ParseCommand) {}
-  load(json: string) {
-    throw new Error('unimplemented')
+  private parser: jsonata.Expression
+  private object: object
+
+  public constructor(private command: I.ParseCommand) {
+    this.parser = jsonata(this.command.params.SELECTOR)
   }
-  forEach(cb: (value: string, index: number) => void) {
-    throw new Error('unimplemented')
+  public load(json: string) {
+    this.object = JSON.parse(json)
+  }
+  public forEach(cb: (value: string, index: number) => void) {
+    const result = this.parser.evaluate(this.object)
+    const resultArray = Array.isArray(result) ? result : [result]
+    for (const [i, result] of resultArray.entries()) {
+      if (typeof result === 'object') cb(JSON.stringify(result), i)
+      else if (typeof result === 'undefined') cb('', i)
+      else cb(result.toString(), i)
+    }
   }
 }
 

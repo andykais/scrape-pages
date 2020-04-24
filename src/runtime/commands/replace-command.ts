@@ -5,15 +5,23 @@ import { TextReplaceCommand } from '@scrape-pages/types/instructions'
 
 class ReplaceCommand extends BaseCommand<TextReplaceCommand, typeof ReplaceCommand.DEFAULT_PARAMS> {
   private static DEFAULT_PARAMS = {
-    WITH: ''
+    WITH: '',
+    FLAGS: ''
   }
+  private regex: RegExp
+
   constructor(settings: Settings, tools: Tools, command: TextReplaceCommand) {
     super(settings, tools, command, ReplaceCommand.DEFAULT_PARAMS)
+
+    const { SELECTOR, FLAGS } = command.params
+    this.regex = new RegExp(SELECTOR, FLAGS)
   }
 
   stream(payload: Stream.Payload) {
-    throw new Error('unimplemented')
-    return Promise.resolve([])
+    const { WITH } = this.params
+    const processedValue = payload.value.replace(this.regex, WITH)
+    const newPayload = this.saveValue(payload, 0, processedValue)
+    return Promise.resolve([newPayload])
   }
 
   async cleanup() {}

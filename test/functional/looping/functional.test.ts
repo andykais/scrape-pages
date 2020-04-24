@@ -10,9 +10,10 @@ const testEnv = new FunctionalTestSetup(__dirname)
 describe(__filename, () => {
   describe('query ordering', () => {
     describe('with simple instructions', () => {
-      const scraper = new ScraperProgram(instructions.simple, testEnv.outputFolder)
+      let scraper: ScraperProgram
 
       before(async function () {
+        scraper = new ScraperProgram(instructions.simple, testEnv.outputFolder)
         await testEnv.beforeEach.bind(this)()
         await scraper.start()
         await scraper.toPromise()
@@ -44,9 +45,10 @@ describe(__filename, () => {
     })
 
     describe('with merging instructions', () => {
-      const scraper = new ScraperProgram(instructions.merging, testEnv.outputFolder)
+      let scraper: ScraperProgram
 
       before(async function () {
+        scraper = new ScraperProgram(instructions.merging, testEnv.outputFolder)
         await testEnv.beforeEach.bind(this)()
         await scraper.start()
         await scraper.toPromise()
@@ -101,9 +103,10 @@ describe(__filename, () => {
     })
 
     describe('with reused labels instructions', () => {
-      const scraper = new ScraperProgram(instructions.reuseLabels, testEnv.outputFolder)
+      let scraper: ScraperProgram
 
       before(async function () {
+        scraper = new ScraperProgram(instructions.reuseLabels, testEnv.outputFolder)
         await testEnv.beforeEach.bind(this)()
         await scraper.start()
         await scraper.toPromise()
@@ -158,9 +161,10 @@ describe(__filename, () => {
     })
 
     describe('query ordering', () => {
-      const scraper = new ScraperProgram(instructions.withEmptyValue, testEnv.outputFolder)
+      let scraper: ScraperProgram
 
       before(async function () {
+        scraper = new ScraperProgram(instructions.withEmptyValue, testEnv.outputFolder)
         await testEnv.beforeEach.bind(this)()
         await scraper.start()
         await scraper.toPromise()

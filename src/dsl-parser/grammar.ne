@@ -193,6 +193,7 @@ BooleanExpr               -> Any _ ComparisonOperator _ Any                     
 ComparisonOperator        -> "==" | ">" | ">=" | "<" | "<="
 LogicOperator             -> "||" | "&&"
 
+# TODO it is impossible to represent the literal character ' inside a string template right now. This is especially annoying for regex commands. We will need to allow both kinds of quotes at some point
 StringTemplate            -> InQuotes[[^'\n\r]:*]                                     {% extractText %}
 Slug                      -> [a-zA-Z0-9-]:+                                           {% extractSlug %}
 Number                    -> "-":? [0-9]:+                                                  {% extractNumber %}
