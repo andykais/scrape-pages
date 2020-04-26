@@ -153,6 +153,7 @@ class FetchCommand extends BaseCommand<I.FetchCommand, typeof FetchCommand.DEFAU
     }
   }
 
+  // runtime-base overrides
   async initialize() {
     await super.initialize()
     this.writeFolder = path.resolve(this.settings.folder, this.commandId.toString())
@@ -160,7 +161,7 @@ class FetchCommand extends BaseCommand<I.FetchCommand, typeof FetchCommand.DEFAU
       await fs.mkdirp(this.writeFolder)
     }
   }
-  async cleanup() {
+  cleanup() {
     // cancel in-flight requests here
   }
 }

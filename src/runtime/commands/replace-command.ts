@@ -24,7 +24,7 @@ class ReplaceCommand extends BaseCommand<TextReplaceCommand, typeof ReplaceComma
     return Promise.resolve([newPayload])
   }
 
-  async cleanup() {}
+  cleanup() {}
 }
 
 export { ReplaceCommand }

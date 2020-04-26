@@ -49,10 +49,10 @@ class ScraperProgramRuntime extends RuntimeBase {
     for (const command of this.commands) await command.initialize()
     super.initialize()
   }
-  public async cleanup() {
+  public cleanup() {
     if (this.subscription) this.subscription.unsubscribe()
-    for (const command of this.commands) await command.cleanup()
-    for (const tool of Object.values(this.tools)) await tool.cleanup()
+    for (const command of this.commands) command.cleanup()
+    for (const tool of Object.values(this.tools)) tool.cleanup()
   }
 }
 

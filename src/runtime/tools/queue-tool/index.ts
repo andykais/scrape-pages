@@ -64,7 +64,7 @@ class Queue extends RuntimeBase {
 
   /* RuntimeBase overrides */
   public async initialize() {}
-  public async cleanup() {}
+  public cleanup() {}
 
   private getNumToDequeue() {
     if (this.maxConcurrency && this.rate) {

@@ -91,7 +91,7 @@ class ParseCommand extends BaseCommand<I.ParseCommand, typeof ParseCommand.PARAM
     return Promise.resolve(parsedResult)
   }
 
-  async cleanup() {}
+  cleanup() {}
 }
 
 export { ParseCommand }

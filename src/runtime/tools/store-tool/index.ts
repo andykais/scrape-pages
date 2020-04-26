@@ -49,7 +49,7 @@ class Store extends RuntimeBase {
       this.qs.truncateTables()
     }
   }
-  public async cleanup() {
+  public cleanup() {
     this.qs.updateProgramState('COMPLETED')
   }
 

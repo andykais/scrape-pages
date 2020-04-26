@@ -11,7 +11,7 @@ class RuntimeBase {
     if (!this[INITIALIZED])
       throw new Error(`${this.name} must be initialized before calling this method.`)
   }
-  public async cleanup(...args: any[]): Promise<void> {}
+  public cleanup(...args: any[]): void {}
 }
 
 export { RuntimeBase }

@@ -58,10 +58,7 @@ class Notify extends RuntimeBase {
 
   /* RuntimeBase overrides */
   public async initialize() {}
-  public async cleanup() {
-    // this.onAnyListeners = [] // TODO is this a memory leak? Should I delete the functions?
-    // this.emitter.removeAllListeners()
-  }
+  public cleanup() {}
 }
 
 export { Notify }
