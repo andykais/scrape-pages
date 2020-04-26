@@ -103,7 +103,7 @@ class ScraperProgram extends EventEmitter {
   public start() {
     this.setState(ProgramState.ACTIVE)
     // setImmediate(() => {
-      this._start()
+    this._start()
     // })
     return this
   }
@@ -117,10 +117,17 @@ class ScraperProgram extends EventEmitter {
   }
 
   public stop = () => {
-    this.runtime.mustBeInitialized()
-    // lets double check that this is all it takes. We may need some state in there when observables fall short
-    this.runtime.cleanup()
-    this.setState(ProgramState.STOPPED)
+    if (this.runtime.isInitialized()) {
+      // lets double check that this is all it takes. We may need some state in there when observables fall short
+      this.runtime.cleanup()
+      this.setState(ProgramState.STOPPED)
+    } else {
+      this.once('initialized', () => {
+        this.runtime.cleanup()
+        this.setState(ProgramState.STOPPED)
+        this.emit('done')
+      })
+    }
   }
   public stopCommand(label: string) {
     this.runtime.mustBeInitialized()
@@ -138,16 +145,8 @@ class ScraperProgram extends EventEmitter {
     if (this.state === ProgramState.COMPLETED) return Promise.resolve()
     if (this.state === ProgramState.STOPPED) return Promise.resolve()
     return new Promise((resolve, reject) => {
-      const onDone = () => {
-        resolve()
-        this.removeListener('done', onDone)
-      }
-      const onError = (e: Error) => {
-        reject(e)
-        this.removeListener('error', onError)
-      }
-      this.on('done', onDone)
-      this.on('error', onError)
+      this.once('done', resolve)
+      this.once('error', reject)
     })
   }
 

@@ -7,11 +7,11 @@ import * as instructions from './instructions'
 
 const testEnv = new FunctionalTestSetup(__dirname)
 
-describe.only(__filename, () => {
+describe(__filename, () => {
   beforeEach(testEnv.beforeEach)
   afterEach(testEnv.afterEach)
 
-  it.only('can run a scraper twice', async () => {
+  it('can run a scraper twice', async () => {
     testEnv.siteMock.persist()
 
     const scraper = new ScraperProgram(instructions.simple, testEnv.outputFolder)
@@ -38,16 +38,17 @@ describe.only(__filename, () => {
   it('can start a scraper after it has been stopped', async () => {
     testEnv.siteMock.persist()
 
+    // await testEnv.siteMock.init()
+
     const scraper = new ScraperProgram(instructions.simple, testEnv.outputFolder)
-    await scraper.start()
+    scraper.start()
     scraper.stop()
     await scraper.toPromise()
 
     const resultAfterImmediateStop = scraper.query(['postTitle'])
     expect(resultAfterImmediateStop).to.deep.equal([])
 
-    await scraper.start()
-    await scraper.toPromise()
+    await scraper.start().toPromise()
 
     const result = scraper.query(['postTitle'])
     assertQueryResultPartial(result, [
