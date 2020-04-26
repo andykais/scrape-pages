@@ -11,12 +11,11 @@ describe.only(__filename, () => {
   beforeEach(testEnv.beforeEach)
   afterEach(testEnv.afterEach)
 
-  it('can run a scraper twice', async () => {
+  it.only('can run a scraper twice', async () => {
     testEnv.siteMock.persist()
 
     const scraper = new ScraperProgram(instructions.simple, testEnv.outputFolder)
-    await scraper.start()
-    await scraper.toPromise()
+    await scraper.start().toPromise()
 
     const result1 = scraper.query(['postTitle'])
     assertQueryResultPartial(result1, [
@@ -31,8 +30,7 @@ describe.only(__filename, () => {
       }
     ])
 
-    await scraper.start()
-    await scraper.toPromise()
+    await scraper.start().toPromise()
     const result2 = scraper.query(['postTitle'])
     expect(result1).to.deep.equal(result2)
   })

@@ -12,7 +12,7 @@ DO UPDATE
 SET
   state = ?
 WHERE
-  state != ?
+  state NOT IN (?, 'ERRORED')
 `
 
 class UpdateProgramState extends Query {

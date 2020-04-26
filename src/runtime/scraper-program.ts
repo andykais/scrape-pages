@@ -100,31 +100,12 @@ class ScraperProgram extends EventEmitter {
    * @name start
    * @description begin scraping and write results to disk
    */
-  public async start() {
-    // TODO make function synchronous and return `this` so we can do scraper.start().toPromise()
-    // TODO only let start be called once? Maybe? Maybe we can reuse a class?
-    try {
-      await fs.mkdirp(this.folder)
-      await this.setState(ProgramState.ACTIVE)
-      await this.runtime.initialize()
-      this.runtime.subscription = this.runtime.observables.subscribe({
-        error: async (error: Error) => {
-          this.emit('error', error)
-          await this.setState(ProgramState.ERRORED)
-          await this.runtime.cleanup()
-        },
-        complete: async () => {
-          this.emit('done')
-          await this.setState(ProgramState.COMPLETED)
-          await this.runtime.cleanup()
-        }
-      })
-      this.runtime.tools.notify.initialized()
-    } catch (error) {
-      this.emit('error', error)
-      await this.setState(ProgramState.ERRORED)
-      await this.runtime.cleanup()
-    }
+  public start() {
+    this.setState(ProgramState.ACTIVE)
+    // setImmediate(() => {
+      this._start()
+    // })
+    return this
   }
 
   /**
@@ -157,27 +138,52 @@ class ScraperProgram extends EventEmitter {
     if (this.state === ProgramState.COMPLETED) return Promise.resolve()
     if (this.state === ProgramState.STOPPED) return Promise.resolve()
     return new Promise((resolve, reject) => {
-      this.on('done', resolve)
-      this.on('error', reject)
+      const onDone = () => {
+        resolve()
+        this.removeListener('done', onDone)
+      }
+      const onError = (e: Error) => {
+        reject(e)
+        this.removeListener('error', onError)
+      }
+      this.on('done', onDone)
+      this.on('error', onError)
     })
+  }
+
+  private async _start() {
+    // TODO make function synchronous and return `this` so we can do scraper.start().toPromise()
+    // TODO only let start be called once? Maybe? Maybe we can reuse a class?
+    try {
+      await fs.mkdirp(this.folder)
+      await this.runtime.initialize()
+      this.runtime.subscription = this.runtime.observables.subscribe({
+        error: async (error: Error) => {
+          this.emit('error', error)
+          this.setState(ProgramState.ERRORED)
+          await this.runtime.cleanup()
+        },
+        complete: async () => {
+          this.emit('done')
+          this.setState(ProgramState.COMPLETED)
+          await this.runtime.cleanup()
+        }
+      })
+      this.runtime.tools.notify.initialized()
+    } catch (error) {
+      this.emit('error', error)
+      await this.setState(ProgramState.ERRORED)
+      await this.runtime.cleanup()
+    }
   }
 
   private async initFolder() {
     // await fs.mkdirp
   }
   private setState(state: ProgramStateEnum) {
-    switch (state) {
-      case ProgramState.ACTIVE:
-        if (this.state === ProgramState.ACTIVE) {
-          // TODO decide how we want to sync this up with the file data (perhaps this is a good case for database state tracking)
-          throw new Error('Scraper is already active')
-        }
-    }
+    // TODO write state from here and here only
     this.state = state
-    // TODO replace w/ database write
-    // await this.writeMetadata({ state })
   }
-  private async writeMetadata({ state }: { state: ProgramStateEnum }) {}
 }
 
 export { ScraperProgram, ProgramStateEnum }
