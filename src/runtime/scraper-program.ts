@@ -14,6 +14,15 @@ import { Instructions, Command } from '@scrape-pages/types/instructions'
 import { Options } from '@scrape-pages/types/options'
 import { Settings, Querier, Tools, Stream } from '@scrape-pages/types/internal'
 
+const ProgramState = {
+  IDLE: 'IDLE' as const,
+  ACTIVE: 'ACTIVE' as const,
+  STOPPED: 'STOPPED' as const,
+  COMPLETED: 'COMPLETED' as const,
+  ERRORED: 'ERRORED' as const
+}
+type ProgramStateEnum = keyof typeof ProgramState
+
 class ScraperProgramRuntime extends RuntimeBase {
   public tools: Tools
   public observables: Rx.Observable<any>
@@ -53,6 +62,8 @@ class ScraperProgram extends EventEmitter {
   private fromExistingFolder: boolean
   private runtime: ScraperProgramRuntime
   private folder: string
+
+  private state: ProgramStateEnum
   // we only track completes, if an error is emitted without anyone watching for it, we get an uncaught
   // exception. This is better
   private completed: boolean
@@ -62,19 +73,23 @@ class ScraperProgram extends EventEmitter {
    */
   public query: Querier.Interface
 
-  public constructor(dslInput: string, folder: string, options?: Options)
-  public constructor(instructions: Instructions, folder: string, options?: Options)
-  public constructor(input: string | Instructions, folder: string, options: Options = {}) {
+  public constructor(dslInstructions: string, folder: string, options?: Options)
+  public constructor(objectInstructions: Instructions, folder: string, options?: Options)
+  // prettier-ignore
+  public constructor(instructionsArg: string | Instructions, folder: string, options: Options = {}) {
     super()
     // if its a string, compile it using the dsl-parser
     const instructions =
-      typeof input === 'string' ? dslParser(input) : JSON.parse(JSON.stringify(input))
+      typeof instructionsArg === 'string'
+        ? dslParser(instructionsArg)
+        : JSON.parse(JSON.stringify(instructionsArg))
     // TODO validate that tag & input slugs do not equal 'value', 'index', 'request'
     const settings: Settings = { instructions, folder, options }
     this.runtime = new ScraperProgramRuntime(settings, this)
     this.query = this.runtime.tools.store.query
     this.fromExistingFolder = false
     this.folder = folder
+    this.state = ProgramState.IDLE
 
     this.on('stop', this.stop)
     this.on('useRateLimiter', this.toggleRateLimiter)
@@ -86,27 +101,28 @@ class ScraperProgram extends EventEmitter {
    * @description begin scraping and write results to disk
    */
   public async start() {
+    // TODO make function synchronous and return `this` so we can do scraper.start().toPromise()
     // TODO only let start be called once? Maybe? Maybe we can reuse a class?
     try {
       await fs.mkdirp(this.folder)
-      await this.writeMetadata({ state: 'ACTIVE' })
+      await this.setState(ProgramState.ACTIVE)
       await this.runtime.initialize()
       this.runtime.subscription = this.runtime.observables.subscribe({
         error: async (error: Error) => {
           this.emit('error', error)
-          await this.writeMetadata({ state: 'ERRORED' })
+          await this.setState(ProgramState.ERRORED)
           await this.runtime.cleanup()
         },
         complete: async () => {
           this.emit('done')
-          await this.writeMetadata({ state: 'COMPLETED' })
+          await this.setState(ProgramState.COMPLETED)
           await this.runtime.cleanup()
         }
       })
       this.runtime.tools.notify.initialized()
     } catch (error) {
       this.emit('error', error)
-      await this.writeMetadata({ state: 'ERRORED' })
+      await this.setState(ProgramState.ERRORED)
       await this.runtime.cleanup()
     }
   }
@@ -123,6 +139,7 @@ class ScraperProgram extends EventEmitter {
     this.runtime.mustBeInitialized()
     // lets double check that this is all it takes. We may need some state in there when observables fall short
     this.runtime.cleanup()
+    this.setState(ProgramState.STOPPED)
   }
   public stopCommand(label: string) {
     this.runtime.mustBeInitialized()
@@ -137,7 +154,8 @@ class ScraperProgram extends EventEmitter {
    * @description convienience method returns a promise that resolves on the 'done' event
    */
   public toPromise(): Promise<void> {
-    if (this.completed) return Promise.resolve()
+    if (this.state === ProgramState.COMPLETED) return Promise.resolve()
+    if (this.state === ProgramState.STOPPED) return Promise.resolve()
     return new Promise((resolve, reject) => {
       this.on('done', resolve)
       this.on('error', reject)
@@ -147,7 +165,19 @@ class ScraperProgram extends EventEmitter {
   private async initFolder() {
     // await fs.mkdirp
   }
-  private async writeMetadata({ state }: { state: 'ACTIVE' | 'COMPLETED' | 'ERRORED' }) {}
+  private setState(state: ProgramStateEnum) {
+    switch (state) {
+      case ProgramState.ACTIVE:
+        if (this.state === ProgramState.ACTIVE) {
+          // TODO decide how we want to sync this up with the file data (perhaps this is a good case for database state tracking)
+          throw new Error('Scraper is already active')
+        }
+    }
+    this.state = state
+    // TODO replace w/ database write
+    // await this.writeMetadata({ state })
+  }
+  private async writeMetadata({ state }: { state: ProgramStateEnum }) {}
 }
 
-export { ScraperProgram }
+export { ScraperProgram, ProgramStateEnum }

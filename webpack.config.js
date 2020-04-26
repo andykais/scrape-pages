@@ -1,6 +1,8 @@
 const path = require('path')
 const typescriptIsTransformer = require('typescript-is/lib/transform-inline/transformer').default
 const nodeExternals = require('webpack-node-externals')
+const webpack = require('webpack')
+const packageJson = require('./package.json')
 
 // const glob = require('glob')
 // const sourceFiles = glob
@@ -47,7 +49,13 @@ module.exports = {
         loader: 'ts-loader',
         options: {
           getCustomTransformers: program => ({
-            before: [typescriptIsTransformer(program, { ignoreFunctions: true, ignoreMethods: true, disallowSuperfluousObjectProperties: true })]
+            before: [
+              typescriptIsTransformer(program, {
+                ignoreFunctions: true,
+                ignoreMethods: true,
+                disallowSuperfluousObjectProperties: true
+              })
+            ]
           })
         }
       },
@@ -61,5 +69,10 @@ module.exports = {
   optimization: {
     minimize: false
   },
+  plugins: [
+    new webpack.DefinePlugin({
+      VERSION: JSON.stringify(packageJson.version)
+    })
+  ],
   externals: [nodeExternals()]
 }

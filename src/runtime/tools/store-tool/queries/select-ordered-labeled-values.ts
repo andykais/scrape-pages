@@ -24,6 +24,7 @@ type SelectedRowWithDebug = SelectedRow & {
   recurseDepth: number
   operatorIndex: number
   valueIndex: number
+  commandId: number
   currentCommandLabel: string
   currentCommandId: number
   commandSort: number

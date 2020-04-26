@@ -17,6 +17,7 @@ type HttpMockOptions = {
   delay?: number
 }
 class HttpFolderMock {
+  private scope?: nock.Scope
   private interceptors?: nock.Interceptor[]
   private debug: boolean = false
 
@@ -38,7 +39,7 @@ class HttpFolderMock {
       const fullPath = path.resolve(this.mockEndpointsFolder, file)
       const interceptor = scope.get(`/${relativePath}`)
       const randomMultiplier = random ? random.nextFloat() : 1
-      const r = interceptor.delay(randomMultiplier * delay).replyWithFile(200, fullPath)
+      interceptor.delay(randomMultiplier * delay).replyWithFile(200, fullPath)
       return interceptor
     })
     scope.on('request', req => {
@@ -46,6 +47,12 @@ class HttpFolderMock {
         console.log(req.method, req.path)
       }
     })
+    this.scope = scope
+  }
+
+  public persist = () => {
+    if (this.scope) this.scope.persist()
+    else throw new Error('Must init() endpoints before calling persist()')
   }
 
   public done = () => {

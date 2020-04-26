@@ -6,15 +6,20 @@ BEGIN TRANSACTION;
 -- We delete the tree each time we start the scraper because adding more cache logic is a pain and rewalking the tree is cheap.
 -- downloadCache remains 'cached' though, so we do not reuse bandwidth unnecessarily
 -- We also delete commands. It means technically you could completely change the instructions and this would chug along fine. The only thing that is reused is the cache
-DROP TABLE IF EXISTS commands;
-DROP TABLE IF EXISTS crawlerTree;
+CREATE TABLE IF NOT EXISTS programState (
+  Lock INTEGER PRIMARY KEY CHECK (Lock = 1),
+  state TEXT NOT NULL,
+  version TEXT NOT NULL
+);
 
-CREATE TABLE commands (
+
+CREATE TABLE IF NOT EXISTS commands (
   id INTEGER PRIMARY KEY NOT NULL,
   label TEXT
 );
+-- DELETE FROM commands;
 
-CREATE TABLE crawlerTree (
+CREATE TABLE IF NOT EXISTS crawlerTree (
   id INTEGER PRIMARY KEY NOT NULL,
   commandId INT NOT NULL,
   parentTreeId INT,
@@ -26,6 +31,7 @@ CREATE TABLE crawlerTree (
   FOREIGN KEY (networkRequestId) REFERENCES networkRequests(id),
   FOREIGN KEY (commandId) REFERENCES commands(id)
 );
+-- DELETE FROM crawlerTree;
 
 -- this table is only written to when cache:true
 CREATE TABLE IF NOT EXISTS networkRequests (

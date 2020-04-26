@@ -76,6 +76,7 @@ class QuerierApi {
         const isGroupByRow = row.commandId === groupById
         if (includeGroupByRow || !isGroupByRow) {
           group[idMap[row.commandId]].push(row)
+          delete row['commandId']
           pushedValuesInGroup = true
         }
         if (isGroupByRow) {

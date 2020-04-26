@@ -38,6 +38,7 @@ namespace Querier {
   // IF so desired, multi-level grouping could be accomplished. Though its hard to know if that adds value
   export type QueryApiOptions = { groupBy?: string; inspector?: DebuggerInspector }
 
+  type QueryResultRow = Omit<OrderedValuesRow, 'commandId'>
   export type OrderedValuesGroup = { [scraperName: string]: OrderedValuesRow[] }
   export type QueryResult = OrderedValuesGroup[]
   export type QueryResultWithDebug = OrderedValuesRowWithDebug[]

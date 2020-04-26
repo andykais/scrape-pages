@@ -43,8 +43,15 @@ class Store extends RuntimeBase {
     this._qs = queries.createStatements(this.database)
     this._transaction = this.database.transaction.bind(this.database)
     super.initialize()
+    if (initializeTables) {
+      this.qs.checkProgramVersion()
+      this.qs.updateProgramState('ACTIVE')
+      this.qs.truncateTables()
+    }
   }
-  public async cleanup() {}
+  public async cleanup() {
+    this.qs.updateProgramState('COMPLETED')
+  }
 
   private static getSqliteFile(folder: string) {
     return path.resolve(folder, 'store.sqlite')
