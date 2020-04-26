@@ -63,4 +63,60 @@ describe(__filename, () => {
       }
     ])
   })
+
+  it('should restrict inapproriate times to call stop() and start()', async () => {
+    const scraper = new ScraperProgram(instructions.simple, testEnv.outputFolder)
+    // cannot stop a scaper before it has started
+    expect(scraper.stop).to.throw()
+
+    scraper.start()
+    // cannot start a scraper that is already active
+    expect(scraper.start).to.throw()
+
+    scraper.stop()
+    // cannot call stop twice (this is important to test because stopping isnt always synchronous)
+    expect(scraper.stop).to.throw()
+
+    await scraper.toPromise()
+
+    // and cannot stop a scraper that has already completed
+    expect(scraper.stop).to.throw()
+  })
+
+  it('can handle two scrapers pointed at the same folder _if_ they are not running simultaneously', async () => {
+    testEnv.siteMock.persist()
+
+    const scraper1 = new ScraperProgram(instructions.simple, testEnv.outputFolder)
+    const scraper2 = new ScraperProgram(instructions.simple, testEnv.outputFolder)
+
+    scraper1.start()
+
+    // cannot start a when another is active in that folder
+    expect(scraper2.start).to.throw()
+
+    const expectedResult = [
+      {
+        postTitle: [
+          { value: 'The' },
+          { value: 'Quick' },
+          { value: 'Brown' },
+          { value: 'Fox' },
+          { value: 'Jumped' }
+        ]
+      }
+    ]
+
+    await scraper1.toPromise()
+    const result1 = scraper1.query(['postTitle'])
+    assertQueryResultPartial(result1, expectedResult)
+
+    // scrapers can query a folder without actually running a scraper
+    const result2 = scraper2.query(['postTitle'])
+    assertQueryResultPartial(result2, expectedResult)
+
+    // querying again should produce the same output
+    await scraper2.start().toPromise()
+    const result3 = scraper2.query(['postTitle'])
+    assertQueryResultPartial(result3, expectedResult)
+  })
 })

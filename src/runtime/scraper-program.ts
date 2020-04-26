@@ -16,8 +16,9 @@ import { Settings, Querier, Tools, Stream } from '@scrape-pages/types/internal'
 
 const ProgramState = {
   IDLE: 'IDLE' as const,
+  INITIALIZING: 'INITIALIZING' as const,
   ACTIVE: 'ACTIVE' as const,
-  STOPPED: 'STOPPED' as const,
+  STOPPING: 'STOPPING' as const,
   COMPLETED: 'COMPLETED' as const,
   ERRORED: 'ERRORED' as const
 }
@@ -101,7 +102,7 @@ class ScraperProgram extends EventEmitter {
    * @description begin scraping and write results to disk
    */
   public start() {
-    this.setState(ProgramState.ACTIVE)
+    this.setState(ProgramState.INITIALIZING)
     // setImmediate(() => {
     this._start()
     // })
@@ -117,16 +118,17 @@ class ScraperProgram extends EventEmitter {
   }
 
   public stop = () => {
-    if (this.runtime.isInitialized()) {
-      // lets double check that this is all it takes. We may need some state in there when observables fall short
+    if (this.state === ProgramState.ACTIVE) {
+      this.setState(ProgramState.STOPPING)
       this.runtime.cleanup()
-      this.setState(ProgramState.STOPPED)
-    } else {
+    } else if (this.state === ProgramState.INITIALIZING) {
+      this.setState(ProgramState.STOPPING)
       this.once('initialized', () => {
         this.runtime.cleanup()
-        this.setState(ProgramState.STOPPED)
         this.emit('done')
       })
+    } else {
+      throw new Error(`Cannot stop scraper while it is in the ${this.state} state.`)
     }
   }
   public stopCommand(label: string) {
@@ -143,7 +145,6 @@ class ScraperProgram extends EventEmitter {
    */
   public toPromise(): Promise<void> {
     if (this.state === ProgramState.COMPLETED) return Promise.resolve()
-    if (this.state === ProgramState.STOPPED) return Promise.resolve()
     return new Promise((resolve, reject) => {
       this.once('done', resolve)
       this.once('error', reject)
@@ -169,6 +170,7 @@ class ScraperProgram extends EventEmitter {
         }
       })
       this.runtime.tools.notify.initialized()
+      this.setState(ProgramState.ACTIVE)
     } catch (error) {
       this.emit('error', error)
       await this.setState(ProgramState.ERRORED)

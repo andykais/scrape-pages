@@ -15,8 +15,7 @@ describe(__filename, () => {
       before(async function () {
         scraper = new ScraperProgram(instructions.simple, testEnv.outputFolder)
         await testEnv.beforeEach.bind(this)()
-        await scraper.start()
-        await scraper.toPromise()
+        await scraper.start().toPromise()
       })
       after(testEnv.afterEach)
 
@@ -50,8 +49,7 @@ describe(__filename, () => {
       before(async function () {
         scraper = new ScraperProgram(instructions.merging, testEnv.outputFolder)
         await testEnv.beforeEach.bind(this)()
-        await scraper.start()
-        await scraper.toPromise()
+        await scraper.start().toPromise()
       })
       after(testEnv.afterEach)
 
@@ -108,8 +106,7 @@ describe(__filename, () => {
       before(async function () {
         scraper = new ScraperProgram(instructions.reuseLabels, testEnv.outputFolder)
         await testEnv.beforeEach.bind(this)()
-        await scraper.start()
-        await scraper.toPromise()
+        await scraper.start().toPromise()
       })
       after(testEnv.afterEach)
 
@@ -166,8 +163,7 @@ describe(__filename, () => {
       before(async function () {
         scraper = new ScraperProgram(instructions.withEmptyValue, testEnv.outputFolder)
         await testEnv.beforeEach.bind(this)()
-        await scraper.start()
-        await scraper.toPromise()
+        await scraper.start().toPromise()
       })
       after(testEnv.afterEach)
 
@@ -245,26 +241,6 @@ describe(__filename, () => {
           }
         ])
       })
-    })
-  })
-
-  describe('scraper state', () => {
-    beforeEach(testEnv.beforeEach)
-    afterEach(testEnv.afterEach)
-
-    it.skip('should be able to init a scraper twice', async () => {
-      const scraper1 = new ScraperProgram(instructions.simple, testEnv.outputFolder)
-      await scraper1.start()
-      await scraper1.toPromise()
-      const result1 = scraper1.query(['tag'])
-
-      await scraper1.start()
-      await scraper1.toPromise()
-
-      const scraper2 = new ScraperProgram(instructions.simple, testEnv.outputFolder)
-      const result2 = scraper2.query(['tag'])
-
-      expect(result1).to.be.deep.equal(result2)
     })
   })
 })
