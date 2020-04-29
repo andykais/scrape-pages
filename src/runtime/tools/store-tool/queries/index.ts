@@ -9,6 +9,7 @@ import { InsertQueuedNetworkRequest } from './insert-queued-network-request'
 import { UpdateNetworkRequestStatus } from './update-network-request-status'
 import { CheckProgramVersion } from './check-program-version'
 import { UpdateProgramState } from './update-program-state'
+import { SelectNetworkRequestValue } from './select-network-request-value'
 
 type Queries = ReturnType<typeof createStatements>
 function createStatements(database: Sqlite3.Database) {
@@ -21,7 +22,8 @@ function createStatements(database: Sqlite3.Database) {
     selectOrderedLabeledValues: new SelectOrderedLabeledValues(database).call,
     insertValue: new InsertValue(database).call,
     insertQueuedNetworkRequest: new InsertQueuedNetworkRequest(database).call,
-    updateNetworkRequestStatus: new UpdateNetworkRequestStatus(database).call
+    updateNetworkRequestStatus: new UpdateNetworkRequestStatus(database).call,
+    selectNetworkRequestValue: new SelectNetworkRequestValue(database).call
   }
 }
 

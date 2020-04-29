@@ -21,8 +21,8 @@ class Queue extends RuntimeBase {
     super('Queue')
     this.settings = settings
 
-    this.rate = this.settings.options.fetch && this.settings.options.fetch.rateLimit
-    this.maxConcurrency = this.settings.options.fetch && this.settings.options.fetch.maxConcurrency
+    this.rate = this.settings.options.FETCH && this.settings.options.FETCH.rateLimit
+    this.maxConcurrency = this.settings.options.FETCH && this.settings.options.FETCH.maxConcurrency
     this.useRateLimit = Boolean(this.rate)
     this.tasksInProgress = 0
 
@@ -55,7 +55,7 @@ class Queue extends RuntimeBase {
   }
 
   public toggleRateLimiter = (toggleOn: boolean) => {
-    if (this.settings.options.fetch && this.settings.options.fetch.rateLimit && toggleOn) {
+    if (this.settings.options.FETCH && this.settings.options.FETCH.rateLimit && toggleOn) {
       this.useRateLimit = true
     } else {
       this.useRateLimit = false

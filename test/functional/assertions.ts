@@ -44,20 +44,13 @@ function assertQueryResultPartial(
       }
       if (ignoreOrderInGroups) {
         for (const expectedRow of expectedPartial[i][label]) {
-          const expectedRowIsSorted = expectedPartial[i][label].every(
-            (row, i, group) =>
-            {
-              // if (i !== 0) {
-              //   console.log({ a: group[i - 1],
-              //   b: row})
-              // console.log(JSON.stringify(group[i - 1]).localeCompare(JSON.stringify(row)))
-
-              // }
-              return i === 0 || JSON.stringify(group[i - 1]).localeCompare(JSON.stringify(row)) <= 0
-            }
-          )
+          const expectedRowIsSorted = expectedPartial[i][label].every((row, i, group) => {
+            return i === 0 || JSON.stringify(group[i - 1]).localeCompare(JSON.stringify(row)) <= 0
+          })
           if (!expectedRowIsSorted) {
-            throw new Error(`The expected array needs to be sorted at expectedPartial[${i}][${label}], sorry`)
+            throw new Error(
+              `The expected array needs to be sorted at expectedPartial[${i}][${label}], sorry`
+            )
           }
         }
         resultCopy[i][label].sort((a: {}, b: {}) =>

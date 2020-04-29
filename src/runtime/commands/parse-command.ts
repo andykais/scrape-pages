@@ -60,7 +60,7 @@ class ParseCommand extends BaseCommand<I.ParseCommand, typeof ParseCommand.PARAM
   private parserEngine: ParserEngine
 
   constructor(settings: Settings, tools: Tools, command: I.ParseCommand) {
-    super(settings, tools, command, ParseCommand.PARAM_DEFAULTS)
+    super(settings, tools, command, ParseCommand.PARAM_DEFAULTS, 'PARSE')
     switch (this.params.FORMAT) {
       case 'html':
         this.parserEngine = new CheerioParser(this.command)

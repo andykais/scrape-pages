@@ -55,7 +55,6 @@ class SelectOrderedLabeledValues extends Query {
     const templateStr = template({ ...templateVars, debugMode })
     if (debugMode) console.log(templateStr)
     const statement = this.database.prepare(templateStr)
-    // console.log({ statement })
     return (): SelectedRow[] => statement.all()
   }
 }

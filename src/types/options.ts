@@ -1,11 +1,26 @@
+import * as I from './instructions'
+
 interface Options {
-  fetch?: {
+  FETCH?: {
     maxConcurrency?: number
     rateLimit?: {
       interval: number
       limit: number
     }
-    cache?: boolean
+    defaults?: {
+      CACHE?: I.FetchCommand['params']['CACHE']
+      READ?: I.FetchCommand['params']['WRITE']
+      WRITE?: I.FetchCommand['params']['READ']
+    }
+  }
+  PARSE?: {
+    defaults?: {
+      MAX?: I.ParseCommand['params']['MAX']
+      FORMAT?: I.ParseCommand['params']['FORMAT']
+    }
+  }
+  REPLACE?: {
+    defaults?: {}
   }
   inputs?: { [inputSlug: string]: string }
   // folder: string

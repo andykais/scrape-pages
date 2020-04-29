@@ -26,11 +26,14 @@ abstract class BaseCommand<
     protected tools: Tools,
     protected command: Command,
     // defaultParams is a wider type than ParamDefaults because we cannot trust ParamDefaults to enforce the proper types
-    defaultParams: ParamDefaultsGeneric<Command['params']>
+    protected defaultParams: ParamDefaultsGeneric<Command['params']>,
+    protected commandName: I.Command['command']
   ) {
     super('Command')
     super.name = this.constructor.name
-    this.params = { LABEL: undefined, ...defaultParams, ...(this.command.params as any) }
+    const optionsDefaults =
+      this.settings.options[this.commandName] && this.settings.options[this.commandName]!.defaults
+    this.params = { LABEL: undefined, ...defaultParams, ...optionsDefaults, ...(this.command.params as any) }
     this.commandId = this.command.databaseId!
   }
 
@@ -49,9 +52,15 @@ abstract class BaseCommand<
     requestId?: number
   ) {
     const { LABEL } = this.command.params
-    const id = this.tools.store.qs.insertValue(this.commandId, parentPayload, valueIndex, value, requestId)
+    const id = this.tools.store.qs.insertValue(
+      this.commandId,
+      parentPayload,
+      valueIndex,
+      value,
+      requestId
+    )
     this.tools.notify.commandSucceeded(this.command.command, { id, LABEL })
-    return parentPayload.merge({ value, id, valueIndex, })
+    return parentPayload.merge({ value, id, valueIndex })
     // return parentPayload.merge({ value, id, valueIndex, operatorIndex: 0 })
   }
 

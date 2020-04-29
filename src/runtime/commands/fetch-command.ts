@@ -16,11 +16,18 @@ import * as I from '@scrape-pages/types/instructions'
 // check for matching in-flight request
 // if none, check for matching request in database
 // if none, add it to the queue
+type RequestParams = {
+  url: string
+  headers: { [headerName: string]: string }
+  method: string
+}
 type ReadInfo = { bytes: number; value: string; filename: null }
 type WriteInfo = { bytes: number; value: null; filename: string }
 type DownloadInfoWithValue = Stream.DownloadInfo & { value: string }
 
 class FetchCommand extends BaseCommand<I.FetchCommand, typeof FetchCommand.DEFAULT_PARAMS> {
+  protected commandName: 'FETCH'
+
   private static DEFAULT_PARAMS = {
     METHOD: 'GET' as 'GET',
     HEADERS: {},
@@ -33,35 +40,68 @@ class FetchCommand extends BaseCommand<I.FetchCommand, typeof FetchCommand.DEFAU
   private urlTemplate: templates.Template
   private headerTemplates: FMap<string, templates.Template>
 
+  private inFlightFetches: {
+    [serializedRequestParams: string]: {
+      requestId: number
+      request: Promise<DownloadInfoWithValue>
+    }
+  }
+
   constructor(settings: Settings, tools: Tools, command: I.FetchCommand) {
-    super(settings, tools, command, FetchCommand.DEFAULT_PARAMS)
+    super(settings, tools, command, FetchCommand.DEFAULT_PARAMS, 'FETCH')
     const { URL, HEADERS = {} } = command.params
     this.urlTemplate = templates.compileTemplate(URL)
     this.headerTemplates = FMap.fromObject(HEADERS).map(templates.compileTemplate)
+    this.inFlightFetches = {}
   }
 
   async stream(payload: Stream.Payload) {
-    // check cache or write to cache (transactional)
-    // write queued command output to db (we need this because we need an id inside here)
-    // create url, create headers
-    const { LABEL, PRIORITY, METHOD } = this.params
-    // const { LABEL, PRIORITY } = this.params
+    const { LABEL, PRIORITY, METHOD, CACHE } = this.params
     const url = this.urlTemplate(payload)
     const headers = this.headerTemplates.map(template => template(payload)).toObject()
-    const requestParams = { url, headers, method: METHOD }
+    const requestParams: RequestParams = { url, headers, method: METHOD }
+
+    const { requestId, value } = await (CACHE
+      ? this.fetchCached(requestParams)
+      : this.fetchUnCached(requestParams))
+
+    const newPayload = this.saveValue(payload, 0, value, requestId)
+    return [newPayload]
+  }
+
+  private async fetchCached(requestParams: RequestParams) {
+    const serializedRequestParams = JSON.stringify(requestParams)
+    const inFlightFetch = this.inFlightFetches[serializedRequestParams]
+    if (inFlightFetch) {
+      const { requestId, request } = inFlightFetch
+      const { bytes, filename, value } = await request
+      return { requestId, value }
+    }
+
+    const cachedRequest = this.tools.store.qs.selectNetworkRequestValue(serializedRequestParams)
+    if (cachedRequest) {
+      if (cachedRequest.status === 'QUEUED') {
+        throw new Error(`'QUEUED' network requests should be found under in flight requests.`)
+      }
+      return { requestId: cachedRequest.id, value: cachedRequest.responseValue }
+    } else {
+      return await this.fetchUnCached(requestParams)
+    }
+  }
+  private async fetchUnCached(requestParams: RequestParams) {
+    const serializedRequestParams = JSON.stringify(requestParams)
     const requestId = this.tools.store.qs.insertQueuedNetworkRequest(
       this.commandId,
-      JSON.stringify(requestParams)
+      serializedRequestParams
     )
+    const { PRIORITY } = this.params
     const task = () => this.fetch(requestParams, requestId)
-    // const cacheId = undefined // TODO add in memory caching and database caching of this.fetch
-    // TODO wrap this in a try/catch and write a FAILED status
-    const { bytes, filename, value } = await this.tools.queue.push(task, PRIORITY)
+    const request = this.tools.queue.push(task, PRIORITY)
+    this.inFlightFetches[serializedRequestParams] = { requestId, request }
+    const { bytes, filename, value } = await request
 
     this.tools.store.qs.updateNetworkRequestStatus(requestId, value, filename, bytes, 'COMPLETE')
-    const newPayload = this.saveValue(payload, 0, value, requestId)
-
-    return [newPayload]
+    return { requestId, value }
   }
 
   private async fetch(

@@ -21,6 +21,12 @@ type Tools = {
   notify: tools.Notify
 }
 
+namespace Models {
+  export namespace NetworkRequest {
+    export type Status = 'QUEUED' | 'COMPLETE' | 'FAILED'
+  }
+}
+
 namespace TypeUtils {
   export type ArgumentTypes<F extends Function> = F extends (...args: infer A) => any ? A : never
   export type OptionalKeys<T> = { [k in keyof T]-?: undefined extends T[k] ? k : never }[keyof T]
@@ -67,4 +73,4 @@ namespace Stream {
   export type Subscriber = Rx.Subscription
 }
 
-export { Settings, Tools, Querier, Stream, TypeUtils, Sqlite3 }
+export { Settings, Tools, Models, Querier, Stream, TypeUtils, Sqlite3 }

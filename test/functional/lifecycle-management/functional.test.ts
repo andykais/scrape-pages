@@ -11,6 +11,12 @@ describe(__filename, () => {
   beforeEach(testEnv.beforeEach)
   afterEach(testEnv.afterEach)
 
+  it('can run an empty scraper', async () => {
+    const scraper = new ScraperProgram('()', testEnv.outputFolder)
+    scraper.start()
+    await scraper.toPromise()
+  })
+
   it('can run a scraper twice', async () => {
     testEnv.siteMock.persist()
 
@@ -37,8 +43,6 @@ describe(__filename, () => {
 
   it('can start a scraper after it has been stopped', async () => {
     testEnv.siteMock.persist()
-
-    // await testEnv.siteMock.init()
 
     const scraper = new ScraperProgram(instructions.simple, testEnv.outputFolder)
     scraper.start()

@@ -11,7 +11,7 @@ class ReplaceCommand extends BaseCommand<TextReplaceCommand, typeof ReplaceComma
   private regex: RegExp
 
   constructor(settings: Settings, tools: Tools, command: TextReplaceCommand) {
-    super(settings, tools, command, ReplaceCommand.DEFAULT_PARAMS)
+    super(settings, tools, command, ReplaceCommand.DEFAULT_PARAMS, 'REPLACE')
 
     const { SELECTOR, FLAGS } = command.params
     this.regex = new RegExp(SELECTOR, FLAGS)

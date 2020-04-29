@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS crawlerTree (
   operatorIndex INT NOT NULL, -- index that represents either a .reduce() or .loop() index
   valueIndex INT NOT NULL, -- index that represents the index of a value in a command output
   value TEXT NOT NULL, -- it is only empty while an incomplete command is in progress
-  networkRequestId INT,
+  networkRequestId INT, -- this is a denormalized column
   FOREIGN KEY (parentTreeId) REFERENCES crawlerTree(id),
   FOREIGN KEY (networkRequestId) REFERENCES networkRequests(id),
   FOREIGN KEY (commandId) REFERENCES commands(id)
@@ -46,8 +46,9 @@ CREATE TABLE IF NOT EXISTS networkRequests (
 );
 
 -- TODO use these indexes?
-CREATE        INDEX IF NOT EXISTS indexes ON crawlerTree(commandId);
-CREATE UNIQUE INDEX IF NOT EXISTS indexes ON networkRequests(requestParams);
+-- CREATE        INDEX IF NOT EXISTS command ON crawlerTree(commandId);
+-- CREATE UNIQUE INDEX IF NOT EXISTS requestParams ON networkRequests(requestParams);
+CREATE INDEX IF NOT EXISTS requestParams ON networkRequests(requestParams);
 
 COMMIT;
 `

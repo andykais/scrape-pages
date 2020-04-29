@@ -5,6 +5,7 @@ const host = testEnv.mockHost
 
 // if you want the loop to happen per each input, put it in a merge!
 // it might be difficult to say "loop 5 times and ignore request failures"
+// it is equally difficult to say retry on request errors 5 times
 const simple = `
 ().loop(
   FETCH '${host}/gallery/page/{{"+" index 1}}.html' LABEL='gallery-get'

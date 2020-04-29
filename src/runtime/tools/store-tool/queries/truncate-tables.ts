@@ -5,6 +5,7 @@ import { ProgramStateEnum } from '@scrape-pages/runtime/scraper-program'
 const template = sql`
 DELETE FROM commands;
 DELETE FROM crawlerTree;
+DELETE FROM networkRequests WHERE status = 'QUEUED'
 `
 
 class TruncateTables extends Query {
