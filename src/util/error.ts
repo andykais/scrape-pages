@@ -44,4 +44,24 @@ class ResponseError extends Error {
   }
 }
 
-export { ContextualError, InternalError, ResponseError }
+/**
+ * @name ExpectedException
+ * @description used in places that we want a short circuit without cancelling the whole program
+ */
+class ExpectedException extends Error {
+  public name = 'ExpectedException'
+  public constructor(public e: Error, public commandId: number) {
+    super('A short circuit was issued')
+  }
+}
+
+// class ExpectedCancellation extends Error {
+//   public name = 'ExpectedCancellationError'
+//   public cause: string
+//   public constructor(e: Error) {
+//     super('Short circuit since stop() was called.')
+//     this.cause = e.toString()
+//   }
+// }
+
+export { ContextualError, InternalError, ResponseError, ExpectedException }

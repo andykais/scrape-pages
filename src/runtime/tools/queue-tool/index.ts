@@ -5,9 +5,15 @@ import { PriorityQueue } from './priority-queue'
 // type imports
 import { Settings } from '@scrape-pages/types/internal'
 
+const QueueStateEnum = {
+  RUNNING: 'RUNNING' as const,
+  STOPPED: 'STOPPED' as const
+}
+
 type Task<T> = () => Promise<T>
 class Queue extends RuntimeBase {
   public scheduler: Rx.Observable<void>
+  private state: keyof typeof QueueStateEnum
   private settings: Settings
   private useRateLimit: boolean
   private enqueueSubject: Rx.Subject<null>
@@ -37,6 +43,15 @@ class Queue extends RuntimeBase {
       ops.tap(() => this.tasksInProgress++),
       ops.map(() => this.pQueue.pop()!),
       ops.flatMap(task => task()),
+      // ops.flatMap(async task => {
+      //   try {
+      //     const x = await task()
+      //     return x
+      //   } catch (e) {
+      //     console.log('flatMap caught error')
+      //   }
+      // }),
+      // ops.catchError(this.catchCancellationErrors),
       ops.tap(() => this.tasksInProgress--),
       ops.tap(() => this.enqueueSubject.next())
     )
@@ -47,7 +62,11 @@ class Queue extends RuntimeBase {
       const wrappedTask = () =>
         task()
           .then(resolve)
-          .catch(reject)
+          .catch(e => {
+            reject(e)
+            // if (e.name === 'ExpectedCancellation') resolve()
+            // else reject(e)
+          })
 
       this.pQueue.push(wrappedTask, priority)
       this.enqueueSubject.next()
@@ -63,8 +82,12 @@ class Queue extends RuntimeBase {
   }
 
   /* RuntimeBase overrides */
-  public async initialize() {}
-  public cleanup() {}
+  public async initialize() {
+    this.state = 'RUNNING'
+  }
+  public cleanup() {
+    this.state = 'STOPPED'
+  }
 
   private getNumToDequeue() {
     if (this.maxConcurrency && this.rate) {
@@ -82,6 +105,14 @@ class Queue extends RuntimeBase {
     } else {
       return this.pQueue.length
     }
+  }
+
+  private catchCancellationErrors(e: Error) {
+    console.log('caught catchCancellationErrors')
+    if (e.name === 'AbortError') {
+      console.log('we cool')
+    }
+    return []
   }
 }
 

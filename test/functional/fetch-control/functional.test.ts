@@ -97,4 +97,33 @@ describe(__filename, () => {
     })
     it.skip('should be able to retry failed requests', async () => {})
   })
+
+  describe('request cancellation', () => {
+    it.only('should occur when stop() is called', async () => {
+      const instructions = `
+      (
+        FETCH 'https://fast-request' LABEL='beforeStop'
+        FETCH 'https://slow-request' LABEL='afterStop'
+      )`
+      const scraper = new ScraperProgram(instructions, testEnv.outputFolder)
+
+      nock('https://fast-request').get('/').reply(200)
+      nock('https://slow-request')
+        .get('/')
+        .reply(() => {
+          scraper.stop()
+          // this never sends a reply, so it should cause mocha to yell at us if the scraper isnt stopped
+        })
+
+      await scraper.start().toPromise()
+
+      const result = scraper.query(['beforeStop', 'afterStop'])
+      assertQueryResultPartial(result, [
+        {
+          beforeStop: [{ value: '' }],
+          afterStop: []
+        }
+      ])
+    })
+  })
 })

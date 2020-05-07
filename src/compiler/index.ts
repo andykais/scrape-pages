@@ -56,10 +56,17 @@ class Compiler {
     return instantiatedCommand
   }
 
+  private static catchExpectedErrors(e: Error) {
+    if (e.name === 'ExpectedException') return Rx.EMPTY
+    else throw e
+  }
+
   private mapCommands(operation: { commands: I.Command[] }): Stream.Operation {
     const commands: Stream.Operation[] = operation.commands
       .map(this.instantiateCommand)
-      .map(command => ops.flatMap(command.callStream))
+      .map(command =>
+        Rx.pipe(ops.flatMap(command.callStream), ops.catchError(Compiler.catchExpectedErrors))
+      )
     return Rx.pipe.apply(Rx, commands)
   }
 

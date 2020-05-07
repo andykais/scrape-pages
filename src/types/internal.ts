@@ -8,6 +8,7 @@ import {
   SelectedRow as OrderedValuesRow,
   SelectedRowWithDebug as OrderedValuesRowWithDebug
 } from '@scrape-pages/runtime/tools/store-tool/queries/select-ordered-labeled-values'
+import { RuntimeState } from '@scrape-pages/runtime/runtime-base'
 
 interface Settings {
   instructions: Instructions
@@ -73,4 +74,4 @@ namespace Stream {
   export type Subscriber = Rx.Subscription
 }
 
-export { Settings, Tools, Models, Querier, Stream, TypeUtils, Sqlite3 }
+export { Settings, Tools, RuntimeState, Models, Querier, Stream, TypeUtils, Sqlite3 }

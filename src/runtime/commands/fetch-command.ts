@@ -1,6 +1,8 @@
 import fetch from 'node-fetch'
+import AbortController from 'abort-controller'
 import * as path from 'path'
 import { createWriteStream } from 'fs'
+import * as errors from '@scrape-pages/util/error'
 import * as fs from '@scrape-pages/util/fs'
 import { BaseCommand } from './base-command'
 import { ResponseError } from '@scrape-pages/util/error'
@@ -46,6 +48,7 @@ class FetchCommand extends BaseCommand<I.FetchCommand, typeof FetchCommand.DEFAU
       request: Promise<DownloadInfoWithValue>
     }
   }
+  private abortController: AbortController
 
   constructor(settings: Settings, tools: Tools, command: I.FetchCommand) {
     super(settings, tools, command, FetchCommand.DEFAULT_PARAMS, 'FETCH')
@@ -53,6 +56,7 @@ class FetchCommand extends BaseCommand<I.FetchCommand, typeof FetchCommand.DEFAU
     this.urlTemplate = templates.compileTemplate(URL)
     this.headerTemplates = FMap.fromObject(HEADERS).map(templates.compileTemplate)
     this.inFlightFetches = {}
+    this.abortController = new AbortController()
   }
 
   async stream(payload: Stream.Payload) {
@@ -95,7 +99,7 @@ class FetchCommand extends BaseCommand<I.FetchCommand, typeof FetchCommand.DEFAU
       serializedRequestParams
     )
     const { PRIORITY } = this.params
-    const task = () => this.fetch(requestParams, requestId)
+    const task = () => this.fetchWithCancel(requestParams, requestId)
     const request = this.tools.queue.push(task, PRIORITY)
     this.inFlightFetches[serializedRequestParams] = { requestId, request }
     const { bytes, filename, value } = await request
@@ -104,21 +108,26 @@ class FetchCommand extends BaseCommand<I.FetchCommand, typeof FetchCommand.DEFAU
     return { requestId, value }
   }
 
+  private async fetchWithCancel(requestParams: RequestParams, requestId: number) {
+    try {
+      return await this.fetch(requestParams, requestId)
+    } catch (e) {
+      // throw e
+      const state = 'STOPPED'
+      if (e.name === 'AbortError' && state === 'STOPPED') {
+        throw new errors.ExpectedException(e, this.commandId)
+      } else {
+        throw e
+      }
+    }
+  }
   private async fetch(
-    {
-      url,
-      headers,
-      method
-    }: {
-      url: string
-      headers: { [headerName: string]: string }
-      method: string
-    },
+    { url, headers, method }: RequestParams,
     id: number
   ): Promise<DownloadInfoWithValue> {
     const { READ, WRITE, METHOD } = this.params
 
-    const response = await fetch(url, { method, headers })
+    const response = await fetch(url, { method, headers, signal: this.abortController.signal })
     if (!response.ok) throw new ResponseError(response, url)
 
     this.notifyProgress(response, id)
@@ -203,6 +212,22 @@ class FetchCommand extends BaseCommand<I.FetchCommand, typeof FetchCommand.DEFAU
   }
   cleanup() {
     // cancel in-flight requests here
+    console.log('abort requests')
+    this.abortController.abort()
+    // for (const { request } of Object.values(this.inFlightFetches)) {
+    //   request
+    //     .then(() => {
+    //       console.log('then')
+    //     })
+    //     .catch(() => {
+    //       console.log('error')
+    //     })
+    //   // request.catch(e => {
+    //   //   if (e.name === 'AbortError') {
+    //   //     console.log('aok')
+    //   //   }
+    //   // })
+    // }
   }
 }
 
