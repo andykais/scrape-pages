@@ -17,7 +17,7 @@ import { RuntimeState, Settings, Querier, Tools, Stream } from '@scrape-pages/ty
 
 class ScraperProgramRuntime extends RuntimeBase {
   public tools: Tools
-  private commands: commands.AnyCommand[]
+  public commands: commands.AnyCommand[]
   public observables: Rx.Observable<any>
   public subscription: Stream.Subscriber
 
@@ -39,6 +39,7 @@ class ScraperProgramRuntime extends RuntimeBase {
     await fs.mkdirp(this.settings.folder)
     for (const tool of Object.values(this.tools)) await tool.start()
     for (const command of this.commands) await command.start()
+    this.tools.notify.initialized()
     this.subscription = this.observables.subscribe({
       error: async (error: Error) => {
         if (error instanceof errors.ExpectedException) return
@@ -46,7 +47,6 @@ class ScraperProgramRuntime extends RuntimeBase {
       },
       complete: this.complete
     })
-    this.tools.notify.initialized()
   }
 
   protected async onStop(prevState: RuntimeState) {
@@ -73,7 +73,6 @@ class ScraperProgramRuntime extends RuntimeBase {
 
 class ScraperProgram extends EventEmitter {
   private runtime: ScraperProgramRuntime
-  // private program: Stream.Observable
   private folder: string
 
   // prettier-ignore
@@ -136,7 +135,10 @@ class ScraperProgram extends EventEmitter {
    * @param label label of the command to stop
    */
   public stopCommand(label: string) {
-    throw new Error('unimplemented')
+    const command = this.runtime.commands.find(command => command.LABEL === label)
+    if (command) {
+      command.stop()
+    }
   }
 
   /**

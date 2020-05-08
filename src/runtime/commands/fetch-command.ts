@@ -98,6 +98,8 @@ class FetchCommand extends BaseCommand<I.FetchCommand, typeof FetchCommand.DEFAU
       this.commandId,
       serializedRequestParams
     )
+    const { LABEL } = this.command.params
+    this.tools.notify.asyncCommandQueued('FETCH', { id: this.commandId, LABEL })
     const { PRIORITY } = this.params
     const task = () => this.fetchWithCancel(requestParams, requestId)
     const request = this.tools.queue.push(task, PRIORITY)

@@ -12,6 +12,22 @@ const simple = `
 )
 `
 
+const merging = `
+(
+  FETCH '${host}/index.html' LABEL='index'
+  PARSE 'li > a' ATTR='href'
+).merge(
+  (
+    FETCH '${host}{{value}}'
+    PARSE 'h1.article-title' LABEL='postTitle'
+  ),
+  (
+    REPLACE 'http' LABEL='urls'
+  )
+)
+`
+
 export {
   simple,
+  merging
 }

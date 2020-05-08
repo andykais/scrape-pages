@@ -87,6 +87,29 @@ describe(__filename, () => {
     expect(scraper.stop).to.throw()
   })
 
+  it.only('should stop values coming to a command after stopCommand is called', async () => {
+    const scraper = new ScraperProgram(instructions.merging, testEnv.outputFolder)
+    scraper.on('FETCH:queued', ({ LABEL }) => {
+      if (LABEL === 'index') scraper.stopCommand('postTitle')
+    })
+
+    await scraper.start().toPromise()
+
+    const result = scraper.query(['postTitle', 'urls'])
+    assertQueryResultPartial(result, [
+      {
+        postTitle: [],
+        urls: [
+          { value: '/post/1.html' },
+          { value: '/post/2.html' },
+          { value: '/post/3.html' },
+          { value: '/post/4.html' },
+          { value: '/post/5.html' }
+        ]
+      }
+    ])
+  })
+
   it('can handle two scrapers pointed at the same folder _if_ they are not running simultaneously', async () => {
     testEnv.siteMock.persist()
 
