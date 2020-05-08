@@ -1,3 +1,4 @@
+import { EventEmitter } from 'events'
 import * as Rx from 'rxjs'
 import * as ops from 'rxjs/operators'
 import Immutable from 'seamless-immutable'
@@ -18,7 +19,10 @@ class Compiler {
   public commands: commands.AnyCommand[]
   public program: Stream.Observable
 
-  public constructor(private settings: Settings, private tools: Tools) {
+  public constructor(
+    private settings: Settings,
+    private tools: Tools
+  ) {
     this.initialPayload = Immutable({
       value: '',
       operatorIndex: 0,

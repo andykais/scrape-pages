@@ -1,3 +1,4 @@
+import { EventEmitter } from 'events'
 import * as Rx from 'rxjs'
 import * as ops from 'rxjs/operators'
 import { RuntimeBase } from '@scrape-pages/runtime/runtime-base'
@@ -5,15 +6,9 @@ import { PriorityQueue } from './priority-queue'
 // type imports
 import { Settings } from '@scrape-pages/types/internal'
 
-const QueueStateEnum = {
-  RUNNING: 'RUNNING' as const,
-  STOPPED: 'STOPPED' as const
-}
-
 type Task<T> = () => Promise<T>
 class Queue extends RuntimeBase {
   public scheduler: Rx.Observable<void>
-  private state: keyof typeof QueueStateEnum
   private settings: Settings
   private useRateLimit: boolean
   private enqueueSubject: Rx.Subject<null>
@@ -79,14 +74,6 @@ class Queue extends RuntimeBase {
     } else {
       this.useRateLimit = false
     }
-  }
-
-  /* RuntimeBase overrides */
-  public async initialize() {
-    this.state = 'RUNNING'
-  }
-  public cleanup() {
-    this.state = 'STOPPED'
   }
 
   private getNumToDequeue() {

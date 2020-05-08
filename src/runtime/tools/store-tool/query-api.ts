@@ -1,6 +1,6 @@
 import { createAssertType } from 'typescript-is'
 import * as fp from '@scrape-pages/util/function'
-import { TypeUtils, Settings } from '@scrape-pages/types/internal'
+import { RuntimeState, TypeUtils, Settings } from '@scrape-pages/types/internal'
 import { RuntimeBase } from '@scrape-pages/runtime/runtime-base'
 import { Store } from './index'
 import * as typechecking from '@scrape-pages/types/runtime-typechecking'
@@ -23,10 +23,13 @@ class QuerierApi {
 
     // we initialize the database from inside this folder so we can use the querier without giving it an initialize function the user needs to call
     // we reuse the store created by ScraperProgram, so this should always be true
+    // console.log('initialzing the store')
     this.initializeOnce()
+    // console.log('i think the store is initialized')
 
     const includeGroupByRow = options.groupBy && labels.includes(options.groupBy)
 
+    // console.log('querying')
     const commandLabels = this.database.qs.selectCommands() // itd be nice if we could call this from selectOrderedLabeledValues directly
     const selectedLabels = labels
       .concat(options.groupBy || [])
@@ -95,7 +98,9 @@ class QuerierApi {
   private initialize = () => {
     if (Store.databaseIsInitialized(this.settings.folder)) {
       // we could already be initialized if .start() was called on this same runtime instance
-      if (!this.database.isInitialized()) this.database.initialize({ initializeTables: false })
+      if (this.database.state != RuntimeState.ACTIVE) {
+        this.database.start(false)
+      }
     } else {
       // prettier-ignore
       throw new Error(`There is no database at '${this.settings.folder}'. The scraper must be ran at least once bfore querying from the database.`)

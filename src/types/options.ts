@@ -20,7 +20,9 @@ interface Options {
     }
   }
   REPLACE?: {
-    defaults?: {}
+    defaults?: {
+      FLAGS?: I.TextReplaceCommand['params']['FLAGS']
+    }
   }
   inputs?: { [inputSlug: string]: string }
   // folder: string

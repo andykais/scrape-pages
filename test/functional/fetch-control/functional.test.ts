@@ -88,6 +88,8 @@ describe(__filename, () => {
       const instructions = `
       (
         FETCH 'https://non-existent.com' LABEL='errored'
+        # alternately:
+        FETCH 'https://non-existent.com' LABEL='error' ALLOW_FAILURES=true
       ).catch(
         REPLACE '' LABEL='caught'
       )`
@@ -99,7 +101,7 @@ describe(__filename, () => {
   })
 
   describe('request cancellation', () => {
-    it.only('should occur when stop() is called', async () => {
+    it('should occur when stop() is called', async () => {
       const instructions = `
       (
         FETCH 'https://fast-request' LABEL='beforeStop'

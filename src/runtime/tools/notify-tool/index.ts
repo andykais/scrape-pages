@@ -12,7 +12,7 @@ type OnAnyListener = (event: string, data: any) => void
 class Notify extends RuntimeBase {
   private onAnyListeners: OnAnyListener[]
 
-  public constructor(private emitter: EventEmitter) {
+  public constructor(private apiEmitter: EventEmitter) {
     super('EmitEvents')
     this.onAnyListeners = []
   }
@@ -22,7 +22,7 @@ class Notify extends RuntimeBase {
     for (const listener of this.onAnyListeners) {
       listener(event, data)
     }
-    this.emitter.emit(event, data)
+    this.apiEmitter.emit(event, data)
   }
 
   public registerOnAny(listener: (event: string, data: any) => void) {
@@ -39,7 +39,7 @@ class Notify extends RuntimeBase {
     this.emit(`${command}:progress`, info)
   }
   public hasProgressListeners(command: CommandNames) {
-    return this.emitter.listenerCount(`${command}:progress`) > 0
+    return this.apiEmitter.listenerCount(`${command}:progress`) > 0
   }
 
   public commandSucceeded(command: CommandNames, info: CommandInfo) {
@@ -49,16 +49,6 @@ class Notify extends RuntimeBase {
   public initialized() {
     this.emit('initialized')
   }
-  public done() {
-    this.emit('done')
-  }
-  public error(error: Error) {
-    this.emit('error', error)
-  }
-
-  /* RuntimeBase overrides */
-  public async initialize() {}
-  public cleanup() {}
 }
 
 export { Notify }

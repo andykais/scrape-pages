@@ -1,6 +1,5 @@
 import { sql, Query } from './query-base'
-import { Sqlite3, Stream } from '@scrape-pages/types/internal'
-import { ProgramStateEnum } from '@scrape-pages/runtime/scraper-program'
+import { RuntimeState, Sqlite3, Stream } from '@scrape-pages/types/internal'
 
 const template = sql`
 INSERT INTO programState
@@ -19,7 +18,7 @@ class UpdateProgramState extends Query {
   protected static template = template
   protected statement: Sqlite3.Statement
 
-  public call = (state: ProgramStateEnum) => {
+  public call = (state: RuntimeState) => {
     const info = this.statement.run(VERSION, state, state, state)
     if (info.changes === 0) {
       // TODO if we can use other queries in here, this will be easier

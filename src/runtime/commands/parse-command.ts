@@ -1,3 +1,4 @@
+import { EventEmitter } from 'events'
 import cheerio from 'cheerio'
 import jsonata from 'jsonata'
 import { BaseCommand } from './base-command'
@@ -90,8 +91,6 @@ class ParseCommand extends BaseCommand<I.ParseCommand, typeof ParseCommand.PARAM
 
     return Promise.resolve(parsedResult)
   }
-
-  cleanup() {}
 }
 
 export { ParseCommand }

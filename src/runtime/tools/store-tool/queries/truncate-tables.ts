@@ -1,6 +1,5 @@
 import { sql, Query } from './query-base'
 import { Sqlite3, Stream } from '@scrape-pages/types/internal'
-import { ProgramStateEnum } from '@scrape-pages/runtime/scraper-program'
 
 const template = sql`
 DELETE FROM commands;

@@ -1,3 +1,4 @@
+import { EventEmitter } from 'events'
 import * as path from 'path'
 import Sqlite3 from 'better-sqlite3'
 import * as fs from '@scrape-pages/util/fs'
@@ -6,8 +7,7 @@ import { RuntimeBase } from '@scrape-pages/runtime/runtime-base'
 import * as queries from './queries'
 import { QuerierApi } from './query-api'
 // type imports
-// import { QueryInterface } from './query-api'
-import { Settings, Querier } from '@scrape-pages/types/internal'
+import { RuntimeState, Settings, Querier } from '@scrape-pages/types/internal'
 
 class Store extends RuntimeBase {
   private database: Sqlite3.Database
@@ -25,15 +25,15 @@ class Store extends RuntimeBase {
   }
 
   public get qs() {
-    this.mustBeInitialized()
+    this.requireState([RuntimeState.ACTIVE, RuntimeState.COMPLETED, RuntimeState.ERRORED])
     return this._qs
   }
   public get transaction() {
-    this.mustBeInitialized()
+    this.requireState([RuntimeState.ACTIVE, RuntimeState.COMPLETED, RuntimeState.ERRORED])
     return this._transaction
   }
 
-  public async initialize({ initializeTables = true } = {}) {
+  public onStart(prevState: RuntimeState, initializeTables = true) {
     this.database = new Sqlite3(Store.getSqliteFile(this.settings.folder))
     this.database.pragma('journal_mode = WAL')
 
@@ -42,17 +42,16 @@ class Store extends RuntimeBase {
     }
     this._qs = queries.createStatements(this.database)
     this._transaction = this.database.transaction.bind(this.database)
-    super.initialize()
     if (initializeTables) {
-      this.qs.checkProgramVersion()
-      this.qs.updateProgramState('ACTIVE')
-      this.qs.truncateTables()
+      this._qs.checkProgramVersion()
+      this._qs.updateProgramState(RuntimeState.ACTIVE)
+      this._qs.truncateTables()
     }
+    // return Promise.resolve()
   }
-  public cleanup() {
-    this.qs.updateProgramState('COMPLETED')
+  public async onComplete() {
+    this.qs.updateProgramState(RuntimeState.COMPLETED)
   }
-
   private static getSqliteFile(folder: string) {
     return path.resolve(folder, 'store.sqlite')
   }

@@ -1,21 +1,3 @@
-const INITIALIZED = Symbol('INITIALIZED')
-
-class RuntimeBase {
-  public [INITIALIZED] = false
-  public constructor(public name: string) {}
-  public async initialize(): Promise<void> {
-    this[INITIALIZED] = true
-  }
-  public isInitialized = () => this[INITIALIZED]
-  public mustBeInitialized() {
-    if (!this[INITIALIZED])
-      throw new Error(`${this.name} must be initialized before calling this method.`)
-  }
-  public cleanup(...args: any[]): void {}
-}
-
-export { RuntimeBase }
-
 import { EventEmitter } from 'events'
 const RuntimeState = {
   IDLE: 'IDLE' as const,
@@ -27,48 +9,80 @@ const RuntimeState = {
 }
 
 type RuntimeState = keyof typeof RuntimeState
-class RuntimeBase_v2 {
-  public constructor(private emitter: EventEmitter) {}
+class RuntimeBase {
   public state: RuntimeState
 
-  private setState(newState: RuntimeState) {}
-
-  public start() {
-    const prevState = this.state
-    this.setState(RuntimeState.INITIALIZING)
-    this.onStart(prevState)
-      .then(() => this.setState(RuntimeState.ACTIVE))
-      .catch(e => this.emitter.emit('error', e))
+  public constructor(public name: string) {
+    this.state = RuntimeState.IDLE
   }
 
-  public stop() {
+  public start = async (passedArg?: any) => {
     const prevState = this.state
-    this.setState(RuntimeState.STOPPING)
-    this.onStop(prevState).catch(e => this.emitter.emit('error', e))
+    if (this.state !== RuntimeState.STOPPING) this.setState(RuntimeState.INITIALIZING)
+    try {
+      const ret = this.onStart(prevState, passedArg)
+      // we do this here because start for store must remain synchrnous
+      if (ret instanceof Promise) await ret
+      if (this.state !== RuntimeState.STOPPING) this.setState(RuntimeState.ACTIVE)
+    } catch (e) {
+      await this.error(e)
+    }
   }
 
-  public error(error: Error) {
+  public stop = async () => {
+    try {
+      const prevState = this.state
+      this.setState(RuntimeState.STOPPING)
+      await this.onStop(prevState)
+    } catch (e) {
+      await this.error(e)
+    }
+  }
+
+  public error = async (error: Error) => {
     const prevState = this.state
     this.setState(RuntimeState.ERRORED)
-    this.onError(prevState, error).catch(e => this.emitter.emit('error', e))
+    // we dont know how to handle errors thrown by the error handler, so they are UnhandledRejections
+    await this.onError(prevState, error)
   }
 
-  public complete() {
+  public complete = async () => {
     const prevState = this.state
-    this.onComplete(prevState)
-      .then(() => this.setState(RuntimeState.COMPLETED))
-      .catch(e => this.emitter.emit('error', e))
+    try {
+      await this.onComplete(prevState)
+      this.setState(RuntimeState.COMPLETED)
+    } catch (e) {
+      await this.error(e)
+    }
+  }
+
+  protected requireState(allowedStates: RuntimeState[]) {
+    if (!allowedStates.includes(this.state)) {
+      throw new Error(
+        `${this.name} state must be ${allowedStates.join(' or ')} to call this method. It is ${
+          this.state
+        }`
+      )
+    }
   }
 
   // overridable classes
   protected async onStop(prevState: RuntimeState) {}
-  protected async onStart(prevState: RuntimeState) {}
+  protected onStart(prevState: RuntimeState, arg?: any): Promise<void> | void {}
   protected async onComplete(prevState: RuntimeState) {}
-  protected async onError(prevState: RuntimeState, error: Error) {}
+  protected async onError(prevState: RuntimeState, error: Error) {
+    // by default we bubble up errors
+    throw error
+  }
+
+  // private methods
+  private setState(newState: RuntimeState) {
+    this.state = newState
+  }
 }
 
 export {
-  RuntimeBase_v2,
+  RuntimeBase,
   // type exports
   RuntimeState
 }

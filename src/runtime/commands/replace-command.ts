@@ -1,3 +1,4 @@
+import { EventEmitter } from 'events'
 import { BaseCommand } from './base-command'
 // type imports
 import { Settings, Tools, Stream } from '@scrape-pages/types/internal'
@@ -10,6 +11,7 @@ class ReplaceCommand extends BaseCommand<TextReplaceCommand, typeof ReplaceComma
   }
   private regex: RegExp
 
+  // prettier-ignore
   constructor(settings: Settings, tools: Tools, command: TextReplaceCommand) {
     super(settings, tools, command, ReplaceCommand.DEFAULT_PARAMS, 'REPLACE')
 

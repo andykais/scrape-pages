@@ -1,3 +1,4 @@
+import { EventEmitter } from 'events'
 import fetch from 'node-fetch'
 import AbortController from 'abort-controller'
 import * as path from 'path'
@@ -10,7 +11,7 @@ import * as templates from '@scrape-pages/util/handlebars'
 import { FMap } from '@scrape-pages/util/map'
 // type imports
 import * as Fetch from 'node-fetch'
-import { Settings, Tools, Stream } from '@scrape-pages/types/internal'
+import { RuntimeState, Settings, Tools, Stream } from '@scrape-pages/types/internal'
 import * as I from '@scrape-pages/types/instructions'
 
 // TODO queues and cache:
@@ -56,7 +57,6 @@ class FetchCommand extends BaseCommand<I.FetchCommand, typeof FetchCommand.DEFAU
     this.urlTemplate = templates.compileTemplate(URL)
     this.headerTemplates = FMap.fromObject(HEADERS).map(templates.compileTemplate)
     this.inFlightFetches = {}
-    this.abortController = new AbortController()
   }
 
   async stream(payload: Stream.Payload) {
@@ -112,13 +112,10 @@ class FetchCommand extends BaseCommand<I.FetchCommand, typeof FetchCommand.DEFAU
     try {
       return await this.fetch(requestParams, requestId)
     } catch (e) {
-      // throw e
-      const state = 'STOPPED'
-      if (e.name === 'AbortError' && state === 'STOPPED') {
+      if (e.name === 'AbortError' && this.state === RuntimeState.STOPPING) {
         throw new errors.ExpectedException(e, this.commandId)
-      } else {
-        throw e
       }
+      throw e
     }
   }
   private async fetch(
@@ -203,31 +200,17 @@ class FetchCommand extends BaseCommand<I.FetchCommand, typeof FetchCommand.DEFAU
   }
 
   // runtime-base overrides
-  async initialize() {
-    await super.initialize()
+  async onStart() {
+    await super.onStart()
     this.writeFolder = path.resolve(this.settings.folder, this.commandId.toString())
     if (this.command.params.WRITE) {
       await fs.mkdirp(this.writeFolder)
     }
+    this.abortController = new AbortController()
   }
-  cleanup() {
-    // cancel in-flight requests here
-    console.log('abort requests')
-    this.abortController.abort()
-    // for (const { request } of Object.values(this.inFlightFetches)) {
-    //   request
-    //     .then(() => {
-    //       console.log('then')
-    //     })
-    //     .catch(() => {
-    //       console.log('error')
-    //     })
-    //   // request.catch(e => {
-    //   //   if (e.name === 'AbortError') {
-    //   //     console.log('aok')
-    //   //   }
-    //   // })
-    // }
+  async onStop(prevState: RuntimeState) {
+    // console.log('aborting!')
+    if (prevState === RuntimeState.ACTIVE) this.abortController.abort()
   }
 }
 
