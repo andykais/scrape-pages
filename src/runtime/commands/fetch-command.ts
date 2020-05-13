@@ -14,11 +14,6 @@ import * as Fetch from 'node-fetch'
 import { RuntimeState, Settings, Tools, Stream } from '@scrape-pages/types/internal'
 import * as I from '@scrape-pages/types/instructions'
 
-// TODO queues and cache:
-// when cache is enabled
-// check for matching in-flight request
-// if none, check for matching request in database
-// if none, add it to the queue
 type RequestParams = {
   url: string
   headers: { [headerName: string]: string }

@@ -296,7 +296,6 @@ WITH cte as (
   INNER JOIN crawlerTree as parentEntries
   ON ${waitingJoinsSql} = parentEntries.id
   ${ifDebugMode(`INNER JOIN commands ON parentEntries.commandId = commands.id`)}
-  -- TODO add tail cleanup (WHERE recurseDepth >= cte.recurseDepth)
   ORDER BY
     recurseDepth,
     valueIndex,

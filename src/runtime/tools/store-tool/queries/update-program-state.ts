@@ -21,7 +21,6 @@ class UpdateProgramState extends Query {
   public call = (state: RuntimeState) => {
     const info = this.statement.run(VERSION, state, state, state)
     if (info.changes === 0) {
-      // TODO if we can use other queries in here, this will be easier
       throw new Error(`Cannot set scraper to ${state} when it is already in the ${state} state or it is ERRORED.`)
     }
   }

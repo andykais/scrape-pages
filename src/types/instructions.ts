@@ -69,7 +69,6 @@ interface CatchOperation {
   operator: 'catch'
   commands: Command[]
 }
-// TODO rename this to merge (its closer to what it is)
 interface MergeOperation {
   operator: 'merge'
   programs: Program[]
