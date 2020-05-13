@@ -1,1 +1,0 @@
-export { normalizeOptions } from './normalize'
