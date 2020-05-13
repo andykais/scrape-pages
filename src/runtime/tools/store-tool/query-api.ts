@@ -12,8 +12,11 @@ class QuerierApi {
   public constructor(private database: Store, private settings: Settings) {}
 
   public prepare: Querier.Interface['prepare'] = (labels, options = {}) => {
+    // separating out functions from serializable properties.
+    // TODO report on the prior issue: https://github.com/woutervh-/typescript-is/issues/50
+    const { inspector, ...typecheckableOptions } = options
     typechecking.typecheckQueryApiLabels(labels)
-    typechecking.typecheckQueryApiOptions(options)
+    typechecking.typecheckQueryApiOptions(typecheckableOptions)
 
     const { instructions } = this.settings
 
@@ -52,14 +55,14 @@ class QuerierApi {
     )
 
     return () => {
-      if (options.inspector) {
+      if (inspector) {
         const debugStmt = this.database.qs.selectOrderedLabeledValues(
           instructions,
           selectedLabels,
           commandLabels,
           true
         )
-        options.inspector(debugStmt())
+        inspector(debugStmt())
       }
 
       const rows = stmt()
