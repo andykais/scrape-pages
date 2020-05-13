@@ -1,10 +1,10 @@
 {
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
-    "project": "./tsconfig/tsconfig.json",
+    "project": "./tsconfig.json",
     "sourceType": "module"
   },
-  "plugins": ["@typescript-eslint", "no-only-tests"],
+  "plugins": ["@typescript-eslint", "no-only-tests", "import"],
   "rules": {
     "no-unused-expressions": "error",
     "no-console": "warn",
@@ -26,6 +26,9 @@
         ]
       }
     ],
-    "no-only-tests/no-only-tests": "error"
+    "no-only-tests/no-only-tests": "error",
+    "import/no-default-export": "error",
+    "import/group-exports": "error",
+    "import/exports-last": "error"
   }
 }

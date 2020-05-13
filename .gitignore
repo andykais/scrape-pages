@@ -1,18 +1,11 @@
 # editor files
 .tern-port
 
-# build files
-lib
-
-# testing cruft
-testing/functional/.run-output
-
-# coverage reports
-  folder: path.resolve(__dirname, '../', '.run-location', `${path.basename(__dirname)}`),
-.nyc_output
-coverage
-
-# scratchwork folder
-scratchwork
-
+# npm files
 node_modules
+
+# build files
+build
+
+# testing temp files
+test/functional/.run-output
