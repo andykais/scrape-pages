@@ -159,4 +159,26 @@ describe(__filename, () => {
       rxjsTestScheduler.run(helpers => helpers.expectObservable(scheduler, unsub).toBe(expected))
     })
   })
+  describe('with dynamic settings', () => {
+    it('should turn off rate limiting after the second value', () => {
+      const rateSettings = { throttleMs: 25 }
+      const settings = { instructions, folder: '', options: { FETCH: { rate: rateSettings } } }
+      const queue = new Queue(settings)
+
+      const onTaskComplete = () => {
+        queue.updateRateLimit({})
+      }
+      const onStart = () => {
+        queue.push(instantTask(), 0)
+        queue.push(taskWithHooks(instantTask(), { onComplete: onTaskComplete }), 0)
+        queue.push(instantTask(), 0)
+        queue.push(instantTask(), 0)
+      }
+      const expected = 'e 24ms (eee)'
+      const unsub = '1000ms !'
+      const scheduler = queueWithHooks(queue, { onStart })
+      rxjsTestScheduler.run(helpers => helpers.expectObservable(scheduler, unsub).toBe(expected))
+
+    })
+  })
 })
