@@ -7,16 +7,6 @@ interface RateLimit {
 interface Options {
   FETCH?: {
     rate?: RateLimit
-
-    // rate?: {
-    //   intervalMs: number
-    //   requestsPerInterval: number
-    // }
-    maxConcurrency?: number
-    rateLimit?: {
-      interval: number
-      limit: number
-    }
     defaults?: {
       CACHE?: I.FetchCommand['params']['CACHE']
       READ?: I.FetchCommand['params']['WRITE']

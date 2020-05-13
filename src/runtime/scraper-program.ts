@@ -12,7 +12,7 @@ import { RuntimeBase } from './runtime-base'
 import { typecheckInstructions } from '@scrape-pages/types/runtime-typechecking'
 // type imports
 import { Instructions, Command } from '@scrape-pages/types/instructions'
-import { Options } from '@scrape-pages/types/options'
+import { Options, RateLimit } from '@scrape-pages/types/options'
 import { RuntimeState, Settings, Querier, Tools, Stream } from '@scrape-pages/types/internal'
 
 class ScraperProgramRuntime extends RuntimeBase {
@@ -121,16 +121,13 @@ class ScraperProgram extends EventEmitter {
     this.runtime.stop()
   }
 
-  // public updateOptions(options: { FETCH: RateLimit }) {}
-
-  // public updateRateLimit(rateLimit: RateLimit) {}
-
   /**
-   * @name toggleRateLimiter
-   * @description toggle the rate limiter on fetch commands
+   * @name updateRateLimit
+   * @description change the current rate limit settings. They go into affect immediately
+   * @param rateLimit the updated throttle and max concurrency settings, same that options FETCH takes
    */
-  public toggleRateLimiter(toggle: boolean) {
-    throw new Error('unimplemented')
+  public updateRateLimit(rateLimit: RateLimit) {
+    this.runtime.tools.queue.updateRateLimit(rateLimit)
   }
 
   /**
