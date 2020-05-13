@@ -5,7 +5,6 @@ import { RuntimeBase } from '@scrape-pages/runtime/runtime-base'
 import { Store } from './index'
 import * as typechecking from '@scrape-pages/types/runtime-typechecking'
 // type imports
-// import { SelectedRow as OrderedValuesRow } from './queries/select-ordered-labeled-values'
 import { Querier } from '@scrape-pages/types/internal'
 
 class QuerierApi {
@@ -13,11 +12,8 @@ class QuerierApi {
   public constructor(private database: Store, private settings: Settings) {}
 
   public prepare: Querier.Interface['prepare'] = (labels, options = {}) => {
-    // separating out functions from serializable properties.
-    // TODO report on the prior issue: https://github.com/woutervh-/typescript-is/issues/50
-    const { inspector, ...typecheckableOptions } = options
     typechecking.typecheckQueryApiLabels(labels)
-    typechecking.typecheckQueryApiOptions(typecheckableOptions)
+    typechecking.typecheckQueryApiOptions(options)
 
     const { instructions } = this.settings
 
@@ -25,11 +21,9 @@ class QuerierApi {
     // we reuse the store created by ScraperProgram, so this should always be true
     // console.log('initialzing the store')
     this.initializeOnce()
-    // console.log('i think the store is initialized')
 
     const includeGroupByRow = options.groupBy && labels.includes(options.groupBy)
 
-    // console.log('querying')
     const commandLabels = this.database.qs.selectCommands() // itd be nice if we could call this from selectOrderedLabeledValues directly
     const selectedLabels = labels
       .concat(options.groupBy || [])
@@ -50,8 +44,6 @@ class QuerierApi {
     const groupByCommand = commandLabels.find(c => c.label === options.groupBy)
     const groupById = groupByCommand ? groupByCommand.id : undefined
 
-    // const selectedLabels = options.groupBy ? labels.concat(options.groupBy) : labels
-    // const labelsThatExist = labels.filter(label => commandLabels.find(c => c.label === label))
     const stmt = this.database.qs.selectOrderedLabeledValues(
       instructions,
       selectedLabels,
@@ -83,7 +75,6 @@ class QuerierApi {
           pushedValuesInGroup = true
         }
         if (isGroupByRow) {
-          // if (pushedValuesInGroup) result.push(group)
           result.push(group)
           group = {}
           for (const label of groupLabels) group[label] = []
