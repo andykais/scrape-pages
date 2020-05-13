@@ -1,7 +1,17 @@
 import * as I from './instructions'
 
+interface RateLimit {
+  maxConcurrent?: number
+  throttleMs?: number
+}
 interface Options {
   FETCH?: {
+    rate?: RateLimit
+
+    // rate?: {
+    //   intervalMs: number
+    //   requestsPerInterval: number
+    // }
     maxConcurrency?: number
     rateLimit?: {
       interval: number
@@ -30,4 +40,4 @@ interface Options {
   // forceStart?: boolean
 }
 
-export { Options }
+export { Options, RateLimit }

@@ -87,7 +87,7 @@ describe(__filename, () => {
     expect(scraper.stop).to.throw()
   })
 
-  it.only('should stop values coming to a command after stopCommand is called', async () => {
+  it('should stop values coming to a command after stopCommand is called', async () => {
     const scraper = new ScraperProgram(instructions.merging, testEnv.outputFolder)
     scraper.on('FETCH:queued', ({ LABEL }) => {
       if (LABEL === 'index') scraper.stopCommand('postTitle')

@@ -128,4 +128,13 @@ describe(__filename, () => {
       ])
     })
   })
+  // describe('rate limiting', () => {
+  //   it('should limit the rate of requests', async () => {
+  //     const options = { FETCH: { rate: { maxConcurrency: 1, throttleMs: 333 } } }
+  //     const scraper = new ScraperProgram(instructions.simple, testEnv.outputFolder, options)
+
+  //     await scraper.start().toPromise()
+  //   })
+  //   it('should be able to toggle the rate limit', () => {})
+  // })
 })

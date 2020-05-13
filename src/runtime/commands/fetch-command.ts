@@ -101,7 +101,7 @@ class FetchCommand extends BaseCommand<I.FetchCommand, typeof FetchCommand.DEFAU
     const { LABEL } = this.command.params
     this.tools.notify.asyncCommandQueued('FETCH', { id: this.commandId, LABEL })
     const { PRIORITY } = this.params
-    const task = () => this.fetchWithCancel(requestParams, requestId)
+    const task = () => this.cancellableFetch(requestParams, requestId)
     const request = this.tools.queue.push(task, PRIORITY)
     this.inFlightFetches[serializedRequestParams] = { requestId, request }
     const { bytes, filename, value } = await request
@@ -110,7 +110,7 @@ class FetchCommand extends BaseCommand<I.FetchCommand, typeof FetchCommand.DEFAU
     return { requestId, value }
   }
 
-  private async fetchWithCancel(requestParams: RequestParams, requestId: number) {
+  private async cancellableFetch(requestParams: RequestParams, requestId: number) {
     try {
       return await this.fetch(requestParams, requestId)
     } catch (e) {

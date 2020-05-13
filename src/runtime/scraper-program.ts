@@ -51,7 +51,7 @@ class ScraperProgramRuntime extends RuntimeBase {
 
   protected async onStop(prevState: RuntimeState) {
     // only the commands need to stop. We cancel anything in flight, and close them off from new values
-    // then the observables simply drain. If there are no errors, the onComplete handles the rest
+    // then the observables simply drain. If there are no unexpected errors, the onComplete handles the rest
     for (const command of this.commands) command.stop()
   }
 
@@ -120,6 +120,10 @@ class ScraperProgram extends EventEmitter {
   public stop() {
     this.runtime.stop()
   }
+
+  // public updateOptions(options: { FETCH: RateLimit }) {}
+
+  // public updateRateLimit(rateLimit: RateLimit) {}
 
   /**
    * @name toggleRateLimiter
