@@ -13,25 +13,39 @@ import * as I from '@scrape-pages/types/instructions'
 import { Options } from '@scrape-pages/types/options'
 import { Settings, Tools, Stream } from '@scrape-pages/types/internal'
 
+const RESERVED_SLUGS = ['value', 'index']
+
 class Compiler {
   private initialPayload: Stream.Payload
   private commandIdCounter: number
   public commands: commands.AnyCommand[]
   public program: Stream.Observable
 
-  public constructor(
-    private settings: Settings,
-    private tools: Tools
-  ) {
+  public constructor(private settings: Settings, private tools: Tools) {
     this.initialPayload = Immutable({
       value: '',
       operatorIndex: 0,
       valueIndex: 0,
       id: -1,
-      inputs: this.settings.options.inputs || {}
+      inputs: Compiler.getInputs(settings)
     })
     this.commands = []
     this.commandIdCounter = 0
+  }
+
+  private static getInputs(settings: Settings) {
+    const result: Options['inputs'] = {}
+    const optionsInputs = settings.options.inputs || {}
+    for (const inputSlug of settings.instructions.inputs) {
+      if (RESERVED_SLUGS.includes(inputSlug)) {
+        throw new Error(`'${inputSlug}' is a reserved slug. It cannot be used as an input name.`)
+      }
+      if (!optionsInputs.hasOwnProperty(inputSlug)) {
+        throw new Error(`Instructions input '${inputSlug}' is not present in options.input.`)
+      }
+      result[inputSlug] = optionsInputs[inputSlug]
+    }
+    return result
   }
 
   private compileExpression(expression: Expression) {}

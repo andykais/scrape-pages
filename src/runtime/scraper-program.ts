@@ -83,19 +83,12 @@ class ScraperProgram extends EventEmitter {
   public constructor(instructionsArg: string | Instructions, folder: string, options: Options = {}) {
     super()
     // if its a string, compile it using the dsl-parser
-    const instructions =
-      typeof instructionsArg === 'string'
-        ? dslParser(instructionsArg)
-        : JSON.parse(JSON.stringify(instructionsArg))
-    // TODO validate that tag & input slugs do not equal 'value', 'index', 'request'
+    const instructions = typeof instructionsArg === 'string' ? dslParser(instructionsArg) : instructionsArg
     const settings: Settings = { instructions, folder, options }
     this.runtime = new ScraperProgramRuntime(settings, this)
 
     this.query = this.runtime.tools.store.query
     this.folder = folder
-
-    this.on('stop', this.stop)
-    this.on('useRateLimiter', this.toggleRateLimiter)
   }
 
   /**
