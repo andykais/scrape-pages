@@ -5,7 +5,7 @@ import { normalizeConfig as normalize } from 'scrape-pages/settings/config/norma
 
 import '../css/index.css'
 
-const thenRender = func => (...args) => {
+const thenRender = (func) => (...args) => {
   func(...args)
   render()
 }
@@ -16,7 +16,7 @@ const state = {
   configIsOpen: true,
   valid: true,
   inputConfig: JSON.stringify(initialConfig, null, 2),
-  fullConfig: normalize(initialConfig)
+  fullConfig: normalize(initialConfig),
 }
 
 const elements = {
@@ -28,11 +28,11 @@ const elements = {
   hideButtonIcon: null,
   treeContainer: null,
   flowErrorBlock: null,
-  d3Elements: null
+  d3Elements: null,
 }
 
 const stateChangers = {
-  handleConfigInput: thenRender(e => {
+  handleConfigInput: thenRender((e) => {
     try {
       state.inputConfig = e.target.value
       state.fullConfig = normalize(JSON.parse(state.inputConfig))
@@ -57,7 +57,7 @@ const stateChangers = {
   }),
   handleShareIconClick: thenRender(() => {
     window.alert('Just copy the url to share with someone!')
-  })
+  }),
 }
 
 const render = () => {

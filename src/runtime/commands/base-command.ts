@@ -38,7 +38,7 @@ abstract class BaseCommand<
       LABEL: undefined,
       ...defaultParams,
       ...optionsDefaults,
-      ...(this.command.params as any)
+      ...(this.command.params as any),
     }
     this.commandId = this.command.databaseId!
     this.LABEL = this.command.params.LABEL
@@ -54,7 +54,7 @@ abstract class BaseCommand<
       default:
         this.requireState([RuntimeState.ACTIVE])
         const values = this.stream(payload)
-        return Rx.from(values).pipe(ops.flatMap(promise => promise))
+        return Rx.from(values).pipe(ops.flatMap((promise) => promise))
     }
   }
 
@@ -91,5 +91,5 @@ type AnyCommand = BaseCommand<I.Command, I.Command['params']>
 export {
   BaseCommand,
   // type exports
-  AnyCommand
+  AnyCommand,
 }

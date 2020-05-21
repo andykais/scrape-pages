@@ -8,7 +8,7 @@ const config = {
       headerTemplates: {},
       cookieTemplates: {},
       method: 'GET',
-      urlTemplate: 'mainpage'
+      urlTemplate: 'mainpage',
     },
     parse: { expect: 'html', selector: 'batchID' },
     scrapeEach: [
@@ -20,20 +20,20 @@ const config = {
           headerTemplates: {},
           cookieTemplates: {},
           method: 'GET',
-          urlTemplate: 'batchPage{batchID}'
+          urlTemplate: 'batchPage{batchID}',
         },
         scrapeNext: {
           name: 'next-batchid',
           parse: {
             selector: 'batchID',
-            expect: 'html'
-          }
+            expect: 'html',
+          },
         },
         scrapeEach: [
           {
             name: 'tag',
             parse: { expect: 'html', selector: 'span.tag' },
-            scrapeEach: []
+            scrapeEach: [],
           },
           {
             name: 'parse-image-page',
@@ -47,7 +47,7 @@ const config = {
                   headerTemplates: {},
                   cookieTemplates: {},
                   method: 'GET',
-                  urlTemplate: 'imagepage{imageID}'
+                  urlTemplate: 'imagepage{imageID}',
                 },
                 parse: { expect: 'html', selector: 'img' },
                 scrapeEach: [
@@ -59,16 +59,16 @@ const config = {
                       headerTemplates: {},
                       cookieTemplates: {},
                       method: 'GET',
-                      urlTemplate: '{src}'
+                      urlTemplate: '{src}',
                     },
-                    scrapeEach: []
-                  }
-                ]
-              }
-            ]
-          }
-        ]
-      }
-    ]
-  }
+                    scrapeEach: [],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  },
 }

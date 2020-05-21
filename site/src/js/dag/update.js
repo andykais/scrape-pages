@@ -8,11 +8,11 @@ const traverse = (root, func, i = 0) => {
     }
   }
 }
-const downloadText = configStep => {
+const downloadText = (configStep) => {
   const download = configStep.download ? 'Download' : 'identity(x) = x'
   return download
 }
-const parseText = configStep => {
+const parseText = (configStep) => {
   if (configStep.parse) {
     const content = configStep.parse.expect.toUpperCase()
     return `Parse ${content}`
@@ -21,40 +21,33 @@ const parseText = configStep => {
   }
 }
 
-export default ({
-  rectNode,
-  get,
-  baseSvg,
-  svgGroup,
-  margin,
-  nodeGroup,
-  linkGroup,
-  diagonal
-}) => config => {
+export default ({ rectNode, get, baseSvg, svgGroup, margin, nodeGroup, linkGroup, diagonal }) => (
+  config
+) => {
   const arrowSize = 12
   const downloadToParse = 20
 
-  const root = d3.hierarchy(config.scrape, step => [
+  const root = d3.hierarchy(config.scrape, (step) => [
     ...(step.scrapeEach || []),
-    ...(step.scrapeNext ? [step.scrapeNext] : [])
+    ...(step.scrapeNext ? [step.scrapeNext] : []),
   ])
   const treemap = d3
     .tree()
     .nodeSize([rectNode.height + rectNode.margin, rectNode.width + rectNode.margin])
   treemap(root)
   const descendants = root.descendants().sort((a, b) => b.y - a.y) // sort for use w/ scrapeNext
-  const links = root.links().map(d => ({
+  const links = root.links().map((d) => ({
     ...d,
     source: {
       ...d.source,
       y: d.source.y + rectNode.width, // make the line start after the rectangle
-      x: d.source.x + downloadToParse // make arrow start at parse
+      x: d.source.x + downloadToParse, // make arrow start at parse
     },
     target: {
       ...d.target,
       y: d.target.y - arrowSize, // space for arrow
-      x: d.target.x
-    }
+      x: d.target.x,
+    },
   }))
   nodeGroup.selectAll('*').remove()
   linkGroup.selectAll('*').remove()
@@ -66,7 +59,7 @@ export default ({
     .enter()
     .append('g')
     // .merge(gNodeAll)
-    .attr('transform', d => `translate(${d[get.x]}, ${d[get.y] - rectNode.height / 2})`)
+    .attr('transform', (d) => `translate(${d[get.x]}, ${d[get.y] - rectNode.height / 2})`)
 
   // Labels
   const labelDiv = gNode
@@ -77,7 +70,7 @@ export default ({
     .attr('height', rectNode.height)
     .append('xhtml:div')
     .classed('scrape-step', true)
-    .attr('title', d =>
+    .attr('title', (d) =>
       JSON.stringify(
         d.data,
         (k, v) => {
@@ -91,34 +84,36 @@ export default ({
   labelDiv
     .append('div')
     .classed('name', true)
-    .text(d => d.data.name)
+    .text((d) => d.data.name)
   labelDiv
     .append('div')
     .classed('download', true)
-    .classed('identity', d => !d.data.download)
-    .text(d => downloadText(d.data))
+    .classed('identity', (d) => !d.data.download)
+    .text((d) => downloadText(d.data))
   labelDiv
     .append('div')
     .classed('parse', true)
-    .classed('identity', d => !d.data.parse)
-    .text(d => parseText(d.data))
+    .classed('identity', (d) => !d.data.parse)
+    .text((d) => parseText(d.data))
 
   // Increment Links
   const curveHeight = 30
   const curvePull = downloadToParse
   gNode
-    .filter(d => d.data.download && d.data.download.increment)
+    .filter((d) => d.data.download && d.data.download.increment)
     .append('g')
     .classed('link', true)
     .append('path')
     .attr(
       'd',
-      d =>
+      (d) =>
         `M ${rectNode.width} ${rectNode.height / 2 + downloadToParse}
-      C ${rectNode.width + curvePull} ${rectNode.height / 2 + downloadToParse} ${rectNode.width +
-          curvePull * 2} ${-curveHeight} ${rectNode.width / 2} ${-curveHeight}
-      C ${-curvePull - arrowSize - 10} ${-curveHeight} ${-curvePull - arrowSize} ${rectNode.height /
-          2} ${-arrowSize} ${rectNode.height / 2}`
+      C ${rectNode.width + curvePull} ${rectNode.height / 2 + downloadToParse} ${
+          rectNode.width + curvePull * 2
+        } ${-curveHeight} ${rectNode.width / 2} ${-curveHeight}
+      C ${-curvePull - arrowSize - 10} ${-curveHeight} ${-curvePull - arrowSize} ${
+          rectNode.height / 2
+        } ${-arrowSize} ${rectNode.height / 2}`
     )
   // scrapeNext Links
   // sort descendants by y

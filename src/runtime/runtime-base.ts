@@ -4,7 +4,7 @@ const RuntimeState = {
   ACTIVE: 'ACTIVE' as const,
   STOPPING: 'STOPPING' as const,
   COMPLETED: 'COMPLETED' as const,
-  ERRORED: 'ERRORED' as const
+  ERRORED: 'ERRORED' as const,
 }
 
 type RuntimeState = keyof typeof RuntimeState
@@ -87,5 +87,5 @@ class RuntimeBase {
 export {
   RuntimeBase,
   // type exports
-  RuntimeState
+  RuntimeState,
 }

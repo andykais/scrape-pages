@@ -31,7 +31,7 @@ class FetchCommand extends BaseCommand<I.FetchCommand, typeof FetchCommand.DEFAU
     READ: true,
     WRITE: false,
     CACHE: false,
-    PRIORITY: -1
+    PRIORITY: -1,
   }
   private writeFolder: string
   private urlTemplate: templates.Template
@@ -56,7 +56,7 @@ class FetchCommand extends BaseCommand<I.FetchCommand, typeof FetchCommand.DEFAU
   public async stream(payload: Stream.Payload) {
     const { METHOD, CACHE } = this.params
     const url = this.urlTemplate(payload)
-    const headers = this.headerTemplates.map(template => template(payload)).toObject()
+    const headers = this.headerTemplates.map((template) => template(payload)).toObject()
     const requestParams: RequestParams = { url, headers, method: METHOD }
 
     const { requestId, value } = await (CACHE
@@ -128,7 +128,7 @@ class FetchCommand extends BaseCommand<I.FetchCommand, typeof FetchCommand.DEFAU
     if (READ && WRITE) {
       const results = await Promise.all([
         this.read(response, url, id),
-        this.write(response, url, id)
+        this.write(response, url, id),
       ])
       const [{ value }, { filename, bytes }] = results
       return { value, bytes, filename }
@@ -148,8 +148,8 @@ class FetchCommand extends BaseCommand<I.FetchCommand, typeof FetchCommand.DEFAU
     const buffers: Buffer[] = []
 
     const buffer: Buffer = await new Promise((resolve, reject) => {
-      response.body.on('error', error => reject(error))
-      response.body.on('data', chunk => buffers.push(chunk))
+      response.body.on('error', (error) => reject(error))
+      response.body.on('data', (chunk) => buffers.push(chunk))
       response.body.on('end', () => resolve(Buffer.concat(buffers)))
     })
     const value = buffer.toString()
@@ -181,14 +181,14 @@ class FetchCommand extends BaseCommand<I.FetchCommand, typeof FetchCommand.DEFAU
           this.tools.notify.asyncCommandProgress(command, { id, LABEL, progress: NaN, metadata })
         } else {
           let bytes = 0
-          response.body.on('data', chunk => {
+          response.body.on('data', (chunk) => {
             bytes += chunk.length
             const progress = bytes / contentLength
             this.tools.notify.asyncCommandProgress(this.command.command, {
               id,
               LABEL,
               progress,
-              metadata
+              metadata,
             })
           })
         }

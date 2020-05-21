@@ -112,5 +112,5 @@ export {
   MergeOperation,
   FetchCommand,
   ParseCommand,
-  TextReplaceCommand
+  TextReplaceCommand,
 }

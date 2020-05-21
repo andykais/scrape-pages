@@ -7,25 +7,25 @@ export default {
       name: 'paginated',
       download: {
         urlTemplate: 'example.com/?id={value}/{index}',
-        increment: 1
+        increment: 1,
       },
       scrapeEach: [
         {
           name: 'title',
-          parse: '.title'
+          parse: '.title',
         },
         {
           name: 'image-parse',
           parse: {
             selector: 'img',
-            attribute: 'src'
+            attribute: 'src',
           },
           scrapeEach: {
             name: 'image',
-            download: '{value}'
-          }
-        }
-      ]
-    }
-  }
+            download: '{value}',
+          },
+        },
+      ],
+    },
+  },
 }

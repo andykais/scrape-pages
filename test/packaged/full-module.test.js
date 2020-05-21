@@ -1,7 +1,7 @@
 const http = require('http')
 const { ScraperProgram } = require('scrape-pages')
 
-process.on('unhandledRejection', e => {
+process.on('unhandledRejection', (e) => {
   console.error(e)
   process.exit(1)
 })
@@ -25,10 +25,10 @@ const EXPECTED_RESULT = [
         filename: null,
         status: null,
         byteLength: null,
-        requestParams: null
-      }
-    ]
-  }
+        requestParams: null,
+      },
+    ],
+  },
 ]
 
 const instructions = `

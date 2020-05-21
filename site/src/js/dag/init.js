@@ -7,7 +7,7 @@ export default () => {
     x: 'y',
     y: 'x',
     width: 'height',
-    height: 'width'
+    height: 'width',
   }
 
   const margin = { top: 50, right: 50, bottom: 50, left: 50 }
@@ -38,15 +38,15 @@ export default () => {
       .attr('orient', 'auto')
       .attr('class', 'arrow')
       .append('path')
-      .attr('d', 'M0,-5L10,0L0,5')
+      .attr('d', 'M0,-5L10,0L0,5'),
   }
 
   const nodeGroup = svgGroup.append('g').attr('id', 'nodes')
   const linkGroup = svgGroup.append('g').attr('id', 'links')
   const diagonal = d3
     .linkHorizontal()
-    .x(d => d[get.x])
-    .y(d => d[get.y])
+    .x((d) => d[get.x])
+    .y((d) => d[get.y])
 
   // update function, call it on text box change
   return {
@@ -57,7 +57,7 @@ export default () => {
     svgGroup,
     nodeGroup,
     linkGroup,
-    diagonal
+    diagonal,
   }
 
   const updater = updateFunc({
@@ -68,7 +68,7 @@ export default () => {
     svgGroup,
     nodeGroup,
     linkGroup,
-    diagonal
+    diagonal,
   })
   return updater
 }

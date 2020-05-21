@@ -12,7 +12,7 @@ INSERT INTO networkRequests (
 const NetworkRequestStatusEnum = {
   QUEUED: 'QUEUED' as const,
   COMPLETE: 'COMPLETE' as const,
-  FAILED: 'FAILED' as const
+  FAILED: 'FAILED' as const,
 }
 
 class InsertQueuedNetworkRequest extends Query {

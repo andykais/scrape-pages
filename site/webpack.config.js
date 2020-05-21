@@ -14,7 +14,7 @@ module.exports = {
   entry: './src/js/index.js',
   output: {
     path: resolve(__dirname, 'dist'),
-    filename: '[name].[contenthash].js'
+    filename: '[name].[contenthash].js',
   },
   module: {
     rules: [
@@ -22,32 +22,32 @@ module.exports = {
         test: /\.css$/,
         use: [
           {
-            loader: MiniCssExtractPlugin.loader
+            loader: MiniCssExtractPlugin.loader,
           },
-          'css-loader'
-        ]
-      }
-    ]
+          'css-loader',
+        ],
+      },
+    ],
   },
   resolve: {
     alias: {
-      'flow-runtime': resolve(__dirname, 'node_modules/flow-runtime/dist/flow-runtime.es2015.js')
-    }
+      'flow-runtime': resolve(__dirname, 'node_modules/flow-runtime/dist/flow-runtime.es2015.js'),
+    },
   },
   plugins: [
     new CleanWebpackPlugin(),
     new MiniCssExtractPlugin({
-      filename: 'main.[contenthash].css'
+      filename: 'main.[contenthash].css',
     }),
     new CopyWebpackPlugin([
       {
-        from: 'CNAME'
-      }
+        from: 'CNAME',
+      },
     ]),
     new HtmlWebpackPlugin({
-      template: 'src/index.html'
+      template: 'src/index.html',
       // inlineSource: /.css$/
-    })
+    }),
     // new HtmlWebpackInlineSourcePlugin()
   ],
   optimization: {
@@ -57,9 +57,9 @@ module.exports = {
         vendor: {
           test: /[\\/]node_modules[\\/]/,
           name: 'vendors',
-          chunks: 'all'
-        }
-      }
-    }
-  }
+          chunks: 'all',
+        },
+      },
+    },
+  },
 }

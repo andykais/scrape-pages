@@ -13,7 +13,7 @@ class ContextualError extends Error {
     super(`${contextualMessage}: ${error.message}`)
     Object.defineProperty(this, 'origin', {
       enumerable: false,
-      value: error
+      value: error,
     })
 
     const thisStack = this.stack ? this.stack.split('\n', 2).join('\n') : ''
@@ -26,7 +26,7 @@ ${originStack}`
     // then set the name to the original error. It helps when filtering errors
     Object.defineProperty(this, 'name', {
       enumerable: false,
-      value: error.name
+      value: error.name,
     })
   }
 }

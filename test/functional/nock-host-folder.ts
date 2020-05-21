@@ -5,7 +5,7 @@ import nock from 'nock'
 class RequestStats {
   public routes: { [route: string]: number } = {}
   public totalRoutes = 0
-  public totalRoutesUsed = () => Object.values(this.routes).filter(v => v > 0).length
+  public totalRoutesUsed = () => Object.values(this.routes).filter((v) => v > 0).length
   public allRoutesUsed = () => this.totalRoutesUsed() === this.totalRoutes
 
   public addRoute(route: string) {
@@ -56,7 +56,7 @@ class HttpFolderMock {
 
     const files = await fs.findFiles(this.mockEndpointsFolder)
 
-    this.interceptors = files.map(file => {
+    this.interceptors = files.map((file) => {
       const relativePath = path.relative(this.mockEndpointsFolder, file)
       const fullPath = path.resolve(this.mockEndpointsFolder, file)
       const route = `/${relativePath}`
@@ -66,7 +66,7 @@ class HttpFolderMock {
       interceptor.delay(randomMultiplier * delay).replyWithFile(200, fullPath)
       return interceptor
     })
-    scope.on('request', req => {
+    scope.on('request', (req) => {
       if (this.debug) {
         /* eslint-disable-next-line no-console */
         console.log(req.method, req.path)
@@ -93,5 +93,5 @@ class HttpFolderMock {
 export {
   HttpFolderMock,
   // type exports
-  HttpMockOptions
+  HttpMockOptions,
 }

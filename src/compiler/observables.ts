@@ -18,7 +18,7 @@ function loop(
   pipeTo: Stream.Operation,
   iterateFn: (index: number) => Stream.Payload
 ): Rx.Observable<Stream.Payload> {
-  return new Rx.Observable(observer => {
+  return new Rx.Observable((observer) => {
     let subscribed = true
     let sourceSubscriber: Rx.Subscription | null = null
     let consecutiveEmtpyPipes = 0
@@ -49,7 +49,7 @@ function loop(
                     `.loop() made ${SENSIBLE_MAX_EMPTY_LOOPS} iterations with no output. Consider refactoring the loop to contain some output.`
                   )
                 resolve()
-              }
+              },
             })
           })
           sourceSubscriber = null
@@ -67,7 +67,7 @@ function loop(
  * @description this functions a lot like merge except that the observable it creates completes after the first observable completes. It is analogous to Promise.any
  */
 function any(...observables: Rx.Observable<any>[]) {
-  return new Rx.Observable(observer => {
+  return new Rx.Observable((observer) => {
     if (observables.length === 0) {
       observer.complete()
     } else {

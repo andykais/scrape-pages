@@ -17,11 +17,11 @@ class CheerioParser implements ParserEngine {
   public load(html: string) {
     this.$ = cheerio.load(html, this.cheerioFlags)
   }
-  public forEach: ParserEngine['forEach'] = cb => {
+  public forEach: ParserEngine['forEach'] = (cb) => {
     const { $ } = this
     const { SELECTOR, ATTR, MAX } = this.command.params
     // we could also set up an generator here, depending on what is better for jsonata parser
-    $(SELECTOR).each(function(i) {
+    $(SELECTOR).each(function (i) {
       if (MAX !== undefined && i > MAX) return false // this stops cheerio each iteration
       const node = $(this)
       if (ATTR === undefined) cb(node.text(), i)
@@ -55,7 +55,7 @@ class ParseCommand extends BaseCommand<I.ParseCommand, typeof ParseCommand.PARAM
   private static PARAM_DEFAULTS = {
     FORMAT: 'html' as 'html',
     ATTR: undefined,
-    MAX: undefined
+    MAX: undefined,
   }
   private parserEngine: ParserEngine
 

@@ -30,9 +30,9 @@ describe(__filename, () => {
           { value: 'Quick' },
           { value: 'Brown' },
           { value: 'Fox' },
-          { value: 'Jumped' }
-        ]
-      }
+          { value: 'Jumped' },
+        ],
+      },
     ])
 
     await scraper.start().toPromise()
@@ -61,9 +61,9 @@ describe(__filename, () => {
           { value: 'Quick' },
           { value: 'Brown' },
           { value: 'Fox' },
-          { value: 'Jumped' }
-        ]
-      }
+          { value: 'Jumped' },
+        ],
+      },
     ])
   })
 
@@ -103,9 +103,9 @@ describe(__filename, () => {
           { value: '/post/2.html' },
           { value: '/post/3.html' },
           { value: '/post/4.html' },
-          { value: '/post/5.html' }
-        ]
-      }
+          { value: '/post/5.html' },
+        ],
+      },
     ])
   })
 
@@ -127,9 +127,9 @@ describe(__filename, () => {
           { value: 'Quick' },
           { value: 'Brown' },
           { value: 'Fox' },
-          { value: 'Jumped' }
-        ]
-      }
+          { value: 'Jumped' },
+        ],
+      },
     ]
 
     await scraper1.toPromise()

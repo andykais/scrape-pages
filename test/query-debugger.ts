@@ -20,13 +20,13 @@ const queryExecutionDebugger = (view: DebuggerView) => (rows: Querier.QueryResul
 
   const groupedDepthArray = Array.from(depthMap.entries())
     .sort((a, b) => a[0] - b[0])
-    .map(entry => entry[1])
+    .map((entry) => entry[1])
 
   let key = ''
   let index = 0
   while (key !== 'q' && index < groupedDepthArray.length) {
     const resultAtDepth = groupedDepthArray[index]
-    const viewable = resultAtDepth.map(row =>
+    const viewable = resultAtDepth.map((row) =>
       view.reduce((acc: { [column: string]: any }, column) => {
         acc[column] = row[column]
         return acc

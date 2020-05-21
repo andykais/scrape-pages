@@ -49,7 +49,7 @@ describe(__filename, () => {
       const expected = '100ms (vv)'
 
       const scheduler = queueWithHooks(queue, { onStart })
-      rxjsTestScheduler.run(helpers => helpers.expectObservable(scheduler).toBe(expected))
+      rxjsTestScheduler.run((helpers) => helpers.expectObservable(scheduler).toBe(expected))
     })
   })
   describe('with maxConcurrent only', () => {
@@ -68,7 +68,7 @@ describe(__filename, () => {
 
       const expected = '100ms v 99ms v'
       const scheduler = queueWithHooks(queue, { onStart })
-      rxjsTestScheduler.run(helpers => helpers.expectObservable(scheduler).toBe(expected))
+      rxjsTestScheduler.run((helpers) => helpers.expectObservable(scheduler).toBe(expected))
     })
     it('should schedule multiple values at once if able', () => {
       const rateSettings = { maxConcurrent: 2 }
@@ -82,7 +82,7 @@ describe(__filename, () => {
       }
       const expected = '100ms (vv) 96ms v'
       const scheduler = queueWithHooks(queue, { onStart })
-      rxjsTestScheduler.run(helpers => helpers.expectObservable(scheduler).toBe(expected))
+      rxjsTestScheduler.run((helpers) => helpers.expectObservable(scheduler).toBe(expected))
     })
   })
   describe('with rateLimit only', () => {
@@ -99,7 +99,7 @@ describe(__filename, () => {
       const expected = 'e 199ms e'
       const unsub = '1000ms !'
       const scheduler = queueWithHooks(queue, { onStart })
-      rxjsTestScheduler.run(helpers => helpers.expectObservable(scheduler, unsub).toBe(expected))
+      rxjsTestScheduler.run((helpers) => helpers.expectObservable(scheduler, unsub).toBe(expected))
     })
     it('should pop from the queue on each interval even when tasks take longer than the interval', () => {
       const rateSettings = { throttleMs: 50 }
@@ -114,7 +114,7 @@ describe(__filename, () => {
       const unsub = '1000ms !'
 
       const scheduler = queueWithHooks(queue, { onStart })
-      rxjsTestScheduler.run(helpers => helpers.expectObservable(scheduler, unsub).toBe(expected))
+      rxjsTestScheduler.run((helpers) => helpers.expectObservable(scheduler, unsub).toBe(expected))
     })
   })
 
@@ -135,7 +135,7 @@ describe(__filename, () => {
       const expected = '100ms v 24ms v 74ms v'
       const unsub = '1000ms !'
       const scheduler = queueWithHooks(queue, { onStart })
-      rxjsTestScheduler.run(helpers => helpers.expectObservable(scheduler, unsub).toBe(expected))
+      rxjsTestScheduler.run((helpers) => helpers.expectObservable(scheduler, unsub).toBe(expected))
     })
   })
 
@@ -156,7 +156,7 @@ describe(__filename, () => {
       const expected = '100ms v 99ms a 99ms b 99ms c'
       const unsub = '1000ms !'
       const scheduler = queueWithHooks(queue, { onStart })
-      rxjsTestScheduler.run(helpers => helpers.expectObservable(scheduler, unsub).toBe(expected))
+      rxjsTestScheduler.run((helpers) => helpers.expectObservable(scheduler, unsub).toBe(expected))
     })
   })
   describe('with dynamic settings', () => {
@@ -177,7 +177,7 @@ describe(__filename, () => {
       const expected = 'e 24ms (eee)'
       const unsub = '1000ms !'
       const scheduler = queueWithHooks(queue, { onStart })
-      rxjsTestScheduler.run(helpers => helpers.expectObservable(scheduler, unsub).toBe(expected))
+      rxjsTestScheduler.run((helpers) => helpers.expectObservable(scheduler, unsub).toBe(expected))
     })
   })
 })

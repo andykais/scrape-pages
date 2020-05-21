@@ -14,7 +14,7 @@ WHERE id = ?
 const NetworkRequestStatusEnum = {
   QUEUED: 0,
   COMPLETE: 1,
-  FAILED: 2
+  FAILED: 2,
 }
 
 class UpdateNetworkRequestStatus extends Query {

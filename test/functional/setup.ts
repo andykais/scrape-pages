@@ -27,7 +27,7 @@ class FunctionalTestSetup {
 
   // curried so that we can pick up the mocha context but also reference our own `this`
   public static beforeEachInternal = (testEnv: FunctionalTestSetup) => {
-    return async function() {
+    return async function () {
       testEnv.mochaContext = this.currentTest
       const isStep = testEnv.mochaContext.body.includes('markRemainingTestsAndSubSuitesAsPending')
       await rmrf(testEnv.outputFolder)
