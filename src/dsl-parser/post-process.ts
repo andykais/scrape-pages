@@ -72,7 +72,7 @@ function postProcessProgram(program: i.Program): any {
 function postProcessPreProgram(preProgram: DslCommand[]) {
   const inputs = []
   for (const rawCommand of preProgram) {
-    switch(rawCommand.command) {
+    switch (rawCommand.command) {
       case 'INPUT':
         inputs.push(rawCommand.arg)
         break

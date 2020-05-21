@@ -89,7 +89,6 @@ const reuseLabels = `
 )
 `
 
-
 const withEmptyValue = `
 ().loop(
   FETCH '${host}/gallery/page/{{"+" index 1}}.html' LABEL='gallery-get'

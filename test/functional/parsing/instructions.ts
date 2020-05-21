@@ -28,8 +28,4 @@ const jsonInsideScript = `
 )
 `
 
-export {
-  simple,
-  parseJsonTwice,
-  jsonInsideScript
-}
+export { simple, parseJsonTwice, jsonInsideScript }
