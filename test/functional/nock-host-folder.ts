@@ -48,7 +48,7 @@ class HttpFolderMock {
     private options: HttpMockOptions = {}
   ) {}
 
-  public init = async (debug: boolean = false) => {
+  public init = async () => {
     const scope = nock(this.baseUrl)
     const random = this.options.randomSeed && new SeedPsuedoRandom(this.options.randomSeed)
     const delay = this.options.delay || 0
@@ -68,6 +68,7 @@ class HttpFolderMock {
     })
     scope.on('request', req => {
       if (this.debug) {
+        /* eslint-disable-next-line no-console */
         console.log(req.method, req.path)
       }
       this.requestStats.useRoute(req.path)
@@ -89,6 +90,8 @@ class HttpFolderMock {
   public setDebug = (on: boolean) => (this.debug = on)
 }
 
-export { HttpFolderMock }
-// type exports
-export { HttpMockOptions }
+export {
+  HttpFolderMock,
+  // type exports
+  HttpMockOptions
+}

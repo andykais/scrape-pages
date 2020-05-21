@@ -1,3 +1,6 @@
+// TODO caching is WIP
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 import { Stream } from '@scrape-pages/types/internal'
 import { compileTemplate } from '@scrape-pages/util/handlebars'
 // type imports
@@ -13,11 +16,11 @@ class ExpressionEvaluator {
   private cache = {}
   private template: Template
 
-  constructor(expressionTemplate: string) {
+  public constructor(expressionTemplate: string) {
     this.template = compileTemplate(expressionTemplate)
   }
 
-  eval(payload: Stream.Payload) {
+  public eval(payload: Stream.Payload) {
     const javascriptEvalStr = this.template(payload)
 
     const result = eval(javascriptEvalStr)
@@ -27,7 +30,7 @@ class ExpressionEvaluator {
 }
 
 class BooleanExpressionEvaluator extends ExpressionEvaluator {
-  eval(payload: Stream.Payload) {
+  public eval(payload: Stream.Payload) {
     return Boolean(super.eval(payload))
   }
 }

@@ -1,5 +1,4 @@
 import * as Rx from 'rxjs'
-import * as ops from 'rxjs/operators'
 // type imports
 import { Stream } from '@scrape-pages/types/internal'
 

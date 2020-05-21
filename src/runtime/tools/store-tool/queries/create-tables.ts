@@ -50,7 +50,7 @@ COMMIT;
 `
 
 class CreateTables extends Query {
-  call = () => {
+  public call = () => {
     this.database.pragma('foreign_keys = OFF')
     this.database.exec(template)
     this.database.pragma('foreign_keys = ON')

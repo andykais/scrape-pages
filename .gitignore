@@ -9,3 +9,6 @@ build
 
 # testing temp files
 test/functional/.run-output
+
+# pnpm cruft
+pnpm-debug.log

@@ -4,8 +4,6 @@ import * as I from '@scrape-pages/types/instructions'
 import { sql, Query } from './query-base'
 import { SelectedRow as CommandLabelRow } from './select-commands'
 
-const READ_ONLY_OPERATORS = ['until']
-
 type SelectedRow = {
   id: number
   value?: string
@@ -53,7 +51,7 @@ class SelectOrderedLabeledValues extends Query {
     const templateVars = compiler.generateSqlFragments()
 
     const templateStr = template({ ...templateVars, debugMode })
-    if (debugMode) console.log(templateStr)
+    if (debugMode) console.log(templateStr) // eslint-disable-line no-console
     const statement = this.database.prepare(templateStr)
     return (): SelectedRow[] => statement.all()
   }

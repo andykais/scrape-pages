@@ -1,4 +1,3 @@
-import { EventEmitter } from 'events'
 import * as Rx from 'rxjs'
 import * as ops from 'rxjs/operators'
 import { RuntimeBase } from '@scrape-pages/runtime/runtime-base'
@@ -37,7 +36,7 @@ class Queue extends RuntimeBase {
       ops.filter(this.shouldScheduleTask),
       ops.map(this.grabTask),
       ops.flatMap(task => task()),
-      ops.tap(v => {
+      ops.tap(() => {
         this.tasksInProgress--
         this.enqueueSubject.next()
       })

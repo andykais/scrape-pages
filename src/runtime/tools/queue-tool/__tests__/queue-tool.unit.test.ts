@@ -3,7 +3,7 @@ import * as ops from 'rxjs/operators'
 import * as RxTesting from 'rxjs/testing'
 import { expect } from 'chai'
 import { dslParser } from '@scrape-pages/dsl-parser'
-import { Queue, Task } from '../index'
+import { Queue } from '../index'
 
 type TestTask<T> = () => Rx.Observable<T>
 function queueWithHooks(queue: Queue, handlers: { onStart?: () => void }) {
@@ -178,7 +178,6 @@ describe(__filename, () => {
       const unsub = '1000ms !'
       const scheduler = queueWithHooks(queue, { onStart })
       rxjsTestScheduler.run(helpers => helpers.expectObservable(scheduler, unsub).toBe(expected))
-
     })
   })
 })

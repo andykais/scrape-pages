@@ -27,6 +27,8 @@ INPUT 'hi'
 )
 `
 
+// TODO add leaf operator
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const instructionsWithLeaves = `
 (
   POST 'https://google.com/login' LABEL='login'
@@ -38,16 +40,6 @@ const instructionsWithLeaves = `
 # I'm working with 'login' value
 
 )
-`
-
-const instructionsNext = `
-(
-  FETCH 'http://recurse-next/index.html'
-).reduce(
-  PARSE '#batch-id'
-  FETCH 'http://recurse-next/batch-page/id-{{ value }}.html'
-)
-
 `
 
 describe(__filename, () => {

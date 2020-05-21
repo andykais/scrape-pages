@@ -1,4 +1,3 @@
-import { EventEmitter } from 'events'
 import * as Rx from 'rxjs'
 import * as ops from 'rxjs/operators'
 import * as errors from '@scrape-pages/util/error'
@@ -23,7 +22,7 @@ abstract class BaseCommand<
   protected commandId: Stream.Id
   protected params: Merge<Required<Command['params']>, ParamDefaults & { LABEL: undefined }>
 
-  constructor(
+  public constructor(
     protected settings: Settings,
     protected tools: Tools,
     protected command: Command,
@@ -45,9 +44,9 @@ abstract class BaseCommand<
     this.LABEL = this.command.params.LABEL
   }
 
-  abstract async stream(payload: Stream.Payload): Promise<Stream.Payload[]>
+  public abstract async stream(payload: Stream.Payload): Promise<Stream.Payload[]>
 
-  callStream = (payload: Stream.Payload): Stream.Observable => {
+  public callStream = (payload: Stream.Payload): Stream.Observable => {
     switch (this.state) {
       case RuntimeState.STOPPING:
         const e = new Error('Received value while stopping')
@@ -77,7 +76,7 @@ abstract class BaseCommand<
     return parentPayload.merge({ value, id, valueIndex })
   }
 
-  async onStart() {
+  public async onStart() {
     const commandId = this.tools.store.qs.insertCommand(this.command.params.LABEL)
     if (commandId !== this.commandId) {
       throw new errors.InternalError(

@@ -1,4 +1,3 @@
-import { EventEmitter } from 'events'
 const RuntimeState = {
   IDLE: 'IDLE' as const,
   INITIALIZING: 'INITIALIZING' as const,
@@ -67,9 +66,13 @@ class RuntimeBase {
   }
 
   // overridable classes
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   protected async onStop(prevState: RuntimeState) {}
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   protected onStart(prevState: RuntimeState, arg?: any): Promise<void> | void {}
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   protected async onComplete(prevState: RuntimeState) {}
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   protected async onError(prevState: RuntimeState, error: Error) {
     // by default we bubble up errors
     throw error

@@ -9,7 +9,7 @@ class ContextualError extends Error {
 
   private origin: Error
 
-  constructor(contextualMessage: string, error: Error) {
+  public constructor(contextualMessage: string, error: Error) {
     super(`${contextualMessage}: ${error.message}`)
     Object.defineProperty(this, 'origin', {
       enumerable: false,
@@ -32,7 +32,7 @@ ${originStack}`
 }
 
 class InternalError extends Error {
-  constructor(message: string) {
+  public constructor(message: string) {
     super(message)
   }
 }
@@ -45,8 +45,9 @@ class ResponseError extends Error {
 }
 
 /**
- * @name ExpectedException
- * @description used in places that we want a short circuit without cancelling the whole program
+ * Used in places that we want a short circuit without cancelling the whole program
+ *
+ * @internal
  */
 class ExpectedException extends Error {
   public name = 'ExpectedException'
@@ -54,14 +55,5 @@ class ExpectedException extends Error {
     super('A short circuit was issued')
   }
 }
-
-// class ExpectedCancellation extends Error {
-//   public name = 'ExpectedCancellationError'
-//   public cause: string
-//   public constructor(e: Error) {
-//     super('Short circuit since stop() was called.')
-//     this.cause = e.toString()
-//   }
-// }
 
 export { ContextualError, InternalError, ResponseError, ExpectedException }

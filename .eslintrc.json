@@ -12,7 +12,7 @@
     "@typescript-eslint/no-unused-vars": ["error", { "varsIgnorePattern": "^_" }],
     "@typescript-eslint/explicit-member-accessibility": "error",
     "@typescript-eslint/member-ordering": [
-      "error",
+      "off",
       {
         "default": [
           "static-field",

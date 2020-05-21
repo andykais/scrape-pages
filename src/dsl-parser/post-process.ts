@@ -32,7 +32,6 @@ function postProcessCommands(commands: any[]) {
         throw new Error(`Unknown command '${rawCommand.command}' in the program`)
     }
   })
-  return commands
 }
 function postProcessExpression(expression: i.Expression) {
   return expression

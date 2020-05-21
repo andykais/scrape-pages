@@ -1,4 +1,3 @@
-import { EventEmitter } from 'events'
 import cheerio from 'cheerio'
 import jsonata from 'jsonata'
 import { BaseCommand } from './base-command'
@@ -60,7 +59,7 @@ class ParseCommand extends BaseCommand<I.ParseCommand, typeof ParseCommand.PARAM
   }
   private parserEngine: ParserEngine
 
-  constructor(settings: Settings, tools: Tools, command: I.ParseCommand) {
+  public constructor(settings: Settings, tools: Tools, command: I.ParseCommand) {
     super(settings, tools, command, ParseCommand.PARAM_DEFAULTS, 'PARSE')
     switch (this.params.FORMAT) {
       case 'html':
@@ -77,7 +76,7 @@ class ParseCommand extends BaseCommand<I.ParseCommand, typeof ParseCommand.PARAM
     }
   }
 
-  stream(payload: Stream.Payload) {
+  public stream(payload: Stream.Payload) {
     const parsedResult: Stream.Payload[] = []
 
     this.parserEngine.load(payload.value)

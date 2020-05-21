@@ -1,13 +1,8 @@
 import * as readlineSync from 'readline-sync'
 // type imports
-import { ScraperProgram } from '@scrape-pages'
-import { Tools, Querier } from '@scrape-pages/types/internal'
+import { Querier, OrderedValuesRowWithDebug } from '@scrape-pages/types/internal'
 
-type RowWithDebug = Querier.QueryResultWithDebug[0]
-type DebuggerView = (keyof RowWithDebug)[]
-class QueryDebugger {
-  public constructor(private view: DebuggerView) {}
-}
+type DebuggerView = (keyof OrderedValuesRowWithDebug)[]
 
 const queryExecutionDebugger = (view: DebuggerView) => (rows: Querier.QueryResultWithDebug) => {
   readlineSync.question(
@@ -15,7 +10,7 @@ const queryExecutionDebugger = (view: DebuggerView) => (rows: Querier.QueryResul
     { mask: '' }
   )
 
-  const depthMap: Map<number, RowWithDebug[]> = rows.reduce((acc, row) => {
+  const depthMap: Map<number, Querier.QueryResultWithDebug> = rows.reduce((acc, row) => {
     acc
       .set(row.recurseDepth, acc.get(row.recurseDepth) || [])
       .get(row.recurseDepth)!

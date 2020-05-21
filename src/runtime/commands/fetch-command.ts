@@ -1,4 +1,3 @@
-import { EventEmitter } from 'events'
 import fetch from 'node-fetch'
 import AbortController from 'abort-controller'
 import * as path from 'path'
@@ -46,7 +45,7 @@ class FetchCommand extends BaseCommand<I.FetchCommand, typeof FetchCommand.DEFAU
   }
   private abortController: AbortController
 
-  constructor(settings: Settings, tools: Tools, command: I.FetchCommand) {
+  public constructor(settings: Settings, tools: Tools, command: I.FetchCommand) {
     super(settings, tools, command, FetchCommand.DEFAULT_PARAMS, 'FETCH')
     const { URL, HEADERS = {} } = command.params
     this.urlTemplate = templates.compileTemplate(URL)
@@ -54,8 +53,8 @@ class FetchCommand extends BaseCommand<I.FetchCommand, typeof FetchCommand.DEFAU
     this.inFlightFetches = {}
   }
 
-  async stream(payload: Stream.Payload) {
-    const { LABEL, PRIORITY, METHOD, CACHE } = this.params
+  public async stream(payload: Stream.Payload) {
+    const { METHOD, CACHE } = this.params
     const url = this.urlTemplate(payload)
     const headers = this.headerTemplates.map(template => template(payload)).toObject()
     const requestParams: RequestParams = { url, headers, method: METHOD }
@@ -73,7 +72,7 @@ class FetchCommand extends BaseCommand<I.FetchCommand, typeof FetchCommand.DEFAU
     const inFlightFetch = this.inFlightFetches[serializedRequestParams]
     if (inFlightFetch) {
       const { requestId, request } = inFlightFetch
-      const { bytes, filename, value } = await request
+      const { value } = await request
       return { requestId, value }
     }
 
@@ -119,7 +118,7 @@ class FetchCommand extends BaseCommand<I.FetchCommand, typeof FetchCommand.DEFAU
     { url, headers, method }: RequestParams,
     id: number
   ): Promise<DownloadInfoWithValue> {
-    const { READ, WRITE, METHOD } = this.params
+    const { READ, WRITE } = this.params
 
     const response = await fetch(url, { method, headers, signal: this.abortController.signal })
     if (!response.ok) throw new ResponseError(response, url)
@@ -144,6 +143,7 @@ class FetchCommand extends BaseCommand<I.FetchCommand, typeof FetchCommand.DEFAU
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   private async read(response: Fetch.Response, url: string, id: number): Promise<ReadInfo> {
     const buffers: Buffer[] = []
 
@@ -197,7 +197,7 @@ class FetchCommand extends BaseCommand<I.FetchCommand, typeof FetchCommand.DEFAU
   }
 
   // runtime-base overrides
-  async onStart() {
+  public async onStart() {
     await super.onStart()
     this.writeFolder = path.resolve(this.settings.folder, this.commandId.toString())
     if (this.command.params.WRITE) {
@@ -205,7 +205,7 @@ class FetchCommand extends BaseCommand<I.FetchCommand, typeof FetchCommand.DEFAU
     }
     this.abortController = new AbortController()
   }
-  async onStop(prevState: RuntimeState) {
+  public async onStop(prevState: RuntimeState) {
     // console.log('aborting!')
     if (prevState === RuntimeState.ACTIVE) this.abortController.abort()
   }

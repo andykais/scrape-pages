@@ -16,7 +16,7 @@ class FunctionalTestSetup {
   private mochaContext: Mocha.Context
   private previousTestWasStep: boolean
 
-  constructor(testDirectory: string) {
+  public constructor(testDirectory: string) {
     const testDirname = path.basename(testDirectory)
     this.outputFolder = path.resolve(RUN_OUTPUT_FOLDER, testDirname)
     this.mockHost = `http://${testDirname}`
@@ -26,7 +26,7 @@ class FunctionalTestSetup {
   }
 
   // curried so that we can pick up the mocha context but also reference our own `this`
-  static beforeEachInternal = (testEnv: FunctionalTestSetup) => {
+  public static beforeEachInternal = (testEnv: FunctionalTestSetup) => {
     return async function() {
       testEnv.mochaContext = this.currentTest
       const isStep = testEnv.mochaContext.body.includes('markRemainingTestsAndSubSuitesAsPending')
@@ -37,17 +37,17 @@ class FunctionalTestSetup {
     }
   }
 
-  afterEach = () => {
+  public afterEach = () => {
     this.siteMock.done()
   }
 
-  async restartHttpMock(options?: HttpMockOptions) {
+  public async restartHttpMock(options?: HttpMockOptions) {
     this.siteMock.done()
     this.siteMock = new HttpFolderMock(this.mockHost, this.mockFolder, options)
     await this.siteMock.init()
   }
 
-  get queryDebugger() {
+  public get queryDebugger() {
     this.mochaContext.timeout(0)
     return queryExecutionDebugger
   }

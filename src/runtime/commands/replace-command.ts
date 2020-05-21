@@ -1,4 +1,3 @@
-import { EventEmitter } from 'events'
 import { BaseCommand } from './base-command'
 // type imports
 import { Settings, Tools, Stream } from '@scrape-pages/types/internal'
@@ -12,21 +11,21 @@ class ReplaceCommand extends BaseCommand<TextReplaceCommand, typeof ReplaceComma
   private regex: RegExp
 
   // prettier-ignore
-  constructor(settings: Settings, tools: Tools, command: TextReplaceCommand) {
+  public constructor(settings: Settings, tools: Tools, command: TextReplaceCommand) {
     super(settings, tools, command, ReplaceCommand.DEFAULT_PARAMS, 'REPLACE')
 
     const { SELECTOR, FLAGS } = command.params
     this.regex = new RegExp(SELECTOR, FLAGS)
   }
 
-  stream(payload: Stream.Payload) {
+  public stream(payload: Stream.Payload) {
     const { WITH } = this.params
     const processedValue = payload.value.replace(this.regex, WITH)
     const newPayload = this.saveValue(payload, 0, processedValue)
     return Promise.resolve([newPayload])
   }
 
-  cleanup() {}
+  public cleanup() {}
 }
 
 export { ReplaceCommand }

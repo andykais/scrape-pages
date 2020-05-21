@@ -2,8 +2,6 @@
   "compilerOptions": {
     "outDir": "build",
     "lib": ["es2017"],
-    "incremental": true,
-    "tsBuildInfoFile": "./node_modules/.cache/tsbuild-info.json",
     "sourceMap": true,
     "noImplicitAny": true,
     "strictNullChecks": true,
@@ -33,6 +31,5 @@
       { "transform": "typescript-transform-paths", "afterDeclarations": true }
     ]
   },
-  //"include": ["src/**/*.ts", "test/**/*.ts"]
-  "include": ["src/**/*.ts"]
+  "include": ["src/**/*.ts", "test/**/*.ts"]
 }

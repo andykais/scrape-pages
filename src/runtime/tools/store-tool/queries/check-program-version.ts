@@ -1,5 +1,5 @@
 import { sql, Query } from './query-base'
-import { Sqlite3, Stream } from '@scrape-pages/types/internal'
+import { Sqlite3 } from '@scrape-pages/types/internal'
 
 const template = sql`SELECT * FROM programState`
 

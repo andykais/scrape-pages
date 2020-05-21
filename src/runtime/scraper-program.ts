@@ -1,6 +1,5 @@
 import { EventEmitter } from 'events'
 import * as Rx from 'rxjs'
-import * as ops from 'rxjs/operators'
 import * as RxCustom from '@scrape-pages/compiler/observables'
 import * as errors from '@scrape-pages/util/error'
 import { dslParser } from '@scrape-pages/dsl-parser'
@@ -11,7 +10,7 @@ import * as commands from '@scrape-pages/runtime/commands'
 import { RuntimeBase } from './runtime-base'
 import { typecheckInstructions } from '@scrape-pages/types/runtime-typechecking'
 // type imports
-import { Instructions, Command } from '@scrape-pages/types/instructions'
+import { Instructions } from '@scrape-pages/types/instructions'
 import { Options, RateLimit } from '@scrape-pages/types/options'
 import { RuntimeState, Settings, Querier, Tools, Stream } from '@scrape-pages/types/internal'
 
@@ -35,7 +34,7 @@ class ScraperProgramRuntime extends RuntimeBase {
     this.observables = RxCustom.any(queue.scheduler, program)
   }
 
-  protected async onStart(prevState: RuntimeState) {
+  protected async onStart() {
     await fs.mkdirp(this.settings.folder)
     for (const tool of Object.values(this.tools)) await tool.start()
     for (const command of this.commands) await command.start()
@@ -49,7 +48,7 @@ class ScraperProgramRuntime extends RuntimeBase {
     })
   }
 
-  protected async onStop(prevState: RuntimeState) {
+  protected async onStop() {
     // only the commands need to stop. We cancel anything in flight, and close them off from new values
     // then the observables simply drain. If there are no unexpected errors, the onComplete handles the rest
     for (const command of this.commands) command.stop()
@@ -63,7 +62,7 @@ class ScraperProgramRuntime extends RuntimeBase {
     this.apiEmitter.emit('error', error)
   }
 
-  protected async onComplete(prevState: RuntimeState) {
+  protected async onComplete() {
     // this.tools.store.qs.updateProgramState(RuntimeState.COMPLETED)
     for (const tool of Object.values(this.tools)) tool.complete()
     for (const command of this.commands) command.complete()
@@ -97,6 +96,7 @@ class ScraperProgram extends EventEmitter {
     super()
     // if its a string, compile it using the dsl-parser
     const instructions = typeof instructionsArg === 'string' ? dslParser(instructionsArg) : instructionsArg
+    typecheckInstructions(instructions)
     const settings: Settings = { instructions, folder, options }
     this.runtime = new ScraperProgramRuntime(settings, this)
 

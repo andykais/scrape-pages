@@ -2,14 +2,13 @@ import * as path from 'path'
 import * as fs from 'fs'
 import { promisify } from 'util'
 
-const [mkdir, readdir, stat, unlink, rmdir, rename, access, readFile, writeFile] = [
+const [mkdir, readdir, stat, unlink, rmdir, rename, readFile, writeFile] = [
   fs.mkdir,
   fs.readdir,
   fs.stat,
   fs.unlink,
   fs.rmdir,
   fs.rename,
-  fs.access,
   fs.readFile,
   fs.writeFile
 ].map(promisify)

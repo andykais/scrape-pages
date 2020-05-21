@@ -1,8 +1,6 @@
-import { EventEmitter } from 'events'
 import * as path from 'path'
 import Sqlite3 from 'better-sqlite3'
 import * as fs from '@scrape-pages/util/fs'
-import { FMap } from '@scrape-pages/util/map'
 import { RuntimeBase } from '@scrape-pages/runtime/runtime-base'
 import * as queries from './queries'
 import { QuerierApi } from './query-api'

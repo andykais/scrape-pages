@@ -1,14 +1,12 @@
-import { EventEmitter } from 'events'
 import * as Rx from 'rxjs'
 import * as ops from 'rxjs/operators'
 import Immutable from 'seamless-immutable'
 import * as commands from '@scrape-pages/runtime/commands'
-import * as tools from '@scrape-pages/runtime/tools'
 import * as RxCustom from './observables'
 import { BooleanExpressionEvaluator } from './expression-evaluator'
 import { InternalError } from '@scrape-pages/util/error'
 // type imports
-import { Program, Operation, Command, Expression } from '@scrape-pages/types/instructions'
+import { Program, Operation, Command } from '@scrape-pages/types/instructions'
 import * as I from '@scrape-pages/types/instructions'
 import { Options } from '@scrape-pages/types/options'
 import { Settings, Tools, Stream } from '@scrape-pages/types/internal'
@@ -47,8 +45,6 @@ class Compiler {
     }
     return result
   }
-
-  private compileExpression(expression: Expression) {}
 
   private instantiateCommand = (command: Command) => {
     // OK this is super hacky. We know that this is a sqlite database with an auto incrementing counter.

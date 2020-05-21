@@ -1,5 +1,5 @@
 import { sql, Query } from './query-base'
-import { Sqlite3, Stream, Models } from '@scrape-pages/types/internal'
+import { Sqlite3, Models } from '@scrape-pages/types/internal'
 
 const template = sql`
 SELECT id, responseValue from networkRequests

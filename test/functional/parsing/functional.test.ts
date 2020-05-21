@@ -1,6 +1,4 @@
-import { expect } from 'chai'
 import { FunctionalTestSetup, assertQueryResultPartial } from '@test/functional/setup'
-import { queryExecutionDebugger } from '@test/query-debugger'
 
 import { ScraperProgram } from '@scrape-pages'
 import * as instructions from './instructions'
