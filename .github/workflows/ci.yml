@@ -32,11 +32,13 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
 
-    - run: npm ci --no-audit
-    - run: npm run build
-    - run: npm run test
+    - uses: pnpm/action-setup@v1.2.0
 
-    - run: npm run test:coverage
+    - run: pnpm install --frozen-lockfile, --strict-peer-dependencies
+    - run: pnpm run build
+    - run: pnpm run test
+
+    - run: pnpm run test:coverage
       if: matrix.os == 'ubuntu-latest' && matrix.node-version == '12'
     - name: send coverage report
       if: matrix.os == 'ubuntu-latest' && matrix.node-version == '12'
@@ -47,30 +49,30 @@ jobs:
 ##############################
 #     Test Package Usage     #
 ##############################
-    - run: npm ci --no-audit
+    - run: pnpm ci --no-audit
       if: matrix.os == 'ubuntu-latest' && matrix.node-version == '8'
-    - run: npm run build
+    - run: pnpm run build
     - run: ./testing/packaging/setup.sh
 
 ##############################
 #       NPM Publish          #
 ##############################
-    - name: npm publish
+    - name: pnpm publish
       if: github.event == 'release' && matrix.os == 'ubuntu-latest' && matrix.node-version == '12'
       env:
         NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
         GITHUB_TOKEN: ${{ secrets.github_token }}
         TAG: ${{ github.ref }}
       run: |
-        npm version --no-git-tag-version $TAG
-        npm run build
+        pnpm version --no-git-tag-version $TAG
+        pnpm run build
         cd lib
         echo '//registry.npmjs.org/:_authToken=${NPM_AUTH_TOKEN}' > .npmrc
-        npm publish
+        pnpm publish
         cd ..
         git fetch origin master
         git checkout master
-        git add package.json package-lock.json
+        git add package.json
         git commit --message "release $TAG"
         git remote add deploy https://${GITHUB_TOKEN}@github.com/${{ github.repository }}.git
         git push deploy master
