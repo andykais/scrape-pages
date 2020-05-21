@@ -9,6 +9,7 @@ dependencies:
   node-fetch: 2.6.0
   rxjs: 6.5.5
   seamless-immutable: 7.1.4
+  typescript-is: 0.16.0_typescript@3.8.3
 devDependencies:
   '@microsoft/api-extractor': 7.8.2-pr1796.0
   '@types/better-sqlite3': 5.4.0
@@ -34,12 +35,12 @@ devDependencies:
   nearley-loader: 2.0.0_nearley@2.19.2
   nock: 12.0.3
   npm-run-all: 4.1.5
+  prettier: 2.0.5
   readline-sync: 1.4.10
   shx: 0.3.2
   ts-loader: 7.0.1_typescript@3.8.3
   ttypescript: 1.5.10_typescript@3.8.3
   typescript: 3.8.3
-  typescript-is: 0.16.0_typescript@3.8.3
   typescript-transform-paths: 1.1.14
   webpack: 4.43.0_webpack@4.43.0
   webpack-cli: 3.3.11_webpack@4.43.0
@@ -3359,7 +3360,7 @@ packages:
     resolution:
       integrity: sha512-iyam8fBuCUpWeKPGpaNMetEocMt364qkCsfL9JuhjXX6dRnguRVOfk2GZaDpPjcOKiiXCPINZC1GczQ7iTq3Zw==
   /nested-error-stacks/2.1.0:
-    dev: true
+    dev: false
     resolution:
       integrity: sha512-AO81vsIO1k1sM4Zrd6Hu7regmJN1NSiAja10gc4bX3F0wd+9rQmcuHQaHVQCYIEC8iFXnE+mavh23GOt7wBgug==
   /nice-try/1.0.5:
@@ -3897,6 +3898,13 @@ packages:
       node: '>= 0.8.0'
     resolution:
       integrity: sha1-IZMqVJ9eUv/ZqCf1cOBL5iqX2lQ=
+  /prettier/2.0.5:
+    dev: true
+    engines:
+      node: '>=10.13.0'
+    hasBin: true
+    resolution:
+      integrity: sha512-7PtVymN48hGcO4fGjybyBSIWDsLU4H4XlvOHfq91pz9kkGlonzwTfYkaIEwiRg/dAJF9YlbsduBAgtYLi+8cFg==
   /process-nextick-args/2.0.1:
     resolution:
       integrity: sha512-3ouUOpQhtgrbOa17J7+uxOTpITYWaGP7/AhoR3+A+/1e9skrzelGi/dXzEYyvbxubEF6Wn2ypscTKiKJFFn1ag==
@@ -4101,7 +4109,7 @@ packages:
     resolution:
       integrity: sha1-hSBLVNuoLVdC4oyWdW70OvUOM4Q=
   /reflect-metadata/0.1.13:
-    dev: true
+    dev: false
     optional: true
     resolution:
       integrity: sha512-Ts1Y/anZELhSsjMcU605fU9RE4Oi3p5ORujwbIKXfWa+0Zxs510Qrmrce5/Jowq3cHSZSJqBjypxmHarc+vEWg==
@@ -4928,14 +4936,12 @@ packages:
     resolution:
       integrity: sha512-aZW88SY8kQbU7gpV19lN24LtXh/yD4ZZg6qieAJDDg+YBsJcSmLGK9QpnUjAKVG/xefmvJGd1WUmfpT/g6AJGA==
   /tslib/1.12.0:
-    dev: true
     resolution:
       integrity: sha512-5rxCQkP0kytf4H1T4xz1imjxaUUPMvc5aWp0rJ/VMIN7ClRiH1FwFvBt8wOeMasp/epeUnmSW6CixSIePtiLqA==
   /tsutils/3.17.1_typescript@3.8.3:
     dependencies:
       tslib: 1.12.0
       typescript: 3.8.3
-    dev: true
     engines:
       node: '>= 6'
     peerDependencies:
@@ -4998,7 +5004,7 @@ packages:
       nested-error-stacks: 2.1.0
       tsutils: 3.17.1_typescript@3.8.3
       typescript: 3.8.3
-    dev: true
+    dev: false
     engines:
       node: '>=6.14.4'
     optionalDependencies:
@@ -5021,7 +5027,6 @@ packages:
     resolution:
       integrity: sha512-/P5lkRXkWHNAbcJIiHPfRoKqyd7bsyCma1hZNUGfn20qm64T6ZBlrzprymeu918H+mB/0rIg2gGK/BXkhhYgBw==
   /typescript/3.8.3:
-    dev: true
     engines:
       node: '>=4.2.0'
     hasBin: true
@@ -5397,6 +5402,7 @@ specifiers:
   nock: ^12.0.3
   node-fetch: ^2.6.0
   npm-run-all: ^4.1.5
+  prettier: ^2.0.5
   readline-sync: ^1.4.10
   rxjs: ^6.5.5
   seamless-immutable: ^7.1.4
