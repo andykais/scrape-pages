@@ -23,7 +23,7 @@ const parseJsonTwice = `
 const jsonInsideScript = `
 (
   FETCH '${host}/json-inside-js-response.js'
-  REPLACE 'var api_read = (.*);' WITH='$1' FLAGS='s'
+  REPLACE '.*var api_read = (.*);.*' WITH='$1' FLAGS='s'
   PARSE 'a.nested.story[].word' FORMAT='json' LABEL='words'
 )
 `
