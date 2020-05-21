@@ -9,7 +9,6 @@
     "typecheck:watch": "tsc --noEmit --watch",
     "lint": "eslint --ignore-path .gitignore '**/*.ts'",
     "clean": "shx rm -rf build test/.run-output node_modules/.build-artifacts node_modules/.cache/tsbuild-info.json",
-    "clean": "shx rm -rf build test/.run-output",
     "compile": "webpack --mode=production",
     "compile:declarations": "ttsc --declaration --emitDeclarationOnly --declarationMap --outDir node_modules/.build-artifacts/declarations",
     "compile:bundle:declarations": "api-extractor run --local --verbose",
