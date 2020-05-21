@@ -71,12 +71,25 @@ class ScraperProgramRuntime extends RuntimeBase {
   }
 }
 
+/**
+ * Scraper class
+ */
 class ScraperProgram extends EventEmitter {
   private runtime: ScraperProgramRuntime
   private folder: string
 
+  /**
+   * @param dslInstructions - scraper instructions using the DSL
+   * @param folder - where the database & downloaded files will be stored
+   * @param options - command specific defaults and behavior options
+   */
   // prettier-ignore
   public constructor(dslInstructions: string, folder: string, options?: Options)
+  /**
+   * @param objectInstructions - scraper instructions using structured json
+   * @param folder - where the database & downloaded files will be stored
+   * @param options - command specific defaults and behavior options
+   */
   // prettier-ignore
   public constructor(objectInstructions: Instructions, folder: string, options?: Options)
   // prettier-ignore
@@ -92,14 +105,12 @@ class ScraperProgram extends EventEmitter {
   }
 
   /**
-   * @name query
-   * @description query for tagged items in the database
+   * Query for tagged items in the database
    */
   public query: Querier.Interface
 
   /**
-   * @name start
-   * @description begin scraping and write results to disk
+   * Begin scraping and write results to disk
    */
   public start() {
     this.runtime.start()
@@ -107,26 +118,25 @@ class ScraperProgram extends EventEmitter {
   }
 
   /**
-   * @name stop
-   * @description stop the scraper at any point
+   * Stop the scraper at any point
    */
   public stop() {
     this.runtime.stop()
   }
 
   /**
-   * @name updateRateLimit
-   * @description change the current rate limit settings. They go into affect immediately
-   * @param rateLimit the updated throttle and max concurrency settings, same that options FETCH takes
+   * Change the current rate limit settings. They go into affect immediately
+   *
+   * @param rateLimit - the updated throttle and max concurrency settings, same that options FETCH takes
    */
   public updateRateLimit(rateLimit: RateLimit) {
     this.runtime.tools.queue.updateRateLimit(rateLimit)
   }
 
   /**
-   * @name stopCommand
-   * @description stop a specific command by label
-   * @param label label of the command to stop
+   * Stop a specific command by label
+   *
+   * @param label - label of the command to stop
    */
   public stopCommand(label: string) {
     const command = this.runtime.commands.find(command => command.LABEL === label)
@@ -136,17 +146,16 @@ class ScraperProgram extends EventEmitter {
   }
 
   /**
-   * @name onAny
-   * @description listen for any event
-   * @param listener event listener callback
+   * Listen for any event
+   *
+   * @param listener - event listener callback
    */
   public async onAny(listener: (event: string, data: any) => void) {
     this.runtime.tools.notify.registerOnAny(listener)
   }
 
   /**
-   * @name toPromise
-   * @description convienience method returns a promise that resolves on the 'done' event
+   * Convienience method returns a promise that resolves on the 'done' event
    */
   public toPromise(): Promise<void> {
     if (this.runtime.state === RuntimeState.COMPLETED) return Promise.resolve()

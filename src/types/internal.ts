@@ -39,15 +39,24 @@ namespace Sqlite3 {
 }
 
 namespace Querier {
+  /** @internal */
   export type DebuggerInspector = (rows: QueryResultWithDebug) => void
 
   export type Labels = string[]
   // IF so desired, multi-level grouping could be accomplished. Though its hard to know if that adds value
-  export type QueryApiOptions = { groupBy?: string; inspector?: DebuggerInspector }
+  export type QueryApiOptions = {
+    /**
+     * Command label by which to group the results
+     */
+    groupBy?: string
+    /** @internal */
+    inspector?: DebuggerInspector
+  }
 
-  type QueryResultRow = Omit<OrderedValuesRow, 'commandId'>
+  export type QueryResultRow = Omit<OrderedValuesRow, 'commandId'>
   export type OrderedValuesGroup = { [scraperName: string]: OrderedValuesRow[] }
   export type QueryResult = OrderedValuesGroup[]
+  /** @internal */
   export type QueryResultWithDebug = OrderedValuesRowWithDebug[]
   /**
    * scraper querying interface.
@@ -74,4 +83,15 @@ namespace Stream {
   export type Subscriber = Rx.Subscription
 }
 
-export { Settings, Tools, RuntimeState, Models, Querier, Stream, TypeUtils, Sqlite3 }
+export {
+  Settings,
+  Tools,
+  RuntimeState,
+  Models,
+  Querier,
+  OrderedValuesRow,
+  OrderedValuesRowWithDebug,
+  Stream,
+  TypeUtils,
+  Sqlite3
+}

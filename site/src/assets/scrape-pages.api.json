@@ -1,0 +1,2038 @@
+{
+  "metadata": {
+    "toolPackage": "@microsoft/api-extractor",
+    "toolVersion": "7.8.2-pr1796.0",
+    "schemaVersion": 1003,
+    "oldestForwardsCompatibleVersion": 1001
+  },
+  "kind": "Package",
+  "canonicalReference": "scrape-pages!",
+  "docComment": "",
+  "name": "scrape-pages",
+  "members": [
+    {
+      "kind": "EntryPoint",
+      "canonicalReference": "scrape-pages!",
+      "name": "",
+      "members": [
+        {
+          "kind": "Interface",
+          "canonicalReference": "scrape-pages!CatchOperation:interface",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "interface CatchOperation "
+            }
+          ],
+          "releaseTag": "Public",
+          "name": "CatchOperation",
+          "members": [
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "scrape-pages!CatchOperation#commands:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "commands: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Command",
+                  "canonicalReference": "scrape-pages!~Command:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "[]"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "commands",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 3
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "scrape-pages!CatchOperation#operator:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "operator: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "'catch'"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "operator",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            }
+          ],
+          "extendsTokenRanges": []
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "scrape-pages!Command:type",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "declare type Command = "
+            },
+            {
+              "kind": "Reference",
+              "text": "FetchCommand",
+              "canonicalReference": "scrape-pages!~FetchCommand:interface"
+            },
+            {
+              "kind": "Content",
+              "text": " | "
+            },
+            {
+              "kind": "Reference",
+              "text": "ParseCommand",
+              "canonicalReference": "scrape-pages!~ParseCommand:interface"
+            },
+            {
+              "kind": "Content",
+              "text": " | "
+            },
+            {
+              "kind": "Reference",
+              "text": "TextReplaceCommand",
+              "canonicalReference": "scrape-pages!~TextReplaceCommand:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "releaseTag": "Public",
+          "name": "Command",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 6
+          }
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "scrape-pages!Expression:type",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "declare type Expression = "
+            },
+            {
+              "kind": "Content",
+              "text": "string"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "releaseTag": "Public",
+          "name": "Expression",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 2
+          }
+        },
+        {
+          "kind": "Interface",
+          "canonicalReference": "scrape-pages!FetchCommand:interface",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "interface FetchCommand "
+            }
+          ],
+          "releaseTag": "Public",
+          "name": "FetchCommand",
+          "members": [
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "scrape-pages!FetchCommand#command:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "command: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "'FETCH'"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "command",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "scrape-pages!FetchCommand#params:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "params: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "{\n        LABEL?: string;\n        METHOD?: 'GET' | 'PUT' | 'POST' | 'DELETE';\n        URL: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Template",
+                  "canonicalReference": "scrape-pages!~Template:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";\n        HEADERS?: {\n            [headerName: string]: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Template",
+                  "canonicalReference": "scrape-pages!~Template:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";\n        };\n        READ?: boolean;\n        WRITE?: boolean;\n        CACHE?: boolean;\n        PRIORITY?: number;\n    }"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "params",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 6
+              }
+            }
+          ],
+          "extendsTokenRanges": []
+        },
+        {
+          "kind": "Interface",
+          "canonicalReference": "scrape-pages!InitOperation:interface",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "interface InitOperation "
+            }
+          ],
+          "releaseTag": "Public",
+          "name": "InitOperation",
+          "members": [
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "scrape-pages!InitOperation#commands:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "commands: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Command",
+                  "canonicalReference": "scrape-pages!~Command:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "[]"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "commands",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 3
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "scrape-pages!InitOperation#operator:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "operator: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "'init'"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "operator",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            }
+          ],
+          "extendsTokenRanges": []
+        },
+        {
+          "kind": "Interface",
+          "canonicalReference": "scrape-pages!Instructions:interface",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "interface Instructions "
+            }
+          ],
+          "releaseTag": "Public",
+          "name": "Instructions",
+          "members": [
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "scrape-pages!Instructions#inputs:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "inputs: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Slug",
+                  "canonicalReference": "scrape-pages!~Slug:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "[]"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "inputs",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 3
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "scrape-pages!Instructions#program:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "program: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Program",
+                  "canonicalReference": "scrape-pages!~Program:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "program",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            }
+          ],
+          "extendsTokenRanges": []
+        },
+        {
+          "kind": "Interface",
+          "canonicalReference": "scrape-pages!LoopOperation:interface",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "interface LoopOperation "
+            }
+          ],
+          "releaseTag": "Public",
+          "name": "LoopOperation",
+          "members": [
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "scrape-pages!LoopOperation#commands:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "commands: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Command",
+                  "canonicalReference": "scrape-pages!~Command:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "[]"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "commands",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 3
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "scrape-pages!LoopOperation#operator:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "operator: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "'loop'"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "operator",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            }
+          ],
+          "extendsTokenRanges": []
+        },
+        {
+          "kind": "Interface",
+          "canonicalReference": "scrape-pages!MapOperation:interface",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "interface MapOperation "
+            }
+          ],
+          "releaseTag": "Public",
+          "name": "MapOperation",
+          "members": [
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "scrape-pages!MapOperation#commands:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "commands: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Command",
+                  "canonicalReference": "scrape-pages!~Command:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "[]"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "commands",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 3
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "scrape-pages!MapOperation#operator:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "operator: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "'map'"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "operator",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            }
+          ],
+          "extendsTokenRanges": []
+        },
+        {
+          "kind": "Interface",
+          "canonicalReference": "scrape-pages!MergeOperation:interface",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "interface MergeOperation "
+            }
+          ],
+          "releaseTag": "Public",
+          "name": "MergeOperation",
+          "members": [
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "scrape-pages!MergeOperation#operator:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "operator: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "'merge'"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "operator",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "scrape-pages!MergeOperation#programs:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "programs: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Program",
+                  "canonicalReference": "scrape-pages!~Program:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "[]"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "programs",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 3
+              }
+            }
+          ],
+          "extendsTokenRanges": []
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "scrape-pages!Operation:type",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "declare type Operation = "
+            },
+            {
+              "kind": "Reference",
+              "text": "InitOperation",
+              "canonicalReference": "scrape-pages!~InitOperation:interface"
+            },
+            {
+              "kind": "Content",
+              "text": " | "
+            },
+            {
+              "kind": "Reference",
+              "text": "UntilOperation",
+              "canonicalReference": "scrape-pages!~UntilOperation:interface"
+            },
+            {
+              "kind": "Content",
+              "text": " | "
+            },
+            {
+              "kind": "Reference",
+              "text": "MapOperation",
+              "canonicalReference": "scrape-pages!~MapOperation:interface"
+            },
+            {
+              "kind": "Content",
+              "text": " | "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReduceOperation",
+              "canonicalReference": "scrape-pages!~ReduceOperation:interface"
+            },
+            {
+              "kind": "Content",
+              "text": " | "
+            },
+            {
+              "kind": "Reference",
+              "text": "LoopOperation",
+              "canonicalReference": "scrape-pages!~LoopOperation:interface"
+            },
+            {
+              "kind": "Content",
+              "text": " | "
+            },
+            {
+              "kind": "Reference",
+              "text": "CatchOperation",
+              "canonicalReference": "scrape-pages!~CatchOperation:interface"
+            },
+            {
+              "kind": "Content",
+              "text": " | "
+            },
+            {
+              "kind": "Reference",
+              "text": "MergeOperation",
+              "canonicalReference": "scrape-pages!~MergeOperation:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "releaseTag": "Public",
+          "name": "Operation",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 14
+          }
+        },
+        {
+          "kind": "Interface",
+          "canonicalReference": "scrape-pages!Options:interface",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "interface Options "
+            }
+          ],
+          "releaseTag": "Public",
+          "name": "Options",
+          "members": [
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "scrape-pages!Options#FETCH:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "FETCH?: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "{\n        rate?: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "RateLimit",
+                  "canonicalReference": "scrape-pages!~RateLimit:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";\n        defaults?: {\n            CACHE?: I."
+                },
+                {
+                  "kind": "Reference",
+                  "text": "FetchCommand",
+                  "canonicalReference": "scrape-pages!~FetchCommand:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": "['params']['CACHE'];\n            READ?: I."
+                },
+                {
+                  "kind": "Reference",
+                  "text": "FetchCommand",
+                  "canonicalReference": "scrape-pages!~FetchCommand:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": "['params']['WRITE'];\n            WRITE?: I."
+                },
+                {
+                  "kind": "Reference",
+                  "text": "FetchCommand",
+                  "canonicalReference": "scrape-pages!~FetchCommand:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": "['params']['READ'];\n        };\n    }"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "FETCH",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 10
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "scrape-pages!Options#inputs:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "inputs?: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "{\n        [inputSlug: string]: string;\n    }"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "inputs",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "scrape-pages!Options#PARSE:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "PARSE?: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "{\n        defaults?: {\n            MAX?: I."
+                },
+                {
+                  "kind": "Reference",
+                  "text": "ParseCommand",
+                  "canonicalReference": "scrape-pages!~ParseCommand:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": "['params']['MAX'];\n            FORMAT?: I."
+                },
+                {
+                  "kind": "Reference",
+                  "text": "ParseCommand",
+                  "canonicalReference": "scrape-pages!~ParseCommand:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": "['params']['FORMAT'];\n        };\n    }"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "PARSE",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 6
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "scrape-pages!Options#REPLACE:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "REPLACE?: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "{\n        defaults?: {\n            FLAGS?: I."
+                },
+                {
+                  "kind": "Reference",
+                  "text": "TextReplaceCommand",
+                  "canonicalReference": "scrape-pages!~TextReplaceCommand:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": "['params']['FLAGS'];\n        };\n    }"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "REPLACE",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 4
+              }
+            }
+          ],
+          "extendsTokenRanges": []
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "scrape-pages!OrderedValuesRow:type",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "declare type SelectedRow = "
+            },
+            {
+              "kind": "Content",
+              "text": "{\n    id: number;\n    value?: string;\n    commandId: number;\n    filename: string | null;\n    byteLength: string | null;\n    status: string | null;\n    requestParams: string | null;\n}"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "releaseTag": "Public",
+          "name": "OrderedValuesRow",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 2
+          }
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "scrape-pages!OrderedValuesRowWithDebug:type",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "declare type SelectedRowWithDebug = "
+            },
+            {
+              "kind": "Reference",
+              "text": "SelectedRow",
+              "canonicalReference": "scrape-pages!~SelectedRow:type"
+            },
+            {
+              "kind": "Content",
+              "text": " & {\n    label: string;\n    parentTreeId: number;\n    requestId: number;\n    recurseDepth: number;\n    operatorIndex: number;\n    valueIndex: number;\n    commandId: number;\n    currentCommandLabel: string;\n    currentCommandId: number;\n    commandSort: number;\n}"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "releaseTag": "Public",
+          "name": "OrderedValuesRowWithDebug",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 3
+          }
+        },
+        {
+          "kind": "Interface",
+          "canonicalReference": "scrape-pages!ParseCommand:interface",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "interface ParseCommand "
+            }
+          ],
+          "releaseTag": "Public",
+          "name": "ParseCommand",
+          "members": [
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "scrape-pages!ParseCommand#command:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "command: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "'PARSE'"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "command",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "scrape-pages!ParseCommand#params:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "params: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "{\n        LABEL?: string;\n        SELECTOR: string;\n        FORMAT?: 'html' | 'xml' | 'json';\n        ATTR?: string;\n        MAX?: number;\n    }"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "params",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            }
+          ],
+          "extendsTokenRanges": []
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "scrape-pages!Program:type",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "declare type Program = "
+            },
+            {
+              "kind": "Reference",
+              "text": "Operation",
+              "canonicalReference": "scrape-pages!~Operation:type"
+            },
+            {
+              "kind": "Content",
+              "text": "[]"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "releaseTag": "Public",
+          "name": "Program",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 3
+          }
+        },
+        {
+          "kind": "Namespace",
+          "canonicalReference": "scrape-pages!Querier:namespace",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "declare namespace Querier "
+            }
+          ],
+          "releaseTag": "Public",
+          "name": "Querier",
+          "members": [
+            {
+              "kind": "Interface",
+              "canonicalReference": "scrape-pages!Querier.Interface:interface",
+              "docComment": "/**\n * scraper querying interface.\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "interface Interface "
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "Interface",
+              "members": [
+                {
+                  "kind": "CallSignature",
+                  "canonicalReference": "scrape-pages!Querier.Interface:call(1)",
+                  "docComment": "",
+                  "excerptTokens": [
+                    {
+                      "kind": "Content",
+                      "text": "(labels: "
+                    },
+                    {
+                      "kind": "Reference",
+                      "text": "Labels",
+                      "canonicalReference": "scrape-pages!~Querier.Labels:type"
+                    },
+                    {
+                      "kind": "Content",
+                      "text": ", options?: "
+                    },
+                    {
+                      "kind": "Reference",
+                      "text": "QueryApiOptions",
+                      "canonicalReference": "scrape-pages!~Querier.QueryApiOptions:type"
+                    },
+                    {
+                      "kind": "Content",
+                      "text": "): "
+                    },
+                    {
+                      "kind": "Reference",
+                      "text": "QueryResult",
+                      "canonicalReference": "scrape-pages!~Querier.QueryResult:type"
+                    },
+                    {
+                      "kind": "Content",
+                      "text": ";"
+                    }
+                  ],
+                  "returnTypeTokenRange": {
+                    "startIndex": 5,
+                    "endIndex": 6
+                  },
+                  "releaseTag": "Public",
+                  "overloadIndex": 1,
+                  "parameters": [
+                    {
+                      "parameterName": "labels",
+                      "parameterTypeTokenRange": {
+                        "startIndex": 1,
+                        "endIndex": 2
+                      }
+                    },
+                    {
+                      "parameterName": "options",
+                      "parameterTypeTokenRange": {
+                        "startIndex": 3,
+                        "endIndex": 4
+                      }
+                    }
+                  ]
+                },
+                {
+                  "kind": "PropertySignature",
+                  "canonicalReference": "scrape-pages!Querier.Interface#prepare:member",
+                  "docComment": "",
+                  "excerptTokens": [
+                    {
+                      "kind": "Content",
+                      "text": "prepare: "
+                    },
+                    {
+                      "kind": "Content",
+                      "text": "(labels: "
+                    },
+                    {
+                      "kind": "Reference",
+                      "text": "Labels",
+                      "canonicalReference": "scrape-pages!~Querier.Labels:type"
+                    },
+                    {
+                      "kind": "Content",
+                      "text": ", options?: "
+                    },
+                    {
+                      "kind": "Reference",
+                      "text": "QueryApiOptions",
+                      "canonicalReference": "scrape-pages!~Querier.QueryApiOptions:type"
+                    },
+                    {
+                      "kind": "Content",
+                      "text": ") => () => "
+                    },
+                    {
+                      "kind": "Reference",
+                      "text": "QueryResult",
+                      "canonicalReference": "scrape-pages!~Querier.QueryResult:type"
+                    },
+                    {
+                      "kind": "Content",
+                      "text": ";"
+                    }
+                  ],
+                  "releaseTag": "Public",
+                  "name": "prepare",
+                  "propertyTypeTokenRange": {
+                    "startIndex": 1,
+                    "endIndex": 7
+                  }
+                }
+              ],
+              "extendsTokenRanges": []
+            },
+            {
+              "kind": "TypeAlias",
+              "canonicalReference": "scrape-pages!Querier.Labels:type",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "type Labels = "
+                },
+                {
+                  "kind": "Content",
+                  "text": "string[]"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "Labels",
+              "typeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "TypeAlias",
+              "canonicalReference": "scrape-pages!Querier.OrderedValuesGroup:type",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "type OrderedValuesGroup = "
+                },
+                {
+                  "kind": "Content",
+                  "text": "{\n        [scraperName: string]: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "OrderedValuesRow",
+                  "canonicalReference": "scrape-pages!~SelectedRow:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "[];\n    }"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "OrderedValuesGroup",
+              "typeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 4
+              }
+            },
+            {
+              "kind": "TypeAlias",
+              "canonicalReference": "scrape-pages!Querier.QueryApiOptions:type",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "type QueryApiOptions = "
+                },
+                {
+                  "kind": "Content",
+                  "text": "{\n        groupBy?: string;\n        inspector?: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "DebuggerInspector",
+                  "canonicalReference": "scrape-pages!~Querier.DebuggerInspector:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";\n    }"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "QueryApiOptions",
+              "typeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 4
+              }
+            },
+            {
+              "kind": "TypeAlias",
+              "canonicalReference": "scrape-pages!Querier.QueryResult:type",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "type QueryResult = "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "OrderedValuesGroup",
+                  "canonicalReference": "scrape-pages!~Querier.OrderedValuesGroup:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "[]"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "QueryResult",
+              "typeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 3
+              }
+            },
+            {
+              "kind": "TypeAlias",
+              "canonicalReference": "scrape-pages!Querier.QueryResultRow:type",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "type QueryResultRow = "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Omit",
+                  "canonicalReference": "!Omit:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<"
+                },
+                {
+                  "kind": "Reference",
+                  "text": "OrderedValuesRow",
+                  "canonicalReference": "scrape-pages!~SelectedRow:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": ", 'commandId'>"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "QueryResultRow",
+              "typeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 5
+              }
+            }
+          ]
+        },
+        {
+          "kind": "Interface",
+          "canonicalReference": "scrape-pages!RateLimit:interface",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "interface RateLimit "
+            }
+          ],
+          "releaseTag": "Public",
+          "name": "RateLimit",
+          "members": [
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "scrape-pages!RateLimit#maxConcurrent:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "maxConcurrent?: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "number"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "maxConcurrent",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "scrape-pages!RateLimit#throttleMs:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "throttleMs?: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "number"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "throttleMs",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            }
+          ],
+          "extendsTokenRanges": []
+        },
+        {
+          "kind": "Interface",
+          "canonicalReference": "scrape-pages!ReduceOperation:interface",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "interface ReduceOperation "
+            }
+          ],
+          "releaseTag": "Public",
+          "name": "ReduceOperation",
+          "members": [
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "scrape-pages!ReduceOperation#commands:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "commands: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Command",
+                  "canonicalReference": "scrape-pages!~Command:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "[]"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "commands",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 3
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "scrape-pages!ReduceOperation#operator:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "operator: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "'reduce'"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "operator",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            }
+          ],
+          "extendsTokenRanges": []
+        },
+        {
+          "kind": "Class",
+          "canonicalReference": "scrape-pages!ScraperProgram:class",
+          "docComment": "/**\n * Scraper class\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "declare class ScraperProgram extends "
+            },
+            {
+              "kind": "Reference",
+              "text": "EventEmitter",
+              "canonicalReference": "!EventEmitter.EventEmitter:class"
+            },
+            {
+              "kind": "Content",
+              "text": " "
+            }
+          ],
+          "releaseTag": "Public",
+          "name": "ScraperProgram",
+          "members": [
+            {
+              "kind": "Constructor",
+              "canonicalReference": "scrape-pages!ScraperProgram:constructor(1)",
+              "docComment": "/**\n * Constructs a new instance of the `ScraperProgram` class\n *\n * @param dslInstructions - scraper instructions using the DSL\n *\n * @param folder - where the database & downloaded files will be stored\n *\n * @param options - command specific defaults and behavior options\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "constructor(dslInstructions: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "string"
+                },
+                {
+                  "kind": "Content",
+                  "text": ", folder: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "string"
+                },
+                {
+                  "kind": "Content",
+                  "text": ", options?: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Options",
+                  "canonicalReference": "scrape-pages!~Options:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": ");"
+                }
+              ],
+              "releaseTag": "Public",
+              "overloadIndex": 1,
+              "parameters": [
+                {
+                  "parameterName": "dslInstructions",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 1,
+                    "endIndex": 2
+                  }
+                },
+                {
+                  "parameterName": "folder",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 3,
+                    "endIndex": 4
+                  }
+                },
+                {
+                  "parameterName": "options",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 5,
+                    "endIndex": 6
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "Constructor",
+              "canonicalReference": "scrape-pages!ScraperProgram:constructor(2)",
+              "docComment": "/**\n * Constructs a new instance of the `ScraperProgram` class\n *\n * @param objectInstructions - scraper instructions using structured json\n *\n * @param folder - where the database & downloaded files will be stored\n *\n * @param options - command specific defaults and behavior options\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "constructor(objectInstructions: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Instructions",
+                  "canonicalReference": "scrape-pages!~Instructions:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": ", folder: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "string"
+                },
+                {
+                  "kind": "Content",
+                  "text": ", options?: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Options",
+                  "canonicalReference": "scrape-pages!~Options:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": ");"
+                }
+              ],
+              "releaseTag": "Public",
+              "overloadIndex": 2,
+              "parameters": [
+                {
+                  "parameterName": "objectInstructions",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 1,
+                    "endIndex": 2
+                  }
+                },
+                {
+                  "parameterName": "folder",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 3,
+                    "endIndex": 4
+                  }
+                },
+                {
+                  "parameterName": "options",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 5,
+                    "endIndex": 6
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "Method",
+              "canonicalReference": "scrape-pages!ScraperProgram#onAny:member(1)",
+              "docComment": "/**\n * Listen for any event\n *\n * @param listener - event listener callback\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "onAny(listener: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "(event: string, data: any) => void"
+                },
+                {
+                  "kind": "Content",
+                  "text": "): "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Promise",
+                  "canonicalReference": "!Promise:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<void>"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isStatic": false,
+              "returnTypeTokenRange": {
+                "startIndex": 3,
+                "endIndex": 5
+              },
+              "releaseTag": "Public",
+              "overloadIndex": 1,
+              "parameters": [
+                {
+                  "parameterName": "listener",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 1,
+                    "endIndex": 2
+                  }
+                }
+              ],
+              "name": "onAny"
+            },
+            {
+              "kind": "Property",
+              "canonicalReference": "scrape-pages!ScraperProgram#query:member",
+              "docComment": "/**\n * Query for tagged items in the database\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "query: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Querier.Interface",
+                  "canonicalReference": "scrape-pages!~Querier.Interface:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "query",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isStatic": false
+            },
+            {
+              "kind": "Method",
+              "canonicalReference": "scrape-pages!ScraperProgram#start:member(1)",
+              "docComment": "/**\n * Begin scraping and write results to disk\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "start(): "
+                },
+                {
+                  "kind": "Content",
+                  "text": "this"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isStatic": false,
+              "returnTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "releaseTag": "Public",
+              "overloadIndex": 1,
+              "parameters": [],
+              "name": "start"
+            },
+            {
+              "kind": "Method",
+              "canonicalReference": "scrape-pages!ScraperProgram#stop:member(1)",
+              "docComment": "/**\n * Stop the scraper at any point\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "stop(): "
+                },
+                {
+                  "kind": "Content",
+                  "text": "void"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isStatic": false,
+              "returnTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "releaseTag": "Public",
+              "overloadIndex": 1,
+              "parameters": [],
+              "name": "stop"
+            },
+            {
+              "kind": "Method",
+              "canonicalReference": "scrape-pages!ScraperProgram#stopCommand:member(1)",
+              "docComment": "/**\n * Stop a specific command by label\n *\n * @param label - label of the command to stop\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "stopCommand(label: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "string"
+                },
+                {
+                  "kind": "Content",
+                  "text": "): "
+                },
+                {
+                  "kind": "Content",
+                  "text": "void"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isStatic": false,
+              "returnTypeTokenRange": {
+                "startIndex": 3,
+                "endIndex": 4
+              },
+              "releaseTag": "Public",
+              "overloadIndex": 1,
+              "parameters": [
+                {
+                  "parameterName": "label",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 1,
+                    "endIndex": 2
+                  }
+                }
+              ],
+              "name": "stopCommand"
+            },
+            {
+              "kind": "Method",
+              "canonicalReference": "scrape-pages!ScraperProgram#toPromise:member(1)",
+              "docComment": "/**\n * Convienience method returns a promise that resolves on the 'done' event\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "toPromise(): "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Promise",
+                  "canonicalReference": "!Promise:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<void>"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isStatic": false,
+              "returnTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 3
+              },
+              "releaseTag": "Public",
+              "overloadIndex": 1,
+              "parameters": [],
+              "name": "toPromise"
+            },
+            {
+              "kind": "Method",
+              "canonicalReference": "scrape-pages!ScraperProgram#updateRateLimit:member(1)",
+              "docComment": "/**\n * Change the current rate limit settings. They go into affect immediately\n *\n * @param rateLimit - the updated throttle and max concurrency settings, same that options FETCH takes\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "updateRateLimit(rateLimit: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "RateLimit",
+                  "canonicalReference": "scrape-pages!~RateLimit:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": "): "
+                },
+                {
+                  "kind": "Content",
+                  "text": "void"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isStatic": false,
+              "returnTypeTokenRange": {
+                "startIndex": 3,
+                "endIndex": 4
+              },
+              "releaseTag": "Public",
+              "overloadIndex": 1,
+              "parameters": [
+                {
+                  "parameterName": "rateLimit",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 1,
+                    "endIndex": 2
+                  }
+                }
+              ],
+              "name": "updateRateLimit"
+            }
+          ],
+          "extendsTokenRange": {
+            "startIndex": 1,
+            "endIndex": 3
+          },
+          "implementsTokenRanges": []
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "scrape-pages!Slug:type",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "declare type Slug = "
+            },
+            {
+              "kind": "Content",
+              "text": "string"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "releaseTag": "Public",
+          "name": "Slug",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 2
+          }
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "scrape-pages!Template:type",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "declare type Template = "
+            },
+            {
+              "kind": "Content",
+              "text": "string"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "releaseTag": "Public",
+          "name": "Template",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 2
+          }
+        },
+        {
+          "kind": "Interface",
+          "canonicalReference": "scrape-pages!TextReplaceCommand:interface",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "interface TextReplaceCommand "
+            }
+          ],
+          "releaseTag": "Public",
+          "name": "TextReplaceCommand",
+          "members": [
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "scrape-pages!TextReplaceCommand#command:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "command: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "'REPLACE'"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "command",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "scrape-pages!TextReplaceCommand#params:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "params: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "{\n        LABEL?: string;\n        SELECTOR: string;\n        WITH?: string;\n        FLAGS?: string;\n    }"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "params",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            }
+          ],
+          "extendsTokenRanges": []
+        },
+        {
+          "kind": "Interface",
+          "canonicalReference": "scrape-pages!UntilOperation:interface",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "interface UntilOperation "
+            }
+          ],
+          "releaseTag": "Public",
+          "name": "UntilOperation",
+          "members": [
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "scrape-pages!UntilOperation#expression:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "expression: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Expression",
+                  "canonicalReference": "scrape-pages!~Expression:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "expression",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "scrape-pages!UntilOperation#operator:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "operator: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "'until'"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "operator",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            }
+          ],
+          "extendsTokenRanges": []
+        }
+      ]
+    }
+  ]
+}

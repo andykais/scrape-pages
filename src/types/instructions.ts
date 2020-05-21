@@ -101,6 +101,8 @@ export {
   Operation,
   Command,
   Expression,
+  Slug,
+  Template,
   InitOperation,
   UntilOperation,
   MapOperation,

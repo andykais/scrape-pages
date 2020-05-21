@@ -2,6 +2,8 @@
   "compilerOptions": {
     "outDir": "build",
     "lib": ["es2017"],
+    "incremental": true,
+    "tsBuildInfoFile": "./node_modules/.cache/tsbuild-info.json",
     "sourceMap": true,
     "noImplicitAny": true,
     "strictNullChecks": true,
@@ -14,7 +16,8 @@
     "target": "es2017",
     "resolveJsonModule": true,
     "esModuleInterop": true,
-    "stripInternal": true,
+    "declaration": true,
+    "declarationMap": true,
     "baseUrl": ".",
     "paths": {
       "@scrape-pages": ["src/index"],
@@ -23,10 +26,13 @@
     },
     "plugins": [
       {
+        "transform": "typescript-is/lib/transform-inline/transformer",
         "ignoreFunctions": true,
         "ignoreMethods": true
-      }
+      },
+      { "transform": "typescript-transform-paths", "afterDeclarations": true }
     ]
   },
-  "include": ["src/**/*.ts", "test/**/*.ts"]
+  //"include": ["src/**/*.ts", "test/**/*.ts"]
+  "include": ["src/**/*.ts"]
 }
