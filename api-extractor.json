@@ -45,7 +45,7 @@
    *
    * SUPPORTED TOKENS: <projectFolder>, <packageName>, <unscopedPackageName>
    */
-  "mainEntryPointFilePath": "<projectFolder>/node_modules/.build-artifacts/declarations/index.d.ts",
+  "mainEntryPointFilePath": "<projectFolder>/node_modules/.build-artifacts/declarations/src/index.d.ts",
 
   /**
    * A list of NPM package names whose exports should be treated as part of this package.
