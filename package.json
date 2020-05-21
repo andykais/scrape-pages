@@ -19,7 +19,6 @@
     "test:watch": "mochapack '{test,src}/**/*.test.ts' --watch --clear-terminal",
     "test:unit": "mochapack 'src/**/*.unit.test.ts'",
     "test:functional": "mochapack 'test/functional/**/*functional.test.ts'"
-
   },
   "repository": {
     "type": "git",

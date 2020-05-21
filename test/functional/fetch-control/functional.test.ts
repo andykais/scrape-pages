@@ -63,7 +63,9 @@ describe(__filename, () => {
 
   describe('failing requests', () => {
     it('should report the failure and stop the scraper', async () => {
-      nock('https://non-existent.com').get('/a/b/c').reply(500)
+      nock('https://non-existent.com')
+        .get('/a/b/c')
+        .reply(500)
 
       const instructions = `
       (
@@ -82,7 +84,9 @@ describe(__filename, () => {
     })
     // .catch() is going to be difficult for ordering. I dont want to deal with it yet
     it.skip('should be able to skip failed requests', async () => {
-      nock('https://non-existent.com').get('/a/b/c').reply(500)
+      nock('https://non-existent.com')
+        .get('/a/b/c')
+        .reply(500)
 
       const instructions = `
       (
@@ -108,7 +112,9 @@ describe(__filename, () => {
       )`
       const scraper = new ScraperProgram(instructions, testEnv.outputFolder)
 
-      nock('https://fast-request').get('/').reply(200)
+      nock('https://fast-request')
+        .get('/')
+        .reply(200)
       nock('https://slow-request')
         .get('/')
         .reply(() => {

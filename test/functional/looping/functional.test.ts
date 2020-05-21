@@ -10,7 +10,7 @@ describe(__filename, () => {
     describe('with simple instructions', () => {
       let scraper: ScraperProgram
 
-      before(async function () {
+      before(async function() {
         scraper = new ScraperProgram(instructions.simple, testEnv.outputFolder)
         await testEnv.beforeEach.bind(this)()
         await scraper.start().toPromise()
@@ -44,7 +44,7 @@ describe(__filename, () => {
     describe('with merging instructions', () => {
       let scraper: ScraperProgram
 
-      before(async function () {
+      before(async function() {
         scraper = new ScraperProgram(instructions.merging, testEnv.outputFolder)
         await testEnv.beforeEach.bind(this)()
         await scraper.start().toPromise()
@@ -80,7 +80,7 @@ describe(__filename, () => {
         ], { ignoreOrderInGroups: true })
         // TODO order merging commands and remove ignoreOrderInGroups (it is doable)
       })
-      it(`query(['image'])`, async function () {
+      it(`query(['image'])`, async function() {
         const result = scraper.query(['image'])
         // prettier-ignore
         assertQueryResultPartial(result, [
@@ -101,7 +101,7 @@ describe(__filename, () => {
     describe('with reused labels instructions', () => {
       let scraper: ScraperProgram
 
-      before(async function () {
+      before(async function() {
         scraper = new ScraperProgram(instructions.reuseLabels, testEnv.outputFolder)
         await testEnv.beforeEach.bind(this)()
         await scraper.start().toPromise()
@@ -158,7 +158,7 @@ describe(__filename, () => {
     describe('query ordering', () => {
       let scraper: ScraperProgram
 
-      before(async function () {
+      before(async function() {
         scraper = new ScraperProgram(instructions.withEmptyValue, testEnv.outputFolder)
         await testEnv.beforeEach.bind(this)()
         await scraper.start().toPromise()
@@ -196,7 +196,7 @@ describe(__filename, () => {
           }
         ])
       })
-      it('non existent labels', async function () {
+      it('non existent labels', async function() {
         assertQueryResultPartial(scraper.query(['nonexistent']), [])
 
         assertQueryResultPartial(scraper.query(['image-parse'], { groupBy: 'nonexistent' }), [
@@ -217,7 +217,7 @@ describe(__filename, () => {
           {}
         ])
       })
-      it('commands that had no values', async function () {
+      it('commands that had no values', async function() {
         const result = scraper.query(['image', 'image-parse', 'never-reached'])
         assertQueryResultPartial(result, [
           {

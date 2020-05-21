@@ -27,7 +27,4 @@ const merging = `
 )
 `
 
-export {
-  simple,
-  merging
-}
+export { simple, merging }
