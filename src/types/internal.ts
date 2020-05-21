@@ -6,7 +6,7 @@ import { Instructions } from './instructions'
 import { Options } from './options'
 import {
   SelectedRow as OrderedValuesRow,
-  SelectedRowWithDebug as OrderedValuesRowWithDebug
+  SelectedRowWithDebug as OrderedValuesRowWithDebug,
 } from '@scrape-pages/runtime/tools/store-tool/queries/select-ordered-labeled-values'
 import { RuntimeState } from '@scrape-pages/runtime/runtime-base'
 
@@ -95,5 +95,5 @@ export {
   OrderedValuesRowWithDebug,
   Stream,
   TypeUtils,
-  Sqlite3
+  Sqlite3,
 }

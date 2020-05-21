@@ -25,7 +25,7 @@ class Compiler {
       operatorIndex: 0,
       valueIndex: 0,
       id: -1,
-      inputs: Compiler.getInputs(settings)
+      inputs: Compiler.getInputs(settings),
     })
     this.commands = []
     this.commandIdCounter = 0
@@ -78,7 +78,7 @@ class Compiler {
   private mapCommands(operation: { commands: I.Command[] }): Stream.Operation {
     const commands: Stream.Operation[] = operation.commands
       .map(this.instantiateCommand)
-      .map(command =>
+      .map((command) =>
         Rx.pipe(ops.flatMap(command.callStream), ops.catchError(Compiler.catchExpectedErrors))
       )
     return Rx.pipe.apply(Rx, commands)
@@ -99,13 +99,13 @@ class Compiler {
   // compile operations
   private compileMergeOperation(operation: I.MergeOperation): Stream.Operation {
     const programs = operation.programs.map(this.compileFlow)
-    return ops.flatMap(payload => Rx.merge(...programs.map(op => Rx.of(payload).pipe(op))))
+    return ops.flatMap((payload) => Rx.merge(...programs.map((op) => Rx.of(payload).pipe(op))))
   }
 
   private compileReduceOperation(operation: I.ReduceOperation): Stream.Operation {
     const commandsOperation = this.mapCommands(operation)
 
-    return ops.flatMap(parentPayload =>
+    return ops.flatMap((parentPayload) =>
       Rx.of(parentPayload).pipe(
         ops.expand((payload, i) => {
           const flattendPayload = payload.merge({ id: parentPayload.id, operatorIndex: i + 1 })
@@ -122,12 +122,12 @@ class Compiler {
 
   private compileUntilOperation(operation: I.UntilOperation): Stream.Operation {
     const evaluator = new BooleanExpressionEvaluator(operation.expression)
-    return ops.takeWhile(payload => !evaluator.eval(payload))
+    return ops.takeWhile((payload) => !evaluator.eval(payload))
   }
 
   // compile program
   private compileFlow = (program: Program): Stream.Operation => {
-    const operations: Stream.Operation[] = program.map(operation => {
+    const operations: Stream.Operation[] = program.map((operation) => {
       switch (operation.operator) {
         case 'init':
           return this.mapCommands(operation)
@@ -155,7 +155,7 @@ class Compiler {
 
     return {
       program: this.program,
-      commands: this.commands
+      commands: this.commands,
     }
   }
 }

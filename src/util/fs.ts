@@ -10,7 +10,7 @@ const [mkdir, readdir, stat, unlink, rmdir, rename, readFile, writeFile] = [
   fs.rmdir,
   fs.rename,
   fs.readFile,
-  fs.writeFile
+  fs.writeFile,
 ].map(promisify)
 
 async function mkdirp(folder: string) {
@@ -75,5 +75,5 @@ export {
   // custom file ops
   mkdirp,
   rmrf,
-  findFiles
+  findFiles,
 }

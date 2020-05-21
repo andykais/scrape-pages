@@ -24,5 +24,5 @@ class SelectNetworkRequestValue extends Query {
 export {
   SelectNetworkRequestValue,
   // type exports
-  SelectedRow
+  SelectedRow,
 }

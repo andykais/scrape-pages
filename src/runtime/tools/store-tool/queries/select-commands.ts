@@ -22,5 +22,5 @@ class SelectCommands extends Query {
 export {
   SelectCommands,
   // type exports
-  SelectedRow
+  SelectedRow,
 }

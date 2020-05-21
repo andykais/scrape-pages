@@ -23,5 +23,5 @@ function compileTemplate(templateStr: string) {
 export {
   compileTemplate,
   // type exports
-  Template
+  Template,
 }

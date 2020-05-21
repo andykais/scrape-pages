@@ -6,7 +6,7 @@ import { TextReplaceCommand } from '@scrape-pages/types/instructions'
 class ReplaceCommand extends BaseCommand<TextReplaceCommand, typeof ReplaceCommand.DEFAULT_PARAMS> {
   private static DEFAULT_PARAMS = {
     WITH: '',
-    FLAGS: ''
+    FLAGS: '',
   }
   private regex: RegExp
 

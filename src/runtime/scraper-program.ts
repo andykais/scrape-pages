@@ -44,7 +44,7 @@ class ScraperProgramRuntime extends RuntimeBase {
         if (error instanceof errors.ExpectedException) return
         this.error(error)
       },
-      complete: this.complete
+      complete: this.complete,
     })
   }
 
@@ -139,7 +139,7 @@ class ScraperProgram extends EventEmitter {
    * @param label - label of the command to stop
    */
   public stopCommand(label: string) {
-    const command = this.runtime.commands.find(command => command.LABEL === label)
+    const command = this.runtime.commands.find((command) => command.LABEL === label)
     if (command) {
       command.stop()
     }

@@ -15,7 +15,7 @@ interface DslCommand {
 function processRawCommandAndRenameArg(renameArgAs: string, rawCommand: DslCommand) {
   return {
     command: rawCommand.command,
-    params: { ...rawCommand.kwargs, [renameArgAs]: rawCommand.arg }
+    params: { ...rawCommand.kwargs, [renameArgAs]: rawCommand.arg },
   }
 }
 
@@ -90,7 +90,7 @@ function postProcess(result: any) {
 
   return {
     ...preProgram,
-    program
+    program,
   }
 }
 

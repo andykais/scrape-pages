@@ -23,7 +23,7 @@ function createStatements(database: Sqlite3.Database) {
     insertValue: new InsertValue(database).call,
     insertQueuedNetworkRequest: new InsertQueuedNetworkRequest(database).call,
     updateNetworkRequestStatus: new UpdateNetworkRequestStatus(database).call,
-    selectNetworkRequestValue: new SelectNetworkRequestValue(database).call
+    selectNetworkRequestValue: new SelectNetworkRequestValue(database).call,
   }
 }
 
@@ -36,5 +36,5 @@ export {
   createStatements,
   initializeTables,
   // type exports
-  Queries
+  Queries,
 }

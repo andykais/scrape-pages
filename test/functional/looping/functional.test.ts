@@ -10,7 +10,7 @@ describe(__filename, () => {
     describe('with simple instructions', () => {
       let scraper: ScraperProgram
 
-      before(async function() {
+      before(async function () {
         scraper = new ScraperProgram(instructions.simple, testEnv.outputFolder)
         await testEnv.beforeEach.bind(this)()
         await scraper.start().toPromise()
@@ -44,7 +44,7 @@ describe(__filename, () => {
     describe('with merging instructions', () => {
       let scraper: ScraperProgram
 
-      before(async function() {
+      before(async function () {
         scraper = new ScraperProgram(instructions.merging, testEnv.outputFolder)
         await testEnv.beforeEach.bind(this)()
         await scraper.start().toPromise()
@@ -80,7 +80,7 @@ describe(__filename, () => {
         ], { ignoreOrderInGroups: true })
         // TODO order merging commands and remove ignoreOrderInGroups (it is doable)
       })
-      it(`query(['image'])`, async function() {
+      it(`query(['image'])`, async function () {
         const result = scraper.query(['image'])
         // prettier-ignore
         assertQueryResultPartial(result, [
@@ -101,7 +101,7 @@ describe(__filename, () => {
     describe('with reused labels instructions', () => {
       let scraper: ScraperProgram
 
-      before(async function() {
+      before(async function () {
         scraper = new ScraperProgram(instructions.reuseLabels, testEnv.outputFolder)
         await testEnv.beforeEach.bind(this)()
         await scraper.start().toPromise()
@@ -158,7 +158,7 @@ describe(__filename, () => {
     describe('query ordering', () => {
       let scraper: ScraperProgram
 
-      before(async function() {
+      before(async function () {
         scraper = new ScraperProgram(instructions.withEmptyValue, testEnv.outputFolder)
         await testEnv.beforeEach.bind(this)()
         await scraper.start().toPromise()
@@ -180,7 +180,7 @@ describe(__filename, () => {
               { value: '/image/the.jpg' },
               { value: '/image/quick.jpg' },
               { value: '/image/brown.jpg' },
-              { value: '/image/fox.jpg' }
+              { value: '/image/fox.jpg' },
             ],
             tag: [
               { value: 'one' },
@@ -191,12 +191,12 @@ describe(__filename, () => {
               { value: 'five' },
               { value: 'three' },
               { value: 'four' },
-              { value: 'five' }
-            ]
-          }
+              { value: 'five' },
+            ],
+          },
         ])
       })
-      it('non existent labels', async function() {
+      it('non existent labels', async function () {
         assertQueryResultPartial(scraper.query(['nonexistent']), [])
 
         assertQueryResultPartial(scraper.query(['image-parse'], { groupBy: 'nonexistent' }), [
@@ -205,19 +205,19 @@ describe(__filename, () => {
               { value: '/image/the.jpg' },
               { value: '/image/quick.jpg' },
               { value: '/image/brown.jpg' },
-              { value: '/image/fox.jpg' }
-            ]
-          }
+              { value: '/image/fox.jpg' },
+            ],
+          },
         ])
 
         assertQueryResultPartial(scraper.query(['nonexistent'], { groupBy: 'post' }), [
           {},
           {},
           {},
-          {}
+          {},
         ])
       })
-      it('commands that had no values', async function() {
+      it('commands that had no values', async function () {
         const result = scraper.query(['image', 'image-parse', 'never-reached'])
         assertQueryResultPartial(result, [
           {
@@ -232,11 +232,11 @@ describe(__filename, () => {
               { value: '/image/the.jpg' },
               { value: '/image/quick.jpg' },
               { value: '/image/brown.jpg' },
-              { value: '/image/fox.jpg' }
+              { value: '/image/fox.jpg' },
             ],
             // commands that do exist always get a field
-            'never-reached': []
-          }
+            'never-reached': [],
+          },
         ])
       })
     })

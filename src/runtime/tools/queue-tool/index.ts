@@ -32,10 +32,12 @@ class Queue extends RuntimeBase {
     this.enqueueSubject = new Rx.Subject()
     this.updateRateSubject = new Rx.BehaviorSubject(rate)
     this.scheduler = this.updateRateSubject.pipe(
-      ops.switchMap(rate => (rate.throttleMs ? Rx.timer(0, rate.throttleMs) : this.enqueueSubject)),
+      ops.switchMap((rate) =>
+        rate.throttleMs ? Rx.timer(0, rate.throttleMs) : this.enqueueSubject
+      ),
       ops.filter(this.shouldScheduleTask),
       ops.map(this.grabTask),
-      ops.flatMap(task => task()),
+      ops.flatMap((task) => task()),
       ops.tap(() => {
         this.tasksInProgress--
         this.enqueueSubject.next()
@@ -51,7 +53,7 @@ class Queue extends RuntimeBase {
         else {
           return activeTask.pipe(
             ops.tap(resolve),
-            ops.catchError(e => {
+            ops.catchError((e) => {
               reject(e)
               return Rx.of(null)
             })
@@ -91,5 +93,5 @@ class Queue extends RuntimeBase {
 export {
   Queue,
   // type exports
-  Task
+  Task,
 }

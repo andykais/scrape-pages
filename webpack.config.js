@@ -19,26 +19,26 @@ module.exports = {
   target: 'node',
   node: {
     __dirname: true,
-    __filename: true
+    __filename: true,
   },
 
   entry: {
-    index: './src/index.ts'
+    index: './src/index.ts',
   },
   // entry: sourceFiles,
   output: {
     path: path.resolve(__dirname, 'build'),
     filename: '[name].js',
     library: 'scrape-pages',
-    libraryTarget: 'umd'
+    libraryTarget: 'umd',
   },
 
   resolve: {
     extensions: ['.ts', '.js'],
     alias: {
       '@scrape-pages': path.resolve(__dirname, 'src'),
-      '@test': path.resolve(__dirname, 'test')
-    }
+      '@test': path.resolve(__dirname, 'test'),
+    },
   },
 
   module: {
@@ -48,31 +48,31 @@ module.exports = {
         exclude: /node_modules/,
         loader: 'ts-loader',
         options: {
-          getCustomTransformers: program => ({
+          getCustomTransformers: (program) => ({
             before: [
               typescriptIsTransformer(program, {
                 ignoreFunctions: true,
                 ignoreMethods: true,
-                disallowSuperfluousObjectProperties: true
-              })
-            ]
-          })
-        }
+                disallowSuperfluousObjectProperties: true,
+              }),
+            ],
+          }),
+        },
       },
       {
         test: /\.ne$/,
         // test: path.resolve(__dirname, 'src/dsl-parser/grammar.ne'),
-        loader: 'nearley-loader'
-      }
-    ]
+        loader: 'nearley-loader',
+      },
+    ],
   },
   optimization: {
-    minimize: false
+    minimize: false,
   },
   plugins: [
     new webpack.DefinePlugin({
-      VERSION: JSON.stringify(packageJson.version)
-    })
+      VERSION: JSON.stringify(packageJson.version),
+    }),
   ],
-  externals: [nodeExternals()]
+  externals: [nodeExternals()],
 }

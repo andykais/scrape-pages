@@ -73,8 +73,8 @@ class QueryCompiler {
     private commandLabels: CommandLabelRow[]
   ) {
     this.selectedCommandIds = commandLabels
-      .filter(c => c.label && labels.includes(c.label))
-      .map(c => c.id)
+      .filter((c) => c.label && labels.includes(c.label))
+      .map((c) => c.id)
   }
 
   public generateSqlFragments() {
@@ -116,7 +116,7 @@ class QueryCompiler {
         ? `CASE WHEN ${caseWaits} THEN cte.id ELSE cte.parentTreeId END`
         : 'cte.parentTreeId',
       waitingSortSql: caseSorts ? `CASE WHEN ${caseSorts} THEN cte.commandId ELSE 0 END` : '0',
-      furthestDistanceTraveled: furthestDistanceTraveled - 1
+      furthestDistanceTraveled: furthestDistanceTraveled - 1,
     }
   }
 
@@ -149,13 +149,13 @@ class QueryCompiler {
           if (this.commandIsSelected(currentCommand)) {
             const currentCommandInfo = {
               command: currentCommand,
-              distanceFromTop: currentDistanceFromTop
+              distanceFromTop: currentDistanceFromTop,
             }
             this.addConditionalWait(currentCommandInfo)
 
             const info = {
               selectedCommands: [currentCommandInfo, ...childInfo.selectedCommands],
-              furthestDistanceTraveled
+              furthestDistanceTraveled,
             }
             if (childInfo.selectedCommands.length) {
               // prettier-ignore
@@ -197,7 +197,7 @@ class QueryCompiler {
 
           return {
             selectedCommands: [...commandsFromMerge, ...childInfo.selectedCommands],
-            furthestDistanceTraveled
+            furthestDistanceTraveled,
           }
         }
         // read only operators
@@ -213,7 +213,7 @@ class QueryCompiler {
   private addConditionalWait(commandInfo: SelectedCommandInfo) {
     this.selectionWaitCasesV2.push({
       commandId: commandInfo.command.databaseId!,
-      stopWaitingAtDistanceFromTop: commandInfo.distanceFromTop
+      stopWaitingAtDistanceFromTop: commandInfo.distanceFromTop,
     })
   }
   private addConditionalMergeWait(
@@ -222,7 +222,7 @@ class QueryCompiler {
   ) {
     this.mergingWaitCasesV2.push({
       currentCommandId: parentCommand ? parentCommand.databaseId! : null,
-      stopWaitingAtDistanceFromTop: currentDistanceFromTop
+      stopWaitingAtDistanceFromTop: currentDistanceFromTop,
     })
   }
   private addConditionalSorts(
@@ -233,7 +233,7 @@ class QueryCompiler {
     for (const { command } of selectedCommands) {
       this.selectionOrderCases.push({
         commandId: command.databaseId!,
-        atRecurseDepth: maxDistanceFromBottom - currentDistanceFromTop
+        atRecurseDepth: maxDistanceFromBottom - currentDistanceFromTop,
       })
     }
   }
@@ -254,7 +254,7 @@ const template = (templateVars: {
     waitingJoinsSql,
     waitingSortSql,
     furthestDistanceTraveled,
-    debugMode
+    debugMode,
   } = templateVars
   const ifDebugMode = (partialSql: string) => (debugMode ? partialSql : '')
   const unlessDebugMode = (partialSql: string) =>
@@ -327,5 +327,5 @@ export {
   SelectOrderedLabeledValues,
   // type exports
   SelectedRow,
-  SelectedRowWithDebug
+  SelectedRowWithDebug,
 }

@@ -28,21 +28,21 @@ class QuerierApi {
     const commandLabels = this.database.qs.selectCommands() // itd be nice if we could call this from selectOrderedLabeledValues directly
     const selectedLabels = labels
       .concat(options.groupBy || [])
-      .filter(label => commandLabels.find(c => c.label === label))
+      .filter((label) => commandLabels.find((c) => c.label === label))
       .filter((label, i, labels) => labels.indexOf(label) === i)
 
     const groupLabels = selectedLabels.filter(
-      label => label !== options.groupBy && !includeGroupByRow
+      (label) => label !== options.groupBy && !includeGroupByRow
     )
     type IdMap = { [id: number]: string }
     const idMap: IdMap = commandLabels
-      .filter(c => c.label && selectedLabels.includes(c.label))
+      .filter((c) => c.label && selectedLabels.includes(c.label))
       .reduce((acc: IdMap, command) => {
         acc[command.id] = command.label!
         return acc
       }, {})
 
-    const groupByCommand = commandLabels.find(c => c.label === options.groupBy)
+    const groupByCommand = commandLabels.find((c) => c.label === options.groupBy)
     const groupById = groupByCommand ? groupByCommand.id : undefined
 
     const stmt = this.database.qs.selectOrderedLabeledValues(
