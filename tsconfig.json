@@ -14,8 +14,6 @@
     "target": "es2017",
     "resolveJsonModule": true,
     "esModuleInterop": true,
-    "declaration": true,
-    "declarationMap": true,
     "baseUrl": ".",
     "paths": {
       "@scrape-pages": ["src/index"],

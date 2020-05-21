@@ -301,7 +301,7 @@ WITH cte as (
     commandSort desc
 )
 SELECT
-    ${waitingSortSql} as commandSort,
+  -- ${waitingSortSql} as commandSort,
   cte.value,
   cte.commandId,
   networkRequests.filename,
