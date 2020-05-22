@@ -3,8 +3,8 @@
   "version": "3.5.0",
   "description": "generalized scraping using a single config object for any site that can be scraped without a headless browser",
   "scripts": {
-    "format": "prettier --write --ignore-path=.gitignore '**/*.{json,ts,js}'",
-    "format:check": "prettier --check --ignore-path=.gitignore '**/*.{json,ts,js}'",
+    "format": "prettier --write --ignore-path=.gitignore '**/!(*.api).{json,ts,js}'",
+    "format:check": "prettier --check --ignore-path=.gitignore '**/!(*.api).{json,ts,js}'",
     "typecheck": "tsc --noEmit",
     "typecheck:watch": "tsc --noEmit --watch",
     "lint": "eslint --ignore-path .gitignore '**/*.ts'",
