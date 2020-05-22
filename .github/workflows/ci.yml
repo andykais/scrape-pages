@@ -52,7 +52,7 @@ jobs:
 ##############################
 #     Test Package Usage     #
 ##############################
-    - run: ./testing/packaging/setup.sh
+    - run: pnpm run test:packaged
       if: matrix.os == 'ubuntu-latest' && matrix.node-version == '10'
 
 ##############################
