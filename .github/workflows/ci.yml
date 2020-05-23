@@ -37,12 +37,9 @@ jobs:
       with:
         version: 4.14.2
 
-    - name: Get npm cache directory (cross platform)
-      id: npm-cache
-      run: echo "::set-output name=dir::$(npm config get cache)"
     - uses: actions/cache@v1
       with:
-        path: ${{ steps.npm-cache.outputs.dir }}
+        path: ~/.pnpm-store
         key: ${{ runner.os }}-node-${{ hashFiles('**/pnpm-lock.yaml') }}
 
 
