@@ -46,11 +46,6 @@ jobs:
     - name: send coverage report
       if: matrix.os == 'ubuntu-latest' && matrix.node-version == '12'
       uses: codecov/codecov-action@v1
-      with:
-        token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
-      # uses: coverallsapp/github-action@master
-      # with:
-      #   github-token: ${{ secrets.github_token }}
 
 ##############################
 #     Test Package Usage     #
