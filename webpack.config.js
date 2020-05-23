@@ -4,15 +4,7 @@ const nodeExternals = require('webpack-node-externals')
 const webpack = require('webpack')
 const packageJson = require('./package.json')
 
-// const glob = require('glob')
-// const sourceFiles = glob
-//   .sync('./src/**/*.ts', { ignore: './src/**/*.test.ts' })
-//   .reduce((acc, file) => {
-//     acc[file.replace(/^\.\/src\/(.*?)\.ts$/, (_, filename) => filename)] = file
-//     return acc
-//   }, {})
-
-module.exports = {
+module.exports = (env) => ({
   mode: 'development',
   devtool: 'source-map',
 
@@ -21,11 +13,9 @@ module.exports = {
     __dirname: true,
     __filename: true,
   },
-
   entry: {
     index: './src/index.ts',
   },
-  // entry: sourceFiles,
   output: {
     path: path.resolve(__dirname, 'build'),
     filename: '[name].js',
@@ -44,6 +34,14 @@ module.exports = {
   module: {
     rules: [
       {
+        test: (content) => env === 'coverage' && /\.ts$/.test(content),
+        include: path.resolve(__dirname, 'src'),
+        exclude: [/node_modules/, /\.test\.ts$/, /query-debugger\.ts$/],
+        loader: 'istanbul-instrumenter-loader',
+        options: { esModules: true },
+        enforce: 'post',
+      },
+      {
         test: /\.ts$/,
         exclude: /node_modules/,
         loader: 'ts-loader',
@@ -61,7 +59,6 @@ module.exports = {
       },
       {
         test: /\.ne$/,
-        // test: path.resolve(__dirname, 'src/dsl-parser/grammar.ne'),
         loader: 'nearley-loader',
       },
     ],
@@ -75,4 +72,4 @@ module.exports = {
     }),
   ],
   externals: [nodeExternals()],
-}
+})
