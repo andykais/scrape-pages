@@ -22,6 +22,7 @@ cd $(dirname $0)
 test_packaged_folder=$PWD
 cd ../..
 project_root=$PWD
+build_folder=$project_root/build
 tmp_folder=/tmp/scrape-pages-full-packaging-test
 
 npm run build
@@ -29,6 +30,6 @@ rm -rf $tmp_folder
 mkdir -p $tmp_folder
 cd $tmp_folder
 npm init --yes
-npm_install_local_package $project_root
+npm_install_local_package $build_folder
 cp $test_packaged_folder/full-module.test.js .
 node full-module.test.js
