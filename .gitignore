@@ -12,3 +12,8 @@ test/functional/.run-output
 
 # pnpm cruft
 pnpm-debug.log
+
+
+# test coverage reports
+.nyc_output
+coverage
