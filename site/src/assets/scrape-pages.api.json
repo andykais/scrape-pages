@@ -131,6 +131,27 @@
           }
         },
         {
+          "kind": "Variable",
+          "canonicalReference": "scrape-pages!commandDocStrings:var",
+          "docComment": "/**\n * Available doc strings\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "commandDocStrings: "
+            },
+            {
+              "kind": "Content",
+              "text": "{\n    FETCH: {\n        args: string[];\n        options: {\n            METHOD: string;\n            HEADERS: {};\n            BODY: undefined;\n            READ: boolean;\n            WRITE: boolean;\n            CACHE: boolean;\n            PRIORITY: number;\n        };\n    };\n    PARSE: {\n        args: string[];\n        kwargs: {\n            FORMAT: \"html\";\n            ATTR: undefined;\n            MAX: undefined;\n        };\n    };\n    REPLACE: {\n        args: string[];\n        kwargs: {\n            WITH: string;\n            FLAGS: string;\n        };\n    };\n    SET: {\n        args: string[];\n        kwargs: {};\n    };\n}"
+            }
+          ],
+          "releaseTag": "Public",
+          "name": "commandDocStrings",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 2
+          }
+        },
+        {
           "kind": "TypeAlias",
           "canonicalReference": "scrape-pages!Expression:type",
           "docComment": "",
@@ -222,7 +243,7 @@
                 },
                 {
                   "kind": "Content",
-                  "text": ";\n        };\n        READ?: boolean;\n        WRITE?: boolean;\n        CACHE?: boolean;\n        PRIORITY?: number;\n    }"
+                  "text": ";\n        };\n        BODY?: any;\n        READ?: boolean;\n        WRITE?: boolean;\n        CACHE?: boolean;\n        PRIORITY?: number;\n    }"
                 },
                 {
                   "kind": "Content",

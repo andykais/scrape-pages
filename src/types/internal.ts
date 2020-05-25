@@ -31,6 +31,7 @@ namespace Models {
 }
 
 namespace TypeUtils {
+  export type ValueOf<T> = T[keyof T]
   export type ArgumentTypes<F extends Function> = F extends (...args: infer A) => any ? A : never
   export type OptionalKeys<T> = { [k in keyof T]-?: undefined extends T[k] ? k : never }[keyof T]
 }
@@ -78,6 +79,7 @@ namespace Stream {
     operatorIndex: number
     valueIndex: number
     inputs: { [slug: string]: string }
+    userSetVars: { [slug: string]: string }
   }
   export type Payload = Immutable.ImmutableObject<Data>
   export type Operation = Rx.UnaryFunction<Rx.Observable<Payload>, Rx.Observable<Payload>>

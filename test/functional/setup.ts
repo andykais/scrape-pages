@@ -16,7 +16,10 @@ class FunctionalTestSetup {
   private mochaContext: Mocha.Context
   private previousTestWasStep: boolean
 
-  public constructor(testDirectory: string) {
+  public constructor(
+    testDirectory: string,
+    private options: { initNock: boolean } = { initNock: true }
+  ) {
     const testDirname = path.basename(testDirectory)
     this.outputFolder = path.resolve(RUN_OUTPUT_FOLDER, testDirname)
     this.mockHost = `http://${testDirname}`
@@ -32,7 +35,7 @@ class FunctionalTestSetup {
       const isStep = testEnv.mochaContext.body.includes('markRemainingTestsAndSubSuitesAsPending')
       await rmrf(testEnv.outputFolder)
       testEnv.siteMock = new HttpFolderMock(testEnv.mockFolder, testEnv.mockHost)
-      await testEnv.siteMock.init()
+      if (testEnv.options.initNock) await testEnv.siteMock.init()
       testEnv.previousTestWasStep = isStep
     }
   }

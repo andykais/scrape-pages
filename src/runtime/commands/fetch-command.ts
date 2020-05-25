@@ -17,6 +17,7 @@ type RequestParams = {
   url: string
   headers: { [headerName: string]: string }
   method: string
+  body: any
 }
 type ReadInfo = { bytes: number; value: string; filename: null }
 type WriteInfo = { bytes: number; value: null; filename: string }
@@ -25,9 +26,10 @@ type DownloadInfoWithValue = Stream.DownloadInfo & { value: string }
 class FetchCommand extends BaseCommand<I.FetchCommand, typeof FetchCommand.DEFAULT_PARAMS> {
   protected commandName: 'FETCH'
 
-  private static DEFAULT_PARAMS = {
-    METHOD: 'GET' as 'GET',
+  public static DEFAULT_PARAMS = {
+    METHOD: 'GET' as NonNullable<I.FetchCommand['params']['METHOD']>,
     HEADERS: {},
+    BODY: undefined,
     READ: true,
     WRITE: false,
     CACHE: false,
@@ -54,10 +56,10 @@ class FetchCommand extends BaseCommand<I.FetchCommand, typeof FetchCommand.DEFAU
   }
 
   public async stream(payload: Stream.Payload) {
-    const { METHOD, CACHE } = this.params
+    const { METHOD, CACHE, BODY } = this.params
     const url = this.urlTemplate(payload)
     const headers = this.headerTemplates.map((template) => template(payload)).toObject()
-    const requestParams: RequestParams = { url, headers, method: METHOD }
+    const requestParams: RequestParams = { url, headers, method: METHOD, body: BODY }
 
     const { requestId, value } = await (CACHE
       ? this.fetchCached(requestParams)
@@ -114,13 +116,17 @@ class FetchCommand extends BaseCommand<I.FetchCommand, typeof FetchCommand.DEFAU
       throw e
     }
   }
-  private async fetch(
-    { url, headers, method }: RequestParams,
-    id: number
-  ): Promise<DownloadInfoWithValue> {
+  private async fetch(params: RequestParams, id: number): Promise<DownloadInfoWithValue> {
     const { READ, WRITE } = this.params
-
-    const response = await fetch(url, { method, headers, signal: this.abortController.signal })
+    const headers = { 'content-type': 'application/json', ...params.headers }
+    const body = JSON.stringify(params.body)
+    const { url, method } = params
+    const response = await fetch(url, {
+      method,
+      headers,
+      body,
+      signal: this.abortController.signal,
+    })
     if (!response.ok) throw new ResponseError(response, url)
 
     this.notifyProgress(response, id)

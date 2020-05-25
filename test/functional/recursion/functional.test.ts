@@ -9,13 +9,13 @@ describe(__filename, () => {
     describe('with simple instructions', () => {
       let scraper: ScraperProgram
       before(async function () {
-        scraper = new ScraperProgram(instructions.simple, testEnv.outputFolder)
         await testEnv.beforeEach.bind(this)()
+        scraper = new ScraperProgram(instructions.simple, testEnv.outputFolder)
         await scraper.start().toPromise()
       })
       after(testEnv.afterEach)
 
-      it(`query(['image', 'title'], {groupBy: 'post'})`, async () => {
+      it(`query(['image', 'title'], {groupBy: 'post'})`, () => {
         const result = scraper.query(['image', 'title'], {
           groupBy: 'post',
         })

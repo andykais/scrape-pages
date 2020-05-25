@@ -5,6 +5,7 @@ import * as instructions from './instructions'
 
 const testEnv = new FunctionalTestSetup(__dirname)
 
+// TODO refactor these to put the scraper inside the test block (and only use one test per each instruction)
 describe(__filename, () => {
   describe('query ordering', () => {
     describe('with simple instructions', () => {
@@ -180,7 +181,7 @@ describe(__filename, () => {
               { value: '/image/the.jpg' },
               { value: '/image/quick.jpg' },
               { value: '/image/brown.jpg' },
-              { value: '/image/fox.jpg' },
+              { value: '/image/fox.jpg' }
             ],
             tag: [
               { value: 'one' },
@@ -191,9 +192,9 @@ describe(__filename, () => {
               { value: 'five' },
               { value: 'three' },
               { value: 'four' },
-              { value: 'five' },
-            ],
-          },
+              { value: 'five' }
+            ]
+          }
         ])
       })
       it('non existent labels', async function () {
@@ -205,16 +206,16 @@ describe(__filename, () => {
               { value: '/image/the.jpg' },
               { value: '/image/quick.jpg' },
               { value: '/image/brown.jpg' },
-              { value: '/image/fox.jpg' },
-            ],
-          },
+              { value: '/image/fox.jpg' }
+            ]
+          }
         ])
 
         assertQueryResultPartial(scraper.query(['nonexistent'], { groupBy: 'post' }), [
           {},
           {},
           {},
-          {},
+          {}
         ])
       })
       it('commands that had no values', async function () {
@@ -232,11 +233,11 @@ describe(__filename, () => {
               { value: '/image/the.jpg' },
               { value: '/image/quick.jpg' },
               { value: '/image/brown.jpg' },
-              { value: '/image/fox.jpg' },
+              { value: '/image/fox.jpg' }
             ],
             // commands that do exist always get a field
-            'never-reached': [],
-          },
+            'never-reached': []
+          }
         ])
       })
     })

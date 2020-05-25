@@ -51,16 +51,16 @@ class JsonataParser implements ParserEngine {
   }
 }
 
-class ParseCommand extends BaseCommand<I.ParseCommand, typeof ParseCommand.PARAM_DEFAULTS> {
-  private static PARAM_DEFAULTS = {
-    FORMAT: 'html' as 'html',
+class ParseCommand extends BaseCommand<I.ParseCommand, typeof ParseCommand.DEFAULT_PARAMS> {
+  public static DEFAULT_PARAMS = {
+    FORMAT: 'html' as NonNullable<I.ParseCommand['params']['FORMAT']>,
     ATTR: undefined,
     MAX: undefined,
   }
   private parserEngine: ParserEngine
 
   public constructor(settings: Settings, tools: Tools, command: I.ParseCommand) {
-    super(settings, tools, command, ParseCommand.PARAM_DEFAULTS, 'PARSE')
+    super(settings, tools, command, ParseCommand.DEFAULT_PARAMS, 'PARSE')
     switch (this.params.FORMAT) {
       case 'html':
         this.parserEngine = new CheerioParser(this.command)

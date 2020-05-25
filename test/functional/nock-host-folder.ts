@@ -76,6 +76,10 @@ class HttpFolderMock {
     this.scope = scope
   }
 
+  public setInterceptors = async (...interceptors: nock.Interceptor[]) => {
+    this.interceptors = interceptors
+  }
+
   public persist = () => {
     if (this.scope) this.scope.persist()
     else throw new Error('Must init() endpoints before calling persist()')

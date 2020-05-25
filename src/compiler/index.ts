@@ -26,6 +26,7 @@ class Compiler {
       valueIndex: 0,
       id: -1,
       inputs: Compiler.getInputs(settings),
+      userSetVars: {} as { [slug: string]: string },
     })
     this.commands = []
     this.commandIdCounter = 0
@@ -63,6 +64,8 @@ class Compiler {
           return new commands.ParseCommand(this.settings, this.tools, command)
         case 'REPLACE':
           return new commands.ReplaceCommand(this.settings, this.tools, command)
+        case 'SET':
+          return new commands.SetVarCommand(this.settings, this.tools, command)
       }
     })()
 

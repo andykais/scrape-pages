@@ -85,7 +85,8 @@
     return args
   }
   function extractInlineCommand([command, ws, arg, kwargs]) {
-    return { command, arg, kwargs }
+    // TODO support multiple positional args
+    return { command, args: [arg], kwargs }
   }
   function extractKwargs([args]) {
     const kwargs = {}
@@ -94,8 +95,8 @@
     }
     return kwargs
   }
-  function extractKwarg([key, eq, [value]]) {
-    return { [key]: value }
+  function extractKwarg([key, eq, value]) {
+    return { [key]: value[0] }
   }
 
   function extractQuoted([_quote, [inQuotes]]) {
@@ -132,6 +133,25 @@
   function extractText([text]) {
     return text.join('')
   }
+
+  function extractJsonObject(args) {
+    const [_1, _2, firstPair, recursivePairs] = args
+    const object = {}
+
+    extractJsonKeyPair(firstPair, object)
+
+    for (const [_1, _2, _3, pair] of recursivePairs) {
+      extractJsonKeyPair(pair, object)
+    }
+    return object
+  }
+  function extractJsonKeyPair([key, _1, _2, _3, val], object) {
+    object[key] = val
+  }
+
+  function extractJsonArray(args) {
+    throw new Error('unimplemented')
+  }
 %}
 
 # this grammar dont give a toot about json keys matching keyword arguments right now.
@@ -140,9 +160,9 @@
 
 # MACROS
 InQuotes[X]               -> "'" $X "'"                                               {% extractQuoted %}
+inDoubleQuotes[X]         -> "\"" $X "\""                                             {% extractQuoted %}
 KeywordArg[Key, Value]    -> _ $Key "=" $Value                                        {% d=> d.slice(1) %}
 jsonKeyVal[Key, Value]    -> "\"" $Key "\"" ws ":" ws $Value
-jsonCommand[Command]      -> "{" ws jsonKeyVal["command", $Command] ws "," ws jsonKeyVal["params", object] ws "}"
 
 
 # MAIN
@@ -170,18 +190,15 @@ FlowSteps                 -> ws FlowStep
 FlowStep                  -> JsonCommand                                              {% extractFlowStep %}
                            | Command                                                  {% extractFlowStep %}
                            | Comment                                                  {% extractFlowStep %}
-# FlowStep                  -> Request                                                  {% extractFlowStep %}
-#                            | Parse                                                    {% extractFlowStep %}
-#                            | Comment                                                  {% extractFlowStep %}
-#                            | Tag                                                      {% extractFlowStep %}
 
 
 # COMMANDS
-JsonCommand               -> "{" ws jsonKeyVal["command", KeywordSlug] ws "," ws jsonKeyVal["params", object] ws "}"
+JsonCommand               -> "{" ws jsonKeyVal["command", KeywordSlug] ws "," ws jsonKeyVal["params", Object] ws "}"
 Command                   -> KeywordSlug _ StringTemplate KeywordArgs                 {% extractInlineCommand %}
 KeywordArgs               -> (_ KeywordArg):*                                         {% extractKwargs %}
-KeywordArg                -> KeywordSlug "=" (StringTemplate | Boolean | Number)      {% extractKwarg %}
-KeywordSlug               -> [A-Z]:+                                                  {% extractSlug %}
+KeywordArg                -> KeywordSlug "=" (StringTemplate | Json)                  {% extractKwarg %}
+KeywordSlug               -> Slug                                                     {% id %}
+# KeywordSlug               -> [A-Z]:+                                                  {% id %}
 
 Input                     -> "INPUT" _ InQuotes[Slug]                                 {% extractInlineCommand %}
 
@@ -196,10 +213,23 @@ LogicOperator             -> "||" | "&&"
 # TODO it is impossible to represent the literal character ' inside a string template right now. This is especially annoying for regex commands. We will need to allow both kinds of quotes at some point
 StringTemplate            -> InQuotes[[^'\n\r]:*]                                     {% extractText %}
 Slug                      -> [a-zA-Z0-9-]:+                                           {% extractSlug %}
-Number                    -> "-":? [0-9]:+                                                  {% extractNumber %}
+Number                    -> "-":? [0-9]:+                                            {% extractNumber %}
 Boolean                   -> "true"                                                   {% d => true %}
                            | "false"                                                  {% d => false %}
 Any                       -> StringTemplate | Number                                  {% id %}
+
+Json                      -> Object                                                   {% id %}
+                           | Array                                                    {% id %}
+                           | Number                                                   {% id %}
+                           | String                                                   {% id %}
+                           | Boolean                                                  {% id %}
+                           | "null"                                                   {% () => null %}
+Object                    -> "{" ws "}"                                               {% () => ({}) %}
+                           | "{" ws JsonPair (ws "," ws JsonPair):* ws "}"            {% extractJsonObject %}
+Array                     -> "[" ws "]"                                               {% () => [] %}
+                           | "[" ws Json (ws "," ws Json) ws "]"                      {% extractJsonArray %}
+JsonPair                  -> String ws ":" ws Json                                    # {% extractJsonKeyPair %}
+String                    -> inDoubleQuotes[[^"\n\r]:*]                               {% extractText %}
 
 
 # COMMENTS
@@ -212,55 +242,5 @@ ws                        -> [\s]:*                                             
 _s                        -> [\s]:+                                                   {% extractWhitespace %}
 _                         -> " ":+                                                    {% extractWhitespace %}
 _star                     -> " ":*                                                    {% extractWhitespace %}
-# __                        -> " ":*
 nl                        -> [\r\n]                                                   {% extractWhitespace %}
-# nl?                       -> [\r\n]:?
 nl_                       -> [\r\n] " ":*                                             {% extractWhitespace %}
-
-
-# COMMANDS JSON
-object -> "{" ws "}" {% function(d) { return {}; } %}
-    | "{" ws pair (ws "," ws pair):* ws "}" {% extractObject %}
-array -> "[" ws "]" {% function(d) { return []; } %}
-    | "[" ws value (ws "," ws value):* ws "]" {% extractArray %}
-pair -> key ws ":" ws value {% function(d) { return [d[0], d[4]]; } %}
-key -> string {% id %}
-value ->
-      object {% id %}
-    | array {% id %}
-    | number {% id %}
-    | string {% id %}
-    | "true" {% function(d) { return true; } %}
-    | "false" {% function(d) { return false; } %}
-    | "null" {% function(d) { return null; } %}
-
-space -> [\s]:+
-number -> "-":? [0-9]:+
-string -> "\"" [^\"\n\r]:* "\"" # /"(?:\\["bfnrt\/\\]|\\u[a-fA-F0-9]{4}|[^"\\])*"/,
-
-@{%
-function extractObject(d) {
-    let output = {};
-
-    extractPair(d[2], output);
-
-    for (let i in d[3]) {
-        extractPair(d[3][i][3], output);
-    }
-
-    return output;
-}
-function extractPair(kv, output) {
-    if(kv[0]) { output[kv[0]] = kv[1]; }
-}
-
-function extractArray(d) {
-    let output = [d[2]];
-
-    for (let i in d[3]) {
-        output.push(d[3][i][3]);
-    }
-
-    return output;
-}
-%}

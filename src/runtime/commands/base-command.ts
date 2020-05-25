@@ -12,15 +12,14 @@ type ParamDefaultsGeneric<T> = Omit<RequiredField<Pick<T, TypeUtils.OptionalKeys
 
 type Merge<A extends object, B extends object> = { [K in keyof A & keyof B]: A[K] | B[K] }
 
-// let commandIdCounter = 1
-
 abstract class BaseCommand<
   Command extends I.Command,
   ParamDefaults extends ParamDefaultsGeneric<I.Command['params']>
 > extends RuntimeBase {
   public LABEL: string | undefined
   protected commandId: Stream.Id
-  protected params: Merge<Required<Command['params']>, ParamDefaults & { LABEL: undefined }>
+  protected params: Required<Command['params']> & ParamDefaults & { LABEL: undefined }
+  // protected params: Merge<Required<Command['params']>, ParamDefaults & { LABEL: undefined }>
 
   public constructor(
     protected settings: Settings,

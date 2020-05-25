@@ -11,12 +11,9 @@ Handlebars.registerHelper('/', (x: number, y: number) => x / y)
 type Template = (payload: Stream.Payload) => string
 function compileTemplate(templateStr: string) {
   const template = Handlebars.compile(templateStr, { noEscape: true })
-  // TODO remove id from payload?
   return (payload: Stream.Payload) => {
-    const index = payload.operatorIndex
-    const value = payload.value
-    const inputs = payload.inputs
-    return template({ ...inputs, index, value })
+    const { operatorIndex: index, value, inputs, userSetVars } = payload
+    return template({ ...inputs, ...userSetVars, index, value })
   }
 }
 

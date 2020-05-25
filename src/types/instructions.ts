@@ -11,6 +11,7 @@ interface FetchCommand {
     METHOD?: 'GET' | 'PUT' | 'POST' | 'DELETE'
     URL: Template
     HEADERS?: { [headerName: string]: Template }
+    BODY?: any
     READ?: boolean
     WRITE?: boolean
     CACHE?: boolean
@@ -43,7 +44,17 @@ interface TextReplaceCommand {
   }
 }
 
-type Command = FetchCommand | ParseCommand | TextReplaceCommand
+interface SetVarCommand {
+  command: 'SET'
+  /** @internal */
+  databaseId?: number
+  params: {
+    LABEL?: string
+    VAR_NAME: string
+  }
+}
+
+type Command = FetchCommand | ParseCommand | TextReplaceCommand | SetVarCommand
 
 interface InitOperation {
   operator: 'init'
@@ -113,4 +124,5 @@ export {
   FetchCommand,
   ParseCommand,
   TextReplaceCommand,
+  SetVarCommand,
 }

@@ -1,4 +1,7 @@
-import * as i from '../types/instructions'
+import * as commandClasses from '@scrape-pages/runtime/commands'
+import { BaseCommand } from '@scrape-pages/runtime/commands/base-command'
+import * as i from '@scrape-pages/types/instructions'
+import { TypeUtils } from '@scrape-pages/types/internal'
 
 /**
  * Lots of any types in the post processors yikes!
@@ -8,26 +11,36 @@ import * as i from '../types/instructions'
  */
 
 interface DslCommand {
-  command: string
-  arg: string
+  command: i.Command['command'] | 'INPUT'
+  args: string
   kwargs: { [keywordArg: string]: any }
 }
-function processRawCommandAndRenameArg(renameArgAs: string, rawCommand: DslCommand) {
+
+function processRawCommandArgs(args: string[], rawCommand: DslCommand): i.Command {
+  if (args.length !== rawCommand.args.length) {
+    const argStrs = args.map((a) => `<${a}>`).join(' ')
+    // prettier-ignore
+    throw new Error(`${rawCommand.command} received incorrect number of positional args. Expected ${rawCommand.command} ${argStrs}`)
+  }
   return {
     command: rawCommand.command,
-    params: { ...rawCommand.kwargs, [renameArgAs]: rawCommand.arg },
-  }
+    params: {
+      ...args.reduce((acc, argName, i) => ({ ...acc, [argName]: rawCommand.args[i] }), {}),
+      ...rawCommand.kwargs,
+    },
+  } as i.Command
 }
-
 function postProcessCommands(commands: any[]) {
   return commands.map((rawCommand: DslCommand) => {
     switch (rawCommand.command) {
       case 'FETCH':
-        return processRawCommandAndRenameArg('URL', rawCommand)
+        return processRawCommandArgs(['URL'], rawCommand)
       case 'PARSE':
-        return processRawCommandAndRenameArg('SELECTOR', rawCommand)
+        return processRawCommandArgs(['SELECTOR'], rawCommand)
       case 'REPLACE':
-        return processRawCommandAndRenameArg('SELECTOR', rawCommand)
+        return processRawCommandArgs(['SELECTOR'], rawCommand)
+      case 'SET':
+        return processRawCommandArgs(['VAR_NAME'], rawCommand)
       default:
         throw new Error(`Unknown command '${rawCommand.command}' in the program`)
     }
@@ -74,7 +87,7 @@ function postProcessPreProgram(preProgram: DslCommand[]) {
   for (const rawCommand of preProgram) {
     switch (rawCommand.command) {
       case 'INPUT':
-        inputs.push(rawCommand.arg)
+        inputs.push(rawCommand.args[0])
         break
       default:
         throw new Error(`Uknown command '${rawCommand.command}' in the pre program.`)

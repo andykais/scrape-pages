@@ -24,6 +24,9 @@ interface Options {
       FLAGS?: I.TextReplaceCommand['params']['FLAGS']
     }
   }
+  SET?: {
+    defaults?: {}
+  }
   inputs?: { [inputSlug: string]: string }
   // folder: string
   // cleanFolder?: boolean
