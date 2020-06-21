@@ -1,6 +1,4 @@
-import path from 'path'
 import nock from 'nock'
-import { expect } from 'chai'
 import { FunctionalTestSetup, assertQueryResultPartial } from '@test/functional/setup'
 
 import { ScraperProgram } from '@scrape-pages'
@@ -18,15 +16,15 @@ describe(__filename, () => {
     const scope = nock('http://auth-tokens')
     scope
       .post('/login', { username: 'alice', password: 'abc' })
-      .reply(200, { auth_token: authToken }),
-      scope
-        .get('/users/alice')
-        .matchHeader('http-x-auth-token', authToken)
-        .reply(200, { birthday: '12/24/1990', name: 'Alice' }),
-      scope
-        .get('/users/alice/likes')
-        .matchHeader('http-x-auth-token', authToken)
-        .reply(200, { likes: ['post-a', 'post-b'] })
+      .reply(200, { auth_token: authToken })
+    scope
+      .get('/users/alice')
+      .matchHeader('http-x-auth-token', authToken)
+      .reply(200, { birthday: '12/24/1990', name: 'Alice' })
+    scope
+      .get('/users/alice/likes')
+      .matchHeader('http-x-auth-token', authToken)
+      .reply(200, { likes: ['post-a', 'post-b'] })
 
     const instructions = `
     (
@@ -45,8 +43,8 @@ describe(__filename, () => {
     const result = scraper.query(['likes'])
     assertQueryResultPartial(result, [
       {
-        likes: [{ value: 'post-a' }, { value: 'post-b' }],
-      },
+        likes: [{ value: 'post-a' }, { value: 'post-b' }]
+      }
     ])
   })
 })

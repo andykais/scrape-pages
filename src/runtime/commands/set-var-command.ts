@@ -12,7 +12,6 @@ class SetVarCommand extends BaseCommand<I.SetVarCommand, typeof SetVarCommand.DE
   // prettier-ignore
   public constructor(settings: Settings, tools: Tools, command: I.SetVarCommand) {
     super(settings, tools, command, SetVarCommand.DEFAULT_PARAMS, 'SET')
-    const { VAR_NAME } = command.params
   }
 
   public stream(payload: Stream.Payload) {

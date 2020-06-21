@@ -41,28 +41,28 @@ const instructionsWithLeaves = `
 )
 `
 
-// save contextual values brainstorming:
-const saveUsingOperator = `
-(
-  FETCH 'http://auth-tokens/login' METHOD='POST' BODY={"username": "alice", "password": "abc" }
-).saveValue('token').map(
-  FETCH 'http://auth-tokens/users/alice' HEADERS={"http-x-auth-token": "{{ token }}"}
-  FETCH 'http://auth-tokens/users/alice/likes' HEADERS={"http-x-auth-token": "{{ token }}"}
-)
-`
-const saveUsingMacros = `
-MACRO 'auth-fetch' FETCH HEADERS={"http-x-auth-token"}
-(
-  FETCH 'http://auth-tokens/login' METHOD='POST' BODY={"username": "alice", "password": "abc"}
-  PARSE 'auth_token' FORMAT='json'
-  SET 'token'
-  MACRO_ENABLE 'auth-fetch'
-  FETCH 'http://auth-tokens/users/alice' HEADERS={"http-x-auth-token": "{{ token }}"}
-  FETCH 'http://auth-tokens/users/alice/likes' HEADERS={"http-x-auth-token": "{{ token }}"}
-  MACRO_DISABLE 'auth-fetch'
-  PARSE 'likes' LABEL='likes' FORMAT='json'
-)
-`
+//// save contextual values brainstorming:
+//const saveUsingOperator = `
+//(
+//  FETCH 'http://auth-tokens/login' METHOD='POST' BODY={"username": "alice", "password": "abc" }
+//).saveValue('token').map(
+//  FETCH 'http://auth-tokens/users/alice' HEADERS={"http-x-auth-token": "{{ token }}"}
+//  FETCH 'http://auth-tokens/users/alice/likes' HEADERS={"http-x-auth-token": "{{ token }}"}
+//)
+//`
+//const saveUsingMacros = `
+//MACRO 'auth-fetch' FETCH HEADERS={"http-x-auth-token": "{{token}}"}
+//(
+//  FETCH 'http://auth-tokens/login' METHOD='POST' BODY={"username": "alice", "password": "abc"}
+//  PARSE 'auth_token' FORMAT='json'
+//  SET 'token'
+//  MACRO_ENABLE 'auth-fetch'
+//  FETCH 'http://auth-tokens/users/alice' HEADERS={"http-x-auth-token": "{{ token }}"}
+//  FETCH 'http://auth-tokens/users/alice/likes' HEADERS={"http-x-auth-token": "{{ token }}"}
+//  MACRO_DISABLE 'auth-fetch'
+//  PARSE 'likes' LABEL='likes' FORMAT='json'
+//)
+//`
 
 describe(__filename, () => {
   describe('instruction set covering all syntax', () => {
