@@ -98,7 +98,7 @@
             {
               "kind": "Reference",
               "text": "FetchCommand",
-              "canonicalReference": "scrape-pages!~FetchCommand:interface"
+              "canonicalReference": "scrape-pages!~FetchCommand:type"
             },
             {
               "kind": "Content",
@@ -107,7 +107,7 @@
             {
               "kind": "Reference",
               "text": "ParseCommand",
-              "canonicalReference": "scrape-pages!~ParseCommand:interface"
+              "canonicalReference": "scrape-pages!~ParseCommand:type"
             },
             {
               "kind": "Content",
@@ -116,7 +116,16 @@
             {
               "kind": "Reference",
               "text": "TextReplaceCommand",
-              "canonicalReference": "scrape-pages!~TextReplaceCommand:interface"
+              "canonicalReference": "scrape-pages!~TextReplaceCommand:type"
+            },
+            {
+              "kind": "Content",
+              "text": " | "
+            },
+            {
+              "kind": "Reference",
+              "text": "SetVarCommand",
+              "canonicalReference": "scrape-pages!~SetVarCommand:type"
             },
             {
               "kind": "Content",
@@ -127,28 +136,7 @@
           "name": "Command",
           "typeTokenRange": {
             "startIndex": 1,
-            "endIndex": 6
-          }
-        },
-        {
-          "kind": "Variable",
-          "canonicalReference": "scrape-pages!commandDocStrings:var",
-          "docComment": "/**\n * Available doc strings\n */\n",
-          "excerptTokens": [
-            {
-              "kind": "Content",
-              "text": "commandDocStrings: "
-            },
-            {
-              "kind": "Content",
-              "text": "{\n    FETCH: {\n        args: string[];\n        options: {\n            METHOD: string;\n            HEADERS: {};\n            BODY: undefined;\n            READ: boolean;\n            WRITE: boolean;\n            CACHE: boolean;\n            PRIORITY: number;\n        };\n    };\n    PARSE: {\n        args: string[];\n        kwargs: {\n            FORMAT: \"html\";\n            ATTR: undefined;\n            MAX: undefined;\n        };\n    };\n    REPLACE: {\n        args: string[];\n        kwargs: {\n            WITH: string;\n            FLAGS: string;\n        };\n    };\n    SET: {\n        args: string[];\n        kwargs: {};\n    };\n}"
-            }
-          ],
-          "releaseTag": "Public",
-          "name": "commandDocStrings",
-          "variableTypeTokenRange": {
-            "startIndex": 1,
-            "endIndex": 2
+            "endIndex": 8
           }
         },
         {
@@ -177,30 +165,69 @@
           }
         },
         {
-          "kind": "Interface",
-          "canonicalReference": "scrape-pages!FetchCommand:interface",
-          "docComment": "",
+          "kind": "TypeAlias",
+          "canonicalReference": "scrape-pages!FetchCommand:type",
+          "docComment": "/**\n * Fetch Command\n *\n * http requests that can use values inside templates\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
-              "text": "interface FetchCommand "
+              "text": "declare type FetchCommand = "
+            },
+            {
+              "kind": "Reference",
+              "text": "RawCommand",
+              "canonicalReference": "scrape-pages!~RawCommand:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<'FETCH', "
+            },
+            {
+              "kind": "Reference",
+              "text": "FetchParams",
+              "canonicalReference": "scrape-pages!~FetchParams:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
             }
           ],
           "releaseTag": "Public",
           "name": "FetchCommand",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 5
+          }
+        },
+        {
+          "kind": "Interface",
+          "canonicalReference": "scrape-pages!FetchParams:interface",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "interface FetchParams "
+            }
+          ],
+          "releaseTag": "Public",
+          "name": "FetchParams",
           "members": [
             {
               "kind": "PropertySignature",
-              "canonicalReference": "scrape-pages!FetchCommand#command:member",
-              "docComment": "",
+              "canonicalReference": "scrape-pages!FetchParams#BODY:member",
+              "docComment": "/**\n * Templated http body\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
-                  "text": "command: "
+                  "text": "BODY?: "
                 },
                 {
                   "kind": "Content",
-                  "text": "'FETCH'"
+                  "text": "any"
                 },
                 {
                   "kind": "Content",
@@ -208,7 +235,7 @@
                 }
               ],
               "releaseTag": "Public",
-              "name": "command",
+              "name": "BODY",
               "propertyTypeTokenRange": {
                 "startIndex": 1,
                 "endIndex": 2
@@ -216,34 +243,16 @@
             },
             {
               "kind": "PropertySignature",
-              "canonicalReference": "scrape-pages!FetchCommand#params:member",
-              "docComment": "",
+              "canonicalReference": "scrape-pages!FetchParams#CACHE:member",
+              "docComment": "/**\n * Cache this request. A cached request will not make a network call, but will read the response from the database\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
-                  "text": "params: "
+                  "text": "CACHE?: "
                 },
                 {
                   "kind": "Content",
-                  "text": "{\n        LABEL?: string;\n        METHOD?: 'GET' | 'PUT' | 'POST' | 'DELETE';\n        URL: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Template",
-                  "canonicalReference": "scrape-pages!~Template:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";\n        HEADERS?: {\n            [headerName: string]: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Template",
-                  "canonicalReference": "scrape-pages!~Template:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";\n        };\n        BODY?: any;\n        READ?: boolean;\n        WRITE?: boolean;\n        CACHE?: boolean;\n        PRIORITY?: number;\n    }"
+                  "text": "boolean"
                 },
                 {
                   "kind": "Content",
@@ -251,10 +260,170 @@
                 }
               ],
               "releaseTag": "Public",
-              "name": "params",
+              "name": "CACHE",
               "propertyTypeTokenRange": {
                 "startIndex": 1,
-                "endIndex": 6
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "scrape-pages!FetchParams#HEADERS:member",
+              "docComment": "/**\n * Templated http headers\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "HEADERS?: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "{\n        [headerName: string]: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Template",
+                  "canonicalReference": "scrape-pages!~Template:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";\n    }"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "HEADERS",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 4
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "scrape-pages!FetchParams#METHOD:member",
+              "docComment": "/**\n * HTTP method\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "METHOD?: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "'GET' | 'PUT' | 'POST' | 'DELETE'"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "METHOD",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "scrape-pages!FetchParams#PRIORITY:member",
+              "docComment": "/**\n * The priority this request will take in the rate limited queue. Note if rate limiting is disabled this has no effect. Higher number = higher priority.\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "PRIORITY?: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "number"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "PRIORITY",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "scrape-pages!FetchParams#READ:member",
+              "docComment": "/**\n * Read the response body into the \\{\\{ value \\}\\} variable\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "READ?: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "boolean"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "READ",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "scrape-pages!FetchParams#URL:member",
+              "docComment": "/**\n * Templated url\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "URL: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Template",
+                  "canonicalReference": "scrape-pages!~Template:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "URL",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "scrape-pages!FetchParams#WRITE:member",
+              "docComment": "/**\n * Write the response body to disk\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "WRITE?: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "boolean"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "WRITE",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
               }
             }
           ],
@@ -734,7 +903,7 @@
                 {
                   "kind": "Reference",
                   "text": "FetchCommand",
-                  "canonicalReference": "scrape-pages!~FetchCommand:interface"
+                  "canonicalReference": "scrape-pages!~FetchCommand:type"
                 },
                 {
                   "kind": "Content",
@@ -743,7 +912,7 @@
                 {
                   "kind": "Reference",
                   "text": "FetchCommand",
-                  "canonicalReference": "scrape-pages!~FetchCommand:interface"
+                  "canonicalReference": "scrape-pages!~FetchCommand:type"
                 },
                 {
                   "kind": "Content",
@@ -752,7 +921,7 @@
                 {
                   "kind": "Reference",
                   "text": "FetchCommand",
-                  "canonicalReference": "scrape-pages!~FetchCommand:interface"
+                  "canonicalReference": "scrape-pages!~FetchCommand:type"
                 },
                 {
                   "kind": "Content",
@@ -811,7 +980,7 @@
                 {
                   "kind": "Reference",
                   "text": "ParseCommand",
-                  "canonicalReference": "scrape-pages!~ParseCommand:interface"
+                  "canonicalReference": "scrape-pages!~ParseCommand:type"
                 },
                 {
                   "kind": "Content",
@@ -820,7 +989,7 @@
                 {
                   "kind": "Reference",
                   "text": "ParseCommand",
-                  "canonicalReference": "scrape-pages!~ParseCommand:interface"
+                  "canonicalReference": "scrape-pages!~ParseCommand:type"
                 },
                 {
                   "kind": "Content",
@@ -854,7 +1023,7 @@
                 {
                   "kind": "Reference",
                   "text": "TextReplaceCommand",
-                  "canonicalReference": "scrape-pages!~TextReplaceCommand:interface"
+                  "canonicalReference": "scrape-pages!~TextReplaceCommand:type"
                 },
                 {
                   "kind": "Content",
@@ -870,6 +1039,31 @@
               "propertyTypeTokenRange": {
                 "startIndex": 1,
                 "endIndex": 4
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "scrape-pages!Options#SET:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "SET?: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "{\n        defaults?: {};\n    }"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "SET",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
               }
             }
           ],
@@ -931,30 +1125,69 @@
           }
         },
         {
-          "kind": "Interface",
-          "canonicalReference": "scrape-pages!ParseCommand:interface",
+          "kind": "TypeAlias",
+          "canonicalReference": "scrape-pages!ParseCommand:type",
           "docComment": "",
           "excerptTokens": [
             {
               "kind": "Content",
-              "text": "interface ParseCommand "
+              "text": "declare type ParseCommand = "
+            },
+            {
+              "kind": "Reference",
+              "text": "RawCommand",
+              "canonicalReference": "scrape-pages!~RawCommand:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<'PARSE', "
+            },
+            {
+              "kind": "Reference",
+              "text": "ParseParams",
+              "canonicalReference": "scrape-pages!~ParseParams:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
             }
           ],
           "releaseTag": "Public",
           "name": "ParseCommand",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 5
+          }
+        },
+        {
+          "kind": "Interface",
+          "canonicalReference": "scrape-pages!ParseParams:interface",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "interface ParseParams "
+            }
+          ],
+          "releaseTag": "Public",
+          "name": "ParseParams",
           "members": [
             {
               "kind": "PropertySignature",
-              "canonicalReference": "scrape-pages!ParseCommand#command:member",
+              "canonicalReference": "scrape-pages!ParseParams#ATTR:member",
               "docComment": "",
               "excerptTokens": [
                 {
                   "kind": "Content",
-                  "text": "command: "
+                  "text": "ATTR?: "
                 },
                 {
                   "kind": "Content",
-                  "text": "'PARSE'"
+                  "text": "string"
                 },
                 {
                   "kind": "Content",
@@ -962,7 +1195,7 @@
                 }
               ],
               "releaseTag": "Public",
-              "name": "command",
+              "name": "ATTR",
               "propertyTypeTokenRange": {
                 "startIndex": 1,
                 "endIndex": 2
@@ -970,16 +1203,16 @@
             },
             {
               "kind": "PropertySignature",
-              "canonicalReference": "scrape-pages!ParseCommand#params:member",
+              "canonicalReference": "scrape-pages!ParseParams#FORMAT:member",
               "docComment": "",
               "excerptTokens": [
                 {
                   "kind": "Content",
-                  "text": "params: "
+                  "text": "FORMAT?: "
                 },
                 {
                   "kind": "Content",
-                  "text": "{\n        LABEL?: string;\n        SELECTOR: string;\n        FORMAT?: 'html' | 'xml' | 'json';\n        ATTR?: string;\n        MAX?: number;\n    }"
+                  "text": "'html' | 'xml' | 'json'"
                 },
                 {
                   "kind": "Content",
@@ -987,7 +1220,82 @@
                 }
               ],
               "releaseTag": "Public",
-              "name": "params",
+              "name": "FORMAT",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "scrape-pages!ParseParams#LABEL:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "LABEL?: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "string"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "LABEL",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "scrape-pages!ParseParams#MAX:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "MAX?: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "number"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "MAX",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "scrape-pages!ParseParams#SELECTOR:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "SELECTOR: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "string"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "SELECTOR",
               "propertyTypeTokenRange": {
                 "startIndex": 1,
                 "endIndex": 2
@@ -1385,6 +1693,112 @@
               ],
               "releaseTag": "Public",
               "name": "throttleMs",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            }
+          ],
+          "extendsTokenRanges": []
+        },
+        {
+          "kind": "Interface",
+          "canonicalReference": "scrape-pages!RawCommand:interface",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "interface RawCommand<T extends "
+            },
+            {
+              "kind": "Content",
+              "text": "string"
+            },
+            {
+              "kind": "Content",
+              "text": ", Params extends "
+            },
+            {
+              "kind": "Content",
+              "text": "{}"
+            },
+            {
+              "kind": "Content",
+              "text": "> "
+            }
+          ],
+          "releaseTag": "Public",
+          "typeParameters": [
+            {
+              "typeParameterName": "T",
+              "constraintTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "defaultTypeTokenRange": {
+                "startIndex": 0,
+                "endIndex": 0
+              }
+            },
+            {
+              "typeParameterName": "Params",
+              "constraintTokenRange": {
+                "startIndex": 3,
+                "endIndex": 4
+              },
+              "defaultTypeTokenRange": {
+                "startIndex": 0,
+                "endIndex": 0
+              }
+            }
+          ],
+          "name": "RawCommand",
+          "members": [
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "scrape-pages!RawCommand#command:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "command: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "T"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "command",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "scrape-pages!RawCommand#params:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "params: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "{\n        LABEL?: string;\n    } & Params"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "params",
               "propertyTypeTokenRange": {
                 "startIndex": 1,
                 "endIndex": 2
@@ -1872,6 +2286,111 @@
         },
         {
           "kind": "TypeAlias",
+          "canonicalReference": "scrape-pages!SetVarCommand:type",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "declare type SetVarCommand = "
+            },
+            {
+              "kind": "Reference",
+              "text": "RawCommand",
+              "canonicalReference": "scrape-pages!~RawCommand:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<'SET', "
+            },
+            {
+              "kind": "Reference",
+              "text": "SetVarParams",
+              "canonicalReference": "scrape-pages!~SetVarParams:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "releaseTag": "Public",
+          "name": "SetVarCommand",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 5
+          }
+        },
+        {
+          "kind": "Interface",
+          "canonicalReference": "scrape-pages!SetVarParams:interface",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "interface SetVarParams "
+            }
+          ],
+          "releaseTag": "Public",
+          "name": "SetVarParams",
+          "members": [
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "scrape-pages!SetVarParams#LABEL:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "LABEL?: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "string"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "LABEL",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "scrape-pages!SetVarParams#VAR_NAME:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "VAR_NAME: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "string"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "VAR_NAME",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            }
+          ],
+          "extendsTokenRanges": []
+        },
+        {
+          "kind": "TypeAlias",
           "canonicalReference": "scrape-pages!Slug:type",
           "docComment": "",
           "excerptTokens": [
@@ -1921,30 +2440,69 @@
           }
         },
         {
-          "kind": "Interface",
-          "canonicalReference": "scrape-pages!TextReplaceCommand:interface",
+          "kind": "TypeAlias",
+          "canonicalReference": "scrape-pages!TextReplaceCommand:type",
           "docComment": "",
           "excerptTokens": [
             {
               "kind": "Content",
-              "text": "interface TextReplaceCommand "
+              "text": "declare type TextReplaceCommand = "
+            },
+            {
+              "kind": "Reference",
+              "text": "RawCommand",
+              "canonicalReference": "scrape-pages!~RawCommand:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<'REPLACE', "
+            },
+            {
+              "kind": "Reference",
+              "text": "TextReplaceParams",
+              "canonicalReference": "scrape-pages!~TextReplaceParams:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
             }
           ],
           "releaseTag": "Public",
           "name": "TextReplaceCommand",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 5
+          }
+        },
+        {
+          "kind": "Interface",
+          "canonicalReference": "scrape-pages!TextReplaceParams:interface",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "interface TextReplaceParams "
+            }
+          ],
+          "releaseTag": "Public",
+          "name": "TextReplaceParams",
           "members": [
             {
               "kind": "PropertySignature",
-              "canonicalReference": "scrape-pages!TextReplaceCommand#command:member",
+              "canonicalReference": "scrape-pages!TextReplaceParams#FLAGS:member",
               "docComment": "",
               "excerptTokens": [
                 {
                   "kind": "Content",
-                  "text": "command: "
+                  "text": "FLAGS?: "
                 },
                 {
                   "kind": "Content",
-                  "text": "'REPLACE'"
+                  "text": "string"
                 },
                 {
                   "kind": "Content",
@@ -1952,7 +2510,7 @@
                 }
               ],
               "releaseTag": "Public",
-              "name": "command",
+              "name": "FLAGS",
               "propertyTypeTokenRange": {
                 "startIndex": 1,
                 "endIndex": 2
@@ -1960,16 +2518,16 @@
             },
             {
               "kind": "PropertySignature",
-              "canonicalReference": "scrape-pages!TextReplaceCommand#params:member",
+              "canonicalReference": "scrape-pages!TextReplaceParams#LABEL:member",
               "docComment": "",
               "excerptTokens": [
                 {
                   "kind": "Content",
-                  "text": "params: "
+                  "text": "LABEL?: "
                 },
                 {
                   "kind": "Content",
-                  "text": "{\n        LABEL?: string;\n        SELECTOR: string;\n        WITH?: string;\n        FLAGS?: string;\n    }"
+                  "text": "string"
                 },
                 {
                   "kind": "Content",
@@ -1977,7 +2535,57 @@
                 }
               ],
               "releaseTag": "Public",
-              "name": "params",
+              "name": "LABEL",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "scrape-pages!TextReplaceParams#SELECTOR:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "SELECTOR: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "string"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "SELECTOR",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "scrape-pages!TextReplaceParams#WITH:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "WITH?: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "string"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "WITH",
               "propertyTypeTokenRange": {
                 "startIndex": 1,
                 "endIndex": 2

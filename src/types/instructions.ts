@@ -2,57 +2,90 @@ type Slug = string
 type Expression = string
 type Template = string
 
-interface FetchCommand {
-  command: 'FETCH'
+interface RawCommand<T extends string, Params extends {}> {
+  command: T
   /** @internal */
   databaseId?: number
   params: {
+    /** Identifies a command so that it can be queried for later. */
     LABEL?: string
-    METHOD?: 'GET' | 'PUT' | 'POST' | 'DELETE'
-    URL: Template
-    HEADERS?: { [headerName: string]: Template }
-    BODY?: any
-    READ?: boolean
-    WRITE?: boolean
-    CACHE?: boolean
-    PRIORITY?: number
-  }
+  } & Params
 }
 
-interface ParseCommand {
-  command: 'PARSE'
-  /** @internal */
-  databaseId?: number
-  params: {
-    LABEL?: string
-    SELECTOR: string
-    FORMAT?: 'html' | 'xml' | 'json'
-    ATTR?: string
-    MAX?: number
-  }
+interface FetchParams {
+  /** HTTP method */
+  METHOD?: 'GET' | 'PUT' | 'POST' | 'DELETE'
+  /** Templated url */
+  URL: Template
+  /** Templated http headers */
+  HEADERS?: { [headerName: string]: Template }
+  /** Templated http body */
+  BODY?: any
+  /** Read the response body into the \{\{ value \}\} variable */
+  READ?: boolean
+  /** Write the response body to disk */
+  WRITE?: boolean
+  /**
+   * Cache this request.
+   * A cached request will not make a network call, but will read the response from the  database
+   */
+  CACHE?: boolean
+  /**
+   * The priority this request will take in the rate limited queue.
+   * Note if rate limiting is disabled this has no effect.
+   * Higher number = higher priority.
+   */
+  PRIORITY?: number
 }
+/**
+ * Fetch Command
+ *
+ * http requests that can use values inside templates
+ *
+ */
+type FetchCommand = RawCommand<'FETCH', FetchParams>
+// TODO on the site, make these look like this (we still need to special case the positional args like URL):
+//
+// Fetch Command
+//
+// http requests that can use values inside templates
+//
+// Usage: FETCH URL [OPTIONS]
+//
+// OPTIONS:
+//    METHOD        HTTP method
+//    HEADERS       Templated http headers
+//    BODY          Templated http body
+//    READ          Read the response body into the \{\{ value \}\} variable
+//    WRITE         Write the response body to disk
+//    CACHE         Cache this request.
+//                  A cached request will not make a network call, but will read the response from the  database
+//    PRIORITY      The priority this request will take in the rate limited queue.
+//                  Note if rate limiting is disabled this has no effect.
+//                  Higher number = higher priority.
 
-interface TextReplaceCommand {
-  command: 'REPLACE'
-  /** @internal */
-  databaseId?: number
-  params: {
-    LABEL?: string
-    SELECTOR: string
-    WITH?: string
-    FLAGS?: string
-  }
+interface ParseParams {
+  LABEL?: string
+  SELECTOR: string
+  FORMAT?: 'html' | 'xml' | 'json'
+  ATTR?: string
+  MAX?: number
 }
+type ParseCommand = RawCommand<'PARSE', ParseParams>
 
-interface SetVarCommand {
-  command: 'SET'
-  /** @internal */
-  databaseId?: number
-  params: {
-    LABEL?: string
-    VAR_NAME: string
-  }
+interface TextReplaceParams {
+  LABEL?: string
+  SELECTOR: string
+  WITH?: string
+  FLAGS?: string
 }
+type TextReplaceCommand = RawCommand<'REPLACE', TextReplaceParams>
+
+interface SetVarParams {
+  LABEL?: string
+  VAR_NAME: string
+}
+type SetVarCommand = RawCommand<'SET', SetVarParams>
 
 type Command = FetchCommand | ParseCommand | TextReplaceCommand | SetVarCommand
 
@@ -121,8 +154,13 @@ export {
   LoopOperation,
   CatchOperation,
   MergeOperation,
+  FetchParams,
+  ParseParams,
+  TextReplaceParams,
+  SetVarParams,
+  RawCommand,
   FetchCommand,
   ParseCommand,
   TextReplaceCommand,
-  SetVarCommand,
+  SetVarCommand
 }
