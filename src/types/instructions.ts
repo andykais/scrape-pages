@@ -162,5 +162,5 @@ export {
   FetchCommand,
   ParseCommand,
   TextReplaceCommand,
-  SetVarCommand
+  SetVarCommand,
 }

@@ -43,8 +43,8 @@ describe(__filename, () => {
     const result = scraper.query(['likes'])
     assertQueryResultPartial(result, [
       {
-        likes: [{ value: 'post-a' }, { value: 'post-b' }]
-      }
+        likes: [{ value: 'post-a' }, { value: 'post-b' }],
+      },
     ])
   })
 })
