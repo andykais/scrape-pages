@@ -87,7 +87,7 @@
     "typescript-is": "^0.16.0"
   },
   "engines": {
-    "node": ">=8.0"
+    "node": ">=10.0"
   },
   "main": "build/index.js",
   "types": "build/scrape-pages-public.d.ts",
