@@ -207,7 +207,7 @@ LogicTree                 -> BooleanExpr                                        
                            | LogicTree _ LogicOperator _ BooleanExpr                  {% extractBooleanLogicTree %}
                            | LogicTree _ LogicOperator _ "(" _star LogicTree _star ")"{% extractBooleanLogicTreeNested %}
 BooleanExpr               -> Any _ ComparisonOperator _ Any                           {% extractBooleanExpr %}
-ComparisonOperator        -> "==" | ">" | ">=" | "<" | "<="
+ComparisonOperator        -> "==" | "!=" | ">" | ">=" | "<" | "<="
 LogicOperator             -> "||" | "&&"
 
 # TODO it is impossible to represent the literal character ' inside a string template right now. This is especially annoying for regex commands. We will need to allow both kinds of quotes at some point
