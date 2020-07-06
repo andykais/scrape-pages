@@ -17,7 +17,7 @@ class CheerioParser implements ParserEngine {
   public load(html: string) {
     this.$ = cheerio.load(html, this.cheerioFlags)
   }
-  public forEach: ParserEngine['forEach'] = cb => {
+  public forEach: ParserEngine['forEach'] = (cb) => {
     const { $ } = this
     const { SELECTOR, ATTR, MAX } = this.command.params
     // we could also set up an generator here, depending on what is better for jsonata parser
@@ -63,7 +63,7 @@ class DelimiterParser implements ParserEngine {
     this.text = text
   }
 
-  public forEach: ParserEngine['forEach'] = cb => {
+  public forEach: ParserEngine['forEach'] = (cb) => {
     this.text.split(this.regex).forEach((value, i) => cb(value, i))
   }
 }
@@ -73,7 +73,7 @@ class ParseCommand extends BaseCommand<I.ParseCommand, typeof ParseCommand.DEFAU
     FORMAT: 'html' as NonNullable<I.ParseCommand['params']['FORMAT']>,
     ATTR: undefined,
     MAX: undefined,
-    TRIM: false
+    TRIM: false,
   }
   private parserEngine: ParserEngine
 

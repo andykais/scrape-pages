@@ -18,8 +18,8 @@ describe(__filename, () => {
         const result = scraper.query(['post'])
         assertQueryResultPartial(result, [
           {
-            post: [{ value: 'the' }, { value: 'quick' }, { value: 'brown' }, { value: 'fox' }]
-          }
+            post: [{ value: 'the' }, { value: 'quick' }, { value: 'brown' }, { value: 'fox' }],
+          },
         ])
       })
     })
@@ -32,8 +32,8 @@ describe(__filename, () => {
         const result = scraper.query(['post'])
         assertQueryResultPartial(result, [
           {
-            post: [{ value: 'the' }, { value: 'quick' }, { value: 'brown' }, { value: 'fox' }]
-          }
+            post: [{ value: 'the' }, { value: 'quick' }, { value: 'brown' }, { value: 'fox' }],
+          },
         ])
       })
     })
@@ -55,9 +55,9 @@ describe(__filename, () => {
               { value: 'over' },
               { value: 'the' },
               { value: 'lazy' },
-              { value: 'dog' }
-            ]
-          }
+              { value: 'dog' },
+            ],
+          },
         ])
       })
     })
@@ -83,16 +83,16 @@ describe(__filename, () => {
               { value: 'alsa-utils.tcz' },
               { value: 'attr.tcz' },
               { value: 'autoconf2.13.tcz' },
-              { value: 'autoconf.tcz' }
-            ]
-          }
+              { value: 'autoconf.tcz' },
+            ],
+          },
         ])
 
         const apiResult = scraper.query(['api-success'])
         assertQueryResultPartial(apiResult, [
           {
-            'api-success': [{ value: 'true' }]
-          }
+            'api-success': [{ value: 'true' }],
+          },
         ])
       })
     })
