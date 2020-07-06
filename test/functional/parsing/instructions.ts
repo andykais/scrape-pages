@@ -28,4 +28,12 @@ const jsonInsideScript = `
 )
 `
 
-export { simple, parseJsonTwice, jsonInsideScript }
+const parseMultilineTextAsSingleLines = `
+(
+  FETCH '${host}/multiline-text-body.html'
+  PARSE 'pre' FORMAT='html'
+  PARSE '\\n' FORMAT='delimiter' TRIM=true LABEL='lines'
+)
+`
+
+export { simple, parseJsonTwice, jsonInsideScript, parseMultilineTextAsSingleLines }

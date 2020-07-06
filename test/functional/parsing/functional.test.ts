@@ -18,8 +18,8 @@ describe(__filename, () => {
         const result = scraper.query(['post'])
         assertQueryResultPartial(result, [
           {
-            post: [{ value: 'the' }, { value: 'quick' }, { value: 'brown' }, { value: 'fox' }],
-          },
+            post: [{ value: 'the' }, { value: 'quick' }, { value: 'brown' }, { value: 'fox' }]
+          }
         ])
       })
     })
@@ -32,8 +32,8 @@ describe(__filename, () => {
         const result = scraper.query(['post'])
         assertQueryResultPartial(result, [
           {
-            post: [{ value: 'the' }, { value: 'quick' }, { value: 'brown' }, { value: 'fox' }],
-          },
+            post: [{ value: 'the' }, { value: 'quick' }, { value: 'brown' }, { value: 'fox' }]
+          }
         ])
       })
     })
@@ -55,9 +55,36 @@ describe(__filename, () => {
               { value: 'over' },
               { value: 'the' },
               { value: 'lazy' },
-              { value: 'dog' },
-            ],
-          },
+              { value: 'dog' }
+            ]
+          }
+        ])
+      })
+    })
+
+    describe('with delimiter parser', () => {
+      it('should be able to be fed from another parser', async () => {
+        const scraper = new ScraperProgram(
+          instructions.parseMultilineTextAsSingleLines,
+          testEnv.outputFolder
+        )
+        await scraper.start().toPromise()
+
+        const result = scraper.query(['lines'])
+        assertQueryResultPartial(result, [
+          {
+            lines: [
+              { value: 'acl.tcz' },
+              { value: 'advcomp.tcz' },
+              { value: 'alsa-plugins-dev.tcz' },
+              { value: 'alsa-plugins.tcz' },
+              { value: 'alsa.tcz' },
+              { value: 'alsa-utils.tcz' },
+              { value: 'attr.tcz' },
+              { value: 'autoconf2.13.tcz' },
+              { value: 'autoconf.tcz' }
+            ]
+          }
         ])
       })
     })
