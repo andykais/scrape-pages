@@ -431,6 +431,73 @@
         },
         {
           "kind": "Interface",
+          "canonicalReference": "scrape-pages!FilterOperation:interface",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "interface FilterOperation "
+            }
+          ],
+          "releaseTag": "Public",
+          "name": "FilterOperation",
+          "members": [
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "scrape-pages!FilterOperation#expression:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "expression: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Expression",
+                  "canonicalReference": "scrape-pages!~Expression:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "expression",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "scrape-pages!FilterOperation#operator:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "operator: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "'filter'"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "operator",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            }
+          ],
+          "extendsTokenRanges": []
+        },
+        {
+          "kind": "Interface",
           "canonicalReference": "scrape-pages!InitOperation:interface",
           "docComment": "",
           "excerptTokens": [
@@ -814,6 +881,15 @@
             },
             {
               "kind": "Reference",
+              "text": "FilterOperation",
+              "canonicalReference": "scrape-pages!~FilterOperation:interface"
+            },
+            {
+              "kind": "Content",
+              "text": " | "
+            },
+            {
+              "kind": "Reference",
               "text": "MapOperation",
               "canonicalReference": "scrape-pages!~MapOperation:interface"
             },
@@ -862,7 +938,7 @@
           "name": "Operation",
           "typeTokenRange": {
             "startIndex": 1,
-            "endIndex": 14
+            "endIndex": 16
           }
         },
         {
@@ -1212,7 +1288,7 @@
                 },
                 {
                   "kind": "Content",
-                  "text": "'html' | 'xml' | 'json'"
+                  "text": "'html' | 'xml' | 'json' | 'delimiter'"
                 },
                 {
                   "kind": "Content",
@@ -1296,6 +1372,31 @@
               ],
               "releaseTag": "Public",
               "name": "SELECTOR",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "scrape-pages!ParseParams#TRIM:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "TRIM?: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "boolean"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "releaseTag": "Public",
+              "name": "TRIM",
               "propertyTypeTokenRange": {
                 "startIndex": 1,
                 "endIndex": 2
