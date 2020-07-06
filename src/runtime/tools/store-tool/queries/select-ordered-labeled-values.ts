@@ -202,6 +202,7 @@ class QueryCompiler {
         }
         // read only operators
         case 'until':
+        case 'filter':
           return this.collectInfo(program, operationIndex + 1, 0, distanceFromTop, previousCommand)
         default:
           throw new errors.InternalError(`unknown operation '${operation.operator}'`)

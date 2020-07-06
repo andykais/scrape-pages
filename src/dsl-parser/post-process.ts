@@ -70,6 +70,9 @@ function postProcessProgram(program: i.Program): any {
       case 'until':
         operation.expression = postProcessExpression(operation.expression)
         return operation
+      case 'filter':
+        operation.expression = postProcessExpression(operation.expression)
+        return operation
       case 'merge':
         operation.programs = postProcessPrograms(operation.programs)
         return operation

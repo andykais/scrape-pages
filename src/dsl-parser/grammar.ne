@@ -175,7 +175,7 @@ PostProgram               -> (Comment | nl_):*                                  
 
 Program                   -> Flow                                                           {% extractProgramFlow %}
                            | Program "\n":? (".map" | ".reduce" | ".loop" | ".catch") Flow  {% extractProgramDotFlow %}
-                           | Program "\n":? (".until") ExpressionBlock                      {% extractProgramExpressionFlow %}
+                           | Program "\n":? (".until" | ".filter") ExpressionBlock         {% extractProgramExpressionFlow %}
                            | Program "\n":? ".merge(" ProgramList ")"                      {% extractProgramMerge %}
 
 ProgramList               -> ws Program ws                                            {% extractProgramList %}
@@ -207,7 +207,7 @@ LogicTree                 -> BooleanExpr                                        
                            | LogicTree _ LogicOperator _ BooleanExpr                  {% extractBooleanLogicTree %}
                            | LogicTree _ LogicOperator _ "(" _star LogicTree _star ")"{% extractBooleanLogicTreeNested %}
 BooleanExpr               -> Any _ ComparisonOperator _ Any                           {% extractBooleanExpr %}
-ComparisonOperator        -> "==" | ">" | ">=" | "<" | "<="
+ComparisonOperator        -> "==" | "!=" | ">" | ">=" | "<" | "<="
 LogicOperator             -> "||" | "&&"
 
 # TODO it is impossible to represent the literal character ' inside a string template right now. This is especially annoying for regex commands. We will need to allow both kinds of quotes at some point

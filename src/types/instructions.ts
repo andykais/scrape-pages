@@ -67,8 +67,9 @@ type FetchCommand = RawCommand<'FETCH', FetchParams>
 interface ParseParams {
   LABEL?: string
   SELECTOR: string
-  FORMAT?: 'html' | 'xml' | 'json'
+  FORMAT?: 'html' | 'xml' | 'json' | 'delimiter'
   ATTR?: string
+  TRIM?: boolean // trim any remaining whitespace
   MAX?: number
 }
 type ParseCommand = RawCommand<'PARSE', ParseParams>
@@ -95,6 +96,10 @@ interface InitOperation {
 }
 interface UntilOperation {
   operator: 'until'
+  expression: Expression
+}
+interface FilterOperation {
+  operator: 'filter'
   expression: Expression
 }
 interface MapOperation {
@@ -126,6 +131,7 @@ interface MergeOperation {
 type Operation =
   | InitOperation
   | UntilOperation
+  | FilterOperation
   | MapOperation
   | ReduceOperation
   | LoopOperation
@@ -149,6 +155,7 @@ export {
   Template,
   InitOperation,
   UntilOperation,
+  FilterOperation,
   MapOperation,
   ReduceOperation,
   LoopOperation,

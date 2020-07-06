@@ -28,4 +28,16 @@ const jsonInsideScript = `
 )
 `
 
-export { simple, parseJsonTwice, jsonInsideScript }
+const parseMultilineTextAsSingleLines = `
+INPUT 'packageName'
+(
+  FETCH '${host}/multiline-text-body.html'
+  PARSE 'pre' FORMAT='html'
+  PARSE '\\n' FORMAT='delimiter' TRIM=true LABEL='lines'
+).filter('"{{ value }}"' == '"{{ packageName }}"').map(
+  FETCH '${host}/success.json'
+  PARSE 'success' FORMAT='json'  LABEL='api-success'
+)
+`
+
+export { simple, parseJsonTwice, jsonInsideScript, parseMultilineTextAsSingleLines }

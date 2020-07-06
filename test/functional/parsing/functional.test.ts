@@ -61,5 +61,40 @@ describe(__filename, () => {
         ])
       })
     })
+
+    describe('with delimiter parser', () => {
+      it('should be able to be fed from another parser', async () => {
+        const scraper = new ScraperProgram(
+          instructions.parseMultilineTextAsSingleLines,
+          testEnv.outputFolder,
+          { inputs: { packageName: 'autoconf2.13.tcz' } }
+        )
+        await scraper.start().toPromise()
+
+        const result = scraper.query(['lines'])
+        assertQueryResultPartial(result, [
+          {
+            lines: [
+              { value: 'acl.tcz' },
+              { value: 'advcomp.tcz' },
+              { value: 'alsa-plugins-dev.tcz' },
+              { value: 'alsa-plugins.tcz' },
+              { value: 'alsa.tcz' },
+              { value: 'alsa-utils.tcz' },
+              { value: 'attr.tcz' },
+              { value: 'autoconf2.13.tcz' },
+              { value: 'autoconf.tcz' },
+            ],
+          },
+        ])
+
+        const apiResult = scraper.query(['api-success'])
+        assertQueryResultPartial(apiResult, [
+          {
+            'api-success': [{ value: 'true' }],
+          },
+        ])
+      })
+    })
   })
 })

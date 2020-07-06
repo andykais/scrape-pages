@@ -51,11 +51,29 @@ class JsonataParser implements ParserEngine {
   }
 }
 
+class DelimiterParser implements ParserEngine {
+  private regex: RegExp
+  private text: string
+
+  public constructor(private command: I.ParseCommand) {
+    this.regex = new RegExp(command.params.SELECTOR)
+  }
+
+  public load(text: string) {
+    this.text = text
+  }
+
+  public forEach: ParserEngine['forEach'] = (cb) => {
+    this.text.split(this.regex).forEach((value, i) => cb(value, i))
+  }
+}
+
 class ParseCommand extends BaseCommand<I.ParseCommand, typeof ParseCommand.DEFAULT_PARAMS> {
   public static DEFAULT_PARAMS = {
     FORMAT: 'html' as NonNullable<I.ParseCommand['params']['FORMAT']>,
     ATTR: undefined,
     MAX: undefined,
+    TRIM: false,
   }
   private parserEngine: ParserEngine
 
@@ -71,6 +89,9 @@ class ParseCommand extends BaseCommand<I.ParseCommand, typeof ParseCommand.DEFAU
       case 'json':
         this.parserEngine = new JsonataParser(this.command)
         break
+      case 'delimiter':
+        this.parserEngine = new DelimiterParser(this.command)
+        break
       default:
         throw new Error(`Unsupported format type '${this.params.FORMAT}'`)
     }
@@ -79,11 +100,13 @@ class ParseCommand extends BaseCommand<I.ParseCommand, typeof ParseCommand.DEFAU
   public stream(payload: Stream.Payload) {
     const parsedResult: Stream.Payload[] = []
 
-    this.parserEngine.load(payload.value)
+    const preProcessedValue = this.params.TRIM ? payload.value.trim() : payload.value
+    this.parserEngine.load(preProcessedValue)
 
     this.tools.store.transaction(() => {
       this.parserEngine.forEach((value, i) => {
-        const newPayload = this.saveValue(payload, i, value)
+        const processedValue = this.params.TRIM ? value.trim() : value
+        const newPayload = this.saveValue(payload, i, processedValue)
         parsedResult.push(newPayload)
       })
     })()

@@ -123,6 +123,10 @@ class Compiler {
     // return ops.expand(payload => Rx.of(payload).pipe(commandsOperation))
   }
 
+  private compileFilterOperation(operation: I.FilterOperation): Stream.Operation {
+    const evaluator = new BooleanExpressionEvaluator(operation.expression)
+    return ops.filter((payload) => evaluator.eval(payload))
+  }
   private compileUntilOperation(operation: I.UntilOperation): Stream.Operation {
     const evaluator = new BooleanExpressionEvaluator(operation.expression)
     return ops.takeWhile((payload) => !evaluator.eval(payload))
@@ -142,6 +146,8 @@ class Compiler {
           return this.compileMergeOperation(operation)
         case 'reduce':
           return this.compileReduceOperation(operation)
+        case 'filter':
+          return this.compileFilterOperation(operation)
         case 'until':
           return this.compileUntilOperation(operation)
         default:
