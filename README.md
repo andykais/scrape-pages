@@ -29,6 +29,7 @@ npm install scrape-pages
 Lets download the ten most recent images from NASA's image of the day archive.
 
 ```javascript
+const { ScraperProgram } = require('scrape-pages')
 // Define some instructions for the scraper:
 const instructions = `
 (
