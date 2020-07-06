@@ -98,6 +98,10 @@ interface UntilOperation {
   operator: 'until'
   expression: Expression
 }
+interface FilterOperation {
+  operator: 'filter'
+  expression: Expression
+}
 interface MapOperation {
   operator: 'map'
   commands: Command[]
@@ -127,6 +131,7 @@ interface MergeOperation {
 type Operation =
   | InitOperation
   | UntilOperation
+  | FilterOperation
   | MapOperation
   | ReduceOperation
   | LoopOperation
@@ -150,6 +155,7 @@ export {
   Template,
   InitOperation,
   UntilOperation,
+  FilterOperation,
   MapOperation,
   ReduceOperation,
   LoopOperation,
@@ -163,5 +169,5 @@ export {
   FetchCommand,
   ParseCommand,
   TextReplaceCommand,
-  SetVarCommand,
+  SetVarCommand
 }

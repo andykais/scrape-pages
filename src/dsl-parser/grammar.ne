@@ -175,7 +175,7 @@ PostProgram               -> (Comment | nl_):*                                  
 
 Program                   -> Flow                                                           {% extractProgramFlow %}
                            | Program "\n":? (".map" | ".reduce" | ".loop" | ".catch") Flow  {% extractProgramDotFlow %}
-                           | Program "\n":? (".until") ExpressionBlock                      {% extractProgramExpressionFlow %}
+                           | Program "\n":? (".until" | ".filter") ExpressionBlock         {% extractProgramExpressionFlow %}
                            | Program "\n":? ".merge(" ProgramList ")"                      {% extractProgramMerge %}
 
 ProgramList               -> ws Program ws                                            {% extractProgramList %}

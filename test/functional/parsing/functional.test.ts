@@ -66,7 +66,8 @@ describe(__filename, () => {
       it('should be able to be fed from another parser', async () => {
         const scraper = new ScraperProgram(
           instructions.parseMultilineTextAsSingleLines,
-          testEnv.outputFolder
+          testEnv.outputFolder,
+          { inputs: { packageName: 'autoconf2.13.tcz' } }
         )
         await scraper.start().toPromise()
 
@@ -84,6 +85,13 @@ describe(__filename, () => {
               { value: 'autoconf2.13.tcz' },
               { value: 'autoconf.tcz' }
             ]
+          }
+        ])
+
+        const apiResult = scraper.query(['api-success'])
+        assertQueryResultPartial(apiResult, [
+          {
+            'api-success': [{ value: 'true' }]
           }
         ])
       })
