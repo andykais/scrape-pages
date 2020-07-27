@@ -63,6 +63,16 @@ const instructionsWithLeaves = `
 //  PARSE 'likes' LABEL='likes' FORMAT='json'
 //)
 //`
+//
+//MACRO FETCH_AUTHED = FETCH HEADERS={"http-x-auth-token": "{{token}}"}
+//(
+//  FETCH 'http://auth-tokens/login' METHOD='POST' BODY={"username": "alice", "password": "abc"}
+//  PARSE 'auth_token' FORMAT='json'
+//  SET 'token'
+//  FETCH_AUTHED 'http://auth-tokens/users/alice'
+//  FETCH_AUTHED 'http://auth-tokens/users/alice/likes'
+//  PARSE 'likes' LABEL='likes' FORMAT='json'
+//)
 
 describe(__filename, () => {
   describe('instruction set covering all syntax', () => {
