@@ -54,8 +54,8 @@ class JsonataParser implements ParserEngine {
 class ParseCommand extends BaseCommand<I.ParseCommand, typeof ParseCommand.DEFAULT_PARAMS> {
   public static DEFAULT_PARAMS = {
     FORMAT: 'html' as NonNullable<I.ParseCommand['params']['FORMAT']>,
-    ATTR: undefined,
-    MAX: undefined,
+    ATTR: undefined as string | undefined,
+    MAX: undefined as number | undefined,
   }
   private parserEngine: ParserEngine
 

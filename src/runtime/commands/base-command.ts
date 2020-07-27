@@ -18,7 +18,7 @@ abstract class BaseCommand<
 > extends RuntimeBase {
   public LABEL: string | undefined
   protected commandId: Stream.Id
-  protected params: Required<Command['params']> & ParamDefaults & { LABEL: undefined }
+  protected params: Required<Command['params']> & ParamDefaults // & { LABEL: undefined }
   // protected params: Merge<Required<Command['params']>, ParamDefaults & { LABEL: undefined }>
 
   public constructor(
