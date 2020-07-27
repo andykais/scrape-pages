@@ -9,6 +9,7 @@ dependencies:
   node-fetch: 2.6.0
   rxjs: 6.6.0
   seamless-immutable: 7.1.4
+  typescript-is: 0.16.3_typescript@3.9.7
 devDependencies:
   '@microsoft/api-extractor': 7.8.2-pr1796.0
   '@types/better-sqlite3': 5.4.0
@@ -42,7 +43,6 @@ devDependencies:
   ts-loader: 8.0.1_typescript@3.9.7
   ttypescript: 1.5.10_typescript@3.9.7
   typescript: 3.9.7
-  typescript-is: 0.16.3_typescript@3.9.7
   typescript-transform-paths: 1.1.14
   webpack: 4.44.0_webpack@4.44.0
   webpack-cli: 3.3.12_webpack@4.44.0
@@ -3537,11 +3537,7 @@ packages:
     dev: true
     resolution:
       integrity: sha1-2HV7HagH3eJIFrDWqEvqGnYjCyM=
-  /lodash/4.17.15:
-    resolution:
-      integrity: sha512-8xOcRHvCjnocdS5cpwXQXVzmmh5e5+saE2QGoeQmbKmRS6J3VQppPOIt0MnmE+4xlZoumy0GPG0D0MVIQbNA1A==
   /lodash/4.17.19:
-    dev: true
     resolution:
       integrity: sha512-JNvd8XER9GQX0v2qJgsaN/mzFCNA5BRe/j8JN9d+tWyGLSodKQHKFicdwNYzWwI3wjRnaKPsGj1XkBjx/F96DQ==
   /log-symbols/3.0.0:
@@ -3920,7 +3916,7 @@ packages:
     resolution:
       integrity: sha512-Yd3UES5mWCSqR+qNT93S3UoYUkqAZ9lLg8a7g9rimsWmYGK8cVToA4/sF3RrshdyV3sAGMXVUmpMYOw+dLpOuw==
   /nested-error-stacks/2.1.0:
-    dev: true
+    dev: false
     resolution:
       integrity: sha512-AO81vsIO1k1sM4Zrd6Hu7regmJN1NSiAja10gc4bX3F0wd+9rQmcuHQaHVQCYIEC8iFXnE+mavh23GOt7wBgug==
   /nice-try/1.0.5:
@@ -4731,7 +4727,7 @@ packages:
     resolution:
       integrity: sha1-hSBLVNuoLVdC4oyWdW70OvUOM4Q=
   /reflect-metadata/0.1.13:
-    dev: true
+    dev: false
     optional: true
     resolution:
       integrity: sha512-Ts1Y/anZELhSsjMcU605fU9RE4Oi3p5ORujwbIKXfWa+0Zxs510Qrmrce5/Jowq3cHSZSJqBjypxmHarc+vEWg==
@@ -5638,7 +5634,6 @@ packages:
     dependencies:
       tslib: 1.13.0
       typescript: 3.9.7
-    dev: true
     engines:
       node: '>= 6'
     peerDependencies:
@@ -5701,7 +5696,7 @@ packages:
       nested-error-stacks: 2.1.0
       tsutils: 3.17.1_typescript@3.9.7
       typescript: 3.9.7
-    dev: true
+    dev: false
     engines:
       node: '>=6.14.4'
     optionalDependencies:
@@ -5724,7 +5719,6 @@ packages:
     resolution:
       integrity: sha512-/P5lkRXkWHNAbcJIiHPfRoKqyd7bsyCma1hZNUGfn20qm64T6ZBlrzprymeu918H+mB/0rIg2gGK/BXkhhYgBw==
   /typescript/3.9.7:
-    dev: true
     engines:
       node: '>=4.2.0'
     hasBin: true
