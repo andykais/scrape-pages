@@ -85,7 +85,7 @@ jobs:
     if: github.event.action == 'published'
     env:
       NODE_VERSION: 14
-
+    steps:
     - name: Dump GitHub context
       env:
         GITHUB_CONTEXT: ${{ toJson(github) }}
