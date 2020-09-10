@@ -25,8 +25,11 @@ jobs:
 #           Test             #
 ##############################
     - name: Debug Action
-      # uses: hmarr/debug-action@v1.0.0
-      run: echo "${{toJson(github.event)}}" | jq -M .
+      env:
+        GITHUB_CONTEXT: ${{ toJson(github) }}
+        GITHUB_EVENT: ${{ toJson(github.event) }}
+      run: echo "$GITHUB_EVENT"
+
 
     - uses: actions/checkout@v2
 
