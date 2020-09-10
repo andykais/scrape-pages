@@ -24,9 +24,9 @@ jobs:
 ##############################
 #           Test             #
 ##############################
-    - run: echo ${{github.event.release.published}}
-    - run: echo ${{github.push}}
-    # - run: echo ${{parseJson(github.event)}}
+    - name: Debug Action
+      uses: hmarr/debug-action@v1.0.0
+
     - uses: actions/checkout@v2
 
     - name: Use Node.js ${{ matrix.node-version }}
@@ -74,7 +74,7 @@ jobs:
 #       NPM Publish          #
 ##############################
     - name: pnpm publish
-      if: github.event == 'release' && matrix.os == 'ubuntu-latest' && matrix.node-version == '12'
+      if: github.event.release.published && matrix.os == 'ubuntu-latest' && matrix.node-version == '12'
       env:
         NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
         GITHUB_TOKEN: ${{ secrets.github_token }}
