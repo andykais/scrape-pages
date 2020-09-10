@@ -12,7 +12,7 @@
     "compile": "webpack --mode=production",
     "compile:declarations": "ttsc --declaration --emitDeclarationOnly --declarationMap --outDir node_modules/.build-artifacts/declarations",
     "compile:bundle:declarations": "api-extractor run --local --verbose",
-    "copy-assets": "shx cp package.json build/package.json",
+    "copy-assets": "shx cp package.json README.md build",
     "build:types": "run-s clean compile:declarations compile:bundle:declarations",
     "build": "run-s clean compile compile:declarations compile:bundle:declarations copy-assets",
     "test": "run-s clean typecheck test:unit test:functional lint format:check",
