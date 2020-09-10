@@ -25,7 +25,8 @@ jobs:
 #           Test             #
 ##############################
     - name: Debug Action
-      uses: hmarr/debug-action@v1.0.0
+      # uses: hmarr/debug-action@v1.0.0
+      run: echo ${{toJson(github.event)}} | jq -M .
 
     - uses: actions/checkout@v2
 
