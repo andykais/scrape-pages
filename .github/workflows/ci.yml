@@ -128,6 +128,7 @@ jobs:
         git checkout master
         git add package.json
         git commit --message "release $TAG"
+        echo "https://${GITHUB_TOKEN}@github.com/${{ github.repository }}.git"
         git remote add deploy https://${GITHUB_TOKEN}@github.com/${{ github.repository }}.git
         git push deploy master
 
