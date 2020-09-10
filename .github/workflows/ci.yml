@@ -92,6 +92,8 @@ jobs:
       run: echo "$GITHUB_CONTEXT"
 
     - uses: actions/checkout@v2
+      with:
+        ref: master
 
     - name: Use Node.js ${{ env.NODE_VERSION }}
       uses: actions/setup-node@v2-beta
