@@ -27,7 +27,9 @@ jobs:
     - name: Dump GitHub context
       env:
         GITHUB_CONTEXT: ${{ toJson(github) }}
-      run: echo "$GITHUB_CONTEXT"
+        GITHUB_TOKEN: ${{ secrets.github_token }}
+      # run: echo "$GITHUB_CONTEXT"
+      run: echo "https://${GITHUB_TOKEN}@github.com/${{ github.repository }}.git"
 
 ##############################
 #           Test             #
