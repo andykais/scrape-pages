@@ -122,7 +122,7 @@ jobs:
         pnpm version --no-git-tag-version $TAG
         pnpm run build
         cd build
-        pnpm publish
+        pnpm publish --no-git-checks
         cd ..
         git fetch origin master
         git checkout master
