@@ -4,9 +4,8 @@ on:
   push:
     branches:
       - '*'
-        # should this be ignored for releases? I think so
-    # tags-ignore:
-    #   - '*'
+  release:
+    types: [published]
 
 jobs:
   test:
