@@ -3,11 +3,11 @@
   "version": "3.5.0",
   "description": "generalized scraping using a single config object for any site that can be scraped without a headless browser",
   "scripts": {
-    "format": "prettier --write --ignore-path=.gitignore '**/!(*.api).{json,ts,js}'",
-    "format:check": "prettier --check --ignore-path=.gitignore '**/!(*.api).{json,ts,js}'",
+    "format": "prettier --write --ignore-path=.gitignore \"**/!(*.api).{json,ts,js}\"",
+    "format:check": "prettier --check --ignore-path=.gitignore \"**/!(*.api).{json,ts,js}\"",
     "typecheck": "tsc --noEmit",
     "typecheck:watch": "tsc --noEmit --watch",
-    "lint": "eslint --ignore-path .gitignore '**/*.ts'",
+    "lint": "eslint --ignore-path .gitignore \"**/*.ts\"",
     "clean": "shx rm -rf build test/.run-output node_modules/.build-artifacts node_modules/.cache/tsbuild-info.json",
     "compile": "webpack --mode=production",
     "compile:declarations": "ttsc --declaration --emitDeclarationOnly --declarationMap --outDir node_modules/.build-artifacts/declarations",
@@ -16,11 +16,11 @@
     "build:types": "run-s clean compile:declarations compile:bundle:declarations",
     "build": "run-s clean compile compile:declarations compile:bundle:declarations copy-assets",
     "test": "run-s clean typecheck test:unit test:functional lint format:check",
-    "test:watch": "mochapack '{test,src}/**/*.test.ts' --watch --clear-terminal",
-    "test:unit": "mochapack 'src/**/*.unit.test.ts'",
-    "test:functional": "mochapack 'test/functional/**/*functional.test.ts'",
+    "test:watch": "mochapack \"{test,src}/**/*.test.ts\" --watch --clear-terminal",
+    "test:unit": "mochapack \"src/**/*.unit.test.ts\"",
+    "test:functional": "mochapack \"test/functional/**/*functional.test.ts\"",
     "test:packaged": "./test/packaged/setup.sh",
-    "test:coverage": "nyc mochapack --webpack-env=coverage '{test,src}/**/*.test.ts'"
+    "test:coverage": "nyc mochapack --webpack-env=coverage \"{test,src}/**/*.test.ts\""
   },
   "repository": {
     "type": "git",

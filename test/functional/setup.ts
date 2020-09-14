@@ -5,6 +5,8 @@ import { HttpFolderMock } from './nock-host-folder'
 import { queryExecutionDebugger } from '@test/query-debugger'
 // type imports
 import { HttpMockOptions } from './nock-host-folder'
+import { ScraperProgram } from '@scrape-pages'
+import { Options } from '@scrape-pages/types/options'
 
 const RUN_OUTPUT_FOLDER = path.resolve(__dirname, '.run-output')
 class FunctionalTestSetup {
@@ -15,6 +17,7 @@ class FunctionalTestSetup {
   public beforeEach: () => Promise<void>
   private mochaContext: Mocha.Context
   private previousTestWasStep: boolean
+  public scrapers: Array<ScraperProgram>
 
   public constructor(
     testDirectory: string,
@@ -26,6 +29,7 @@ class FunctionalTestSetup {
     this.mockFolder = `${testDirectory}/fixtures`
     this.beforeEach = FunctionalTestSetup.beforeEachInternal(this)
     this.previousTestWasStep = false
+    this.scrapers = []
   }
 
   // curried so that we can pick up the mocha context but also reference our own `this`
@@ -41,6 +45,12 @@ class FunctionalTestSetup {
   }
 
   public afterEach = () => {
+    for (const scraper of this.scrapers) {
+      if ((scraper as any).runtime.tools.store.database.open) {
+        ;(scraper as any).runtime.tools.store.database.close()
+      }
+    }
+    this.scrapers = []
     this.siteMock.done()
   }
 
@@ -53,6 +63,11 @@ class FunctionalTestSetup {
   public get queryDebugger() {
     this.mochaContext.timeout(0)
     return queryExecutionDebugger
+  }
+
+  public addScraper(instructionsArg: string, folder: string, options?: Options) {
+    const newSize = this.scrapers.push(new ScraperProgram(instructionsArg, folder, options))
+    return this.scrapers[newSize - 1]
   }
 }
 

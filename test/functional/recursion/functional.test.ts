@@ -8,9 +8,10 @@ describe(__filename, () => {
   describe('query ordering', () => {
     describe('with simple instructions', () => {
       let scraper: ScraperProgram
+
       before(async function () {
         await testEnv.beforeEach.bind(this)()
-        scraper = new ScraperProgram(instructions.simple, testEnv.outputFolder)
+        scraper = testEnv.addScraper(instructions.simple, testEnv.outputFolder)
         await scraper.start().toPromise()
       })
       after(testEnv.afterEach)
@@ -67,7 +68,7 @@ describe(__filename, () => {
       let scraper: ScraperProgram
 
       before(async function () {
-        scraper = new ScraperProgram(instructions.merging, testEnv.outputFolder)
+        scraper = testEnv.addScraper(instructions.merging, testEnv.outputFolder)
         await testEnv.beforeEach.bind(this)()
         await scraper.start().toPromise()
       })

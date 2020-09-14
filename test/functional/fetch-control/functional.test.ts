@@ -2,7 +2,6 @@ import nock from 'nock'
 import { expect } from 'chai'
 import { FunctionalTestSetup, assertQueryResultPartial } from '@test/functional/setup'
 
-import { ScraperProgram } from '@scrape-pages'
 import * as instructions from './instructions'
 
 const testEnv = new FunctionalTestSetup(__dirname)
@@ -16,7 +15,7 @@ describe(__filename, () => {
       testEnv.siteMock.persist()
 
       const options = { FETCH: { defaults: { CACHE: true } } }
-      const scraper = new ScraperProgram(instructions.simple, testEnv.outputFolder, options)
+      const scraper = testEnv.addScraper(instructions.simple, testEnv.outputFolder, options)
 
       await scraper.start().toPromise()
       expect(testEnv.siteMock.requestStats.allRoutesUsed()).to.equal(true)
@@ -45,7 +44,7 @@ describe(__filename, () => {
       assertQueryResultPartial(result2, expectedResult)
 
       // we can also specify individual fetch commads to be cached
-      const scraperCachePost = new ScraperProgram(instructions.cachePost, testEnv.outputFolder)
+      const scraperCachePost = testEnv.addScraper(instructions.cachePost, testEnv.outputFolder)
       await scraperCachePost.start().toPromise()
       expect(testEnv.siteMock.requestStats.allRoutesUsed()).to.equal(false)
       expect(testEnv.siteMock.requestStats.totalRoutesUsed()).to.equal(1)
@@ -53,7 +52,7 @@ describe(__filename, () => {
       assertQueryResultPartial(result3, expectedResult)
 
       // running without cache should make normal requests
-      const scraperNoCache = new ScraperProgram(instructions.simple, testEnv.outputFolder)
+      const scraperNoCache = testEnv.addScraper(instructions.simple, testEnv.outputFolder)
       await scraperNoCache.start().toPromise()
       expect(testEnv.siteMock.requestStats.allRoutesUsed()).to.equal(true)
       const result4 = scraperNoCache.query(['postTitle'])
@@ -69,7 +68,7 @@ describe(__filename, () => {
       (
         FETCH 'https://non-existent.com/a/b/c' LABEL='errored'
       )`
-      const scraper = new ScraperProgram(instructions, testEnv.outputFolder)
+      const scraper = testEnv.addScraper(instructions, testEnv.outputFolder)
       try {
         await scraper.start().toPromise()
         throw new Error(`scraper should have emitted 'error' not 'done'.`)
@@ -92,7 +91,7 @@ describe(__filename, () => {
       ).catch(
         REPLACE '' LABEL='caught'
       )`
-      const scraper = new ScraperProgram(instructions, testEnv.outputFolder)
+      const scraper = testEnv.addScraper(instructions, testEnv.outputFolder)
       const result = scraper.query(['errored'])
       expect(result).to.deep.equal([{ errored: [], caught: [{ value: '' }] }])
     })
@@ -106,7 +105,7 @@ describe(__filename, () => {
         FETCH 'https://fast-request' LABEL='beforeStop'
         FETCH 'https://slow-request' LABEL='afterStop'
       )`
-      const scraper = new ScraperProgram(instructions, testEnv.outputFolder)
+      const scraper = testEnv.addScraper(instructions, testEnv.outputFolder)
 
       nock('https://fast-request').get('/').reply(200)
       nock('https://slow-request')
