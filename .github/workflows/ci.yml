@@ -62,6 +62,10 @@ jobs:
 
     - run: pnpm install --frozen-lockfile --strict-peer-dependencies
     - run: pnpm run build
+    - run: pnpm run format
+    - run: pnpm run format:check
+    - run: git status
+    - run: git diff webpack.config.js
     - run: pnpm run test
 
     - run: pnpm run test:coverage
