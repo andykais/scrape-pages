@@ -22,8 +22,17 @@ jobs:
     steps:
 
 ##############################
+#         Debugging          #
+##############################
+    # - name: Dump GitHub context
+    #   env:
+    #     GITHUB_CONTEXT: ${{ toJson(github) }}
+    #   run: echo "$GITHUB_CONTEXT"
+
+##############################
 #           Test             #
 ##############################
+
     - uses: actions/checkout@v2
 
     - name: Use Node.js ${{ matrix.node-version }}
@@ -70,18 +79,49 @@ jobs:
 ##############################
 #       NPM Publish          #
 ##############################
+  publish:
+    runs-on: ubuntu-latest
+    needs: [test]
+    if: github.event.action == 'published'
+    env:
+      NODE_VERSION: 14
+    steps:
+
+    - uses: actions/checkout@v2
+      with:
+        ref: master
+
+    - name: Use Node.js ${{ env.NODE_VERSION }}
+      uses: actions/setup-node@v2-beta
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        registry-url: 'https://registry.npmjs.org'
+
+    - name: Cache PNPM store
+      uses: actions/cache@v2
+      with:
+        path: ~/.pnpm-store/v3
+        key: ${{ runner.os }}-pnpm
+
+    - name: Setup PNPM
+      uses: pnpm/action-setup@v1.2.0
+      with:
+        version: latest
+
+    - run: pnpm install --frozen-lockfile --strict-peer-dependencies
     - name: pnpm publish
-      if: github.event == 'release' && matrix.os == 'ubuntu-latest' && matrix.node-version == '12'
       env:
         NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
         GITHUB_TOKEN: ${{ secrets.github_token }}
-        TAG: ${{ github.ref }}
+        TAG: ${{ github.event.release.tag_name }}
       run: |
         pnpm version --no-git-tag-version $TAG
         pnpm run build
         cd build
-        pnpm publish
+        pnpm publish --no-git-checks
         cd ..
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Publish Action"
         git fetch origin master
         git checkout master
         git add package.json
