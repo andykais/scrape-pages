@@ -32,7 +32,9 @@ class Store extends RuntimeBase {
   }
 
   public onStart(prevState: RuntimeState, initializeTables = true) {
-    this.database = new Sqlite3(Store.getSqliteFile(this.settings.folder))
+    if (this.database === undefined) {
+      this.database = new Sqlite3(Store.getSqliteFile(this.settings.folder))
+    }
     this.database.pragma('journal_mode = WAL')
 
     if (initializeTables) {

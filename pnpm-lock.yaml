@@ -1776,6 +1776,7 @@ packages:
     resolution:
       integrity: sha512-WkrWp9GR4KXfKGYzOLmTuGVi1UWFfws377n9cc55/tb6DuqyF6pcQ5AbiHEshaDpY9v6oaSr2XCDidGmMwdzIA==
   /discontinuous-range/1.0.0:
+    dev: false
     resolution:
       integrity: sha1-44Mx8IRLukm5qctxx3FYWqsbxlo=
   /doctrine/1.5.0:
@@ -3821,6 +3822,7 @@ packages:
     resolution:
       integrity: sha512-al0MUK7cpIcglMv3YF13qSgdAIqxHTO7brRtaz3DlSULbqfazqkc5kEjNrLDOM7fsjshoFIihnU8snrP7zUvhQ==
   /moo/0.5.1:
+    dev: false
     resolution:
       integrity: sha512-I1mnb5xn4fO80BH9BLcF0yLypy2UKl+Cb01Fu0hJRkJjlCRtxZMWkTdAtDd5ZqCOxtCkhmRwyI57vWT+1iZ67w==
   /move-concurrently/1.0.1:
@@ -3904,6 +3906,7 @@ packages:
       railroad-diagrams: 1.0.0
       randexp: 0.4.6
       semver: 5.7.1
+    dev: false
     hasBin: true
     resolution:
       integrity: sha512-qoh1ZXXl0Kpn40tFhmgvffUAlbpRMcjLUagNVnT1JmliUIsB4tFabmCNhD97+tkf9FZ/SLhhYzNow0V3GitzDg==
@@ -4603,12 +4606,14 @@ packages:
     resolution:
       integrity: sha1-sgmEkgO7Jd+CDadW50cAWHhSFiA=
   /railroad-diagrams/1.0.0:
+    dev: false
     resolution:
       integrity: sha1-635iZ1SN3t+4mcG5Dlc3RVnN234=
   /randexp/0.4.6:
     dependencies:
       discontinuous-range: 1.0.0
       ret: 0.1.15
+    dev: false
     engines:
       node: '>=0.12'
     resolution:
@@ -5719,6 +5724,7 @@ packages:
     resolution:
       integrity: sha512-/P5lkRXkWHNAbcJIiHPfRoKqyd7bsyCma1hZNUGfn20qm64T6ZBlrzprymeu918H+mB/0rIg2gGK/BXkhhYgBw==
   /typescript/3.9.7:
+    dev: true
     engines:
       node: '>=4.2.0'
     hasBin: true

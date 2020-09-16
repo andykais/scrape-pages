@@ -57,7 +57,10 @@ class HttpFolderMock {
     const files = await fs.findFiles(this.mockEndpointsFolder)
 
     this.interceptors = files.map((file) => {
-      const relativePath = path.relative(this.mockEndpointsFolder, file)
+      const relativePath = path
+        .relative(this.mockEndpointsFolder, file)
+        .split(path.sep)
+        .join(path.posix.sep)
       const fullPath = path.resolve(this.mockEndpointsFolder, file)
       const route = `/${relativePath}`
       this.requestStats.addRoute(route)

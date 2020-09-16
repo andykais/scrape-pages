@@ -12,7 +12,7 @@ describe(__filename, () => {
       let scraper: ScraperProgram
 
       before(async function () {
-        scraper = new ScraperProgram(instructions.simple, testEnv.outputFolder)
+        scraper = testEnv.attachScraper(instructions.simple, testEnv.outputFolder)
         await testEnv.beforeEach.bind(this)()
         await scraper.start().toPromise()
       })
@@ -46,7 +46,7 @@ describe(__filename, () => {
       let scraper: ScraperProgram
 
       before(async function () {
-        scraper = new ScraperProgram(instructions.merging, testEnv.outputFolder)
+        scraper = testEnv.attachScraper(instructions.merging, testEnv.outputFolder)
         await testEnv.beforeEach.bind(this)()
         await scraper.start().toPromise()
       })
@@ -103,7 +103,7 @@ describe(__filename, () => {
       let scraper: ScraperProgram
 
       before(async function () {
-        scraper = new ScraperProgram(instructions.reuseLabels, testEnv.outputFolder)
+        scraper = testEnv.attachScraper(instructions.reuseLabels, testEnv.outputFolder)
         await testEnv.beforeEach.bind(this)()
         await scraper.start().toPromise()
       })
@@ -160,7 +160,7 @@ describe(__filename, () => {
       let scraper: ScraperProgram
 
       before(async function () {
-        scraper = new ScraperProgram(instructions.withEmptyValue, testEnv.outputFolder)
+        scraper = testEnv.attachScraper(instructions.withEmptyValue, testEnv.outputFolder)
         await testEnv.beforeEach.bind(this)()
         await scraper.start().toPromise()
       })
