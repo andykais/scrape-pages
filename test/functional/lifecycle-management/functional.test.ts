@@ -10,7 +10,7 @@ describe(__filename, () => {
   afterEach(testEnv.afterEach)
 
   it('can run an empty scraper', async () => {
-    const scraper = testEnv.addScraper('()', testEnv.outputFolder)
+    const scraper = testEnv.attachScraper('()', testEnv.outputFolder)
     scraper.start()
     await scraper.toPromise()
   })
@@ -18,7 +18,7 @@ describe(__filename, () => {
   it('can run a scraper twice', async () => {
     testEnv.siteMock.persist()
 
-    const scraper = testEnv.addScraper(instructions.simple, testEnv.outputFolder)
+    const scraper = testEnv.attachScraper(instructions.simple, testEnv.outputFolder)
     await scraper.start().toPromise()
 
     const result1 = scraper.query(['postTitle'])
@@ -42,7 +42,7 @@ describe(__filename, () => {
   it('can start a scraper after it has been stopped', async () => {
     testEnv.siteMock.persist()
 
-    const scraper = testEnv.addScraper(instructions.simple, testEnv.outputFolder)
+    const scraper = testEnv.attachScraper(instructions.simple, testEnv.outputFolder)
     scraper.start()
     scraper.stop()
     await scraper.toPromise()
@@ -67,7 +67,7 @@ describe(__filename, () => {
   })
 
   it('should restrict inapproriate times to call stop() and start()', async () => {
-    const scraper = testEnv.addScraper(instructions.simple, testEnv.outputFolder)
+    const scraper = testEnv.attachScraper(instructions.simple, testEnv.outputFolder)
     // cannot stop a scaper before it has started
     expect(scraper.stop).to.throw()
 
@@ -86,7 +86,7 @@ describe(__filename, () => {
   })
 
   it('should stop values coming to a command after stopCommand is called', async () => {
-    const scraper = testEnv.addScraper(instructions.merging, testEnv.outputFolder)
+    const scraper = testEnv.attachScraper(instructions.merging, testEnv.outputFolder)
     scraper.on('FETCH:queued', ({ LABEL }) => {
       if (LABEL === 'index') scraper.stopCommand('postTitle')
     })
@@ -111,8 +111,8 @@ describe(__filename, () => {
   it('can handle two scrapers pointed at the same folder _if_ they are not running simultaneously', async () => {
     testEnv.siteMock.persist()
 
-    const scraper1 = testEnv.addScraper(instructions.simple, testEnv.outputFolder)
-    const scraper2 = testEnv.addScraper(instructions.simple, testEnv.outputFolder)
+    const scraper1 = testEnv.attachScraper(instructions.simple, testEnv.outputFolder)
+    const scraper2 = testEnv.attachScraper(instructions.simple, testEnv.outputFolder)
 
     scraper1.start()
 

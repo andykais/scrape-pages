@@ -11,7 +11,7 @@ describe(__filename, () => {
 
       before(async function () {
         await testEnv.beforeEach.bind(this)()
-        scraper = testEnv.addScraper(instructions.simple, testEnv.outputFolder)
+        scraper = testEnv.attachScraper(instructions.simple, testEnv.outputFolder)
         await scraper.start().toPromise()
       })
       after(testEnv.afterEach)
@@ -68,7 +68,7 @@ describe(__filename, () => {
       let scraper: ScraperProgram
 
       before(async function () {
-        scraper = testEnv.addScraper(instructions.merging, testEnv.outputFolder)
+        scraper = testEnv.attachScraper(instructions.merging, testEnv.outputFolder)
         await testEnv.beforeEach.bind(this)()
         await scraper.start().toPromise()
       })

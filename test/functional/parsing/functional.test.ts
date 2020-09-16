@@ -11,7 +11,7 @@ describe(__filename, () => {
   describe('json', () => {
     describe('with simple instructions', () => {
       it(`should handle FORMAT='json'`, async () => {
-        const scraper = testEnv.addScraper(instructions.simple, testEnv.outputFolder)
+        const scraper = testEnv.attachScraper(instructions.simple, testEnv.outputFolder)
         await scraper.start().toPromise()
 
         const result = scraper.query(['post'])
@@ -25,7 +25,7 @@ describe(__filename, () => {
 
     describe('with twice parsed json', () => {
       it('should handle json being passed from a parse', async () => {
-        const scraper = testEnv.addScraper(instructions.parseJsonTwice, testEnv.outputFolder)
+        const scraper = testEnv.attachScraper(instructions.parseJsonTwice, testEnv.outputFolder)
         await scraper.start().toPromise()
 
         const result = scraper.query(['post'])
@@ -39,7 +39,7 @@ describe(__filename, () => {
 
     describe('with json inside another document', () => {
       it('should parse any valid json from a string', async () => {
-        const scraper = testEnv.addScraper(instructions.jsonInsideScript, testEnv.outputFolder)
+        const scraper = testEnv.attachScraper(instructions.jsonInsideScript, testEnv.outputFolder)
         await scraper.start().toPromise()
 
         const result = scraper.query(['words'])

@@ -46,9 +46,7 @@ class FunctionalTestSetup {
 
   public afterEach = () => {
     for (const scraper of this.scrapers) {
-      if ((scraper as any).runtime.tools.store.database.open) {
-        ;(scraper as any).runtime.tools.store.database.close()
-      }
+      ;(scraper as any).runtime.tools.store.database.close()
     }
     this.scrapers = []
     this.siteMock.done()
@@ -65,9 +63,10 @@ class FunctionalTestSetup {
     return queryExecutionDebugger
   }
 
-  public addScraper(instructionsArg: string, folder: string, options?: Options) {
-    const newSize = this.scrapers.push(new ScraperProgram(instructionsArg, folder, options))
-    return this.scrapers[newSize - 1]
+  public attachScraper(instructionsArg: string, folder: string, options?: Options) {
+    const scraper = new ScraperProgram(instructionsArg, folder, options)
+    this.scrapers.push(scraper)
+    return scraper
   }
 }
 
