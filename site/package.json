@@ -36,7 +36,7 @@
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.2.0",
     "copy-webpack-plugin": "^5.1.1",
-    "d3": "^5.5.0",
+    "d3": "^7.6.1",
     "lzutf8": "^0.5.5",
     "scrape-pages": "^3.0.4"
   }
